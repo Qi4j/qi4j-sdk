@@ -206,7 +206,9 @@ allprojects {
       beforeDeployment { MavenDeployment deployment -> signPom(deployment) }
       name = 'sshDeployer' // optional
       configuration = configurations.deployerJars
-      repository(url: "scp://repository.ops4j.org/home/www/repository.ops4j.org/maven2/")
+      repository(url:"http://nexus.process.tree/content/repositories/snapshots/") {
+        authentication(userName: nexusUser, password: nexusPassword)
+      }
     }
   }
 
