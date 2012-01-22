@@ -19,12 +19,16 @@ package org.qi4j.library.spring.bootstrap.internal.service;
 import org.qi4j.api.object.ObjectDescriptor;
 import org.qi4j.api.service.ImportedServiceDescriptor;
 import org.qi4j.api.service.ServiceDescriptor;
-import org.qi4j.api.service.ServiceFinder;
 import org.qi4j.api.service.ServiceReference;
-import org.qi4j.api.structure.*;
+import org.qi4j.api.structure.Application;
+import org.qi4j.api.structure.ApplicationDescriptor;
+import org.qi4j.api.structure.LayerDescriptor;
+import org.qi4j.api.structure.Module;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.functional.HierarchicalVisitor;
 
-final class ServiceLocator extends HierarchicalVisitor<Object, Object, RuntimeException>
+final class ServiceLocator
+    implements HierarchicalVisitor<Object, Object, RuntimeException>
 {
     private final String serviceId;
     private Class serviceType;
@@ -40,20 +44,24 @@ final class ServiceLocator extends HierarchicalVisitor<Object, Object, RuntimeEx
     }
 
     @Override
-    public boolean visitEnter( Object visited ) throws RuntimeException
+    public boolean visitEnter( Object visited )
+        throws RuntimeException
     {
-        if (visited instanceof ApplicationDescriptor)
+        if( visited instanceof ApplicationDescriptor )
         {
             return true;
-        }else if (visited instanceof LayerDescriptor)
+        }
+        else if( visited instanceof LayerDescriptor )
         {
-            tempLayerName = ((LayerDescriptor)visited).name();
+            tempLayerName = ( (LayerDescriptor) visited ).name();
             return true;
-        } else if (visited instanceof ModuleDescriptor)
+        }
+        else if( visited instanceof ModuleDescriptor )
         {
-            tempModuleName = ((ModuleDescriptor)visited).name();
+            tempModuleName = ( (ModuleDescriptor) visited ).name();
             return true;
-        } else if (visited instanceof ServiceDescriptor)
+        }
+        else if( visited instanceof ServiceDescriptor )
         {
             ServiceDescriptor aDescriptor = (ServiceDescriptor) visited;
             String identity = aDescriptor.identity();
@@ -63,7 +71,8 @@ final class ServiceLocator extends HierarchicalVisitor<Object, Object, RuntimeEx
                 moduleName = tempModuleName;
                 serviceType = aDescriptor.type();
             }
-        } else if (visited instanceof ObjectDescriptor )
+        }
+        else if( visited instanceof ObjectDescriptor )
         {
             return false;
         }
@@ -72,15 +81,17 @@ final class ServiceLocator extends HierarchicalVisitor<Object, Object, RuntimeEx
     }
 
     @Override
-    public boolean visitLeave( Object visited ) throws RuntimeException
+    public boolean visitLeave( Object visited )
+        throws RuntimeException
     {
         return true;
     }
 
     @Override
-    public boolean visit( Object visited ) throws RuntimeException
+    public boolean visit( Object visited )
+        throws RuntimeException
     {
-        if (visited instanceof ImportedServiceDescriptor)
+        if( visited instanceof ImportedServiceDescriptor )
         {
             ImportedServiceDescriptor aDescriptor = (ImportedServiceDescriptor) visited;
             String identity = aDescriptor.identity();
@@ -95,7 +106,8 @@ final class ServiceLocator extends HierarchicalVisitor<Object, Object, RuntimeEx
         return true;
     }
 
-    @SuppressWarnings( "unchecked" ) ServiceReference locateService( Application anApplication )
+    @SuppressWarnings( "unchecked" )
+    ServiceReference locateService( Application anApplication )
     {
         if( layerName != null )
         {
