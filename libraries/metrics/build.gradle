@@ -25,6 +25,7 @@ dependencies {
   compile(libraries.slf4j_api)
   testCompile(libraries.junit)
   testCompile(project(":org.qi4j.core:org.qi4j.core.testsupport"))
+  testCompile(project(":org.qi4j.extensions:org.qi4j.extension.metrics-yammer"))
   testRuntime(project(":org.qi4j.core:org.qi4j.core.runtime"))
   testCompile(project(":org.qi4j.extensions:org.qi4j.extension.metrics-yammer"))
   testRuntime(libraries.asm)
