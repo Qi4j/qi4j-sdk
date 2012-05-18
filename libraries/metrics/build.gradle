@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-description = "Qi4j Locking Library provides lock management for methods."
+description = "Qi4j Metrics Library provides metrics for methods."
 
-jar { manifest { name = "Qi4j Library - Locking" }}
+jar { manifest { name = "Qi4j Library - Metrics" }}
 
 dependencies {
   compile(project(":org.qi4j.core:org.qi4j.core.api"))
   compile(project(":org.qi4j.core:org.qi4j.core.bootstrap"))
+
   compile(libraries.slf4j_api)
   testCompile(libraries.junit)
   testCompile(project(":org.qi4j.core:org.qi4j.core.testsupport"))
   testCompile(project(":org.qi4j.extensions:org.qi4j.extension.metrics-yammer"))
   testRuntime(project(":org.qi4j.core:org.qi4j.core.runtime"))
+  testCompile(project(":org.qi4j.extensions:org.qi4j.extension.metrics-yammer"))
   testRuntime(libraries.asm)
   testRuntime(libraries.asm_commons)
   testRuntime(libraries.slf4j_simple)
