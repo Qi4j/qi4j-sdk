@@ -14,20 +14,9 @@
 
 package org.qi4j.runtime.composite;
 
-import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.injection.InjectionScope;
-import org.qi4j.api.injection.scope.Uses;
-import org.qi4j.api.util.Annotations;
-import org.qi4j.api.util.Classes;
-import org.qi4j.bootstrap.BindingException;
-import org.qi4j.functional.*;
-import org.qi4j.runtime.injection.*;
-import org.qi4j.runtime.model.Binder;
-import org.qi4j.runtime.model.Resolution;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -35,8 +24,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import org.qi4j.api.common.ConstructionException;
+import org.qi4j.api.composite.CompositeDescriptor;
+import org.qi4j.api.composite.InvalidCompositeException;
+import org.qi4j.api.injection.InjectionScope;
+import org.qi4j.api.injection.scope.Uses;
+import org.qi4j.api.util.Annotations;
+import org.qi4j.api.util.Classes;
+import org.qi4j.bootstrap.BindingException;
+import org.qi4j.functional.Function;
+import org.qi4j.functional.HierarchicalVisitor;
+import org.qi4j.functional.HierarchicalVisitorAdapter;
+import org.qi4j.functional.Iterables;
+import org.qi4j.functional.Specifications;
+import org.qi4j.functional.VisitableHierarchy;
+import org.qi4j.runtime.injection.Dependencies;
+import org.qi4j.runtime.injection.DependencyModel;
+import org.qi4j.runtime.injection.InjectedParametersModel;
+import org.qi4j.runtime.injection.InjectionContext;
+import org.qi4j.runtime.injection.ParameterizedTypeInstance;
+import org.qi4j.runtime.model.Binder;
+import org.qi4j.runtime.model.Resolution;
 
-import static org.qi4j.functional.Iterables.*;
+import static org.qi4j.functional.Iterables.filter;
+import static org.qi4j.functional.Iterables.first;
+import static org.qi4j.functional.Iterables.iterable;
 
 /**
  * JAVADOC
@@ -51,15 +63,17 @@ public final class ConstructorsModel
     public ConstructorsModel( Class fragmentClass )
     {
         this.fragmentClass = fragmentClass;
-
+        validate( fragmentClass );
         constructorModels = new ArrayList<ConstructorModel>();
         Constructor[] realConstructors = this.fragmentClass.getDeclaredConstructors();
         Class injectionClass = FragmentClassLoader.getSourceClass( fragmentClass );
         for( Constructor constructor : realConstructors )
         {
+            constructor.setAccessible( true );
             try
             {
                 Constructor injectionConstructor = injectionClass.getDeclaredConstructor( constructor.getParameterTypes() );
+                injectionConstructor.setAccessible( true );
                 ConstructorModel constructorModel = newConstructorModel( this.fragmentClass, constructor,
                                                                          injectionConstructor );
                 if( constructorModel != null )
@@ -75,6 +89,21 @@ public final class ConstructorsModel
         }
     }
 
+    private void validate( Class fragmentClass )
+    {
+        // Ensure that the fragment class is not an inner class, in which case we should give a reasonable exception
+        if( fragmentClass.getDeclaringClass() == null )
+        {
+            return;
+        }
+        if( Modifier.isStatic( fragmentClass.getModifiers() ) )
+        {
+            return;
+        }
+        throw new InvalidCompositeException( "Inner classes can not be used. Use static nested classes instead: " + fragmentClass );
+    }
+
+    @Override
     public Iterable<DependencyModel> dependencies()
     {
         Function<ConstructorModel, Iterable<DependencyModel>> constructorDependencies = new Function<ConstructorModel, Iterable<DependencyModel>>()
@@ -86,7 +115,7 @@ public final class ConstructorsModel
             }
         };
 
-        return Iterables.flattenIterables( Iterables.map( constructorDependencies, boundConstructors == null ? constructorModels : boundConstructors ));
+        return Iterables.flattenIterables( Iterables.map( constructorDependencies, boundConstructors == null ? constructorModels : boundConstructors ) );
     }
 
     private ConstructorModel newConstructorModel( Class fragmentClass,
@@ -100,10 +129,11 @@ public final class ConstructorsModel
         for( Type type : injectedConstructor.getGenericParameterTypes() )
         {
             Annotation injectionAnnotation = first(
-                filter( Specifications.translate( Annotations.type(), Annotations.hasAnnotation( InjectionScope.class ) ), iterable( parameterAnnotations[idx] ) ) );
+                filter( Specifications.translate( Annotations.type(), Annotations.hasAnnotation( InjectionScope.class ) ), iterable( parameterAnnotations[ idx ] ) ) );
+
             if( injectionAnnotation == null )
             {
-                if (fragmentClass.getSuperclass().isMemberClass())
+                if( fragmentClass.getSuperclass().isMemberClass() )
                 {
                     injectionAnnotation = new Uses()
                     {
@@ -113,24 +143,28 @@ public final class ConstructorsModel
                             return Uses.class;
                         }
                     };
-                } else
+                }
+                else
+                {
                     return null; // invalid constructor parameter
+                }
             }
 
             boolean optional = DependencyModel.isOptional( injectionAnnotation, parameterAnnotations[ idx ] );
 
             Type genericType = type;
-            if (genericType instanceof ParameterizedType )
+            if( genericType instanceof ParameterizedType )
             {
-                genericType = new ParameterizedTypeInstance(((ParameterizedType) genericType).getActualTypeArguments(), ((ParameterizedType) genericType).getRawType(), ((ParameterizedType) genericType).getOwnerType());
+                genericType = new ParameterizedTypeInstance( ( (ParameterizedType) genericType ).getActualTypeArguments(), ( (ParameterizedType) genericType )
+                    .getRawType(), ( (ParameterizedType) genericType ).getOwnerType() );
 
-                for( int i = 0; i < ((ParameterizedType) genericType).getActualTypeArguments().length; i++ )
+                for( int i = 0; i < ( (ParameterizedType) genericType ).getActualTypeArguments().length; i++ )
                 {
-                    Type typeArg = ((ParameterizedType) genericType).getActualTypeArguments()[i];
-                    if (typeArg instanceof TypeVariable )
+                    Type typeArg = ( (ParameterizedType) genericType ).getActualTypeArguments()[ i ];
+                    if( typeArg instanceof TypeVariable )
                     {
                         typeArg = Classes.resolveTypeVariable( (TypeVariable) typeArg, realConstructor.getDeclaringClass(), fragmentClass );
-                        ((ParameterizedType) genericType).getActualTypeArguments()[i] = typeArg;
+                        ( (ParameterizedType) genericType ).getActualTypeArguments()[ i ] = typeArg;
                     }
                 }
             }
@@ -144,24 +178,29 @@ public final class ConstructorsModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+        throws ThrowableType
     {
-        if (visitor.visitEnter( this ))
+        if( visitor.visitEnter( this ) )
         {
             if( boundConstructors != null )
             {
                 for( ConstructorModel constructorModel : boundConstructors )
                 {
-                    if (!constructorModel.accept( visitor ))
+                    if( !constructorModel.accept( visitor ) )
+                    {
                         break;
+                    }
                 }
             }
             else
             {
                 for( ConstructorModel constructorModel : constructorModels )
                 {
-                    if (!constructorModel.accept( visitor ))
+                    if( !constructorModel.accept( visitor ) )
+                    {
                         break;
+                    }
                 }
             }
         }
@@ -169,6 +208,7 @@ public final class ConstructorsModel
     }
 
     // Binding
+    @Override
     public void bind( final Resolution resolution )
         throws BindingException
     {
@@ -180,10 +220,13 @@ public final class ConstructorsModel
                 constructorModel.accept( new HierarchicalVisitorAdapter<Object, Object, BindingException>()
                 {
                     @Override
-                    public boolean visit( Object visitor ) throws BindingException
+                    public boolean visit( Object visitor )
+                        throws BindingException
                     {
                         if( visitor instanceof Binder )
-                            ((Binder)visitor).bind( resolution );
+                        {
+                            ( (Binder) visitor ).bind( resolution );
+                        }
                         return true;
                     }
                 } );
@@ -196,7 +239,7 @@ public final class ConstructorsModel
             }
         }
 
-        if( boundConstructors.size() == 0 )
+        if( boundConstructors.isEmpty() )
         {
             StringBuilder messageBuilder = new StringBuilder( "Found no constructor that could be bound: " );
             if( resolution.model() instanceof CompositeDescriptor )
@@ -214,9 +257,8 @@ public final class ConstructorsModel
             {
                 // This could be ok if instance is created manually
                 return;
-//                messageBuilder.append( "\nNon-static inner classes can not be used." );
+//                messageBuilder.append( "\nInner classes can not be used." );
             }
-
             String message = messageBuilder.toString();
             throw new BindingException( message );
         }
@@ -224,6 +266,7 @@ public final class ConstructorsModel
         // Sort based on parameter count
         Collections.sort( boundConstructors, new Comparator<ConstructorModel>()
         {
+            @Override
             public int compare( ConstructorModel o1, ConstructorModel o2 )
             {
                 Integer model2ParametersCount = o2.constructor().getParameterTypes().length;

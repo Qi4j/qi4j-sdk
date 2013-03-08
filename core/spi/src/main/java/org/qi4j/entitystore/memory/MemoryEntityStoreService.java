@@ -17,17 +17,23 @@ package org.qi4j.entitystore.memory;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceComposite;
-import org.qi4j.spi.entitystore.*;
+import org.qi4j.spi.entitystore.BackupRestore;
+import org.qi4j.spi.entitystore.ConcurrentModificationCheckConcern;
+import org.qi4j.spi.entitystore.EntityStateVersions;
+import org.qi4j.spi.entitystore.EntityStore;
+import org.qi4j.spi.entitystore.StateChangeNotificationConcern;
+import org.qi4j.spi.entitystore.helpers.JSONMapEntityStoreActivation;
 import org.qi4j.spi.entitystore.helpers.JSONMapEntityStoreMixin;
 import org.qi4j.spi.entitystore.helpers.StateStore;
 
 /**
- * In-memory EntityStore service. Useful for testing
- * and non-persistent entities.
+ * In-memory EntityStore service.
+ * <p>Useful for testing and non-persistent entities.</p>
+ * <p>Based on {@link JSONMapEntityStoreMixin}</p>
  */
 @Concerns( { StateChangeNotificationConcern.class, ConcurrentModificationCheckConcern.class } )
 @Mixins( { JSONMapEntityStoreMixin.class, MemoryMapEntityStoreMixin.class } )
 public interface MemoryEntityStoreService
-    extends EntityStore, EntityStateVersions, BackupRestore, StateStore, ServiceComposite
+    extends EntityStore, EntityStateVersions, BackupRestore, StateStore, ServiceComposite, JSONMapEntityStoreActivation
 {
 }

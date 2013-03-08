@@ -38,25 +38,24 @@ public final class TransientBuilderInstance<T>
 
     private TransientStateInstance state;
 
-    public TransientBuilderInstance( ModelModule<TransientModel> model, TransientStateInstance state, UsesInstance uses )
+    public TransientBuilderInstance( ModelModule<TransientModel> model,
+                                     TransientStateInstance state,
+                                     UsesInstance uses
+    )
     {
         this.model = model;
         this.state = state;
         this.uses = uses;
     }
 
-    public Class<T> compositeType()
-    {
-        return (Class<T>) model.model().type();
-    }
-
+    @Override
     public TransientBuilder<T> use( Object... usedObjects )
     {
         uses = uses.use( usedObjects );
-
         return this;
     }
 
+    @Override
     public T prototype()
     {
         // Instantiate given value type
@@ -68,6 +67,7 @@ public final class TransientBuilderInstance<T>
         return prototypeInstance.<T>proxy();
     }
 
+    @Override
     public <K> K prototypeFor( Class<K> mixinType )
     {
         // Instantiate given value type
@@ -79,13 +79,14 @@ public final class TransientBuilderInstance<T>
         return prototypeInstance.newProxy( mixinType );
     }
 
+    @Override
     public T newInstance()
         throws ConstructionException
     {
         // Set correct info's (immutable) on the state
         for( PropertyDescriptor propertyDescriptor : model.model().state().properties() )
         {
-            ((PropertyInstance<Object>)state.propertyFor( propertyDescriptor.accessor() )).setPropertyInfo( (PropertyInfo) propertyDescriptor );
+            ( (PropertyInstance<Object>) state.propertyFor( propertyDescriptor.accessor() ) ).setPropertyInfo( (PropertyInfo) propertyDescriptor );
         }
 
         model.model().checkConstraints( state );

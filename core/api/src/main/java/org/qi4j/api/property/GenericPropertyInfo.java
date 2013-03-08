@@ -13,23 +13,27 @@
  * implied.
  *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package org.qi4j.api.property;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import org.qi4j.api.util.Classes;
 
+import static org.qi4j.api.util.Classes.typeOf;
+
+/**
+ * Generic Property info utility class.
+ */
 public final class GenericPropertyInfo
 {
-    public static Type getPropertyType( AccessibleObject accessor )
+    public static Type propertyTypeOf( AccessibleObject accessor )
     {
-        return getPropertyType( Classes.TYPE_OF.map( accessor ) );
+        return toPropertyType( typeOf( accessor ) );
     }
 
-    public static Type getPropertyType( Type methodReturnType )
+    public static Type toPropertyType( Type methodReturnType )
     {
         if( methodReturnType instanceof ParameterizedType )
         {
@@ -45,7 +49,7 @@ public final class GenericPropertyInfo
             Type[] interfaces = ( (Class<?>) methodReturnType ).getGenericInterfaces();
             for( Type anInterface : interfaces )
             {
-                Type propertyType = getPropertyType( anInterface );
+                Type propertyType = toPropertyType( anInterface );
                 if( propertyType != null )
                 {
                     return propertyType;

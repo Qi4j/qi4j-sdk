@@ -19,7 +19,7 @@ import org.qi4j.api.injection.scope.Service;
 import org.qi4j.spi.entity.EntityState;
 
 /**
- * JAVADOC
+ * State change notification Concern.
  */
 public abstract class StateChangeNotificationConcern
     extends ConcernOf<EntityStoreSPI>
@@ -28,6 +28,7 @@ public abstract class StateChangeNotificationConcern
     @Service
     Iterable<StateChangeListener> listeners;
 
+    @Override
     public StateCommitter applyChanges( final EntityStoreUnitOfWork unitofwork,
                                         final Iterable<EntityState> state
     )
@@ -35,6 +36,7 @@ public abstract class StateChangeNotificationConcern
         final StateCommitter committer = next.applyChanges( unitofwork, state );
         return new StateCommitter()
         {
+            @Override
             public void commit()
             {
                 for( StateChangeListener listener : listeners )
@@ -44,6 +46,7 @@ public abstract class StateChangeNotificationConcern
                 committer.commit();
             }
 
+            @Override
             public void cancel()
             {
                 committer.cancel();

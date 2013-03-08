@@ -18,13 +18,15 @@
 
 package org.qi4j.api.util;
 
-import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+/**
+ * Useful methods for handling Dates.
+ */
 public final class Dates
 {
     // Formatters are not thread-safe. Create one per thread
@@ -48,6 +50,10 @@ public final class Dates
         }
     };
 
+    /**
+     * @param stringDate a string representing a date as either ISO8601, @millis@ or /Date() formats
+     * @return a Date
+     */
     public static Date fromString( String stringDate )
     {
         try
@@ -82,6 +88,10 @@ public final class Dates
         }
     }
 
+    /**
+     * @param date a Date
+     * @return String representation in ISO8601 UTC
+     */
     public static String toUtcString( Date date )
     {
         return ISO8601_UTC.get().format( date );

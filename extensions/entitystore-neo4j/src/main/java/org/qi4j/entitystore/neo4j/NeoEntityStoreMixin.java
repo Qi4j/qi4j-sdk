@@ -1,5 +1,8 @@
 package org.qi4j.entitystore.neo4j;
 
+import java.io.File;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship;
@@ -12,9 +15,11 @@ import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.This;
-import org.qi4j.api.service.Activatable;
+import org.qi4j.api.service.ServiceActivation;
+import org.qi4j.api.service.qualifier.Tagged;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.usecase.Usecase;
+import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.io.Input;
 import org.qi4j.io.Output;
 import org.qi4j.io.Receiver;
@@ -24,16 +29,15 @@ import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entitystore.*;
 
-import java.io.File;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class NeoEntityStoreMixin
-        implements Activatable, EntityStore, EntityStoreSPI
+        implements ServiceActivation, EntityStore, EntityStoreSPI
 {
    @Optional
    @Service
    FileConfiguration fileConfiguration;
+   @Service
+   @Tagged( ValueSerialization.Formats.JSON )
+   private ValueSerialization valueSerialization;
 
    @This
    private Configuration<NeoConfiguration> config;
@@ -44,14 +48,15 @@ public class NeoEntityStoreMixin
    private AtomicInteger count = new AtomicInteger(0);
    private String uuid;
 
-   public void activate()
+   @Override
+   public void activateService()
            throws Exception
    {
-      String path = config.configuration().path().get();
+      String path = config.get().path().get();
       if (path == null)
       {
          if (fileConfiguration != null)
-            path = new File(fileConfiguration.dataDirectory(), config.configuration().identity().get()).getAbsolutePath();
+            path = new File(fileConfiguration.dataDirectory(), config.get().identity().get()).getAbsolutePath();
          else
             path = "build/neodb";
       }
@@ -60,18 +65,21 @@ public class NeoEntityStoreMixin
       uuid = UUID.randomUUID().toString() + "-";
    }
 
-   public void passivate()
+   @Override
+   public void passivateService()
            throws Exception
    {
       indexService.shutdown();
       neo.shutdown();
    }
 
+    @Override
    public EntityStoreUnitOfWork newUnitOfWork( Usecase usecase, Module module, long currentTime )
    {
-      return new NeoEntityStoreUnitOfWork(neo, indexService, newUnitOfWorkId(), module, currentTime);
+      return new NeoEntityStoreUnitOfWork(neo, indexService, valueSerialization, newUnitOfWorkId(), module, currentTime);
    }
 
+    @Override
    public Input<EntityState, EntityStoreException> entityStates(final Module module)
    {
       return new Input<EntityState, EntityStoreException>()
@@ -84,7 +92,7 @@ public class NeoEntityStoreMixin
                @Override
                public <ReceiverThrowableType extends Throwable> void sendTo(Receiver<? super EntityState, ReceiverThrowableType> receiver) throws ReceiverThrowableType, EntityStoreException
                {
-                  NeoEntityStoreUnitOfWork uow = new NeoEntityStoreUnitOfWork(neo, indexService, newUnitOfWorkId(), module, System.currentTimeMillis());
+                  NeoEntityStoreUnitOfWork uow = new NeoEntityStoreUnitOfWork(neo, indexService, valueSerialization, newUnitOfWorkId(), module, System.currentTimeMillis());
 
                   try
                   {
@@ -97,7 +105,7 @@ public class NeoEntityStoreMixin
                         for (Relationship entityRel : entityType.getRelationships(RelTypes.IS_OF_TYPE, Direction.INCOMING))
                         {
                            Node entityNode = entityRel.getStartNode();
-                           NeoEntityState entityState = new NeoEntityState(uow, entityNode, EntityStatus.LOADED);
+                           NeoEntityState entityState = new NeoEntityState( valueSerialization, uow, entityNode, EntityStatus.LOADED);
                            receiver.receive(entityState);
                         }
                      }
@@ -111,23 +119,26 @@ public class NeoEntityStoreMixin
       };
    }
 
+    @Override
    public StateCommitter applyChanges( EntityStoreUnitOfWork unitofwork, Iterable<EntityState> state )
    {
       for (EntityState firstState : state)
       {
          if (firstState instanceof NeoEntityState)
          {
-            return ((NeoEntityState) firstState).getUnitOfWork().applyChanges();
+            return ((NeoEntityState) firstState).unitOfWork().applyChanges();
          }
       }
       return null;
    }
 
-   public EntityState getEntityState(EntityStoreUnitOfWork unitOfWork, EntityReference identity)
+    @Override
+   public EntityState entityStateOf( EntityStoreUnitOfWork unitOfWork, EntityReference identity )
    {
-      return unitOfWork.getEntityState(identity);
+      return unitOfWork.entityStateOf( identity );
    }
 
+    @Override
    public EntityState newEntityState( EntityStoreUnitOfWork uow, EntityReference ref, EntityDescriptor descriptor )
    {
       return uow.newEntityState(ref, descriptor);

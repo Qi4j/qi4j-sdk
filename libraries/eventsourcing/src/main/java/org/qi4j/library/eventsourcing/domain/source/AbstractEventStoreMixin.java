@@ -17,11 +17,17 @@
 
 package org.qi4j.library.eventsourcing.domain.source;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.qi4j.api.entity.Identity;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.This;
-import org.qi4j.api.json.JSONDeserializer;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.io.Output;
@@ -32,22 +38,13 @@ import org.qi4j.library.eventsourcing.domain.api.UnitOfWorkDomainEventsValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 import static java.util.Collections.synchronizedList;
 
 /**
  * Base implementation for EventStores.
  */
 public abstract class AbstractEventStoreMixin
-        implements EventStore, EventStream, Activatable
+        implements EventStore, EventStream, EventStoreActivation
 {
     @This
     protected Identity identity;
@@ -61,25 +58,23 @@ public abstract class AbstractEventStoreMixin
     @Structure
     protected Module module;
 
-    protected JSONDeserializer deserializer;
-
     private ExecutorService transactionNotifier;
 
     final private List<UnitOfWorkEventsListener> listeners = synchronizedList( new ArrayList<UnitOfWorkEventsListener>() );
 
-    public void activate() throws IOException
+    @Override
+    public void activateEventStore() throws Exception
     {
         logger = LoggerFactory.getLogger( identity.identity().get() );
 
         domainEventType = module.valueDescriptor( DomainEventValue.class.getName() ).valueType();
         eventsType = module.valueDescriptor( UnitOfWorkDomainEventsValue.class.getName() ).valueType();
 
-        deserializer = new JSONDeserializer( module );
-
         transactionNotifier = Executors.newSingleThreadExecutor();
     }
 
-    public void passivate() throws Exception
+    @Override
+    public void passivateEventStore() throws Exception
     {
         transactionNotifier.shutdown();
         transactionNotifier.awaitTermination( 10000, TimeUnit.MILLISECONDS );
@@ -128,6 +123,7 @@ public abstract class AbstractEventStoreMixin
                 // Notify listeners
                 transactionNotifier.submit( new Runnable()
                 {
+                    @Override
                     public void run()
                     {
                         synchronized(listeners)
@@ -150,11 +146,13 @@ public abstract class AbstractEventStoreMixin
     }
 
     // EventStream implementation
+    @Override
     public void registerListener( UnitOfWorkEventsListener subscriber )
     {
         listeners.add( subscriber );
     }
 
+    @Override
     public void unregisterListener( UnitOfWorkEventsListener subscriber )
     {
         listeners.remove( subscriber );

@@ -19,6 +19,7 @@ package org.qi4j.tutorials.cargo.step2;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
@@ -47,9 +48,11 @@ public class SequencingConcernTest
     @Test
     @Ignore( "Expectations need to be figured out." )
     public void failingBooking()
+        throws ActivationException, AssemblyException
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
+            @Override
             public void assemble( ModuleAssembly module )
                 throws AssemblyException
             {
@@ -81,10 +84,12 @@ public class SequencingConcernTest
      */
     @Test
     @Ignore( "Expectations need to be figured out." )
-    public void succesfulBooking()
+    public void successfulBooking()
+        throws ActivationException, AssemblyException
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
+            @Override
             public void assemble( ModuleAssembly module )
                 throws AssemblyException
             {

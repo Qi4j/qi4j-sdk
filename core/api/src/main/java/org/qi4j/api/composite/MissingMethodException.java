@@ -18,11 +18,19 @@
 
 package org.qi4j.api.composite;
 
+/**
+ * This exception is thrown if client code tries to invoke a non-existing Composite method.
+ */
 public class MissingMethodException
     extends RuntimeException
 {
-    public MissingMethodException( String message)
+    public MissingMethodException( String message )
     {
         super( message );
+    }
+
+    public MissingMethodException( String message, NoSuchMethodException e )
+    {
+        super(message,e);
     }
 }

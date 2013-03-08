@@ -11,19 +11,27 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.api.structure;
 
 import org.qi4j.api.Qi4j;
 import org.qi4j.functional.VisitableHierarchy;
 
 /**
- * JAVADOC
+ * Application Descriptor.
  */
 public interface ApplicationDescriptor
-        extends VisitableHierarchy<Object, Object>
+    extends VisitableHierarchy<Object, Object>
 {
+    /**
+     * Create a new instance of the Application.
+     * @param runtime Qi4j Runtime
+     * @param importedServiceInstances Imported Services instances
+     * @return a new instance of the Application.
+     */
     Application newInstance( Qi4j runtime, Object... importedServiceInstances );
 
+    /**
+     * @return the Application's name
+     */
     String name();
 }

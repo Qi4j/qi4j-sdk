@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +15,22 @@
 
 package org.qi4j.runtime.structure;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.qi4j.api.Qi4j;
+import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.common.InvalidApplicationException;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ApplicationDescriptor;
 import org.qi4j.bootstrap.Qi4jRuntime;
 import org.qi4j.functional.HierarchicalVisitor;
+import org.qi4j.runtime.activation.ActivatorsInstance;
+import org.qi4j.runtime.activation.ActivatorsModel;
 import org.qi4j.runtime.injection.InjectionProviderFactory;
 import org.qi4j.runtime.injection.provider.InjectionProviderFactoryStrategy;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * JAVADOC
@@ -39,6 +42,7 @@ public final class ApplicationModel
     private final String version;
     private Application.Mode mode;
     private MetaInfo metaInfo;
+    private final ActivatorsModel<Application> activatorsModel;
     private final List<LayerModel> layers;
     private final InjectionProviderFactory ipf;
 
@@ -46,6 +50,7 @@ public final class ApplicationModel
                              String version,
                              Application.Mode mode,
                              MetaInfo metaInfo,
+                             ActivatorsModel<Application> activatorsModel,
                              List<LayerModel> layers
     )
     {
@@ -53,10 +58,12 @@ public final class ApplicationModel
         this.version = version;
         this.mode = mode;
         this.metaInfo = metaInfo;
+        this.activatorsModel = activatorsModel;
         this.layers = layers;
         ipf = new InjectionProviderFactoryStrategy( metaInfo );
     }
 
+    @Override
     public String name()
     {
         return name;
@@ -77,21 +84,31 @@ public final class ApplicationModel
         return metaInfo;
     }
 
+    public ActivatorsInstance<Application> newActivatorsInstance()
+        throws ActivationException
+    {
+        return new ActivatorsInstance<Application>( activatorsModel.newInstances() );
+    }
+
     // SPI
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+        throws ThrowableType
     {
-        if (visitor.visitEnter( this ))
+        if( visitor.visitEnter( this ) )
         {
             for( LayerModel layer : layers )
             {
-                if (!layer.accept( visitor ))
+                if( !layer.accept( visitor ) )
+                {
                     break;
+                }
             }
         }
         return visitor.visitLeave( this );
     }
 
+    @Override
     public ApplicationInstance newInstance( Qi4j runtime, Object... importedServiceInstances )
         throws InvalidApplicationException
     {
@@ -137,5 +154,17 @@ public final class ApplicationModel
     public InjectionProviderFactory injectionProviderFactory()
     {
         return ipf;
+    }
+
+    @Override
+    public String toString()
+    {
+        final StringBuilder sb = new StringBuilder();
+        sb.append( "ApplicationModel" );
+        sb.append( "{name='" ).append( name ).append( '\'' );
+        sb.append( ", version='" ).append( version ).append( '\'' );
+        sb.append( ", mode=" ).append( mode );
+        sb.append( '}' );
+        return sb.toString();
     }
 }

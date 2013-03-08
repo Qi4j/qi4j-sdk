@@ -13,10 +13,14 @@
  * implied.
  *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package org.qi4j.logging.log.service;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.qi4j.api.Qi4j;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.entity.EntityBuilder;
@@ -33,10 +37,7 @@ import org.qi4j.logging.log.records.EntityLogRecord;
 import org.qi4j.logging.log.records.LogRecord;
 import org.qi4j.logging.log.records.ServiceLogRecord;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static org.qi4j.functional.Iterables.first;
 
 public abstract class LoggingServiceMixin
     implements LoggingService
@@ -103,6 +104,7 @@ public abstract class LoggingServiceMixin
         }
     }
 
+    @Override
     public void log( LogType type, Composite composite, String category, String message, Serializable... params )
     {
         UnitOfWork uow = uowf.newUnitOfWork();
@@ -157,9 +159,13 @@ public abstract class LoggingServiceMixin
         state.time().set( System.currentTimeMillis() );
         state.category().set( category );
         state.message().set( message );
-        state.compositeTypeName().set( Qi4j.DESCRIPTOR_FUNCTION.map( composite ).type().getName() );
+        state.compositeTypeName().set( getCompositeName( composite ) );
         state.threadName().set( Thread.currentThread().getName() );
         state.parameters().set( params );
     }
 
+    private String getCompositeName( Composite composite )
+    {
+        return first(Qi4j.FUNCTION_DESCRIPTOR_FOR.map( composite ).types()).getName();
+    }
 }

@@ -14,7 +14,12 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import org.qi4j.bootstrap.*;
+import org.qi4j.bootstrap.ApplicationAssembly;
+import org.qi4j.bootstrap.ApplicationAssemblyFactory;
+import org.qi4j.bootstrap.Assembler;
+import org.qi4j.bootstrap.AssemblyException;
+import org.qi4j.bootstrap.LayerAssembly;
+import org.qi4j.bootstrap.ModuleAssembly;
 
 /**
  * Factory for ApplicationAssembly.
@@ -22,12 +27,14 @@ import org.qi4j.bootstrap.*;
 public final class ApplicationAssemblyFactoryImpl
     implements ApplicationAssemblyFactory
 {
+    @Override
     public ApplicationAssembly newApplicationAssembly( Assembler assembler )
         throws AssemblyException
     {
         return newApplicationAssembly( new Assembler[][][]{ { { assembler } } } );
     }
 
+    @Override
     public ApplicationAssembly newApplicationAssembly( Assembler[][][] assemblers )
         throws AssemblyException
     {
@@ -58,6 +65,7 @@ public final class ApplicationAssemblyFactoryImpl
         return applicationAssembly;
     }
 
+    @Override
     public ApplicationAssembly newApplicationAssembly()
     {
         return new ApplicationAssemblyImpl();

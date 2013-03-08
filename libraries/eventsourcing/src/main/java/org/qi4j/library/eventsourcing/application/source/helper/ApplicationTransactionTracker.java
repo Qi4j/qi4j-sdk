@@ -71,7 +71,7 @@ public class ApplicationTransactionTracker<ReceiverThrowableType extends Throwab
             trackerOutput = output();
             try
             {
-                source.transactionsAfter( configuration.configuration().lastOffset().get(), Long.MAX_VALUE ).transferTo( trackerOutput );
+                source.transactionsAfter( configuration.get().lastOffset().get(), Long.MAX_VALUE ).transferTo( trackerOutput );
             } catch (Throwable receiverThrowableType)
             {
                 upToSpeed = false;
@@ -108,7 +108,7 @@ public class ApplicationTransactionTracker<ReceiverThrowableType extends Throwab
                     // Get all transactions from last timestamp, including the one in this call
                     try
                     {
-                        source.transactionsAfter( configuration.configuration().lastOffset().get(), Long.MAX_VALUE ).transferTo( trackerOutput );
+                        source.transactionsAfter( configuration.get().lastOffset().get(), Long.MAX_VALUE ).transferTo( trackerOutput );
                     } catch (Throwable e)
                     {
                         upToSpeed = false;
@@ -125,12 +125,13 @@ public class ApplicationTransactionTracker<ReceiverThrowableType extends Throwab
                        {
                             sender.sendTo( new Receiver<TransactionApplicationEvents, ReceiverThrowableType>()
                             {
+                                @Override
                                 public void receive( TransactionApplicationEvents item ) throws ReceiverThrowableType
                                 {
                                     receiver.receive( item );
 
                                     // Events in this transactionDomain were handled successfully so store new marker
-                                    configuration.configuration().lastOffset().set( item.timestamp().get() );
+                                    configuration.get().lastOffset().set( item.timestamp().get() );
                                     configuration.save();
                                 }
                             } );

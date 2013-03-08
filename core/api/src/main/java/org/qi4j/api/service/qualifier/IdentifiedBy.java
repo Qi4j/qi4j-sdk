@@ -14,19 +14,21 @@
 
 package org.qi4j.api.service.qualifier;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.functional.Specification;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
 /**
  * Filter services based on identity. Identity can be set during assembly, like so:
+ * <pre><code>
  * module.addService(MyService.class).identifiedBy("myservice1");
+ * </code></pre>
  *
  * and then at an injection point you can do this:
- *
- * @Service @IdentifiedBy("myservice1") MyService service;
+ * <pre><code>
+ * &#64;Service @IdentifiedBy("myservice1") MyService service;
+ * </code></pre>
  * to get only a service identified "myservice1".
  */
 @Retention( RetentionPolicy.RUNTIME )
@@ -35,9 +37,14 @@ public @interface IdentifiedBy
 {
     public abstract String value();
 
+    /**
+     * IdentifiedBy Annotation Qualifier.
+     * See {@see IdentifiedBy}.
+     */
     public final class IdentifiedByQualifier
         implements AnnotationQualifier<IdentifiedBy>
     {
+        @Override
         public <T> Specification<ServiceReference<?>> qualifier( IdentifiedBy identifiedBy )
         {
             return ServiceQualifier.withId( identifiedBy.value() );

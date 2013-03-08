@@ -13,10 +13,15 @@
  * implied.
  *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package org.qi4j.logging.debug.service;
 
+import java.io.PrintStream;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import org.qi4j.api.Qi4j;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.injection.scope.Invocation;
@@ -24,11 +29,7 @@ import org.qi4j.api.sideeffect.SideEffectOf;
 import org.qi4j.logging.debug.Debug;
 import org.qi4j.logging.log.service.LoggingService;
 
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.text.MessageFormat;
-import java.util.ResourceBundle;
+import static org.qi4j.functional.Iterables.first;
 
 /**
  * The DebugOnConsoleSideEffect is just a temporary solution for logging output, until a more
@@ -46,44 +47,54 @@ public class DebugOnConsoleSideEffect extends SideEffectOf<LoggingService>
         bundle = ResourceBundle.getBundle( thisMethod.getDeclaringClass().getName() );
     }
 
+    @Override
     public int debugLevel()
     {
         return Debug.OFF;
     }
 
+    @Override
     public void debug( Composite composite, String message )
     {
         String localized = bundle.getString( message );
-        OUT.println( "DEBUG:" + Qi4j.DESCRIPTOR_FUNCTION.map( composite ).type().getName() + ": " + localized );
+        OUT.println( "DEBUG:" + getCompositeName( composite ) + ": " + localized );
     }
 
+    private String getCompositeName( Composite composite )
+    {
+        return first(Qi4j.FUNCTION_DESCRIPTOR_FOR.map( composite ).types()).getName();
+    }
+
+    @Override
     public void debug( Composite composite, String message, Serializable param1 )
     {
         String localized = bundle.getString( message );
         String formatted = MessageFormat.format( localized, param1 );
-        OUT.println( "DEBUG:" + Qi4j.DESCRIPTOR_FUNCTION.map( composite ).type().getName() + ": " + formatted );
+        OUT.println( "DEBUG:" + getCompositeName( composite ) + ": " + formatted );
         if( param1 instanceof Throwable )
         {
             handleException( (Throwable) param1 );
         }
     }
 
+    @Override
     public void debug( Composite composite, String message, Serializable param1, Serializable param2 )
     {
         String localized = bundle.getString( message );
         String formatted = MessageFormat.format( localized, param1, param2 );
-        OUT.println( "DEBUG:" + Qi4j.DESCRIPTOR_FUNCTION.map( composite ).type().getName() + ": " + formatted );
+        OUT.println( "DEBUG:" + getCompositeName( composite ) + ": " + formatted );
         if( param1 instanceof Throwable )
         {
             handleException( (Throwable) param1 );
         }
     }
 
+    @Override
     public void debug( Composite composite, String message, Serializable... params )
     {
         String localized = bundle.getString( message );
         String formatted = MessageFormat.format( localized, (Serializable) params );
-        OUT.println( "DEBUG:" + Qi4j.DESCRIPTOR_FUNCTION.map( composite ).type().getName() + ": " + formatted );
+        OUT.println( "DEBUG:" + getCompositeName( composite ) + ": " + formatted );
         if( params[ 0 ] instanceof Throwable )
         {
             handleException( (Throwable) params[ 0 ] );

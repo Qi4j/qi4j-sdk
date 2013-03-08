@@ -17,7 +17,7 @@ package org.qi4j.runtime.bootstrap;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.TransientDeclaration;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 
 /**
  * Declaration of a Composite. Created by {@link org.qi4j.bootstrap.ModuleAssembly#transients(Class[])}.
@@ -27,11 +27,12 @@ public final class TransientDeclarationImpl
 {
     private Iterable<TransientAssemblyImpl> assemblies;
 
-    public TransientDeclarationImpl( Iterable<TransientAssemblyImpl> assemblies)
+    public TransientDeclarationImpl( Iterable<TransientAssemblyImpl> assemblies )
     {
         this.assemblies = assemblies;
     }
 
+    @Override
     public TransientDeclaration setMetaInfo( Object info )
     {
         for( TransientAssemblyImpl assembly : assemblies )
@@ -41,6 +42,7 @@ public final class TransientDeclarationImpl
         return this;
     }
 
+    @Override
     public TransientDeclaration visibleIn( Visibility visibility )
     {
         for( TransientAssemblyImpl assembly : assemblies )
@@ -50,38 +52,42 @@ public final class TransientDeclarationImpl
         return this;
     }
 
+    @Override
     public TransientDeclaration withConcerns( Class<?>... concerns )
     {
         for( TransientAssemblyImpl assembly : assemblies )
         {
-            assembly.concerns.addAll( Arrays.asList( concerns ) );
+            assembly.concerns.addAll( asList( concerns ) );
         }
         return this;
     }
 
+    @Override
     public TransientDeclaration withSideEffects( Class<?>... sideEffects )
     {
         for( TransientAssemblyImpl assembly : assemblies )
         {
-            assembly.sideEffects.addAll( Arrays.asList( sideEffects ) );
+            assembly.sideEffects.addAll( asList( sideEffects ) );
         }
         return this;
     }
 
+    @Override
     public TransientDeclaration withMixins( Class<?>... mixins )
     {
         for( TransientAssemblyImpl assembly : assemblies )
         {
-            assembly.mixins.addAll( Arrays.asList( mixins ) );
+            assembly.mixins.addAll( asList( mixins ) );
         }
         return this;
     }
 
+    @Override
     public TransientDeclaration withTypes( Class<?>... types )
     {
         for( TransientAssemblyImpl assembly : assemblies )
         {
-            assembly.types.addAll( Arrays.asList( types ) );
+            assembly.types.addAll( asList( types ) );
         }
         return this;
     }

@@ -20,6 +20,7 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.structure.Application;
 import org.springframework.beans.factory.FactoryBean;
 
+import static org.qi4j.functional.Iterables.first;
 import static org.springframework.util.Assert.notNull;
 
 public final class ServiceFactoryBean
@@ -43,17 +44,20 @@ public final class ServiceFactoryBean
         }
     }
 
+    @Override
     public final Object getObject()
         throws Exception
     {
         return serviceReference.get();
     }
 
+    @Override
     public final Class getObjectType()
     {
-        return serviceReference.type();
+        return first( serviceReference.types() );
     }
 
+    @Override
     public final boolean isSingleton()
     {
         return false;

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2007, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,116 +12,96 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.runtime.bootstrap;
 
-import org.qi4j.api.common.InvalidApplicationException;
-import org.qi4j.api.common.MetaInfo;
-import org.qi4j.api.common.Visibility;
-import org.qi4j.api.constraint.Constraint;
-import org.qi4j.api.property.Immutable;
-import org.qi4j.api.service.ServiceComposite;
-import org.qi4j.bootstrap.StateDeclarations;
-import org.qi4j.bootstrap.ServiceAssembly;
-import org.qi4j.functional.Iterables;
-import org.qi4j.runtime.composite.*;
-import org.qi4j.runtime.property.PropertiesModel;
-import org.qi4j.runtime.service.ServiceModel;
-
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import org.qi4j.api.activation.Activator;
+import org.qi4j.api.activation.Activators;
+import org.qi4j.api.common.InvalidApplicationException;
+import org.qi4j.api.service.ServiceComposite;
+import org.qi4j.api.util.Annotations;
+import org.qi4j.api.util.Classes;
+import org.qi4j.bootstrap.ServiceAssembly;
+import org.qi4j.bootstrap.StateDeclarations;
+import org.qi4j.functional.Function;
+import org.qi4j.functional.Iterables;
+import org.qi4j.runtime.activation.ActivatorsModel;
+import org.qi4j.runtime.service.ServiceModel;
 
 /**
  * Assembly of a Service.
  */
-public final class ServiceAssemblyImpl
-    extends CompositeAssemblyImpl
+public final class ServiceAssemblyImpl extends CompositeAssemblyImpl
     implements ServiceAssembly
 {
-    List<Class<?>> concerns = new ArrayList<Class<?>>();
-    List<Class<?>> sideEffects = new ArrayList<Class<?>>();
-    List<Class<?>> mixins = new ArrayList<Class<?>>();
-    List<Class<?>> types = new ArrayList<Class<?>>();
     String identity;
     boolean instantiateOnStartup = false;
-    MetaInfo metaInfo = new MetaInfo();
-    Visibility visibility = Visibility.module;
+    List<Class<? extends Activator<?>>> activators = new ArrayList<Class<? extends Activator<?>>>();
 
-    public ServiceAssemblyImpl( Class<?> serviceType
-    )
+    public ServiceAssemblyImpl( Class<?> serviceType )
     {
-        this.compositeType = serviceType;
+        super( serviceType );
+        // The composite must always implement ServiceComposite, as a marker interface
+        if( !ServiceComposite.class.isAssignableFrom( serviceType ) )
+        {
+            types.add( ServiceComposite.class );
+        }
     }
 
     @Override
-    public Class<?> type()
+    public String identity()
     {
-        return compositeType;
+        return identity;
     }
 
-   @Override
-   public String identity()
-   {
-      return identity;
-   }
-
-    ServiceModel newServiceModel(
-            StateDeclarations stateDeclarations,
-            AssemblyHelper helper
-    )
+    ServiceModel newServiceModel( StateDeclarations stateDeclarations, AssemblyHelper helper )
     {
-        this.stateDeclarations = stateDeclarations;
         try
         {
-            this.helper = helper;
-
-            metaInfo = new MetaInfo( metaInfo ).withAnnotations( compositeType );
-            addAnnotationsMetaInfo( compositeType, metaInfo );
-
-            immutable = metaInfo.get( Immutable.class ) != null;
-            propertiesModel = new PropertiesModel();
-            stateModel = new StateModel( propertiesModel );
-            mixinsModel = new MixinsModel();
-
-            compositeMethodsModel = new CompositeMethodsModel( mixinsModel );
-
-            // The composite must always implement ServiceComposite, as a marker interface
-            if (!ServiceComposite.class.isAssignableFrom(compositeType))
-            {
-                types.add( ServiceComposite.class );
-            }
-
-            // Implement composite methods
-            Iterable<Class<? extends Constraint<?, ?>>> constraintClasses = constraintDeclarations( compositeType );
-            Iterable<Class<?>> concernClasses = Iterables.<Class<?>, Iterable<Class<?>>>flatten( concerns, concernDeclarations( compositeType ) );
-            Iterable<Class<?>> sideEffectClasses = Iterables.<Class<?>, Iterable<Class<?>>>flatten( sideEffects, sideEffectDeclarations( compositeType ) );
-            Iterable<Class<?>> mixinClasses = Iterables.<Class<?>, Iterable<Class<?>>>flatten( mixins, mixinDeclarations( compositeType ) );
-            implementMixinType( compositeType,
-                    constraintClasses, concernClasses, sideEffectClasses, mixinClasses);
-
-            // Implement additional type methods
-            for( Class<?> type : types )
-            {
-                Iterable<Class<? extends Constraint<?, ?>>> typeConstraintClasses = Iterables.<Class<? extends Constraint<?, ?>>, Iterable<Class<? extends Constraint<?, ?>>>>flatten( constraintClasses, constraintDeclarations( type ) );
-                Iterable<Class<?>> typeConcernClasses = Iterables.<Class<?>, Iterable<Class<?>>>flatten( concernClasses, concernDeclarations( type ) );
-                Iterable<Class<?>> typeSideEffectClasses = Iterables.<Class<?>, Iterable<Class<?>>>flatten( sideEffectClasses, sideEffectDeclarations( type ) );
-                Iterable<Class<?>> typeMixinClasses = Iterables.<Class<?>, Iterable<Class<?>>>flatten( mixinClasses, mixinDeclarations( type ) );
-
-                implementMixinType( type,
-                        typeConstraintClasses, typeConcernClasses, typeSideEffectClasses, typeMixinClasses);
-            }
-
-            // Add state from methods and fields
-            addState(constraintClasses);
-
-            ServiceModel serviceModel = new ServiceModel(
-                compositeType, Iterables.prepend(compositeType, types), visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel, identity, instantiateOnStartup );
-
-            return serviceModel;
+            buildComposite( helper, stateDeclarations );
+            List<Class<? extends Activator<?>>> activatorClasses = Iterables.toList(
+                    Iterables.<Class<? extends Activator<?>>>flatten( activators, activatorsDeclarations( types ) ) );
+            return new ServiceModel( types, visibility, metaInfo,
+                                     new ActivatorsModel( activatorClasses ),
+                                     mixinsModel, stateModel, compositeMethodsModel,
+                                     identity, instantiateOnStartup );
         }
         catch( Exception e )
         {
-            throw new InvalidApplicationException( "Could not register " + compositeType.getName(), e );
+            throw new InvalidApplicationException( "Could not register " + types, e );
         }
     }
+    
+    protected Iterable<Class<? extends Activator<?>>> activatorsDeclarations( Iterable<? extends Class<?>> typess )
+    {
+        // Find activator declarations
+        ArrayList<Type> allTypes = new ArrayList<Type>();
+        for( Class<?> type : typess )
+        {
+            Iterable<Type> types = Classes.typesOf( type );
+            Iterables.addAll( allTypes, types );
+        }
+        // Find all activators and flattern them into an iterable
+        Function<Type, Iterable<Class<? extends Activator<?>>>> function = new Function<Type, Iterable<Class<? extends Activator<?>>>>()
+        {
+            @Override
+            public Iterable<Class<? extends Activator<?>>> map( Type type )
+            {
+                Activators activators = Annotations.annotationOn( type, Activators.class );
+                if( activators == null )
+                {
+                    return Iterables.empty();
+                }
+                else
+                {
+                    return Iterables.iterable( activators.value() );
+                }
+            }
+        };
+        Iterable<Class<? extends Activator<?>>> flatten = Iterables.flattenIterables( Iterables.map( function, allTypes ) );
+        return Iterables.toList( flatten );
+    }
+
 }

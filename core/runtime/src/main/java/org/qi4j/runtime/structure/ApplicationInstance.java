@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,21 +12,22 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.runtime.structure;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.qi4j.api.activation.ActivationEvent;
+import org.qi4j.api.activation.ActivationEventListener;
+import org.qi4j.api.activation.ActivationException;
+import org.qi4j.api.activation.PassivationException;
 import org.qi4j.api.common.MetaInfo;
-import org.qi4j.api.event.ActivationEvent;
-import org.qi4j.api.event.ActivationEventListener;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ApplicationDescriptor;
 import org.qi4j.api.structure.Layer;
 import org.qi4j.api.structure.Module;
 import org.qi4j.bootstrap.Qi4jRuntime;
-import org.qi4j.runtime.service.Activator;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.qi4j.runtime.activation.ActivationDelegate;
+import org.qi4j.runtime.activation.ActivationEventListenerSupport;
 
 /**
  * Instance of a Qi4j application. Contains a list of layers which are managed by this application
@@ -33,62 +35,55 @@ import java.util.List;
 public class ApplicationInstance
     implements Application
 {
-    private final org.qi4j.runtime.structure.ApplicationModel model;
+
+    // Constructor parameters
+    private final ApplicationModel applicationModel;
     private final Qi4jRuntime runtime;
-    private MetaInfo instanceMetaInfo;
-    private final List<LayerInstance> layerInstances = new ArrayList<LayerInstance>(  );
-    private final Activator layerActivator;
-    private final ActivationEventListenerSupport eventListenerSupport = new ActivationEventListenerSupport();
+    private final MetaInfo instanceMetaInfo;
+    // Eager instance objects
+    private final ActivationDelegate activation;
+    private final ActivationEventListenerSupport activationEventSupport;
+    private final List<LayerInstance> layerInstances;
 
     public ApplicationInstance( ApplicationModel model, Qi4jRuntime runtime, MetaInfo instanceMetaInfo )
     {
-        this.model = model;
+        // Constructor parameters
+        this.applicationModel = model;
         this.runtime = runtime;
         this.instanceMetaInfo = instanceMetaInfo;
-        layerActivator = new Activator();
+
+        // Eager instance objects
+        activation = new ActivationDelegate( this );
+        activationEventSupport = new ActivationEventListenerSupport();
+        layerInstances = new ArrayList<LayerInstance>();
     }
 
-    void addLayer(LayerInstance layer)
+    @Override
+    public String toString()
     {
-        layerInstances.add(layer);
-        layer.registerActivationEventListener( eventListenerSupport );
+        return name();
     }
 
-    public ApplicationDescriptor descriptor()
-    {
-        return model;
-    }
-
-    public Qi4jRuntime runtime()
-    {
-        return runtime;
-    }
-
+    // Implementation of Application
+    @Override
     public String name()
     {
-        return model.name();
+        return applicationModel.name();
     }
 
+    @Override
     public String version()
     {
-        return model.version();
+        return applicationModel.version();
     }
 
+    @Override
     public Mode mode()
     {
-        return model.mode();
+        return applicationModel.mode();
     }
 
-    public <T> T metaInfo( Class<T> infoType )
-    {
-        return instanceMetaInfo.get( infoType );
-    }
-
-    public List<LayerInstance> layers()
-    {
-        return layerInstances;
-    }
-
+    @Override
     public Layer findLayer( String layerName )
     {
         for( LayerInstance layerInstance : layerInstances )
@@ -99,9 +94,10 @@ public class ApplicationInstance
             }
         }
 
-        throw new IllegalArgumentException( "No such layer:"+layerName );
+        throw new IllegalArgumentException( "No such layer:" + layerName );
     }
 
+    @Override
     public Module findModule( String layerName, String moduleName )
     {
         for( LayerInstance layerInstance : layerInstances )
@@ -112,40 +108,63 @@ public class ApplicationInstance
             }
         }
 
-        throw new IllegalArgumentException( "No such layer:"+layerName );
+        throw new IllegalArgumentException( "No such layer:" + layerName );
+    }
+
+    @Override
+    public ApplicationDescriptor descriptor()
+    {
+        return applicationModel;
+    }
+
+    // Implementation of MetaInfoHolder
+    @Override
+    public <T> T metaInfo( Class<T> infoType )
+    {
+        return instanceMetaInfo.get( infoType );
+    }
+
+    // Implementation of Activation
+    @Override
+    public void activate()
+        throws ActivationException
+    {
+        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.ACTIVATING ) );
+        activation.activate( applicationModel.newActivatorsInstance(), layerInstances );
+        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.ACTIVATED ) );
+    }
+
+    @Override
+    public void passivate()
+        throws PassivationException
+    {
+        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.PASSIVATING ) );
+        activation.passivate();
+        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.PASSIVATED ) );
     }
 
     @Override
     public void registerActivationEventListener( ActivationEventListener listener )
     {
-        eventListenerSupport.registerActivationEventListener( listener );
+        activationEventSupport.registerActivationEventListener( listener );
     }
 
     @Override
     public void deregisterActivationEventListener( ActivationEventListener listener )
     {
-        eventListenerSupport.deregisterActivationEventListener( listener );
+        activationEventSupport.deregisterActivationEventListener( listener );
     }
 
-    public void activate()
-        throws Exception
+    // Other methods
+    /* package */ void addLayer( LayerInstance layer )
     {
-        eventListenerSupport.fireEvent( new ActivationEvent(this, ActivationEvent.EventType.ACTIVATING) );
-        layerActivator.activate( layerInstances );
-        eventListenerSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.ACTIVATED ) );
+        layer.registerActivationEventListener( activationEventSupport );
+        layerInstances.add( layer );
     }
 
-    public void passivate()
-        throws Exception
+    public Qi4jRuntime runtime()
     {
-        eventListenerSupport.fireEvent( new ActivationEvent(this, ActivationEvent.EventType.PASSIVATING) );
-        layerActivator.passivate();
-        eventListenerSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.PASSIVATED ) );
+        return runtime;
     }
 
-    @Override
-    public String toString()
-    {
-        return name();
-    }
 }

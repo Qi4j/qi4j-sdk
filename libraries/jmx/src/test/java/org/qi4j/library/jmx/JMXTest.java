@@ -11,18 +11,20 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.library.jmx;
 
 import org.junit.Test;
+import org.qi4j.api.activation.ActivationException;
+import org.qi4j.api.activation.ActivatorAdapter;
+import org.qi4j.api.activation.Activators;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.configuration.ConfigurationComposite;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.api.service.ServiceComposite;
+import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
@@ -35,26 +37,28 @@ import org.qi4j.test.EntityTestAssembler;
  */
 public class JMXTest
 {
-    public static void main( String[] args )
-        throws InterruptedException
-    {
-/*
-        Logger logger = Logger.getLogger( "" );
-        logger.setLevel( Level.FINE );
-        Logger.getLogger("sun.rmi").setLevel( Level.WARNING );
 
-        ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel( Level.FINE );
-        logger.addHandler( consoleHandler );
-*/
+    public static void main( String[] args )
+        throws InterruptedException, ActivationException, AssemblyException
+    {
+        /*
+         Logger logger = Logger.getLogger( "" );
+         logger.setLevel( Level.FINE );
+         Logger.getLogger("sun.rmi").setLevel( Level.WARNING );
+
+         ConsoleHandler consoleHandler = new ConsoleHandler();
+         consoleHandler.setLevel( Level.FINE );
+         logger.addHandler( consoleHandler );
+         */
 
         SingletonAssembler assembler = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
-                throws AssemblyException
-            {
-                new JMXAssembler().assemble( module );
+            // START SNIPPET: assembly
 
+            public void assemble( ModuleAssembly module )
+                    throws AssemblyException
+            {
+                // END SNIPPET: assembly
                 new EntityTestAssembler().assemble( module );
 
                 module.services( TestService.class, TestService2.class, TestService3.class ).instantiateOnStartup();
@@ -64,16 +68,20 @@ public class JMXTest
 
                 module.objects( TestObject.class );
 
+                // START SNIPPET: assembly
+                new JMXAssembler().assemble( module );
+
                 module.services( JMXConnectorService.class ).instantiateOnStartup();
                 module.entities( JMXConnectorConfiguration.class );
                 module.forMixin( JMXConnectorConfiguration.class ).declareDefaults().port().set( 1099 );
             }
+            // END SNIPPET: assembly
+
         };
 
         // This allows user to connect using VisualVM/JConsole
-        while(true)
-        {
-            Thread.sleep(10000);
+        while ( true ) {
+            Thread.sleep( 10000 );
         }
     }
 
@@ -82,98 +90,118 @@ public class JMXTest
     {
     }
 
-    @Mixins( TestService.Mixin.class)
+    public interface TestActivation
+    {
+
+        void printConfig();
+
+    }
+
+    public static class TestActivator
+            extends ActivatorAdapter<ServiceReference<TestActivation>>
+    {
+
+        @Override
+        public void afterActivation( ServiceReference<TestActivation> activated )
+                throws Exception
+        {
+            activated.get().printConfig();
+        }
+
+    }
+
+    @Mixins( TestService.Mixin.class )
+    @Activators( TestActivator.class )
     interface TestService
-        extends Configuration<TestConfiguration>, Activatable, ServiceComposite
+            extends TestActivation, ServiceComposite
     {
 
         class Mixin
-            implements Activatable
+                implements TestActivation
         {
+
             @This
             Configuration<TestConfiguration> config;
 
-            public void activate()
-                throws Exception
+            public void printConfig()
             {
-                System.out.println("Activate service:"+config.configuration().stringConfig().get());
+                System.out.println( "Activate service:" + config.get().stringConfig().get() );
             }
 
-            public void passivate()
-                throws Exception
-            {
-            }
         }
+
     }
 
-    @Mixins( TestService.Mixin.class)
+    @Mixins( TestService2.Mixin.class )
+    @Activators( TestActivator.class )
     interface TestService2
-        extends Configuration, Activatable, ServiceComposite
+            extends TestActivation, ServiceComposite
     {
 
         class Mixin
-            implements Activatable
+                implements TestActivation
         {
+
             @This
             Configuration<TestConfiguration> config;
 
-            public void activate()
-                throws Exception
+            public void printConfig()
             {
-                System.out.println("Activate service:"+config.configuration().stringConfig().get());
+                System.out.println( "Activate service:" + config.get().stringConfig().get() );
             }
 
-            public void passivate()
-                throws Exception
-            {
-            }
         }
+
     }
 
-    @Mixins( TestService.Mixin.class)
+    @Mixins( TestService3.Mixin.class )
+    @Activators( TestActivator.class )
     interface TestService3
-        extends Activatable, ServiceComposite
+            extends TestActivation, ServiceComposite
     {
 
         class Mixin
-            implements Activatable
+                implements TestActivation
         {
+
             @This
             Configuration<TestConfiguration> config;
 
-            public void activate()
-                throws Exception
+            public void printConfig()
             {
-                System.out.println("Activate service:"+config.configuration().stringConfig().get());
+                System.out.println( "Activate service:" + config.get().stringConfig().get() );
             }
 
-            public void passivate()
-                throws Exception
-            {
-            }
         }
+
     }
 
     interface TestConfiguration
-        extends ConfigurationComposite
+            extends ConfigurationComposite
     {
+
         @UseDefaults
         Property<String> stringConfig();
 
         @UseDefaults
         Property<TestEnum> enumConfig();
+
     }
 
     enum TestEnum
     {
-        Value1,Value2,Value3
+
+        Value1, Value2, Value3
+
     }
 
     interface TestValue
-        extends ValueComposite
-    {}
+            extends ValueComposite
+    {
+    }
 
     public static class TestObject
     {
     }
+
 }

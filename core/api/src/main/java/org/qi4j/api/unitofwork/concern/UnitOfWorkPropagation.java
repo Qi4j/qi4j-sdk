@@ -55,6 +55,11 @@ public @interface UnitOfWorkPropagation
 {
     Propagation value() default Propagation.REQUIRED;
 
+    String usecase() default "";
+
+    /**
+     * Propagation behaviors.
+     */
     enum Propagation
     {
         /**

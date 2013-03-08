@@ -17,12 +17,11 @@
  */
 package org.qi4j.api.composite;
 
-import org.qi4j.api.injection.scope.Uses;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import org.qi4j.api.injection.scope.Uses;
 
 /**
  * Generic decorator mixin that allows a Composite to wrap
@@ -46,6 +45,7 @@ public class DecoratorMixin
         this.delegate = delegate;
     }
 
+    @Override
     public Object invoke( Object object, Method method, Object[] args )
         throws Throwable
     {
@@ -82,7 +82,7 @@ public class DecoratorMixin
         builder.append( "\ndelegate: " );
         builder.append( delegate );
         builder.append( "\ndelegateType: " );
-        builder.append( delegate.getClass().getName() );
+        builder.append( delegate == null ? "n/a" : delegate.getClass().getName() );
         builder.append( "\narguments: \n" );
         for( Object arg : args )
         {

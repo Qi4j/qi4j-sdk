@@ -22,10 +22,15 @@ import org.qi4j.functional.Specification;
  * from a list. Provide a Selector which does the actual
  * selection from the list. A common case is to select
  * based on identity of the service, which you can do this way:
+ *
+ * <pre><code>
  * new ServiceQualifier<MyService>(services, ServiceQualifier.withId("someId"))
+ * </code></pre>
  *
  * Many selectors can be combined by using firstOf. Example:
+ * <pre><code>
  * new ServiceQualifier<MyService>(services, firstOf(withTags("sometag"), firstActive(), first()))
+ * </code></pre>
  * This will pick a service that has the tag "sometag", or if none is found take the first active one. If no
  * service is active, then the first service will be picked.
  */
@@ -49,6 +54,7 @@ public abstract class ServiceQualifier
     {
         return new Specification<ServiceReference<?>>()
         {
+            @Override
             public boolean satisfiedBy( ServiceReference<?> service )
             {
                 return service.identity().equals( anId );
@@ -60,6 +66,7 @@ public abstract class ServiceQualifier
     {
         return new Specification<ServiceReference<?>>()
         {
+            @Override
             public boolean satisfiedBy( ServiceReference<?> service )
             {
                 Object metaObject = service.metaInfo( metaInfo.getClass() );
@@ -72,6 +79,7 @@ public abstract class ServiceQualifier
     {
         return new Specification<ServiceReference<?>>()
         {
+            @Override
             public boolean satisfiedBy( ServiceReference<?> service )
             {
                 return service.isActive();
@@ -83,6 +91,7 @@ public abstract class ServiceQualifier
     {
         return new Specification<ServiceReference<?>>()
         {
+            @Override
             public boolean satisfiedBy( ServiceReference<?> service )
             {
                 return service.isAvailable();
@@ -94,6 +103,7 @@ public abstract class ServiceQualifier
     {
         return new Specification<ServiceReference<?>>()
         {
+            @Override
             public boolean satisfiedBy( ServiceReference<?> service )
             {
                 ServiceTags serviceTags = service.metaInfo( ServiceTags.class );

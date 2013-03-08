@@ -1,5 +1,6 @@
 /*
  * Copyright 2008 Niclas Hedhman. All rights Reserved.
+ * Copyright 2012 Paul Merlin.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -18,6 +19,7 @@
 
 package org.qi4j.bootstrap;
 
+import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.Visibility;
 
 /**
@@ -43,4 +45,13 @@ public interface ServiceDeclaration
     ServiceDeclaration taggedWith( String... tags );
 
     ServiceDeclaration instantiateOnStartup();
+
+    /**
+     * Set the service activators. Activators are executed in order around the
+     * ServiceReference activation and passivation.
+     *
+     * @param activators the service activators
+     * @return the assembly
+     */    
+    ServiceDeclaration withActivators( Class<? extends Activator<?>>... activators );
 }

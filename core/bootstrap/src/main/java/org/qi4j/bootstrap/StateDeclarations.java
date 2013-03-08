@@ -14,19 +14,17 @@
 
 package org.qi4j.bootstrap;
 
+import java.lang.reflect.AccessibleObject;
 import org.qi4j.api.common.MetaInfo;
 
-import java.lang.reflect.AccessibleObject;
-
 /**
- * This provides declared property information that
- * the runtime can use.
+ * This provides declared {@see org.qi4j.api.property.Property} information that the runtime can use.
  */
 public interface StateDeclarations
 {
-    MetaInfo getMetaInfo( AccessibleObject accessor );
+    MetaInfo metaInfoFor( AccessibleObject accessor );
 
-    Object getInitialValue( AccessibleObject accessor );
+    Object initialValueOf( AccessibleObject accessor );
 
-    boolean isUseDefaults(AccessibleObject accessor);
+    boolean useDefaults( AccessibleObject accessor );
 }

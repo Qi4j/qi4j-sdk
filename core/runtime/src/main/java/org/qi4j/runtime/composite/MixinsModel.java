@@ -14,29 +14,38 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.qi4j.api.util.Classes;
 import org.qi4j.bootstrap.BindingException;
 import org.qi4j.functional.Function;
 import org.qi4j.functional.HierarchicalVisitor;
 import org.qi4j.functional.HierarchicalVisitorAdapter;
+import org.qi4j.functional.Specification;
 import org.qi4j.functional.VisitableHierarchy;
 import org.qi4j.runtime.injection.DependencyModel;
 import org.qi4j.runtime.injection.InjectedFieldModel;
 import org.qi4j.runtime.model.Binder;
 import org.qi4j.runtime.model.Resolution;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.*;
-
-import static org.qi4j.functional.Iterables.*;
+import static org.qi4j.api.util.Classes.interfacesOf;
+import static org.qi4j.functional.Iterables.filter;
+import static org.qi4j.functional.Iterables.flattenIterables;
+import static org.qi4j.functional.Iterables.map;
 
 /**
  * Base implementation of model for mixins. This records the mapping between methods in the Composite
  * and mixin implementations.
  */
 public class MixinsModel
-        implements Binder, VisitableHierarchy<Object, Object>
+    implements Binder, VisitableHierarchy<Object, Object>
 {
     protected final Map<Method, MixinModel> methodImplementation = new HashMap<Method, MixinModel>();
     protected final Map<Method, Integer> methodIndex = new HashMap<Method, Integer>();
@@ -64,37 +73,40 @@ public class MixinsModel
     {
         return methodImplementation.get( method );
     }
-    
-    public MixinModel getMixinModel(Class mixinClass)
+
+    public MixinModel getMixinModel( Class mixinClass )
     {
         for( MixinModel mixinModel : mixinModels )
         {
-            if (mixinModel.mixinClass().equals( mixinClass ))
+            if( mixinModel.mixinClass().equals( mixinClass ) )
+            {
                 return mixinModel;
+            }
         }
         return null;
     }
 
     public void addMixinType( Class mixinType )
     {
-        for( Type type : Classes.INTERFACES_OF.map( mixinType ) )
+        for( Type type : interfacesOf( mixinType ) )
         {
             mixinTypes.add( Classes.RAW_CLASS.map( type ) );
         }
     }
 
-    public void addMixinModel(MixinModel mixinModel)
+    public void addMixinModel( MixinModel mixinModel )
     {
         mixinModels.add( mixinModel );
     }
 
-    public void addMethodMixin(Method method, MixinModel mixinModel)
+    public void addMethodMixin( Method method, MixinModel mixinModel )
     {
-        methodImplementation.put( method, mixinModel);
+        methodImplementation.put( method, mixinModel );
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+        throws ThrowableType
     {
         if( visitor.visitEnter( this ) )
         {
@@ -107,8 +119,9 @@ public class MixinsModel
     }
 
     // Binding
+    @Override
     public void bind( final Resolution resolution )
-            throws BindingException
+        throws BindingException
     {
         // Order mixins based on @This usages
         UsageGraph<MixinModel> deps = new UsageGraph<MixinModel>( mixinModels, new Uses(), true );
@@ -131,14 +144,16 @@ public class MixinsModel
             mixinModel.accept( new HierarchicalVisitorAdapter<Object, Object, BindingException>()
             {
                 @Override
-                public boolean visitEnter( Object visited ) throws BindingException
+                public boolean visitEnter( Object visited )
+                    throws BindingException
                 {
                     if( visited instanceof InjectedFieldModel )
                     {
                         InjectedFieldModel fieldModel = (InjectedFieldModel) visited;
                         fieldModel.bind( resolution.forField( fieldModel.field() ) );
                         return false;
-                    } else if( visited instanceof Binder )
+                    }
+                    else if( visited instanceof Binder )
                     {
                         Binder constructorsModel = (Binder) visited;
                         constructorsModel.bind( resolution );
@@ -149,11 +164,12 @@ public class MixinsModel
                 }
 
                 @Override
-                public boolean visit( Object visited ) throws BindingException
+                public boolean visit( Object visited )
+                    throws BindingException
                 {
                     if( visited instanceof Binder )
                     {
-                        ((Binder) visited).bind( resolution );
+                        ( (Binder) visited ).bind( resolution );
                     }
                     return true;
                 }
@@ -165,7 +181,7 @@ public class MixinsModel
 
     public Object[] newMixinHolder()
     {
-        return new Object[mixinIndex.size()];
+        return new Object[ mixinIndex.size() ];
     }
 
     public FragmentInvocationHandler newInvocationHandler( final Method method )
@@ -173,71 +189,42 @@ public class MixinsModel
         return mixinFor( method ).newInvocationHandler( method );
     }
 
-    public void activate( Object[] mixins )
-            throws Exception
-    {
-        int idx = 0;
-        try
-        {
-            for( MixinModel mixinModel : mixinModels )
-            {
-                mixinModel.activate( mixins[idx] );
-                idx++;
-            }
-        } catch( Exception e )
-        {
-            // Passivate activated mixins
-            for( int i = idx - 1; i >= 0; i-- )
-            {
-                try
-                {
-                    mixinModels.get( i ).passivate( i );
-                } catch( Exception e1 )
-                {
-                    // Ignore
-                }
-            }
-
-            throw e;
-        }
-    }
-
-    public void passivate( Object[] mixins )
-            throws Exception
-    {
-        int idx = 0;
-        Exception ex = null;
-        for( MixinModel mixinModel : mixinModels )
-        {
-            try
-            {
-                mixinModel.passivate( mixins[idx++] );
-            } catch( Exception e )
-            {
-                ex = e;
-            }
-        }
-        if( ex != null )
-        {
-            throw ex;
-        }
-    }
-
     public Iterable<DependencyModel> dependencies()
     {
         return flattenIterables( map( new Function<MixinModel, Iterable<DependencyModel>>()
-                {
-                    @Override
-                    public Iterable<DependencyModel> map( MixinModel mixinModel )
-                    {
-                        return mixinModel.dependencies();
-                    }
-                }, mixinModels ) );
+        {
+            @Override
+            public Iterable<DependencyModel> map( MixinModel mixinModel )
+            {
+                return mixinModel.dependencies();
+            }
+        }, mixinModels ) );
+    }
+
+    public Iterable<Method> invocationsFor( final Class<?> mixinClass )
+    {
+        return map( new Function<Map.Entry<Method, MixinModel>, Method>()
+        {
+            @Override
+            public Method map( Map.Entry<Method, MixinModel> entry )
+            {
+                return entry.getKey();
+            }
+        }, filter( new Specification<Map.Entry<Method, MixinModel>>()
+        {
+            @Override
+            public boolean satisfiedBy( Map.Entry<Method, MixinModel> item )
+            {
+                MixinModel model = item.getValue();
+                return model.mixinClass().equals( mixinClass );
+            }
+        }, methodImplementation.entrySet() ) );
     }
 
     private class Uses
-            implements UsageGraph.Use<MixinModel>
+        implements UsageGraph.Use<MixinModel>
     {
+        @Override
         public Collection<MixinModel> uses( MixinModel source )
         {
             Iterable<Class<?>> thisMixinTypes = source.thisMixinTypes();

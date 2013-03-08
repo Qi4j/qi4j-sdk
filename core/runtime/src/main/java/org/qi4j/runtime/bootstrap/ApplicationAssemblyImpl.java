@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2007, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +15,18 @@
 
 package org.qi4j.runtime.bootstrap;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.structure.Application;
 import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.AssemblyVisitor;
 import org.qi4j.bootstrap.LayerAssembly;
-
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * The representation of an entire application. From
@@ -37,12 +41,14 @@ public final class ApplicationAssemblyImpl
     private String version = "1.0"; // Default version
     private Application.Mode mode;
     private MetaInfo metaInfo = new MetaInfo();
+    private List<Class<? extends Activator<Application>>> activators = new ArrayList<Class<? extends Activator<Application>>>();
 
     public ApplicationAssemblyImpl()
     {
         mode = Application.Mode.valueOf( System.getProperty( "mode", "production" ) );
     }
 
+    @Override
     public LayerAssembly layer( String name )
     {
         if( name != null )
@@ -58,30 +64,42 @@ public final class ApplicationAssemblyImpl
         return layerAssembly;
     }
 
+    @Override
     public ApplicationAssembly setName( String name )
     {
         this.name = name;
         return this;
     }
 
+    @Override
     public ApplicationAssembly setVersion( String version )
     {
         this.version = version;
         return this;
     }
 
+    @Override
     public ApplicationAssembly setMode( Application.Mode mode )
     {
         this.mode = mode;
         return this;
     }
 
+    @Override
     public ApplicationAssembly setMetaInfo( Object info )
     {
         metaInfo.set( info );
         return this;
     }
 
+    @Override
+    public ApplicationAssembly withActivators( Class<? extends Activator<Application>>... activators )
+    {
+        this.activators.addAll( Arrays.asList( activators ) );
+        return this;
+    }
+
+    @Override
     public <ThrowableType extends Throwable> void visit( AssemblyVisitor<ThrowableType> visitor )
         throws ThrowableType
     {
@@ -97,11 +115,17 @@ public final class ApplicationAssemblyImpl
         return layerAssemblies.values();
     }
 
+    public List<Class<? extends Activator<Application>>> activators()
+    {
+        return activators;
+    }
+
     public MetaInfo metaInfo()
     {
         return metaInfo;
     }
 
+    @Override
     public String name()
     {
         return name;
@@ -112,6 +136,7 @@ public final class ApplicationAssemblyImpl
         return version;
     }
 
+    @Override
     public Application.Mode mode()
     {
         return mode;

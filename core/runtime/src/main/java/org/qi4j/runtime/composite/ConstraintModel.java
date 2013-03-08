@@ -14,10 +14,9 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.annotation.Annotation;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.constraint.Constraint;
-
-import java.lang.annotation.Annotation;
 
 /**
  * JAVADOC
@@ -33,6 +32,7 @@ public final class ConstraintModel
         this.constraintClass = constraintClass;
     }
 
+    @Override
     public ConstraintInstance<?, ?> newInstance()
     {
         try

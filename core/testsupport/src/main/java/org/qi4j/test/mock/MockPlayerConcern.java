@@ -1,9 +1,8 @@
 package org.qi4j.test.mock;
 
-import org.qi4j.api.concern.ConcernOf;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import org.qi4j.api.concern.ConcernOf;
 
 public class MockPlayerConcern
     extends ConcernOf<InvocationHandler>
@@ -12,6 +11,7 @@ public class MockPlayerConcern
     /**
      * @see java.lang.reflect.InvocationHandler#invoke(Object, java.lang.reflect.Method, Object[])
      */
+    @Override
     public Object invoke( final Object proxy, final Method method, final Object[] args )
         throws Throwable
     {

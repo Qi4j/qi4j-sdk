@@ -14,10 +14,9 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.annotation.Annotation;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.constraint.Constraint;
-
-import java.lang.annotation.Annotation;
 
 /**
  * JAVADOC
@@ -33,6 +32,7 @@ public final class CompositeConstraintModel
         this.constraintsModel = constraintsModel;
     }
 
+    @Override
     public ConstraintInstance<?, ?> newInstance()
     {
         try
@@ -57,10 +57,11 @@ public final class CompositeConstraintModel
             this.valueConstraintsInstance = valueConstraintsInstance;
         }
 
+        @Override
         public boolean isValid( Annotation annotation, Object value )
             throws NullPointerException
         {
-            return valueConstraintsInstance.checkConstraints( value ).size() == 0;
+            return valueConstraintsInstance.checkConstraints( value ).isEmpty();
         }
     }
 }

@@ -14,6 +14,8 @@
 
 package org.qi4j.library.eventsourcing.domain.source.jdbm;
 
+import java.io.IOException;
+import java.security.Principal;
 import org.junit.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.entity.EntityComposite;
@@ -35,19 +37,15 @@ import org.qi4j.library.eventsourcing.domain.factory.CurrentUserUoWPrincipal;
 import org.qi4j.library.eventsourcing.domain.factory.DomainEventCreationConcern;
 import org.qi4j.library.eventsourcing.domain.factory.DomainEventFactoryService;
 import org.qi4j.library.eventsourcing.domain.source.EventSource;
-import org.qi4j.library.fileconfig.FileConfiguration;
+import org.qi4j.library.fileconfig.FileConfigurationService;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
+import org.qi4j.valueserialization.orgjson.OrgJsonValueSerializationAssembler;
 
-import java.io.IOException;
-import java.security.Principal;
-
-/**
- * JAVADOC
- */
 public class JdbmEventStoreServiceTest
         extends AbstractQi4jTest
     {
+        @Override
         public void assemble( ModuleAssembly module ) throws AssemblyException
         {
             module.layer().application().setName( "JDBMEventStoreTest" );
@@ -55,7 +53,8 @@ public class JdbmEventStoreServiceTest
             new EntityTestAssembler(  ).assemble( module );
 
             module.values( DomainEventValue.class, UnitOfWorkDomainEventsValue.class );
-            module.services( FileConfiguration.class );
+            module.services( FileConfigurationService.class );
+            new OrgJsonValueSerializationAssembler().assemble( module );
             module.services( JdbmEventStoreService.class );
             module.services( DomainEventFactoryService.class );
             module.importedServices( CurrentUserUoWPrincipal.class ).importedBy( ImportedServiceDeclaration.NEW_OBJECT );
@@ -75,7 +74,7 @@ public class JdbmEventStoreServiceTest
             for (int i = 0; i < count; i++)
             {
                 uow = module.newUnitOfWork( UsecaseBuilder.newUsecase( "Change description" ));
-                uow.metaInfo().set( new Principal()
+                uow.setMetaInfo( new Principal()
                 {
                     public String getName()
                     {
@@ -98,7 +97,7 @@ public class JdbmEventStoreServiceTest
                         }
                     }, Outputs.systemOut() ));
         }
-        
+
         @Mixins( TestEntity.Mixin.class )
         public interface TestEntity
             extends EntityComposite

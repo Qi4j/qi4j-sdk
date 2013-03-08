@@ -14,6 +14,11 @@
 
 package org.qi4j.index.solr.internal;
 
+import java.lang.reflect.Member;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -36,12 +41,6 @@ import org.qi4j.spi.query.EntityFinderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Member;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 /**
  * JAVADOC
  */
@@ -60,11 +59,11 @@ public class SolrEntityQueryMixin
         {
             QuerySpecification expr = (QuerySpecification) whereClause;
 
-            SolrServer server = solr.getSolrServer();
+            SolrServer server = solr.solrServer();
 
-            NamedList list = new NamedList();
+            NamedList<Object> list = new NamedList<Object>();
 
-            list.add( "q", expr.getQuery() );
+            list.add( "q", expr.query() );
             list.add( "rows", maxResults != 0 ? maxResults : 10000 );
             list.add( "start", firstResult );
 
@@ -72,7 +71,7 @@ public class SolrEntityQueryMixin
             {
                 for( OrderBy orderBySegment : orderBySegments )
                 {
-                    String propName = ((Member)orderBySegment.getPropertyFunction().getAccessor()).getName() + "_for_sort";
+                    String propName = ((Member)orderBySegment.property().accessor()).getName() + "_for_sort";
                     String order = orderBySegment.order() == OrderBy.Order.ASCENDING ? "asc" : "desc";
                     list.add( "sort", propName + " " + order );
 
@@ -116,16 +115,16 @@ public class SolrEntityQueryMixin
         return Iterables.count( findEntities( resultType, whereClause, null, 0, 1, variables ) );
     }
 
+    @Override
     public SolrDocumentList search( String queryString ) throws SolrServerException
     {
-        SolrServer server = solr.getSolrServer();
+        SolrServer server = solr.solrServer();
 
-        NamedList list = new NamedList();
+        NamedList<Object> list = new NamedList<Object>();
 
         list.add( "q", queryString );
 
         QueryResponse query = server.query( SolrParams.toSolrParams( list ) );
-        SolrDocumentList results = query.getResults();
-        return results;
+        return query.getResults();
     }
 }

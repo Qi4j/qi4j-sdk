@@ -39,10 +39,11 @@ public class CircuitBreakers
                {
                   // Check breaker first
                   if (!breaker.isOn())
-                     throw (ReceiverThrowableType) breaker.getLastThrowable();
+                     throw (ReceiverThrowableType) breaker.lastThrowable();
 
                   sender.sendTo( new Receiver<Item, ReceiverThrowableType>()
                   {
+                     @Override
                      public void receive( Item item ) throws ReceiverThrowableType
                      {
                         try
@@ -69,13 +70,14 @@ public class CircuitBreakers
    /**
     * Allow all throwables that are equal to or subclasses of given list of throwables.
     *
-    * @param throwables
-    * @return
+    * @param throwables The Throwable types that are allowed.
+    * @return A Specification that specifies the allowed Throwables.
     */
    public static Specification<Throwable> in( final Class<? extends Throwable>... throwables)
    {
       return new Specification<Throwable>()
       {
+         @Override
          public boolean satisfiedBy( Throwable item )
          {
             Class<? extends Throwable> throwableClass = item.getClass();
@@ -93,6 +95,7 @@ public class CircuitBreakers
    {
       return new Specification<Throwable>()
       {
+         @Override
          public boolean satisfiedBy( Throwable item )
          {
             return specification.satisfiedBy( unwrap(item) );

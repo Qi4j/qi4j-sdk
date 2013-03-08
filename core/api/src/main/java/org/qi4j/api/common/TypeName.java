@@ -1,11 +1,13 @@
 package org.qi4j.api.common;
 
+import java.io.Serializable;
+import java.lang.reflect.Type;
 import org.qi4j.api.util.Classes;
 import org.qi4j.api.util.NullArgumentException;
 
-import java.io.Serializable;
-import java.lang.reflect.Type;
-
+/**
+ * Represents a Type name.
+ */
 public final class TypeName
     implements Serializable, Comparable<TypeName>
 {
@@ -59,6 +61,7 @@ public final class TypeName
         return type.getName().equals( name );
     }
 
+    @Override
     public boolean equals( final Object o )
     {
         if( this == o )
@@ -75,11 +78,13 @@ public final class TypeName
         return name.equals( other.name );
     }
 
+    @Override
     public int hashCode()
     {
         return name.hashCode();
     }
 
+    @Override
     public int compareTo( final TypeName typeName )
     {
         return this.name.compareTo( typeName.name );

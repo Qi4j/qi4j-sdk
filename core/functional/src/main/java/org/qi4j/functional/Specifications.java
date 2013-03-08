@@ -23,6 +23,7 @@ public class Specifications
     {
         return new Specification<T>()
         {
+            @Override
             public boolean satisfiedBy( T instance )
             {
                 return true;
@@ -34,6 +35,7 @@ public class Specifications
     {
         return new Specification<T>()
         {
+            @Override
             public boolean satisfiedBy( T instance )
             {
                 return !specification.satisfiedBy( instance );
@@ -70,6 +72,7 @@ public class Specifications
     {
         return new Specification<T>()
         {
+            @Override
             public boolean satisfiedBy( T item )
             {
                 for( T allow : allowed )
@@ -110,6 +113,9 @@ public class Specifications
         };
     }
 
+    /**
+     * AND Specification.
+     */
     public static class AndSpecification<T>
         implements Specification<T>
     {
@@ -120,6 +126,7 @@ public class Specifications
             this.specifications = specifications;
         }
 
+        @Override
         public boolean satisfiedBy( T instance )
         {
             for( Specification<T> specification : specifications )
@@ -146,6 +153,9 @@ public class Specifications
         }
     }
 
+    /**
+     * OR Specification.
+     */
     public static class OrSpecification<T>
         implements Specification<T>
     {
@@ -156,6 +166,7 @@ public class Specifications
             this.specifications = specifications;
         }
 
+        @Override
         public boolean satisfiedBy( T instance )
         {
             for( Specification<T> specification : specifications )

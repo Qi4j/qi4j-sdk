@@ -13,25 +13,25 @@
  * implied.
  *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package org.qi4j.library.rest.admin;
 
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.api.structure.Module;
 import org.restlet.Component;
 import org.restlet.data.Protocol;
 
-public class RestServerMixin
-    implements Activatable
+public abstract class RestServerMixin
+    implements RestServerComposite
 {
     @Structure
     private Module module;
 
     private Component component;
 
-    public void activate()
+    @Override
+    public void startServer()
         throws Exception
     {
         component = new Component();
@@ -41,7 +41,8 @@ public class RestServerMixin
         component.start();
     }
 
-    public void passivate()
+    @Override
+    public void stopServer()
         throws Exception
     {
         component.stop();

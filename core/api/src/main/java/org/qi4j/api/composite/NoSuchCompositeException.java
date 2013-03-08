@@ -16,7 +16,7 @@ package org.qi4j.api.composite;
 import org.qi4j.api.common.InvalidApplicationException;
 
 /**
- * This exception is thrown if client code tries to create a non-existing Composite type
+ * This exception is thrown if client code tries to create a non-existing Composite type.
  */
 public class NoSuchCompositeException
     extends InvalidApplicationException
@@ -26,9 +26,9 @@ public class NoSuchCompositeException
     private final String compositeType;
     private final String moduleName;
 
-    public NoSuchCompositeException( String compositeType, String moduleName )
+    protected NoSuchCompositeException( String metaType, String compositeType, String moduleName )
     {
-        super( "Could not find any visible Composite of type [" + compositeType + "] in module [" +
+        super( "Could not find any visible " + metaType + " of type [" + compositeType + "] in module [" +
                moduleName + "]." );
         this.compositeType = compositeType;
         this.moduleName = moduleName;

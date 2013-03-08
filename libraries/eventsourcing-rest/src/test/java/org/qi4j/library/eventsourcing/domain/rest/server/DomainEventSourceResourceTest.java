@@ -49,7 +49,6 @@ import java.security.Principal;
 /**
  * Start simple web server that exposes the Restlet resource. Test through browser.
  */
-@Ignore
 public class DomainEventSourceResourceTest
 {
     public static void main( String[] args ) throws Exception
@@ -97,7 +96,7 @@ public class DomainEventSourceResourceTest
         for (int i = 0; i < 43; i++)
         {
             UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "Change description "+(i+1) ));
-            uow.metaInfo().set( administratorPrincipal );
+            uow.setMetaInfo( administratorPrincipal );
 
             TestEntity entity = uow.newEntity( TestEntity.class );
             entity.changedDescription( "New description" );
@@ -170,7 +169,7 @@ public class DomainEventSourceResourceTest
             try
             {
                 UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "Change description "+(eventSource.count()) ));
-                uow.metaInfo().set( administratorPrincipal );
+                uow.setMetaInfo( administratorPrincipal );
 
                 TestEntity entity = uow.newEntity( TestEntity.class );
                 entity.changedDescription( "New description" );

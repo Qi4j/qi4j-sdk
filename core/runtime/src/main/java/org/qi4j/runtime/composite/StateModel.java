@@ -14,13 +14,13 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.reflect.AccessibleObject;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.composite.StateDescriptor;
-import org.qi4j.functional.*;
+import org.qi4j.functional.HierarchicalVisitor;
+import org.qi4j.functional.VisitableHierarchy;
 import org.qi4j.runtime.property.PropertiesModel;
 import org.qi4j.runtime.property.PropertyModel;
-
-import java.lang.reflect.AccessibleObject;
 
 /**
  * Base model for Composite state
@@ -35,34 +35,38 @@ public class StateModel
         this.propertiesModel = propertiesModel;
     }
 
-    public PropertyModel getProperty( AccessibleObject accessor )
+    public PropertyModel propertyModelFor( AccessibleObject accessor )
     {
         return propertiesModel.getProperty( accessor );
     }
 
-    public PropertyModel getPropertyByName( String name )
-            throws IllegalArgumentException
+    @Override
+    public PropertyModel findPropertyModelByName( String name )
+        throws IllegalArgumentException
     {
         return propertiesModel.getPropertyByName( name );
     }
 
-    public PropertyModel getPropertyByQualifiedName( QualifiedName name )
-            throws IllegalArgumentException
+    @Override
+    public PropertyModel findPropertyModelByQualifiedName( QualifiedName name )
+        throws IllegalArgumentException
     {
         return propertiesModel.getPropertyByQualifiedName( name );
     }
 
+    @Override
     public Iterable<PropertyModel> properties()
     {
         return propertiesModel.properties();
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+        throws ThrowableType
     {
-        if (visitor.visitEnter( this ))
+        if( visitor.visitEnter( this ) )
         {
-            ((VisitableHierarchy<Object, Object>)propertiesModel).accept(visitor);
+            ( (VisitableHierarchy<Object, Object>) propertiesModel ).accept( visitor );
         }
 
         return visitor.visitLeave( this );

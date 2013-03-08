@@ -69,23 +69,26 @@ public final class EntityBuilderInstance<T>
         EntityReference reference = new EntityReference( identity );
         entityState = new BuilderEntityState( model.model(), reference );
         model.model().initState( model.module(), entityState );
-        entityState.setProperty( identityStateName, identity );
+        entityState.setPropertyValue( identityStateName, identity );
         prototypeInstance = model.model().newInstance( uow, model.module(), entityState );
     }
 
     @SuppressWarnings( "unchecked" )
+    @Override
     public T instance()
     {
         checkValid();
         return prototypeInstance.<T>proxy();
     }
 
+    @Override
     public <K> K instanceFor( Class<K> mixinType )
     {
         checkValid();
         return prototypeInstance.newProxy( mixinType );
     }
 
+    @Override
     public T newInstance()
         throws LifecycleException
     {
@@ -94,8 +97,9 @@ public final class EntityBuilderInstance<T>
         String identity;
 
         // Figure out whether to use given or generated identity
-        identity = (String) entityState.getProperty( identityStateName );
-        EntityState newEntityState = model.model().newEntityState( store, EntityReference.parseEntityReference( identity ) );
+        identity = (String) entityState.propertyValueOf( identityStateName );
+        EntityState newEntityState = model.model()
+            .newEntityState( store, EntityReference.parseEntityReference( identity ) );
 
         prototypeInstance.invokeCreate();
 

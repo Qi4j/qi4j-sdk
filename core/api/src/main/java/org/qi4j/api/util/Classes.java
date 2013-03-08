@@ -14,43 +14,68 @@
 
 package org.qi4j.api.util;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.functional.Function;
 import org.qi4j.functional.Iterables;
 import org.qi4j.functional.Specification;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
-
-import static org.qi4j.functional.Iterables.*;
+import static org.qi4j.functional.Iterables.cast;
+import static org.qi4j.functional.Iterables.empty;
+import static org.qi4j.functional.Iterables.flatten;
+import static org.qi4j.functional.Iterables.flattenIterables;
+import static org.qi4j.functional.Iterables.iterable;
+import static org.qi4j.functional.Iterables.map;
+import static org.qi4j.functional.Iterables.matchesAny;
+import static org.qi4j.functional.Iterables.prepend;
 
 /**
- * Class-related utility methods
+ * Useful methods for handling Classes.
  */
 public final class Classes
 {
     private final static Map<Type, Type> wrapperClasses = new HashMap<Type, Type>();
-    static {
-        wrapperClasses.put(boolean.class, Boolean.class);
-        wrapperClasses.put(byte.class, Byte.class);
-        wrapperClasses.put(short.class, Short.class);
-        wrapperClasses.put(char.class, Character.class);
-        wrapperClasses.put(int.class, Integer.class);
-        wrapperClasses.put(long.class, Long.class);
-        wrapperClasses.put(float.class, Float.class);
-        wrapperClasses.put(double.class, Double.class);
+
+    static
+    {
+        wrapperClasses.put( boolean.class, Boolean.class );
+        wrapperClasses.put( byte.class, Byte.class );
+        wrapperClasses.put( short.class, Short.class );
+        wrapperClasses.put( char.class, Character.class );
+        wrapperClasses.put( int.class, Integer.class );
+        wrapperClasses.put( long.class, Long.class );
+        wrapperClasses.put( float.class, Float.class );
+        wrapperClasses.put( double.class, Double.class );
     }
 
     private final static Map<Type, Type> primitiveClasses = new HashMap<Type, Type>();
-    static {
-        primitiveClasses.put(boolean.class, Boolean.class);
-        primitiveClasses.put(byte.class, Byte.class);
-        primitiveClasses.put(short.class, Short.class);
-        primitiveClasses.put(char.class, Character.class);
-        primitiveClasses.put(int.class, Integer.class);
-        primitiveClasses.put(long.class, Long.class);
-        primitiveClasses.put(float.class, Float.class);
-        primitiveClasses.put(double.class, Double.class);
+
+    static
+    {
+        primitiveClasses.put( boolean.class, Boolean.class );
+        primitiveClasses.put( byte.class, Byte.class );
+        primitiveClasses.put( short.class, Short.class );
+        primitiveClasses.put( char.class, Character.class );
+        primitiveClasses.put( int.class, Integer.class );
+        primitiveClasses.put( long.class, Long.class );
+        primitiveClasses.put( float.class, Float.class );
+        primitiveClasses.put( double.class, Double.class );
     }
 
     /**
@@ -58,7 +83,7 @@ public final class Classes
      * Return the same class if it's not a primitive class. This can therefore safely be used on all types
      * to ensure that they are not primitives.
      */
-    public static final Function<Type, Type> WRAPPER_CLASS = new Function<Type, Type>()
+    private static final Function<Type, Type> WRAPPER_CLASS = new Function<Type, Type>()
     {
         @Override
         public Type map( Type aClass )
@@ -73,7 +98,7 @@ public final class Classes
      * Return the same class if it's not a wrapper class. This can therefore safely be used on all types
      * to ensure that they are primitives if possible.
      */
-    public static final Function<Type, Type> PRIMITIVE_CLASS = new Function<Type, Type>()
+    private static final Function<Type, Type> PRIMITIVE_CLASS = new Function<Type, Type>()
     {
         @Override
         public Type map( Type aClass )
@@ -83,6 +108,9 @@ public final class Classes
         }
     };
 
+    /**
+     * Function that extract the raw class of a type.
+     */
     public static final Function<Type, Class<?>> RAW_CLASS = new Function<Type, Class<?>>()
     {
         @Override
@@ -92,52 +120,61 @@ public final class Classes
             if( genericType instanceof Class )
             {
                 return (Class<?>) genericType;
-            } else if( genericType instanceof ParameterizedType )
+            }
+            else if( genericType instanceof ParameterizedType )
             {
-                return (Class<?>) ((ParameterizedType) genericType).getRawType();
-            } else if( genericType instanceof TypeVariable )
+                return (Class<?>) ( (ParameterizedType) genericType ).getRawType();
+            }
+            else if( genericType instanceof TypeVariable )
             {
-                return (Class<?>) ((TypeVariable) genericType).getGenericDeclaration();
-            } else if( genericType instanceof WildcardType )
+                return (Class<?>) ( (TypeVariable) genericType ).getGenericDeclaration();
+            }
+            else if( genericType instanceof WildcardType )
             {
-                return (Class<?>) ((WildcardType) genericType).getUpperBounds()[0];
-            } else if( genericType instanceof GenericArrayType )
+                return (Class<?>) ( (WildcardType) genericType ).getUpperBounds()[ 0 ];
+            }
+            else if( genericType instanceof GenericArrayType )
             {
-                Object temp = Array.newInstance( (Class<?>) ((GenericArrayType) genericType).getGenericComponentType(), 0 );
+                Object temp = Array.newInstance( (Class<?>) ( (GenericArrayType) genericType ).getGenericComponentType(), 0 );
                 return temp.getClass();
             }
             throw new IllegalArgumentException( "Could not extract the raw class of " + genericType );
         }
     };
 
-    public static final Function<AccessibleObject, Type> TYPE_OF = new Function<AccessibleObject, Type>()
+    private static final Function<AccessibleObject, Type> TYPE_OF = new Function<AccessibleObject, Type>()
     {
         @Override
         public Type map( AccessibleObject accessor )
         {
-            return accessor instanceof Method ? ((Method) accessor).getGenericReturnType() : ((Field) accessor).getGenericType();
+            return accessor instanceof Method ? ( (Method) accessor ).getGenericReturnType() : ( (Field) accessor ).getGenericType();
         }
     };
 
-    public static final Function<Type, Iterable<Class<?>>> CLASS_HIERARCHY = new Function<Type, Iterable<Class<?>>>()
+    private static final Function<Type, Iterable<Class<?>>> CLASS_HIERARCHY = new Function<Type, Iterable<Class<?>>>()
     {
         @Override
         public Iterable<Class<?>> map( Type type )
         {
+            if( type == null )
+            {
+                return empty();
+            }
             if( type.equals( Object.class ) )
             {
                 Class<?> aClass = (Class<?>) type;
-                return cast(iterable( aClass ));
+                return cast( iterable( aClass ) );
             }
             else
             {
                 type = RAW_CLASS.map( type );
-                return prepend( ((Class) type), map( ((Class) type).getSuperclass() ) );
+                Class superclass = ( (Class) type ).getSuperclass();
+                return prepend( (Class<?>) type, map( superclass ) );
             }
         }
     };
 
-    public static final Function<Type, Iterable<Type>> INTERFACES_OF = new Function<Type, Iterable<Type>>()
+    private static final Function<Type, Iterable<Type>> INTERFACES_OF = new Function<Type, Iterable<Type>>()
     {
         @Override
         public Iterable<Type> map( Type type )
@@ -146,18 +183,27 @@ public final class Classes
 
             if( clazz.isInterface() )
             {
-                return prepend( type, flattenIterables( Iterables.map( INTERFACES_OF, iterable( clazz.getGenericInterfaces() ) ) ) );
-            } else
+                Iterable<Type> genericInterfaces = iterable( clazz.getGenericInterfaces() );
+                Iterable<Type> flattenIterables = flattenIterables( Iterables.map( INTERFACES_OF, genericInterfaces ) );
+                return prepend( type, flattenIterables );
+            }
+            else
             {
-                if (type.equals( Object.class ))
-                    return iterable(clazz.getGenericInterfaces());
+                if( type.equals( Object.class ) )
+                {
+                    return iterable( clazz.getGenericInterfaces() );
+                }
                 else
-                    return flatten( flattenIterables( Iterables.map( INTERFACES_OF, iterable(clazz.getGenericInterfaces()))), INTERFACES_OF.map( RAW_CLASS.map( type ).getSuperclass() ) );
+                {
+                    return flatten( flattenIterables( Iterables.map( INTERFACES_OF,
+                                                                     iterable( clazz.getGenericInterfaces() ) ) ),
+                                    INTERFACES_OF.map( RAW_CLASS.map( type ).getSuperclass() ) );
+                }
             }
         }
     };
 
-    public static final Function<Type, Iterable<Type>> TYPES_OF = new Function<Type, Iterable<Type>>()
+    private static final Function<Type, Iterable<Type>> TYPES_OF = new Function<Type, Iterable<Type>>()
     {
         @Override
         public Iterable<Type> map( Type type )
@@ -166,15 +212,64 @@ public final class Classes
 
             if( clazz.isInterface() )
             {
-                return prepend( clazz, flattenIterables( Iterables.map( INTERFACES_OF, iterable( clazz.getGenericInterfaces() ) ) ) );
-            } else
+                Iterable<Type> genericInterfaces = iterable( clazz.getGenericInterfaces() );
+                Iterable<Type> flattenIterables = flattenIterables( Iterables.map( INTERFACES_OF, genericInterfaces ) );
+                return prepend( clazz, flattenIterables );
+            }
+            else
             {
-                return flatten( CLASS_HIERARCHY.map( type ), flattenIterables( Iterables.map( INTERFACES_OF, CLASS_HIERARCHY.map( type ) ) ) );
+                return flatten( CLASS_HIERARCHY.map( type ),
+                                flattenIterables( Iterables.map( INTERFACES_OF, CLASS_HIERARCHY.map( type ) ) ) );
             }
         }
     };
 
-    public static Specification<Class<?>> isAssignableFrom( final Class clazz)
+    public static Type typeOf( AccessibleObject from )
+    {
+        return TYPE_OF.map( from );
+    }
+
+    public static Iterable<Type> typesOf( Iterable<Type> types )
+    {
+        Iterable<Type> result = empty();
+        for( Type type : types )
+        {
+            result = flatten( result, typesOf( type ) );
+        }
+        return result;
+    }
+
+    public static Iterable<Type> typesOf( Type type )
+    {
+        return TYPES_OF.map( type );
+    }
+
+    public static Iterable<? extends Type> interfacesOf( Iterable<? extends Type> types )
+    {
+        Iterable<Type> result = empty();
+        for( Type type : types )
+        {
+            result = flatten( result, interfacesOf( type ) );
+        }
+        return result;
+    }
+
+    public static Iterable<Type> interfacesOf( Type type )
+    {
+        return INTERFACES_OF.map( type );
+    }
+
+    public static Iterable<Class<?>> classHierarchy( Class<?> type )
+    {
+        return CLASS_HIERARCHY.map( type );
+    }
+
+    public static Type wrapperClass( Type type )
+    {
+        return WRAPPER_CLASS.map( type );
+    }
+
+    public static Specification<Class<?>> isAssignableFrom( final Class clazz )
     {
         return new Specification<Class<?>>()
         {
@@ -186,7 +281,7 @@ public final class Classes
         };
     }
 
-    public static Specification<Object> instanceOf( final Class clazz)
+    public static Specification<Object> instanceOf( final Class clazz )
     {
         return new Specification<Object>()
         {
@@ -198,7 +293,6 @@ public final class Classes
         };
     }
 
-
     public static Specification<Class<?>> hasModifier( final int classModifier )
     {
         return new Specification<Class<?>>()
@@ -206,7 +300,7 @@ public final class Classes
             @Override
             public boolean satisfiedBy( Class<?> item )
             {
-                return (item.getModifiers() & classModifier) != 0;
+                return ( item.getModifiers() & classModifier ) != 0;
             }
         };
     }
@@ -249,59 +343,70 @@ public final class Classes
         return newSet;
     }
 
-    public static String getSimpleGenericName( Type type )
+    public static String simpleGenericNameOf( Type type )
+    {
+        StringBuilder sb = new StringBuilder();
+        simpleGenericNameOf( sb, type );
+        return sb.toString();
+    }
+
+    private static void simpleGenericNameOf( StringBuilder sb, Type type )
     {
         if( type instanceof Class )
         {
-            return ((Class) type).getSimpleName();
-        } else if( type instanceof ParameterizedType )
+            sb.append( ( (Class) type ).getSimpleName() );
+        }
+        else if( type instanceof ParameterizedType )
         {
             ParameterizedType pt = (ParameterizedType) type;
-            String str = getSimpleGenericName( pt.getRawType() );
-            str += "<";
-            String args = "";
+            simpleGenericNameOf( sb, pt.getRawType() );
+            sb.append( "<" );
+            boolean atLeastOne = false;
             for( Type typeArgument : pt.getActualTypeArguments() )
             {
-                if( args.length() != 0 )
+                if( atLeastOne )
                 {
-                    args += ", ";
+                    sb.append( ", " );
                 }
-                args += getSimpleGenericName( typeArgument );
+                simpleGenericNameOf( sb, typeArgument );
+                atLeastOne = true;
             }
-            str += args;
-            str += ">";
-            return str;
-        } else if( type instanceof GenericArrayType )
+            sb.append( ">" );
+        }
+        else if( type instanceof GenericArrayType )
         {
             GenericArrayType gat = (GenericArrayType) type;
-            return getSimpleGenericName( gat.getGenericComponentType() ) + "[]";
-        } else if( type instanceof TypeVariable )
+            simpleGenericNameOf( sb, gat.getGenericComponentType() );
+            sb.append( "[]" );
+        }
+        else if( type instanceof TypeVariable )
         {
             TypeVariable tv = (TypeVariable) type;
-            return tv.getName();
-        } else if( type instanceof WildcardType )
+            sb.append( tv.getName() );
+        }
+        else if( type instanceof WildcardType )
         {
             WildcardType wt = (WildcardType) type;
-            String args = "";
+            sb.append( "? extends " );
+            boolean atLeastOne = false;
             for( Type typeArgument : wt.getUpperBounds() )
             {
-                if( args.length() != 0 )
+                if( atLeastOne )
                 {
-                    args += ", ";
+                    sb.append( ", " );
                 }
-                args += getSimpleGenericName( typeArgument );
+                simpleGenericNameOf( sb, typeArgument );
+                atLeastOne = true;
             }
-
-            return "? extends " + args;
-        } else
+        }
+        else
         {
             throw new IllegalArgumentException( "Don't know how to deal with type:" + type );
         }
     }
 
-    public static <AnnotationType extends Annotation> AnnotationType getAnnotationOfTypeOrAnyOfSuperTypes( Class<?> type,
-                                                                                                           Class<AnnotationType> annotationClass
-    )
+    public static <AnnotationType extends Annotation>
+    AnnotationType findAnnotationOfTypeOrAnyOfSuperTypes( Class<?> type, Class<AnnotationType> annotationClass )
     {
         AnnotationType result = null;
         for( Type clazz : Classes.TYPES_OF.map( type ) )
@@ -335,6 +440,7 @@ public final class Classes
      * @param name
      * @param declaringClass
      * @param topClass
+     *
      * @return
      */
     public static Type resolveTypeVariable( TypeVariable name, Class declaringClass, Class topClass )
@@ -377,8 +483,10 @@ public final class Classes
             types.add( type );
         }
 
-        if (current.getGenericSuperclass() != null)
+        if( current.getGenericSuperclass() != null )
+        {
             types.add( current.getGenericSuperclass() );
+        }
 
         for( Type type : types )
         {
@@ -391,12 +499,13 @@ public final class Classes
                 TypeVariable[] vars = clazz.getTypeParameters();
                 for( int i = 0; i < vars.length; i++ )
                 {
-                    TypeVariable var = vars[i];
-                    Type mappedType = args[i];
+                    TypeVariable var = vars[ i ];
+                    Type mappedType = args[ i ];
                     mappings.put( var, mappedType );
                 }
                 subClass = (Class) pt.getRawType();
-            } else
+            }
+            else
             {
                 subClass = (Class) type;
             }
@@ -415,11 +524,13 @@ public final class Classes
      * Get URI for a class.
      *
      * @param clazz class
+     *
      * @return URI
+     *
      * @throws NullPointerException if clazz is null
      */
     public static String toURI( final Class clazz )
-            throws NullPointerException
+        throws NullPointerException
     {
         return toURI( clazz.getName() );
     }
@@ -433,11 +544,13 @@ public final class Classes
      * URI urn:qi4j:com.example.Foo-Bar
      *
      * @param className class name
+     *
      * @return URI
+     *
      * @throws NullPointerException if className is null
      */
     public static String toURI( String className )
-            throws NullPointerException
+        throws NullPointerException
     {
         className = normalizeClassToURI( className );
         return "urn:qi4j:type:" + className;
@@ -447,11 +560,13 @@ public final class Classes
      * Get class name from a URI
      *
      * @param uri URI
+     *
      * @return class name
+     *
      * @throws NullPointerException if uri is null
      */
     public static String toClassName( String uri )
-            throws NullPointerException
+        throws NullPointerException
     {
         uri = uri.substring( "urn:qi4j:type:".length() );
         uri = denormalizeURIToClass( uri );
@@ -467,4 +582,100 @@ public final class Classes
     {
         return uriPart.replace( '-', '$' );
     }
+
+    public static Specification<ModelDescriptor> modelTypeSpecification( final String className )
+    {
+        return new Specification<ModelDescriptor>()
+        {
+            @Override
+            public boolean satisfiedBy( ModelDescriptor item )
+            {
+                return matchesAny( new Specification<String>()
+                {
+                    @Override
+                    public boolean satisfiedBy( String item )
+                    {
+                        return item.equals( className );
+                    }
+                }, map( new Function<Class<?>, String>()
+                {
+                    @Override
+                    public String map( Class<?> item )
+                    {
+                        return item.getName();
+                    }
+                }, item.types() ) );
+            }
+        };
+    }
+
+    public static Specification<ModelDescriptor> exactTypeSpecification( final Class type )
+    {
+        return new Specification<ModelDescriptor>()
+        {
+            @Override
+            public boolean satisfiedBy( ModelDescriptor item )
+            {
+                return matchesAny( new Specification<Class<?>>()
+                {
+                    @Override
+                    public boolean satisfiedBy( Class<?> item )
+                    {
+                        return item.equals( type );
+                    }
+                }, item.types() );
+            }
+        };
+    }
+
+    public static Specification<ModelDescriptor> assignableTypeSpecification( final Class type )
+    {
+        return new Specification<ModelDescriptor>()
+        {
+            @Override
+            public boolean satisfiedBy( ModelDescriptor item )
+            {
+                return matchesAny( new Specification<Class<?>>()
+                {
+                    @Override
+                    public boolean satisfiedBy( Class<?> itemType )
+                    {
+                        return !type.equals( itemType ) && type.isAssignableFrom( itemType );
+                    }
+                }, item.types() );
+            }
+        };
+    }
+
+    public static String toString( Iterable<? extends Class> type )
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append( "[" );
+        boolean first = true;
+        for( Class c : type )
+        {
+            if( !first )
+            {
+                builder.append( "," );
+            }
+            first = false;
+            builder.append( c.getSimpleName() );
+        }
+        builder.append( "]" );
+        return builder.toString();
+    }
+
+    public static Function<Type, String> toClassName()
+    {
+        return new Function<Type, String>()
+        {
+            @Override
+            public String map( Type type )
+            {
+                return RAW_CLASS.map( type ).getName();
+            }
+        };
+    }
 }
+
+

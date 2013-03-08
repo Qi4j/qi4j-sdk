@@ -11,19 +11,23 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.library.constraints;
 
 import org.qi4j.api.constraint.Constraint;
 import org.qi4j.library.constraints.annotation.InstanceOf;
 
 /**
- * JAVADOC
+ * Implement @InstanceOf constraint.
  */
 public class InstanceOfConstraint
     implements Constraint<InstanceOf, Object>
 {
-    public boolean isValid( InstanceOf annotation, Object parameter ) throws NullPointerException
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public boolean isValid( InstanceOf annotation, Object parameter )
+        throws NullPointerException
     {
         if( parameter != null )
         {
@@ -35,7 +39,7 @@ public class InstanceOfConstraint
                 }
             }
         }
-
         return true;
     }
+
 }

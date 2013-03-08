@@ -15,20 +15,19 @@
 package org.qi4j.api.common;
 
 import org.junit.Test;
+import org.qi4j.api.association.Association;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.association.Association;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.entitystore.memory.MemoryEntityStoreService;
-import org.qi4j.spi.uuid.UuidIdentityGeneratorService;
 import org.qi4j.test.AbstractQi4jTest;
+import org.qi4j.test.EntityTestAssembler;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
@@ -45,8 +44,7 @@ public class OptionalTest
         module.transients( TestComposite.class );
         module.transients( TestComposite2.class );
         module.entities( TestComposite3.class, TestComposite4.class );
-        module.services( MemoryEntityStoreService.class );
-        module.services( UuidIdentityGeneratorService.class );
+        new EntityTestAssembler().assemble( module );
     }
 
     @Test
@@ -150,7 +148,8 @@ public class OptionalTest
             TestComposite3 testComposite3 = builder.newInstance();
 
             unitOfWork.complete();
-        } finally
+        }
+        finally
         {
             unitOfWork.discard();
         }

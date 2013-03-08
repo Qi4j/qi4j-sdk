@@ -3,17 +3,16 @@ description = "Qi4j REST Client Library provides a client library for the Qi4j R
 jar { manifest { name = "Qi4j Library - REST Client" }}
 
 dependencies {
-  compile(project(":org.qi4j.core:org.qi4j.core.api"))
-  compile(project(":org.qi4j.libraries:org.qi4j.library.rest-common"))
-  compile(libraries.slf4j_api)
-  compile('org.restlet.jee:org.restlet:' + restletVersion)
-  compile('org.restlet.jee:org.restlet.ext.servlet:' + restletVersion)
-  compile('org.restlet.jee:org.restlet.ext.xml:' + restletVersion)
-  testCompile(project(":org.qi4j.libraries:org.qi4j.library.rest-server"))
-  testCompile(project(":org.qi4j.core:org.qi4j.core.bootstrap"))
-  testCompile(project(":org.qi4j.core:org.qi4j.core.testsupport"))
-  testCompile('org.restlet.jee:org.restlet.ext.atom:' + restletVersion)
-  testCompile(libraries.junit)
-  testRuntime(project(":org.qi4j.core:org.qi4j.core.runtime"))
-  testRuntime(libraries.slf4j_simple)
+
+    compile project( ":org.qi4j.core:org.qi4j.core.api" )
+    compile project( ":org.qi4j.libraries:org.qi4j.library.rest-common" )
+    compile libraries.restlet
+
+    testCompile project( ":org.qi4j.core:org.qi4j.core.testsupport" )
+    testCompile project( ":org.qi4j.libraries:org.qi4j.library.rest-server" )
+    testCompile project( ':org.qi4j.extensions:org.qi4j.extension.valueserialization-orgjson' )
+
+    testRuntime project( ":org.qi4j.core:org.qi4j.core.runtime" )
+    testRuntime libraries.logback
+
 }

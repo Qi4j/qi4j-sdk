@@ -19,14 +19,15 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.spi.entity.EntityState;
 
 /**
- * JAVADOC
+ * EntityStore SPI.
  */
 public interface EntityStoreSPI
 {
     EntityState newEntityState( EntityStoreUnitOfWork unitOfWork,
-                                EntityReference identity, EntityDescriptor entityDescriptor );
+                                EntityReference identity, EntityDescriptor entityDescriptor
+    );
 
-    EntityState getEntityState( EntityStoreUnitOfWork unitOfWork, EntityReference identity );
+    EntityState entityStateOf( EntityStoreUnitOfWork unitOfWork, EntityReference identity );
 
     StateCommitter applyChanges( EntityStoreUnitOfWork unitOfWork, Iterable<EntityState> state
     );

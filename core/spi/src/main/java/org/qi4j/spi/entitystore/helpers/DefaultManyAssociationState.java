@@ -14,11 +14,10 @@
 
 package org.qi4j.spi.entitystore.helpers;
 
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.spi.entity.ManyAssociationState;
-
 import java.util.Iterator;
 import java.util.List;
+import org.qi4j.api.entity.EntityReference;
+import org.qi4j.spi.entity.ManyAssociationState;
 
 /**
  * Default implementation of ManyAssociationState. Backed by ArrayList.
@@ -35,16 +34,19 @@ public final class DefaultManyAssociationState
         this.references = references;
     }
 
+    @Override
     public int count()
     {
         return references.size();
     }
 
+    @Override
     public boolean contains( EntityReference entityReference )
     {
         return references.contains( entityReference );
     }
 
+    @Override
     public boolean add( int i, EntityReference entityReference )
     {
         if( references.contains( entityReference ) )
@@ -57,6 +59,7 @@ public final class DefaultManyAssociationState
         return true;
     }
 
+    @Override
     public boolean remove( EntityReference entity )
     {
         boolean removed = references.remove( entity );
@@ -64,11 +67,13 @@ public final class DefaultManyAssociationState
         return removed;
     }
 
+    @Override
     public EntityReference get( int i )
     {
         return references.get( i );
     }
 
+    @Override
     public Iterator<EntityReference> iterator()
     {
         final Iterator<EntityReference> iter = references.iterator();
@@ -77,17 +82,20 @@ public final class DefaultManyAssociationState
         {
             EntityReference current;
 
+            @Override
             public boolean hasNext()
             {
                 return iter.hasNext();
             }
 
+            @Override
             public EntityReference next()
             {
                 current = iter.next();
                 return current;
             }
 
+            @Override
             public void remove()
             {
                 iter.remove();

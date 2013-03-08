@@ -15,14 +15,21 @@
 
 package org.qi4j.runtime.entity;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashSet;
+import java.util.Set;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateDescriptor;
+import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.constraint.ConstraintViolationException;
-import org.qi4j.api.entity.*;
-import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.entity.EntityReference;
+import org.qi4j.api.entity.Identity;
+import org.qi4j.api.entity.LifecycleException;
 import org.qi4j.api.unitofwork.NoSuchEntityException;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.unitofwork.UnitOfWorkException;
@@ -33,18 +40,13 @@ import org.qi4j.runtime.structure.ModuleUnitOfWork;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * Entity instance
  */
 public final class EntityInstance
     implements CompositeInstance, MixinsInstance
 {
-    public static EntityInstance getEntityInstance( EntityComposite composite )
+    public static EntityInstance entityInstanceOf( EntityComposite composite )
     {
         return (EntityInstance) Proxy.getInvocationHandler( composite );
     }
@@ -74,6 +76,7 @@ public final class EntityInstance
         proxy = (EntityComposite) entityModel.newProxy( this );
     }
 
+    @Override
     public Object invoke( Object proxy, Method method, Object[] args )
         throws Throwable
     {
@@ -85,28 +88,33 @@ public final class EntityInstance
         return identity;
     }
 
+    @Override
     public <T> T proxy()
     {
         return (T) proxy;
     }
 
+    @Override
     public CompositeDescriptor descriptor()
     {
         return entityModel;
     }
 
+    @Override
     public <T> T newProxy( Class<T> mixinType )
         throws IllegalArgumentException
     {
         return entityModel.newProxy( this, mixinType );
     }
 
+    @Override
     public Object invokeComposite( Method method, Object[] args )
         throws Throwable
     {
         return entityModel.invoke( this, proxy, method, args, moduleInstance );
     }
 
+    @Override
     public <T> T metaInfo( Class<T> infoType )
     {
         return entityModel.metaInfo( infoType );
@@ -117,11 +125,13 @@ public final class EntityInstance
         return entityModel;
     }
 
-    public Class<?> type()
+    @Override
+    public Iterable<Class<?>> types()
     {
-        return entityModel.type();
+        return entityModel.types();
     }
 
+    @Override
     public ModuleInstance module()
     {
         return moduleInstance;
@@ -137,6 +147,7 @@ public final class EntityInstance
         return entityState;
     }
 
+    @Override
     public EntityStateInstance state()
     {
         if( state == null )
@@ -152,6 +163,7 @@ public final class EntityInstance
         return entityState.status();
     }
 
+    @Override
     public Object invoke( Object composite, Object[] params, CompositeMethodInstance methodInstance )
         throws Throwable
     {
@@ -160,7 +172,7 @@ public final class EntityInstance
             initState();
         }
 
-        Object mixin = methodInstance.getMixin( mixins );
+        Object mixin = methodInstance.getMixinFrom( mixins );
 
         if( mixin == null )
         {
@@ -170,6 +182,7 @@ public final class EntityInstance
         return methodInstance.invoke( proxy, params, mixin );
     }
 
+    @Override
     public Object invokeObject( Object proxy, Object[] args, Method method )
         throws Throwable
     {
@@ -295,7 +308,8 @@ public final class EntityInstance
         }
         catch( ConstraintViolationException e )
         {
-            throw new ConstraintViolationException( identity.identity(), entityModel.type().getName(), e.mixinTypeName(), e.methodName(), e.constraintViolations() );
+            throw new ConstraintViolationException( identity.identity(), entityModel.types(), e.mixinTypeName(), e.methodName(), e
+                .constraintViolations() );
         }
     }
 }

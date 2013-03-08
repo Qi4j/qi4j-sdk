@@ -10,14 +10,15 @@ import org.qi4j.functional.Specification;
 public class QuerySpecification
     implements Specification<Composite>
 {
-    public static boolean isQueryLanguage(String language, Specification<Composite> specification)
+    public static boolean isQueryLanguage( String language, Specification<Composite> specification )
     {
-        if (!(specification instanceof QuerySpecification))
+        if( !( specification instanceof QuerySpecification ) )
+        {
             return false;
+        }
 
-        return ((QuerySpecification)specification).getLanguage().equals( language );
+        return ( (QuerySpecification) specification ).language().equals( language );
     }
-
 
     private String language;
     private String query;
@@ -28,12 +29,12 @@ public class QuerySpecification
         this.query = query;
     }
 
-    public String getLanguage()
+    public String language()
     {
         return language;
     }
 
-    public String getQuery()
+    public String query()
     {
         return query;
     }
@@ -47,6 +48,6 @@ public class QuerySpecification
     @Override
     public String toString()
     {
-        return language+":"+query;
+        return language + ":" + query;
     }
 }

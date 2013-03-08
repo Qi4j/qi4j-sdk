@@ -14,27 +14,33 @@
 
 package org.qi4j.api.service.qualifier;
 
-import org.qi4j.api.service.ServiceReference;
-import org.qi4j.functional.Specification;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import org.qi4j.api.service.ServiceReference;
+import org.qi4j.functional.Specification;
 
 /**
  * Filter services based on whether they are available or not.
  *
  * At an injection point you can do this:
  *
- * @Service @Available MyService service;
+ * <pre><code>
+ * &#64;Service @Available MyService service;
+ * </code></pre>
  * to get only a service that is currently available.
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Qualifier( Available.AvailableQualifier.class )
 public @interface Available
 {
+    /**
+     * Available Annotation Qualifier.
+     * See {@see Available}.
+     */
     public final class AvailableQualifier
         implements AnnotationQualifier<Available>
     {
+        @Override
         public <T> Specification<ServiceReference<?>> qualifier( Available active )
         {
             return ServiceQualifier.whereAvailable();

@@ -14,6 +14,7 @@
 
 package org.qi4j.runtime.entity;
 
+import java.lang.reflect.AccessibleObject;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateDescriptor;
 import org.qi4j.api.common.QualifiedName;
@@ -25,8 +26,6 @@ import org.qi4j.runtime.association.ManyAssociationModel;
 import org.qi4j.runtime.association.ManyAssociationsModel;
 import org.qi4j.runtime.composite.StateModel;
 import org.qi4j.runtime.property.PropertiesModel;
-
-import java.lang.reflect.AccessibleObject;
 
 /**
  * JAVADOC
@@ -54,8 +53,9 @@ public final class EntityStateModel
         return associationsModel.getAssociation( accessor );
     }
 
+    @Override
     public AssociationDescriptor getAssociationByName( String name )
-            throws IllegalArgumentException
+        throws IllegalArgumentException
     {
         return associationsModel.getAssociationByName( name );
     }
@@ -73,6 +73,7 @@ public final class EntityStateModel
         return manyAssociationsModel.getManyAssociation( accessor );
     }
 
+    @Override
     public AssociationDescriptor getManyAssociationByName( String name )
         throws IllegalArgumentException
     {
@@ -86,28 +87,33 @@ public final class EntityStateModel
         return manyAssociationsModel.getManyAssociationByQualifiedName( name );
     }
 
+    @Override
     public Iterable<AssociationModel> associations()
     {
         return associationsModel.associations();
     }
 
+    @Override
     public Iterable<ManyAssociationModel> manyAssociations()
     {
         return manyAssociationsModel.manyAssociations();
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+        throws ThrowableType
     {
-        if (visitor.visitEnter( this ))
+        if( visitor.visitEnter( this ) )
         {
-            if (((VisitableHierarchy<Object, Object>)propertiesModel).accept(visitor))
-                if (((VisitableHierarchy<AssociationsModel, AssociationModel>)associationsModel).accept(visitor))
-                    ((VisitableHierarchy<ManyAssociationsModel, ManyAssociationModel>)manyAssociationsModel).accept(visitor);
-
+            if( ( (VisitableHierarchy<Object, Object>) propertiesModel ).accept( visitor ) )
+            {
+                if( ( (VisitableHierarchy<AssociationsModel, AssociationModel>) associationsModel ).accept( visitor ) )
+                {
+                    ( (VisitableHierarchy<ManyAssociationsModel, ManyAssociationModel>) manyAssociationsModel ).accept( visitor );
+                }
+            }
         }
 
         return visitor.visitLeave( this );
     }
-
 }

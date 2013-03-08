@@ -14,27 +14,33 @@
 
 package org.qi4j.api.service.qualifier;
 
-import org.qi4j.api.service.ServiceReference;
-import org.qi4j.functional.Specification;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import org.qi4j.api.service.ServiceReference;
+import org.qi4j.functional.Specification;
 
 /**
  * Filter services based on whether they are active or not.
  *
  * At an injection point you can do this:
  *
- * @Service @Active MyService service;
+ * <pre><code>
+ * &#64;Service @Active MyService service;
+ * </code></pre>
  * to get only a service that is currently active.
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Qualifier( Active.ActiveQualifier.class )
 public @interface Active
 {
+    /**
+     * Active Annotation Qualifier.
+     * See {@see Active}.
+     */
     public final class ActiveQualifier
         implements AnnotationQualifier<Active>
     {
+        @Override
         public <T> Specification<ServiceReference<?>> qualifier( Active active )
         {
             return ServiceQualifier.whereActive();

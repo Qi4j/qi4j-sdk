@@ -21,26 +21,24 @@ package org.qi4j.entitystore.gae;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.qi4j.api.common.QualifiedName;
-import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.api.json.JSONDeserializer;
-import org.qi4j.api.json.JSONWriterSerializer;
-import org.qi4j.api.property.PropertyDescriptor;
-import org.qi4j.api.structure.Module;
-import org.qi4j.api.type.ValueCompositeType;
-import org.qi4j.api.type.ValueType;
-import org.qi4j.spi.entity.EntityState;
-import org.qi4j.spi.entity.EntityStatus;
-import org.qi4j.spi.entity.ManyAssociationState;
-
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import org.qi4j.api.common.QualifiedName;
+import org.qi4j.api.entity.EntityDescriptor;
+import org.qi4j.api.entity.EntityReference;
+import org.qi4j.api.property.PropertyDescriptor;
+import org.qi4j.api.structure.Module;
+import org.qi4j.api.type.ValueCompositeType;
+import org.qi4j.api.type.ValueType;
+import org.qi4j.api.value.ValueSerialization;
+import org.qi4j.api.value.ValueSerializationException;
+import org.qi4j.spi.entity.EntityState;
+import org.qi4j.spi.entity.EntityStatus;
+import org.qi4j.spi.entity.ManyAssociationState;
+
+import static org.qi4j.functional.Iterables.first;
 
 public class GaeEntityState
     implements EntityState
@@ -50,20 +48,25 @@ public class GaeEntityState
     private final Entity entity;
     private EntityStatus status;
     private final GaeEntityStoreUnitOfWork unitOfWork;
+    private final ValueSerialization valueSerialization;
     private final EntityDescriptor descriptor;
     private final HashMap<QualifiedName, ValueType> valueTypes;
     private final Module module;
-    private JSONDeserializer deserializer;
 
-    public GaeEntityState( GaeEntityStoreUnitOfWork unitOfWork, Key key, EntityDescriptor descriptor, Module module )
+    public GaeEntityState( GaeEntityStoreUnitOfWork unitOfWork,
+                           ValueSerialization valueSerialization,
+                           Key key,
+                           EntityDescriptor descriptor,
+                           Module module )
     {
         System.out.println( "GaeEntityState( " + unitOfWork + ", " + key + ", " + descriptor + " )" );
         this.module = module;
         this.unitOfWork = unitOfWork;
+        this.valueSerialization = valueSerialization;
         this.descriptor = descriptor;
         entity = new Entity( key );
         entity.setProperty( "$version", unitOfWork.identity() );
-        Class type = descriptor.type();
+        Class type = first( descriptor.types() );
         String name = type.getName();
         System.out.println( "New Entity\n" +
                             "    descriptor:" + descriptor + "\n  " +
@@ -75,7 +78,10 @@ public class GaeEntityState
         valueTypes = initializeValueTypes( descriptor );
     }
 
-    public GaeEntityState( GaeEntityStoreUnitOfWork unitOfWork, Entity entity, Module module )
+    public GaeEntityState( GaeEntityStoreUnitOfWork unitOfWork,
+                           ValueSerialization valueSerialization,
+                           Entity entity,
+                           Module module )
     {
         System.out.println( "GaeEntityState( " + unitOfWork + ", " + entity + " )" );
         if( entity == null )
@@ -88,13 +94,13 @@ public class GaeEntityState
         }
         this.module = module;
         this.unitOfWork = unitOfWork;
+        this.valueSerialization = valueSerialization;
         this.entity = entity;
         String typeName = (String) entity.getProperty( GaeEntityState.PROPERTY_TYPE );
         System.out.println( "LOADING [" + typeName + "]" );
         descriptor = module.entityDescriptor( typeName );
         status = EntityStatus.LOADED;
         valueTypes = initializeValueTypes( descriptor );
-        deserializer = new JSONDeserializer( module );
     }
 
     private HashMap<QualifiedName, ValueType> initializeValueTypes( EntityDescriptor descriptor )
@@ -117,6 +123,7 @@ public class GaeEntityState
         return entity;
     }
 
+    @Override
     public EntityReference identity()
     {
         EntityReference ref = new EntityReference( entity.getKey().getName() );
@@ -124,6 +131,7 @@ public class GaeEntityState
         return ref;
     }
 
+    @Override
     public String version()
     {
         String version = (String) entity.getProperty( "$version" );
@@ -131,6 +139,7 @@ public class GaeEntityState
         return version;
     }
 
+    @Override
     public long lastModified()
     {
         Long lastModified = (Long) entity.getProperty( "$lastModified" );
@@ -138,12 +147,14 @@ public class GaeEntityState
         return lastModified;
     }
 
+    @Override
     public void remove()
     {
         System.out.println( "remove()" );
         status = EntityStatus.REMOVED;
     }
 
+    @Override
     public EntityStatus status()
     {
         System.out.println( "status()  -->  " + status );
@@ -157,13 +168,15 @@ public class GaeEntityState
         return false;
     }
 
+    @Override
     public EntityDescriptor entityDescriptor()
     {
         System.out.println( "entityDescriptor()  -->  " + descriptor );
         return descriptor;
     }
 
-    public Object getProperty( QualifiedName stateName )
+    @Override
+    public Object propertyValueOf( QualifiedName stateName )
     {
         String uri = stateName.toURI();
         Object value = entity.getProperty( uri );
@@ -172,23 +185,20 @@ public class GaeEntityState
             value = ( (Text) value ).getValue();
         }
         ValueType type = valueTypes.get( stateName );
-
-        if( type != null )
+        if( value != null && type != null )
         {
             try
             {
-                JSONObject json = new JSONObject( value );
-                value = deserializer.deserialize( json, type );
+                value = valueSerialization.deserialize( type, value.toString() );
             }
-            catch( JSONException e )
+            catch( ValueSerializationException e )
             {
                 String message = "\nqualifiedName: " + stateName +
                                  "\n    stateName: " + stateName.name() +
                                  "\n          uri: " + uri +
                                  "\n         type: " + type +
                                  "\n        value: " + value +
-                                 "\n"
-                    ;
+                                 "\n";
                 InternalError error = new InternalError( message );
                 error.initCause( e );
                 throw error;
@@ -198,22 +208,29 @@ public class GaeEntityState
         return value;
     }
 
-    public void setProperty( QualifiedName stateName, Object value )
+    @Override
+    public void setPropertyValue( QualifiedName stateName, Object newValue )
     {
-        System.out.println( "setProperty( " + stateName + ", " + value + " )" );
-        if( value != null && Proxy.isProxyClass( value.getClass() ) )
+        System.out.println( "setProperty( " + stateName + ", " + newValue + " )" );
+        Object value = null;
+        if( newValue == null || ValueType.isPrimitiveValue( newValue ) )
         {
-            System.out.println( "handler: " + Proxy.getInvocationHandler( value ) );
-            ValueType type = valueTypes.get( stateName );
+            value = newValue;
+        }
+        else
+        {
             try
             {
-                JSONWriterSerializer serializer = new JSONWriterSerializer(  );
-                serializer.serialize( value, type );
-                value = serializer.getJSON().toString();
+                value = valueSerialization.serialize( newValue );
             }
-            catch( JSONException e )
+            catch( ValueSerializationException e )
             {
-                InternalError error = new InternalError();
+                String message = "\nqualifiedName: " + stateName +
+                                 "\n    stateName: " + stateName.name() +
+                                 "\n        class: " + newValue.getClass() +
+                                 "\n        value: " + value +
+                                 "\n";
+                InternalError error = new InternalError( message );
                 error.initCause( e );
                 throw error;
             }
@@ -225,16 +242,18 @@ public class GaeEntityState
         entity.setUnindexedProperty( stateName.toURI(), value );
     }
 
-    public EntityReference getAssociation( QualifiedName stateName )
+    @Override
+    public EntityReference associationValueOf( QualifiedName stateName )
     {
         String uri = stateName.toURI();
         String identity = (String) entity.getProperty( uri );
-        System.out.println( "getAssociation( " + stateName + " )  -->  " + uri + " = " + identity );
+        System.out.println( "association( " + stateName + " )  -->  " + uri + " = " + identity );
         EntityReference ref = new EntityReference( identity );
         return ref;
     }
 
-    public void setAssociation( QualifiedName stateName, EntityReference newEntity )
+    @Override
+    public void setAssociationValue( QualifiedName stateName, EntityReference newEntity )
     {
         System.out.println( "setAssociation( " + stateName + ", " + newEntity + " )" );
         String uri = stateName.toURI();
@@ -246,7 +265,8 @@ public class GaeEntityState
         entity.setUnindexedProperty( uri, id );
     }
 
-    public ManyAssociationState getManyAssociation( QualifiedName stateName )
+    @Override
+    public ManyAssociationState manyAssociationValueOf( QualifiedName stateName )
     {
         List<String> assocs = (List<String>) entity.getProperty( stateName.toURI() );
         ManyAssociationState state = new GaeManyAssociationState( this, assocs );
@@ -278,16 +298,19 @@ public class GaeEntityState
             }
         }
 
+        @Override
         public int count()
         {
             return assocs.size();
         }
 
+        @Override
         public boolean contains( EntityReference entityReference )
         {
             return assocs.contains( entityReference.identity() );
         }
 
+        @Override
         public boolean add( int index, EntityReference entityReference )
         {
             System.out.println( "NICLAS::" + entityReference );
@@ -303,17 +326,20 @@ public class GaeEntityState
             return true;
         }
 
+        @Override
         public boolean remove( EntityReference entityReference )
         {
             return assocs.remove( entityReference.identity() );
         }
 
+        @Override
         public EntityReference get( int index )
         {
             String id = assocs.get( index );
             return new EntityReference( id );
         }
 
+        @Override
         public Iterator<EntityReference> iterator()
         {
             ArrayList<EntityReference> result = new ArrayList<EntityReference>();

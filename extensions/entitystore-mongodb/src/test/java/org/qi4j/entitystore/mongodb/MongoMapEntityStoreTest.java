@@ -18,69 +18,69 @@
 package org.qi4j.entitystore.mongodb;
 
 import com.mongodb.Mongo;
-import org.junit.After;
 import org.junit.Ignore;
-import org.junit.Test;
-import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
+import org.qi4j.valueserialization.orgjson.OrgJsonValueSerializationAssembler;
 
 /**
  * Test the MongoMapEntityStoreService.
- * 
- * FIXME This test is ignored because it needs a MongoDB instance
- * 
+ *
+ *
  * Installing mongodb and starting it should suffice as the test use mongodb defaults: 127.0.0.1:27017
- * 
+ *
  * Do we have a build-wise way to switch on/off theses kind of tests ?
  */
-@Ignore
+@Ignore( "This test is ignored because it needs a MongoDB instance" )
 public class MongoMapEntityStoreTest
-        extends AbstractEntityStoreTest
+    extends AbstractEntityStoreTest
 {
 
     @Override
+    // START SNIPPET: assembly
     public void assemble( ModuleAssembly module )
-            throws AssemblyException
+        throws AssemblyException
     {
+        // END SNIPPET: assembly
         super.assemble( module );
 
         ModuleAssembly config = module.layer().module( "config" );
         config.services( MemoryEntityStoreService.class );
 
+        new OrgJsonValueSerializationAssembler().assemble( module );
+
+        // START SNIPPET: assembly
         new MongoMapEntityStoreAssembler().withConfigModule( config ).assemble( module );
+        // END SNIPPET: assembly
 
         MongoEntityStoreConfiguration mongoConfig = config.forMixin( MongoEntityStoreConfiguration.class ).declareDefaults();
         mongoConfig.writeConcern().set( MongoEntityStoreConfiguration.WriteConcern.FSYNC_SAFE );
+        mongoConfig.database().set( "qi4j:test" );
+        mongoConfig.collection().set( "qi4j:test:entities" );
+        // START SNIPPET: assembly
     }
-
+    // END SNIPPET: assembly
     private Mongo mongo;
+    private String dbName;
 
     @Override
     public void setUp()
-            throws Exception
+        throws Exception
     {
         super.setUp();
-        mongo = module.findService( MongoMapEntityStoreService.class ).get().mongoInstanceUsed();
+        MongoMapEntityStoreService es = module.findService( MongoMapEntityStoreService.class ).get();
+        mongo = es.mongoInstanceUsed();
+        dbName = es.dbInstanceUsed().getName();
+
     }
 
-    @Test
-    @Override
-    public void givenConcurrentUnitOfWorksWhenUoWCompletesThenCheckConcurrentModification()
-            throws UnitOfWorkCompletionException
-    {
-        super.givenConcurrentUnitOfWorksWhenUoWCompletesThenCheckConcurrentModification();
-    }
-
-    @After
     @Override
     public void tearDown()
-            throws Exception
+        throws Exception
     {
-        mongo.dropDatabase( MongoMapEntityStoreAssembler.DEFAULT_DATABASE_NAME );
+        mongo.dropDatabase( dbName );
         super.tearDown();
     }
-
 }

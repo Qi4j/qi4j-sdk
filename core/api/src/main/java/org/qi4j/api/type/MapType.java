@@ -11,27 +11,32 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.api.type;
-
-import org.qi4j.api.util.Classes;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import org.qi4j.api.util.Classes;
 
 /**
- * Map type. This handles instances of Map
+ * Map ValueType.
+ * <p>This handles instances of Map.</p>
  */
 public final class MapType
     extends ValueType
 {
+
     private ValueType keyType;
     private ValueType valueType;
 
     public static boolean isMap( Type type )
     {
-        Class cl = Classes.RAW_CLASS.map( type );
+        Class<?> cl = Classes.RAW_CLASS.map( type );
         return Map.class.isAssignableFrom( cl );
+    }
+
+    public static MapType of( Class<?> keyType, Class<?> valueType )
+    {
+        return new MapType( Map.class, ValueType.of( keyType ), ValueType.of( valueType ) );
     }
 
     public MapType( Class<?> type, ValueType keyType, ValueType valueType )
@@ -39,14 +44,18 @@ public final class MapType
         super( type );
         this.keyType = keyType;
         this.valueType = valueType;
+        if( !isMap( type ) )
+        {
+            throw new IllegalArgumentException( type + " is not a Map." );
+        }
     }
 
-    public ValueType getKeyType()
+    public ValueType keyType()
     {
         return keyType;
     }
 
-    public ValueType getValueType()
+    public ValueType valueType()
     {
         return valueType;
     }
@@ -54,6 +63,6 @@ public final class MapType
     @Override
     public String toString()
     {
-        return type().getName() + "<" + keyType + "," + valueType + ">";
+        return super.toString() + "<" + keyType + "," + valueType + ">";
     }
 }

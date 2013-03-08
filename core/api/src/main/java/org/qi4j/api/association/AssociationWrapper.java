@@ -1,7 +1,5 @@
 package org.qi4j.api.association;
 
-import org.qi4j.api.association.Association;
-
 /**
  * If you want to catch getting and setting association, then create a GenericConcern
  * that wraps the Qi4j-supplied Association instance with AssociationWrappers. Override
@@ -17,7 +15,7 @@ public class AssociationWrapper
         this.next = next;
     }
 
-    public Association<Object> getNext()
+    public Association<Object> next()
     {
         return next;
     }
@@ -29,7 +27,8 @@ public class AssociationWrapper
     }
 
     @Override
-    public void set( Object associated ) throws IllegalArgumentException
+    public void set( Object associated )
+        throws IllegalArgumentException
     {
         next.set( associated );
     }
@@ -43,7 +42,7 @@ public class AssociationWrapper
     @Override
     public boolean equals( Object obj )
     {
-        return next.equals( obj );    //To change body of overridden methods use File | Settings | File Templates.
+        return next.equals( obj );
     }
 
     @Override

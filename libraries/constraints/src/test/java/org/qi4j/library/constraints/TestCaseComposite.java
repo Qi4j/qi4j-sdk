@@ -12,13 +12,12 @@
 */
 package org.qi4j.library.constraints;
 
+import java.util.Collection;
+import java.util.List;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 import org.qi4j.library.constraints.annotation.*;
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Test composite with all the constraints
@@ -26,9 +25,14 @@ import java.util.List;
 @Mixins( TestCaseComposite.TestCaseMixin.class)
 public interface TestCaseComposite extends TransientComposite
 {
+    // START SNIPPET: constraints
     @Contains( "foo" ) Property<String> containsString();
 
     @Email Property<String> email();
+
+    @URL Property<String> url();
+
+    @URI Property<String> uri();
 
     @GreaterThan( 10 ) Property<Integer> greaterThan();
 
@@ -53,6 +57,7 @@ public interface TestCaseComposite extends TransientComposite
     @OneOf( { "Bar", "Xyzzy" } ) Property<String> oneOf();
 
     void testParameters(@GreaterThan(10) Integer greaterThan);
+    // END SNIPPET: constraints
 
     abstract class TestCaseMixin
         implements TestCaseComposite

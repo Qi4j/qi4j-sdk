@@ -21,21 +21,17 @@ import org.junit.Test;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.usecase.UsecaseBuilder;
 import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ClassScanner;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
 import org.qi4j.dci.moneytransfer.context.PayBillsContext;
 import org.qi4j.dci.moneytransfer.context.TransferMoneyContext;
-import org.qi4j.dci.moneytransfer.context.TransferMoneyContext2;
 import org.qi4j.dci.moneytransfer.domain.data.BalanceData;
 import org.qi4j.dci.moneytransfer.domain.entity.CheckingAccountEntity;
 import org.qi4j.dci.moneytransfer.domain.entity.SavingsAccountEntity;
 import org.qi4j.dci.moneytransfer.rolemap.CheckingAccountRolemap;
 import org.qi4j.dci.moneytransfer.rolemap.CreditorRolemap;
 import org.qi4j.dci.moneytransfer.rolemap.SavingsAccountRolemap;
-import org.qi4j.entitystore.memory.MemoryEntityStoreService;
-import org.qi4j.functional.Iterables;
-import org.qi4j.spi.uuid.UuidIdentityGeneratorService;
+import org.qi4j.test.EntityTestAssembler;
 
 import static org.qi4j.api.usecase.UsecaseBuilder.newUsecase;
 
@@ -51,20 +47,20 @@ public class TransferMoneyTest
     public static final String CREDITOR_ID2 = "ButcherAccount";
 
     @BeforeClass
-    public static void setup() throws Exception
+    public static void setup()
+        throws Exception
     {
         assembler = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module ) throws AssemblyException
+            public void assemble( ModuleAssembly module )
+                throws AssemblyException
             {
                 module.entities(
                     CheckingAccountRolemap.class,
                     SavingsAccountRolemap.class,
                     CreditorRolemap.class );
 
-                module.services(
-                    MemoryEntityStoreService.class,
-                    UuidIdentityGeneratorService.class );
+                new EntityTestAssembler().assemble( module );
             }
         };
 
@@ -93,25 +89,30 @@ public class TransferMoneyTest
 
         try
         {
-            System.out.println( SAVINGS_ACCOUNT_ID + ":" + uow.get( BalanceData.class, SAVINGS_ACCOUNT_ID ).getBalance() );
-            System.out.println( CHECKING_ACCOUNT_ID + ":" + uow.get( BalanceData.class, CHECKING_ACCOUNT_ID ).getBalance() );
+            System.out
+                .println( SAVINGS_ACCOUNT_ID + ":" + uow.get( BalanceData.class, SAVINGS_ACCOUNT_ID ).getBalance() );
+            System.out
+                .println( CHECKING_ACCOUNT_ID + ":" + uow.get( BalanceData.class, CHECKING_ACCOUNT_ID ).getBalance() );
             System.out.println( CREDITOR_ID1 + ":" + uow.get( BalanceData.class, CREDITOR_ID1 ).getBalance() );
             System.out.println( CREDITOR_ID2 + ":" + uow.get( BalanceData.class, CREDITOR_ID2 ).getBalance() );
-        } finally
+        }
+        finally
         {
             uow.discard();
         }
     }
 
-    private static void bootstrapData( SingletonAssembler assembler ) throws Exception
+    private static void bootstrapData( SingletonAssembler assembler )
+        throws Exception
     {
         UnitOfWork uow = assembler.module().newUnitOfWork( newUsecase( "Bootstrap data" ) );
         try
         {
-            SavingsAccountEntity account = uow.newEntity( SavingsAccountEntity.class, SAVINGS_ACCOUNT_ID );
-            account.increasedBalance( 1000 );
+            SavingsAccountEntity savingsAccount = uow.newEntity( SavingsAccountEntity.class, SAVINGS_ACCOUNT_ID );
+            savingsAccount.increasedBalance(1000);
 
-            uow.newEntity( CheckingAccountEntity.class, CHECKING_ACCOUNT_ID );
+            CheckingAccountEntity checkingAccount = uow.newEntity(CheckingAccountEntity.class, CHECKING_ACCOUNT_ID);
+            checkingAccount.increasedBalance(200);
 
             // Create some creditor debt
             BalanceData bakerAccount = uow.newEntity( CreditorRolemap.class, CREDITOR_ID1 );
@@ -122,16 +123,19 @@ public class TransferMoneyTest
 
             // Save
             uow.complete();
-        } finally
+        }
+        finally
         {
             uow.discard();
         }
     }
 
     @Test
-    public void transferHalfOfMoneyFromSavingsToChecking() throws Exception
+    public void transferHalfOfMoneyFromSavingsToChecking()
+        throws Exception
     {
-        UnitOfWork uow = assembler.module().newUnitOfWork( UsecaseBuilder.newUsecase( "Transfer from savings to checking" ) );
+        UnitOfWork uow = assembler.module()
+            .newUnitOfWork( UsecaseBuilder.newUsecase( "Transfer from savings to checking" ) );
 
         try
         {
@@ -148,18 +152,19 @@ public class TransferMoneyTest
 
             // Transfer from savings to checking
             context.transfer( amountToTransfer );
-
-            uow.complete();
-        } finally
+        }
+        finally
         {
             uow.discard();
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void transferTwiceOfMoneyFromSavingsToChecking() throws Exception
+    @Test( expected = IllegalArgumentException.class )
+    public void transferTwiceOfMoneyFromSavingsToChecking()
+        throws Exception
     {
-        UnitOfWork uow = assembler.module().newUnitOfWork( UsecaseBuilder.newUsecase( "Transfer from savings to checking" ) );
+        UnitOfWork uow = assembler.module()
+            .newUnitOfWork( UsecaseBuilder.newUsecase( "Transfer from savings to checking" ) );
 
         try
         {
@@ -176,16 +181,16 @@ public class TransferMoneyTest
 
             // Transfer from savings to checking
             context.transfer( amountToTransfer );
-
-            uow.complete();
-        } finally
+        }
+        finally
         {
             uow.discard();
         }
     }
 
     @Test
-    public void payAllBills() throws Exception
+    public void payAllBills()
+        throws Exception
     {
         UnitOfWork uow = assembler.module().newUnitOfWork( newUsecase( "Pay all bills from checking to creditors" ) );
         try
@@ -194,8 +199,6 @@ public class TransferMoneyTest
 
             PayBillsContext context = new PayBillsContext();
             context.bind( source ).payBills();
-
-            uow.complete();
         }
         finally
         {

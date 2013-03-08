@@ -14,11 +14,12 @@
 
 package org.qi4j.spi.entity;
 
+import java.io.Serializable;
 import org.qi4j.api.Qi4j;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.util.Classes;
 
-import java.io.Serializable;
+import static org.qi4j.functional.Iterables.first;
 
 /**
  * A Qualified Identity is the combination of the Composite type name and the identity of a specific
@@ -45,7 +46,7 @@ public final class QualifiedIdentity
         return new QualifiedIdentity( id );
     }
 
-    public static QualifiedIdentity getQualifiedIdentity( Object o )
+    public static QualifiedIdentity qualifiedIdentityOf( Object o )
     {
         return new QualifiedIdentity( (EntityComposite) o );
     }
@@ -60,10 +61,12 @@ public final class QualifiedIdentity
 
     public QualifiedIdentity( EntityComposite entityComposite )
     {
-        this( entityComposite.identity().get(), Qi4j.DESCRIPTOR_FUNCTION.map(entityComposite).type().getName() );
+        this( entityComposite.identity().get(), first( Qi4j.FUNCTION_DESCRIPTOR_FOR
+                                                           .map( entityComposite )
+                                                           .types() ).getName() );
     }
 
-    public QualifiedIdentity( String identity, Class clazz )
+    public QualifiedIdentity( String identity, Class<?> clazz )
     {
         this.identity = identity;
         this.compositeType = clazz.getName();
@@ -102,6 +105,7 @@ public final class QualifiedIdentity
     }
 
     @Override
+    @SuppressWarnings( "AccessingNonPublicFieldOfAnotherObject" )
     public boolean equals( Object o )
     {
         if( this == o )

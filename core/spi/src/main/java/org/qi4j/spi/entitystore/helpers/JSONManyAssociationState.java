@@ -11,24 +11,24 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.spi.entitystore.helpers;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.entitystore.EntityStoreException;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 /**
- * JSON implementation of ManyAssociationState. Backed by JSONArray.
+ * JSON implementation of ManyAssociationState.
+ * <p>Backed by a JSONArray.</p>
  */
 public final class JSONManyAssociationState
     implements ManyAssociationState
 {
+
     private JSONEntityState entityState;
     private JSONArray references;
 
@@ -38,40 +38,29 @@ public final class JSONManyAssociationState
         this.references = references;
     }
 
+    @Override
     public int count()
     {
         return references.length();
     }
 
+    @Override
     public boolean contains( EntityReference entityReference )
     {
-        try
-        {
-            for( int i = 0; i < references.length(); i++ )
-            {
-                if( references.get( i ).equals( entityReference.identity() ) )
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-        catch( JSONException e )
-        {
-            throw new EntityStoreException( e );
-        }
+        return indexOfReference( entityReference.identity() ) != -1;
     }
 
+    @Override
     public boolean add( int idx, EntityReference entityReference )
     {
         try
         {
-            if( contains( entityReference ) )
+            if( indexOfReference( entityReference.identity() ) != -1 )
             {
                 return false;
             }
             entityState.cloneStateIfGlobalStateLoaded();
-            references.insert( idx, entityReference.identity() );
+            insertReference( idx, entityReference.identity() );
             entityState.markUpdated();
             return true;
         }
@@ -81,28 +70,21 @@ public final class JSONManyAssociationState
         }
     }
 
+    @Override
     public boolean remove( EntityReference entityReference )
     {
-        try
+        int refIndex = indexOfReference( entityReference.identity() );
+        if( refIndex != -1 )
         {
-            for( int i = 0; i < references.length(); i++ )
-            {
-                if( references.get( i ).equals( entityReference.identity() ) )
-                {
-                    entityState.cloneStateIfGlobalStateLoaded();
-                    references.remove( i );
-                    entityState.markUpdated();
-                    return true;
-                }
-            }
-            return false;
+            entityState.cloneStateIfGlobalStateLoaded();
+            references.remove( refIndex );
+            entityState.markUpdated();
+            return true;
         }
-        catch( JSONException e )
-        {
-            throw new EntityStoreException( e );
-        }
+        return false;
     }
 
+    @Override
     public EntityReference get( int i )
     {
         try
@@ -115,17 +97,20 @@ public final class JSONManyAssociationState
         }
     }
 
+    @Override
     public Iterator<EntityReference> iterator()
     {
         return new Iterator<EntityReference>()
         {
-            int idx = 0;
+            private int idx = 0;
 
+            @Override
             public boolean hasNext()
             {
                 return idx < references.length();
             }
 
+            @Override
             public EntityReference next()
             {
                 try
@@ -140,10 +125,60 @@ public final class JSONManyAssociationState
                 }
             }
 
+            @Override
             public void remove()
             {
                 throw new UnsupportedOperationException( "remove() is not supported on ManyAssociation iterators." );
             }
         };
+    }
+
+    @Override
+    public String toString()
+    {
+        return references.toString();
+    }
+
+    private int indexOfReference( Object item )
+    {
+        for( int idx = 0; idx < references.length(); idx++ )
+        {
+            if( item.equals( references.opt( idx ) ) )
+            {
+                return idx;
+            }
+        }
+        return -1;
+    }
+
+    private void insertReference( int insert, Object item )
+        throws JSONException
+    {
+        if( insert < 0 || insert > references.length() )
+        {
+            throw new JSONException( "JSONArray[" + insert + "] is out of bounds." );
+        }
+        if( insert == references.length() )
+        {
+            // append
+            references.put( item );
+        }
+        else
+        {
+            // insert (copy/insert/apply)
+            JSONArray output = new JSONArray();
+            for( int idx = 0; idx < references.length(); idx++ )
+            {
+                if( idx == insert )
+                {
+                    output.put( item );
+                }
+                output.put( references.opt( idx ) );
+            }
+            for( int idx = 0; idx < output.length(); idx++ )
+            {
+                references.put( idx, output.opt( idx ) );
+            }
+        }
     }
 }

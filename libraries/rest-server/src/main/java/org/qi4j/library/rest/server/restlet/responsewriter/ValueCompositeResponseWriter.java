@@ -28,7 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.qi4j.api.injection.scope.Service;
+import org.qi4j.api.service.qualifier.Tagged;
 import org.qi4j.api.value.ValueComposite;
+import org.qi4j.api.value.ValueSerialization;
+import org.qi4j.api.value.ValueSerializer;
 import org.restlet.Response;
 import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
@@ -39,15 +42,18 @@ import org.restlet.resource.ResourceException;
 /**
  * JAVADOC
  */
-public class ValueCompositeResponseWriter
-    extends AbstractResponseWriter
+public class ValueCompositeResponseWriter extends AbstractResponseWriter
 {
     private static final List<MediaType> supportedMediaTypes = Arrays.asList( MediaType.TEXT_HTML, MediaType.APPLICATION_JSON );
 
-    private
     @Service
-    Configuration cfg;
+    private Configuration cfg;
 
+    @Service
+    @Tagged( ValueSerialization.Formats.JSON )
+    private ValueSerializer valueSerializer;
+
+    @Override
     public boolean writeResponse( final Object result, final Response response )
         throws ResourceException
     {
@@ -56,9 +62,8 @@ public class ValueCompositeResponseWriter
             MediaType type = getVariant( response.getRequest(), ENGLISH, supportedMediaTypes ).getMediaType();
             if( MediaType.APPLICATION_JSON.equals( type ) )
             {
-                StringRepresentation representation = new StringRepresentation( result.toString(),
+                StringRepresentation representation = new StringRepresentation( valueSerializer.serialize( result ),
                                                                                 MediaType.APPLICATION_JSON );
-
                 response.setEntity( representation );
                 return true;
             }
@@ -86,10 +91,8 @@ public class ValueCompositeResponseWriter
                         Map<String, Object> context = new HashMap<String, Object>();
                         context.put( "request", response.getRequest() );
                         context.put( "response", response );
-
                         context.put( "result", result );
-                        context.put("util", this);
-
+                        context.put( "util", this );
                         try
                         {
                             template.process( context, writer );
@@ -100,7 +103,7 @@ public class ValueCompositeResponseWriter
                         }
                     }
 
-                    public boolean isSequence(Object obj)
+                    public boolean isSequence( Object obj )
                     {
                         return obj instanceof Collection;
                     }
@@ -109,7 +112,6 @@ public class ValueCompositeResponseWriter
                 return true;
             }
         }
-
         return false;
     }
 }

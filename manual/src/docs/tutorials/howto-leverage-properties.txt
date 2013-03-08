@@ -1,0 +1,94 @@
+//////////////////////
+ * Copyright (c) 2007-2013, Niclas Hedhman. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied.
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+//////////////////////
+
+[[howto-leverage-properties,Leverage Properties]]
+= Leverage Properties =
+
+Qi4j does not follow the JavaBeans standard for property support. Instead, a much more explicit concept is in place. The
+advantages are enormous, and the only real downside is that people are already destroyed, thinking in so called POJO
+terms.
+
+So in Qi4j, instead of writing;
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/properties/pojo/Book.java
+tag=book
+-----------
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/properties/pojo/MutableBook.java
+tag=mutableBook
+-----------
+
+where we need the MutableBook to be able to initialize it (known as Type 2 Dependency Injection) on creation. From our
+point of view, this has many flaws. If we refactor the "Title" property, our IDE need to understand the getters and
+setters concept. The good news now is that they all do, but how about meta information about the property itself. For
+instance, how to define a system where a UI can get an Icon for "Author" in a generic way? All kinds of system has been
+added, such as one can create a BookBean for some metadata, and then MBeans for management. Where will it end?
+
+We think we have a much better solution, and are bold enough to abandon the getters/setters and POJOs. The above looks
+like this;
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/properties/Book.java
+tag=book
+-----------
+
+
+There is more to this than meets the eye.
+
+- @Immutable annotation signals that this can't change.
+- Property still have a set() method, which can be used during the initialization only.
+- Metadata about each Property can be declared as <<def-metainfo>>.
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/properties/BookFactory.java
+tag=create
+-----------
+
+== Persistence ==
+
+The Property concept also allows a much better defined persistence model. In Qi4j, only Property and Association
+instances are persisted, and that makes the semantics around the persistence system very clear. 
+
+Properties reference values only, and these values must be Serializable, which means that Properties can not contain
+Entities, since Entities are not Serializable. Associations are the opposite, as they must only reference Entities and
+nothing else.
+
+== MetaInfo ==
+
+Properties can also have typed, custom meta information associated with them. Meta information is declared once per
+Property per Module. A Property is identified by its method name and the interface it is declared in.
+
+Let's say we want to create a generic Swing client that can show and navigate the domain model, without knowing the
+actual domain model. Such Swing client will utilize a SwingInfo property info if it is available.
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/properties/SwingInfo.java
+tag=info
+-----------
+
+Our generic Swing UI will be mainly reflective in nature, but when it gets hold of a Property, it can simply do;
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/properties/SwingPanel.java
+tag=info-use
+-----------

@@ -14,11 +14,10 @@
 
 package org.qi4j.api.common;
 
-import org.qi4j.api.util.NullArgumentException;
-
 import java.io.Serializable;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
+import org.qi4j.api.util.NullArgumentException;
 
 /**
  * QualifiedName is a representation of Property names to their full declaration.
@@ -68,7 +67,7 @@ public final class QualifiedName
     public static QualifiedName fromAccessor( AccessibleObject method )
     {
         NullArgumentException.validateNotNull( "method", method );
-        return fromClass( ((Member)method).getDeclaringClass(), ((Member)method).getName() );
+        return fromClass( ( (Member) method ).getDeclaringClass(), ( (Member) method ).getName() );
     }
 
     /**
@@ -111,27 +110,27 @@ public final class QualifiedName
      * instance from the string representation of the QualifiedName.
      * </p>
      *
-     * @param qualifiedName The QualifiedName external string representation to be converted back into a QualifiedName
+     * @param fullQualifiedName The QualifiedName external string representation to be converted back into a QualifiedName
      *                      instance.
      *
      * @return The QualifiedName instance represented by the {@code qualifiedName} argument.
      *
      * @throws IllegalArgumentException If the {@code qualifiedName} argument has wrong format.
      */
-    public static QualifiedName fromQN( String qualifiedName )
+    public static QualifiedName fromFQN( String fullQualifiedName )
     {
-        NullArgumentException.validateNotEmpty( "qualifiedName", qualifiedName );
-        int idx = qualifiedName.lastIndexOf( ":" );
+        NullArgumentException.validateNotEmpty( "qualifiedName", fullQualifiedName );
+        int idx = fullQualifiedName.lastIndexOf( ":" );
         if( idx == -1 )
         {
-            throw new IllegalArgumentException( "Name '" + qualifiedName + "' is not a qualified name" );
+            throw new IllegalArgumentException( "Name '" + fullQualifiedName + "' is not a qualified name" );
         }
-        final String type = qualifiedName.substring( 0, idx );
-        final String name = qualifiedName.substring( idx + 1 );
+        final String type = fullQualifiedName.substring( 0, idx );
+        final String name = fullQualifiedName.substring( idx + 1 );
         return new QualifiedName( TypeName.nameOf( type ), name );
     }
 
-    public QualifiedName( TypeName typeName, String name )
+    QualifiedName( TypeName typeName, String name )
     {
         NullArgumentException.validateNotNull( "typeName", typeName );
         NullArgumentException.validateNotEmpty( "name", name );
@@ -240,6 +239,7 @@ public final class QualifiedName
         return 31 * typeName.hashCode() + name.hashCode();
     }
 
+    @Override
     public int compareTo( QualifiedName other )
     {
         final int result = typeName.compareTo( other.typeName );

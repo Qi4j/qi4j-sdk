@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Collection;
@@ -70,7 +71,7 @@ public class Outputs
             public <SenderThrowableType extends Throwable> void receiveFrom( Sender<? extends String, SenderThrowableType> sender )
                 throws IOException, SenderThrowableType
             {
-                File tmpFile = File.createTempFile( file.getName(), ".bin" );
+                File tmpFile = Files.createTemporayFileOf( file );
 
                 OutputStream stream = new FileOutputStream( tmpFile );
 
@@ -86,6 +87,7 @@ public class Outputs
                 {
                     sender.sendTo( new Receiver<String, IOException>()
                     {
+                        @Override
                         public void receive( String item )
                             throws IOException
                         {
@@ -121,6 +123,74 @@ public class Outputs
     // START SNIPPET: method
 
     /**
+     * Write lines to a Writer. Separate each line with a newline ("\n" character).
+     *
+     * @param writer the Writer to write the text to
+     * @return an Output for storing text in a Writer
+     */
+    public static Output<String, IOException> text( final Writer writer )
+    // END SNIPPET: method
+    {
+        return new Output<String, IOException>()
+        {
+
+            @Override
+            public <SenderThrowableType extends Throwable> void receiveFrom( Sender<? extends String, SenderThrowableType> sender )
+                throws IOException, SenderThrowableType
+            {
+                sender.sendTo( new Receiver<String, IOException>()
+                {
+
+                    @Override
+                    public void receive( String item )
+                        throws IOException
+                    {
+                        writer.append( item ).append( "\n" );
+                    }
+
+                } );
+            }
+
+        };
+    }
+
+    // START SNIPPET: method
+
+    /**
+     * Write lines to a StringBuilder. Separate each line with a newline ("\n" character).
+     *
+     * @param builder the StringBuilder to append the text to
+     * @return an Output for storing text in a StringBuilder
+     */
+    public static Output<String, IOException> text( final StringBuilder builder )
+    // END SNIPPET: method
+    {
+        return new Output<String, IOException>()
+        {
+
+            @Override
+            public <SenderThrowableType extends Throwable> void receiveFrom( Sender<? extends String, SenderThrowableType> sender )
+                throws IOException, SenderThrowableType
+            {
+                sender.sendTo( new Receiver<String, IOException>()
+                {
+
+                    @Override
+                    public void receive( String item )
+                        throws IOException
+                    {
+                        builder.append( item ).append( "\n" );
+                    }
+
+                } );
+            }
+
+        };
+    }
+
+    // START SNIPPET: method
+
+    /**
      * Write ByteBuffer data to a file. If the writing or sending of data fails the file will be deleted.
      *
      * @param file
@@ -137,7 +207,7 @@ public class Outputs
             public <SenderThrowableType extends Throwable> void receiveFrom( Sender<? extends ByteBuffer, SenderThrowableType> sender )
                 throws IOException, SenderThrowableType
             {
-                File tmpFile = File.createTempFile( file.getName(), ".bin" );
+                File tmpFile = Files.createTemporayFileOf( file );
                 FileOutputStream stream = new FileOutputStream( tmpFile );
                 final FileChannel fco = stream.getChannel();
 
@@ -145,6 +215,7 @@ public class Outputs
                 {
                     sender.sendTo( new Receiver<ByteBuffer, IOException>()
                     {
+                        @Override
                         public void receive( ByteBuffer item )
                             throws IOException
                         {
@@ -200,6 +271,7 @@ public class Outputs
                 {
                     sender.sendTo( new Receiver<ByteBuffer, IOException>()
                     {
+                        @Override
                         public void receive( ByteBuffer item )
                             throws IOException
                         {
@@ -245,13 +317,14 @@ public class Outputs
             public <SenderThrowableType extends Throwable> void receiveFrom( Sender<? extends byte[], SenderThrowableType> sender )
                 throws IOException, SenderThrowableType
             {
-                File tmpFile = File.createTempFile( file.getName(), ".bin" );
+                File tmpFile = Files.createTemporayFileOf( file );
                 final OutputStream stream = new BufferedOutputStream( new FileOutputStream( tmpFile ), bufferSize );
 
                 try
                 {
                     sender.sendTo( new Receiver<byte[], IOException>()
                     {
+                        @Override
                         public void receive( byte[] item )
                             throws IOException
                         {
@@ -298,6 +371,7 @@ public class Outputs
     {
         return withReceiver( new Receiver<T, RuntimeException>()
         {
+            @Override
             public void receive( T item )
                 throws RuntimeException
             {
@@ -349,6 +423,7 @@ public class Outputs
             {
                 sender.sendTo( new Receiver<Object, RuntimeException>()
                 {
+                    @Override
                     public void receive( Object item )
                     {
                         System.out.println( item );
@@ -359,6 +434,33 @@ public class Outputs
     }
 
     // START SNIPPET: method
+
+    /**
+     * Write objects to System.err.println.
+     */
+    public static Output<Object, RuntimeException> systemErr()
+    // END SNIPPET: method
+    {
+        return new Output<Object, RuntimeException>()
+        {
+            @Override
+            public <SenderThrowableType extends Throwable> void receiveFrom( Sender<? extends Object, SenderThrowableType> sender )
+                throws RuntimeException, SenderThrowableType
+            {
+                sender.sendTo( new Receiver<Object, RuntimeException>()
+                {
+                    @Override
+                    public void receive( Object item )
+                    {
+                        System.err.println( item );
+                    }
+                } );
+            }
+        };
+    }
+
+    // START SNIPPET: method
+
     /**
      * Add items to a collection
      */
@@ -373,6 +475,7 @@ public class Outputs
             {
                 sender.sendTo( new Receiver<T, RuntimeException>()
                 {
+                    @Override
                     public void receive( T item )
                         throws RuntimeException
                     {

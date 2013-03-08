@@ -31,6 +31,8 @@ import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.api.value.ValueBuilderFactory;
 import org.qi4j.library.eventsourcing.domain.api.DomainEventValue;
 
+import static org.qi4j.functional.Iterables.first;
+
 /**
  * DomainEventValue factory
  */
@@ -45,13 +47,14 @@ public interface DomainEventFactoryService
         @Structure
         private ValueBuilderFactory vbf;
 
+        @Override
         public DomainEventValue createEvent( EntityComposite entity, String name, Object[] args )
         {
             ValueBuilder<DomainEventValue> builder = vbf.newValueBuilder( DomainEventValue.class );
 
             DomainEventValue prototype = builder.prototype();
             prototype.name().set( name );
-            prototype.entityType().set( Qi4j.DESCRIPTOR_FUNCTION.map( entity ).type().getName() );
+            prototype.entityType().set( first(Qi4j.FUNCTION_DESCRIPTOR_FOR.map( entity ).types()).getName() );
             prototype.entityId().set( entity.identity().get() );
 
             // JSON-ify parameters
@@ -62,7 +65,7 @@ public interface DomainEventFactoryService
                 for (int i = 0; i < args.length; i++)
                 {
                     params.key( "param" + i );
-                    if (args == null)
+                    if (args[i] == null)
                         params.value( JSONObject.NULL );
                     else
                         params.value( args[i] );

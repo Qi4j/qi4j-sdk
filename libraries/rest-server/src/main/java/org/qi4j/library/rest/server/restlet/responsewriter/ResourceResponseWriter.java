@@ -40,15 +40,14 @@ import org.restlet.resource.ResourceException;
 /**
  * ResponseWriter for ResourceValues
  */
-public class ResourceResponseWriter
-    extends AbstractResponseWriter
+public class ResourceResponseWriter extends AbstractResponseWriter
 {
     private static final List<MediaType> supportedMediaTypes = Arrays.asList( MediaType.TEXT_HTML, MediaType.APPLICATION_JSON, MediaType.APPLICATION_ATOM );
 
-    private
     @Service
-    Configuration cfg;
+    private Configuration cfg;
 
+    @Override
     public boolean writeResponse( final Object result, final Response response )
         throws ResourceException
     {
@@ -85,7 +84,6 @@ public class ResourceResponseWriter
                         Map<String, Object> context = new HashMap<String, Object>();
                         context.put( "request", response.getRequest() );
                         context.put( "response", response );
-
                         context.put( "result", result );
                         try
                         {

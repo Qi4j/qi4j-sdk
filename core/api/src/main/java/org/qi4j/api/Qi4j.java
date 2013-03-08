@@ -14,30 +14,24 @@
 
 package org.qi4j.api;
 
-import org.qi4j.api.association.Association;
-import org.qi4j.api.association.AssociationStateHolder;
-import org.qi4j.api.composite.*;
-import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.association.AbstractAssociation;
-import org.qi4j.api.association.AssociationDescriptor;
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.api.property.Property;
-import org.qi4j.api.property.PropertyDescriptor;
-import org.qi4j.api.property.StateHolder;
-import org.qi4j.api.service.ServiceComposite;
-import org.qi4j.api.service.ServiceDescriptor;
-import org.qi4j.api.service.ServiceReference;
-import org.qi4j.api.structure.Module;
-import org.qi4j.api.unitofwork.UnitOfWork;
-import org.qi4j.api.value.ValueBuilder;
-import org.qi4j.api.value.ValueComposite;
-import org.qi4j.api.value.ValueDescriptor;
-import org.qi4j.functional.Function;
-import org.qi4j.functional.Visitor;
-
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
+import org.qi4j.api.association.AbstractAssociation;
+import org.qi4j.api.association.AssociationDescriptor;
+import org.qi4j.api.composite.Composite;
+import org.qi4j.api.composite.CompositeDescriptor;
+import org.qi4j.api.composite.CompositeInstance;
+import org.qi4j.api.composite.InvalidCompositeException;
+import org.qi4j.api.composite.ModelDescriptor;
+import org.qi4j.api.composite.TransientDescriptor;
+import org.qi4j.api.entity.EntityDescriptor;
+import org.qi4j.api.property.Property;
+import org.qi4j.api.property.PropertyDescriptor;
+import org.qi4j.api.service.ServiceDescriptor;
+import org.qi4j.api.structure.Module;
+import org.qi4j.api.value.ValueDescriptor;
+import org.qi4j.functional.Function;
 
 /**
  * Encapsulation of the Qi4j API.
@@ -50,101 +44,138 @@ public interface Qi4j
      * before handing it out for others to use.
      *
      * @param composite instance reference injected in Modified using @This
-     *
      * @return the dereferenced Composite
      */
     <T> T dereference( T composite );
 
     /**
-     * Returns the Module where the UnitOfWork belongs.
+     * Returns the Module or UnitOfWork where the Composite belongs.
      *
-     * @param uow The UnitOfWork to be checked.
-     *
-     * @return The Module instance where the UnitOfWork belongs.
+     * @param compositeOrUow The Composite (Service, Value, Entity or Transient) or UnitOfWork to lookup the Module it
+     *                       belongs to.
+     * @return The Module instance where the Composite or UnitOfWork belongs to.
      */
-    Module getModule( UnitOfWork uow );
+    Module moduleOf( Object compositeOrUow );
 
     /**
-     * Returns the Module where the Composite belongs.
+     * Returns the ModelDescriptor of the Composite.
      *
-     * @param composite The Composite to be checked.
-     *
-     * @return The Module instance where the Composite belongs.
+     * @param compositeOrServiceReference The Composite (Service, Value, Entity or Transient) for which to lookup the
+     *                                    ModelDescriptor
+     * @return The ModelDescriptor of the Composite
      */
-    Module getModule( Composite composite );
+    ModelDescriptor modelDescriptorFor( Object compositeOrServiceReference );
 
     /**
-     * Returns the Module where the service is located.
+     * Returns the CompositeDescriptor of the Composite.
      *
-     * @param service The service to be checked.
-     *
-     * @return The Module instance where the Composite belongs.
+     * @param compositeOrServiceReference The Composite (Service, Value, Entity or Transient) for which to lookup the
+     *                                    CompositeDescriptor
+     * @return The CompositeDescriptor of the Composite
      */
-    Module getModule( ServiceReference service );
+    CompositeDescriptor compositeDescriptorFor( Object compositeOrServiceReference );
 
-    TransientDescriptor getTransientDescriptor( TransientComposite composite );
+    /**
+     * Returns the TransientDescriptor of the TransientComposite.
+     *
+     * @param transsient The TransientComposite for which to lookup the TransientDescriptor
+     * @return The TransientDescriptor of the TransientComposite
+     */
+    TransientDescriptor transientDescriptorFor( Object transsient );
 
-    EntityDescriptor getEntityDescriptor( EntityComposite composite );
+    /**
+     * Returns the EntityDescriptor of the EntityComposite.
+     *
+     * @param entity The EntityComposite for which to lookup the EntityDescriptor
+     * @return The EntityDescriptor of the EntityComposite
+     */
+    EntityDescriptor entityDescriptorFor( Object entity );
 
-    ValueDescriptor getValueDescriptor( ValueComposite value );
+    /**
+     * Returns the ValueDescriptor of the ValueComposite.
+     *
+     * @param value The ValueComposite for which to lookup the ValueDescriptor
+     * @return The ValueDescriptor of the ValueComposite
+     */
+    ValueDescriptor valueDescriptorFor( Object value );
 
-    // Services
-    ServiceDescriptor getServiceDescriptor( ServiceReference service );
+    /**
+     * Returns the ServiceDescriptor of the ServiceComposite.
+     *
+     * @param service The ServiceComposite for which to lookup the ServiceDescriptor
+     * @return The ServiceDescriptor of the ServiceComposite
+     */
+    ServiceDescriptor serviceDescriptorFor( Object service );
 
-    ServiceDescriptor getServiceDescriptor( ServiceComposite service );
+    /**
+     * Returns the PropertyDescriptor of the Property.
+     *
+     * @param property The Property for which to lookup the PropertyDescriptor
+     * @return The PropertyDescriptor of the Property
+     */
+    PropertyDescriptor propertyDescriptorFor( Property property );
 
-    // State
-    PropertyDescriptor getPropertyDescriptor( Property property );
+    /**
+     * Returns the AssociationDescriptor of the Association.
+     *
+     * @param association The Association for which to lookup the AssociationDescriptor
+     * @return The AssociationDescriptor of the Association
+     */
+    AssociationDescriptor associationDescriptorFor( AbstractAssociation association );
 
-    AssociationDescriptor getAssociationDescriptor( AbstractAssociation association);
-
-    StateHolder getState( TransientComposite composite );
-
-    AssociationStateHolder getState( EntityComposite composite );
-
-    AssociationStateHolder getState( ValueComposite composite );
-
-    public static Function<Composite, CompositeDescriptor> DESCRIPTOR_FUNCTION = new Function<Composite, CompositeDescriptor>()
+    /**
+     * Function that returns the CompositeDescriptor of a Composite.
+     */
+    Function<Composite, CompositeDescriptor> FUNCTION_DESCRIPTOR_FOR = new Function<Composite, CompositeDescriptor>()
     {
         @Override
         public CompositeDescriptor map( Composite composite )
         {
-            if (composite instanceof Proxy)
+            if( composite instanceof Proxy )
             {
                 InvocationHandler invocationHandler = Proxy.getInvocationHandler( composite );
-                return ((CompositeInstance) invocationHandler).descriptor();
-            } else
+                return ( (CompositeInstance) invocationHandler ).descriptor();
+            }
+            try
             {
-                try
-                {
-                    CompositeInstance instance = (CompositeInstance) composite.getClass().getField( "_instance" ).get( composite );
-                    return instance.descriptor();
-                } catch( Exception e )
-                {
-                    throw (InvalidCompositeException) new InvalidCompositeException( "Could not get _instance field" ).initCause( e );
-                }
+                Class<? extends Composite> compositeClass = composite.getClass();
+                Field instanceField = compositeClass.getField( "_instance" );
+                Object instance = instanceField.get( composite );
+                return ((CompositeInstance) instance).descriptor();
+            }
+            catch( Exception e )
+            {
+                InvalidCompositeException exception = new InvalidCompositeException( "Could not get _instance field" );
+                exception.initCause( e );
+                throw exception;
             }
         }
     };
 
-    public static Function<Composite, CompositeInstance> INSTANCE_FUNCTION = new Function<Composite, CompositeInstance>()
+    /**
+     * Function that returns the CompositeInstance of a Composite.
+     */
+    Function<Composite, CompositeInstance> FUNCTION_COMPOSITE_INSTANCE_OF = new Function<Composite, CompositeInstance>()
     {
         @Override
         public CompositeInstance map( Composite composite )
         {
-            if (composite instanceof Proxy)
+            if( composite instanceof Proxy )
             {
-                return ((CompositeInstance) Proxy.getInvocationHandler( composite ));
-            } else
+                return ( (CompositeInstance) Proxy.getInvocationHandler( composite ) );
+            }
+            try
             {
-                try
-                {
-                    CompositeInstance instance = (CompositeInstance) composite.getClass().getField( "_instance" ).get( composite );
-                    return instance;
-                } catch( Exception e )
-                {
-                    throw (InvalidCompositeException) new InvalidCompositeException( "Could not get _instance field" ).initCause( e );
-                }
+                Class<? extends Composite> compositeClass = composite.getClass();
+                Field instanceField = compositeClass.getField( "_instance" );
+                Object instance = instanceField.get( composite );
+                return (CompositeInstance) instance;
+            }
+            catch( Exception e )
+            {
+                InvalidCompositeException exception = new InvalidCompositeException( "Could not get _instance field" );
+                exception.initCause( e );
+                throw exception;
             }
         }
     };

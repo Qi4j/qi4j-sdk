@@ -1,5 +1,25 @@
-[[qi4j-core-io]]
-= Qi4j Core I/O API =
+//////////////////////
+ * Copyright (c) 2007-2012, Niclas Hedhman. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied.
+ * See the License for the specific language governing permissions
+ * and limitations under the License.
+//////////////////////
+
+[[core-io,I/O API]]
+= Core I/O API =
+
+[devstatus]
+--------------
+source=core/io/dev-status.xml
+--------------
 
 The Qi4j Core I/O API is completely generic and not tied to the Qi4j programming model as a whole. It can be used
 independently of Qi4j, together with the Qi4j Core Functional API, which the Core I/O API depends on.
@@ -7,7 +27,9 @@ independently of Qi4j, together with the Qi4j Core Functional API, which the Cor
 The Qi4j Core I/O API tries to address the problem around shuffling data around from various I/O inputs and outputs,
 possibly with transformations and filtering along the way. It was identified that there is a general mix-up of concerns
 in the stereotypical I/O handling codebases that people deal with all the time. The reasoning around this, can be found
-in the <<appendix-io-blog>>, and is recommended reading.
+in the <<howto-use-io>>, and is recommended reading.
+
+include::../../build/docs/buildinfo/artifact.txt[]
 
 == The Problem ==
 Why does I/O operations in Java have to be so complicated, with nested try/catch/finally and loops? Don't you wish
@@ -21,7 +43,7 @@ source.copyTo( destination );
 -------------
 
 It seems natural to do, yet it is not present for us. We need to involve FileInputStream/FileOutputStream, wrap them
-in Buffered versions of it, do out own looping, close the streams afterwards and what not. So, the java.io.File does
+in Buffered versions of it, do our own looping, close the streams afterwards and what not. So, the java.io.File does
 not have this simple feature and in the Qi4j Core API, we need to work around this limitation. We also want to
 make the abstraction a little bit more encompassing than "just" files. So how does that look like then?
 
@@ -31,28 +53,24 @@ factory methods, but you can create your (more about that later).
 
 So, we want to read a text file and write the content into another text file, right? This is how it is done;
 
-[source,java]
--------------
-File source = ...
-File destination = ...
-Inputs.text( source ).transferTo( Outputs.text(destination) );
--------------
+[snippet,java]
+-----------
+source=core/io/src/test/java/org/qi4j/io/docsupport/IoDocs.java
+tag=io1
+-----------
 
 Pretty much self-explanatory, wouldn't you say? But what happened to the handling of exceptions and closing of
 resources? It is all handled inside the Qi4j Core I/O API. There is nothing you can forget to do.
 
 Another simple example, where we want to count the number of lines in the text;
 
-[source,java]
--------------
-File source = ...
-File destination = ...
-Counter<String> counter = new Counter<String>();
-Inputs.text( source ).transferTo( Transforms.map(counter, Outputs.text(destination) ));
-System.out.println( "Lines: " + counter.getCount() );
--------------
+[snippet,java]
+-----------
+source=core/io/src/test/java/org/qi4j/io/docsupport/IoDocs.java
+tag=io2
+-----------
 
-The Counter is a <<qi4j-core-functional, Function>> which gets injected into the transfer.
+The Counter is a <<core-functional>> which gets injected into the transfer.
 
 == The 3 Parts ==
 Ok, so we have seen that the end result can become pretty compelling. How does it work?
@@ -162,7 +180,7 @@ how you can combine the general principles found in the Qi4j Core API package.
 
 == How to write a filter specification? ==
 The filter transform takes a specification implementation which has a very simple method, isSatisfiedBy() (read more
-about that in <<qi4j-core-functional>>.
+about that in <<core-functional>>.
 
 [snippet,java]
 --------------
@@ -185,7 +203,7 @@ Input and Output implementations at first glance look quite scary. Taking a clos
 simplify for users, the org.qi4j.io.Inputs and org.qi4h.io.Outputs contains static factory methods for many useful
 sources and destinations.
 
-=== org.qi4j.io.Inputs ===
+== org.qi4j.io.Inputs ==
 The current set of ready-to-use Input implementations are;
 
 [snippet,java]
@@ -194,7 +212,7 @@ source=core/io/src/main/java/org/qi4j/io/Inputs.java
 tag=method
 --------------
 
-=== org.qi4j.io.Outputs ===
+== org.qi4j.io.Outputs ==
 The current set of ready-to-use Input implementations are;
 
 [snippet,java]

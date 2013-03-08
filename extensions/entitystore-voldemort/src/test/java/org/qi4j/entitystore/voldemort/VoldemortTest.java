@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.qi4j.entitystore.voldemort;
 
+import org.junit.Ignore;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
@@ -31,16 +31,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
+import org.qi4j.test.EntityTestAssembler;
+import org.qi4j.valueserialization.orgjson.OrgJsonValueSerializationAssembler;
 
-public class VoldemortTest extends AbstractEntityStoreTest
+@Ignore( "This version of Voldemort is still using Jetty 6. If we can not upgrade, we should drop support for this ES." )
+public class VoldemortTest
+    extends AbstractEntityStoreTest
 {
+
     private List<VoldemortServer> servers = new ArrayList<VoldemortServer>();
 
     @Override
     public void setUp()
         throws Exception
     {
-        Thread.sleep(200);
+        Thread.sleep( 200 );
         File voldemortHome1 = setupVoldemortHome();
         startServer( voldemortHome1, "node0.properties" );
         File voldemortHome2 = setupVoldemortHome();
@@ -64,6 +69,11 @@ public class VoldemortTest extends AbstractEntityStoreTest
         throws AssemblyException
     {
         super.assemble( module );
+        ModuleAssembly config = module.layer().module( "config" );
+        new EntityTestAssembler().assemble( config );
+        config.entities( VoldemortConfiguration.class ).visibleIn( Visibility.layer );
+        new OrgJsonValueSerializationAssembler().assemble( module );
+
         new VoldemortAssembler( Visibility.layer ).assemble( module );
     }
 
@@ -110,5 +120,4 @@ public class VoldemortTest extends AbstractEntityStoreTest
         in.close();
         stream.close();
     }
-
 }

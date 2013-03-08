@@ -38,14 +38,16 @@ public interface Identity
     @Immutable
     Property<String> identity();
 
-    // Default implementation
-
+    /**
+     * Default Identity implementation.
+     */
     public class IdentityMixin
         implements Identity
     {
         @State
         private Property<String> identity;
 
+        @Override
         public Property<String> identity()
         {
             return identity;

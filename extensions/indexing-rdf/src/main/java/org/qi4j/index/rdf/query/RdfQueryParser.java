@@ -18,19 +18,18 @@
 
 package org.qi4j.index.rdf.query;
 
+import java.util.Map;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.functional.Specification;
 
-import java.util.Map;
-
 public interface RdfQueryParser
 {
-    String getQuery( Class<?> resultType,
-                     Specification<Composite> whereClause,
-                     OrderBy[] orderBySegments,
-                     Integer firstResult,
-                     Integer maxResults,
-                     Map<String, Object> variables
+    String constructQuery( Class<?> resultType,
+                           Specification<Composite> whereClause,
+                           OrderBy[] orderBySegments,
+                           Integer firstResult,
+                           Integer maxResults,
+                           Map<String, Object> variables
     );
 }

@@ -18,17 +18,16 @@
 
 package org.qi4j.library.alarm;
 
+import java.util.List;
+import java.util.Map;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 
-import java.util.List;
-import java.util.Map;
-
 /**
- * History of an Alarm.
- * Alarm system <i>should</i> implement <code>AlarmHistory</code> classes to
- * record the events of an <code>Alarm</code>.
+ * History of an AlarmPoint.
+ * AlarmPoint system <i>should</i> implement <code>AlarmHistory</code> classes to
+ * record the events of an <code>AlarmPoint</code>.
  *
  * @author Niclas Hedhman
  */
@@ -135,26 +134,29 @@ public interface AlarmHistory
     abstract class AlarmHistoryMixin
         implements AlarmHistory
     {
+        @Override
         public AlarmEvent firstEvent()
         {
             List<AlarmEvent> eventList = allAlarmEvents().get();
-            if( eventList.size() == 0 )
+            if( eventList.isEmpty() )
             {
                 return null;
             }
             return eventList.get( 0 );
         }
 
+        @Override
         public AlarmEvent lastEvent()
         {
             List<AlarmEvent> eventList = allAlarmEvents().get();
-            if( eventList.size() == 0 )
+            if( eventList.isEmpty() )
             {
                 return null;
             }
             return eventList.get( eventList.size() - 1 );
         }
 
+        @Override
         public AlarmEvent eventAt( final int position )
         {
             List<AlarmEvent> eventList = allAlarmEvents().get();
@@ -165,6 +167,7 @@ public interface AlarmHistory
             return eventList.get( position );
         }
 
+        @Override
         public AlarmEvent eventAtEnd( final int position )
         {
             List<AlarmEvent> eventList = allAlarmEvents().get();
@@ -197,9 +200,10 @@ public interface AlarmHistory
             counters().set( counters );
         }
 
+        @Override
         public String toString()
         {
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             buf.append( "history[maxsize=" );
             buf.append( maxSize().get() );
             buf.append( ", size=" );
@@ -233,6 +237,7 @@ public interface AlarmHistory
             }
         }
 
+        @Override
         public void resetAllCounters()
         {
             Map<String, Integer> counters = counters().get();
@@ -240,9 +245,10 @@ public interface AlarmHistory
             counters().set(counters);
         }
 
+        @Override
         public int activateCounter()
         {
-            Integer counter = counters().get().get( Alarm.TRIGGER_ACTIVATE );
+            Integer counter = counters().get().get( AlarmPoint.TRIGGER_ACTIVATE );
             if( counter == null )
             {
                 return 0;
@@ -250,10 +256,11 @@ public interface AlarmHistory
             return counter;
         }
 
+        @Override
         public void resetActivateCounter()
         {
             Map<String, Integer> counters = counters().get();
-            counters.remove( Alarm.TRIGGER_ACTIVATE );
+            counters.remove( AlarmPoint.TRIGGER_ACTIVATE );
             counters().set( counters );
         }
     }

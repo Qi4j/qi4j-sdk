@@ -1,13 +1,13 @@
 package org.qi4j.api.query.grammar;
 
-import org.qi4j.api.composite.Composite;
 import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.composite.Composite;
 
 /**
- * TODO
+ * ManyAssociation Contains Specification.
  */
 public class ManyAssociationContainsSpecification<T>
-        extends ExpressionSpecification
+    extends ExpressionSpecification
 {
     private ManyAssociationFunction<T> manyAssociationFunction;
     private T value;
@@ -18,12 +18,12 @@ public class ManyAssociationContainsSpecification<T>
         this.value = value;
     }
 
-    public ManyAssociationFunction<T> getManyAssociationFunction()
+    public ManyAssociationFunction<T> manyAssociation()
     {
         return manyAssociationFunction;
     }
 
-    public T getValue()
+    public T value()
     {
         return value;
     }
@@ -32,14 +32,16 @@ public class ManyAssociationContainsSpecification<T>
     public boolean satisfiedBy( Composite item )
     {
         ManyAssociation<T> collection = manyAssociationFunction.map( item );
-        if (collection == null)
+        if( collection == null )
+        {
             return false;
+        }
         return collection.contains( value );
     }
 
     @Override
     public String toString()
     {
-        return manyAssociationFunction+" contains:" + value;
+        return manyAssociationFunction + " contains:" + value;
     }
 }

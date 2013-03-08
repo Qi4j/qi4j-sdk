@@ -14,22 +14,26 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.composite.MethodDescriptor;
+import org.qi4j.api.util.NullArgumentException;
 import org.qi4j.functional.HierarchicalVisitor;
 import org.qi4j.functional.VisitableHierarchy;
 import org.qi4j.runtime.injection.Dependencies;
 import org.qi4j.runtime.injection.DependencyModel;
 import org.qi4j.runtime.structure.ModuleInstance;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.qi4j.functional.Iterables.*;
+import static org.qi4j.functional.Iterables.filter;
+import static org.qi4j.functional.Iterables.flattenIterables;
+import static org.qi4j.functional.Iterables.iterable;
 import static org.qi4j.functional.Specifications.notNull;
 
 /**
@@ -77,6 +81,7 @@ public final class CompositeMethodModel
 
     // Model
 
+    @Override
     public Method method()
     {
         return method;
@@ -87,6 +92,7 @@ public final class CompositeMethodModel
         return mixins.mixinFor( method );
     }
 
+    @Override
     public Iterable<DependencyModel> dependencies()
     {
         return flattenIterables( filter( notNull(), iterable( concerns != null ? concerns.dependencies() : null,
@@ -97,7 +103,7 @@ public final class CompositeMethodModel
     public Object invoke( Object composite, Object[] params, MixinsInstance mixins, ModuleInstance moduleInstance )
         throws Throwable
     {
-        constraintsInstance.checkValid( composite, method,  params );
+        constraintsInstance.checkValid( composite, method, params );
 
         CompositeMethodInstance methodInstance = getInstance( moduleInstance );
         try
@@ -106,13 +112,13 @@ public final class CompositeMethodModel
         }
         finally
         {
-            instancePool.returnInstance( methodInstance );
+            instancePool.releaseInstance( methodInstance );
         }
     }
 
     private CompositeMethodInstance getInstance( ModuleInstance moduleInstance )
     {
-        CompositeMethodInstance methodInstance = instancePool.getInstance();
+        CompositeMethodInstance methodInstance = instancePool.obtainInstance();
         if( methodInstance == null )
         {
             methodInstance = newCompositeMethodInstance( moduleInstance );
@@ -170,9 +176,10 @@ public final class CompositeMethodModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+        throws ThrowableType
     {
-        if (modelVisitor.visitEnter( this ))
+        if( modelVisitor.visitEnter( this ) )
         {
             constraints.accept( modelVisitor );
             concerns.accept( modelVisitor );
@@ -187,9 +194,15 @@ public final class CompositeMethodModel
         return method.toGenericString();
     }
 
+    public Iterable<Method> invocationsFor( Class<?> mixinClass )
+    {
+        return mixins.invocationsFor(mixinClass);
+    }
+
     public class CompositeMethodAnnotatedElement
         implements AnnotatedElement
     {
+        @Override
         public boolean isAnnotationPresent( Class<? extends Annotation> annotationClass )
         {
             // Check method
@@ -216,6 +229,7 @@ public final class CompositeMethodModel
             }
         }
 
+        @Override
         public <T extends Annotation> T getAnnotation( Class<T> annotationClass )
         {
             // Check mixin
@@ -242,6 +256,7 @@ public final class CompositeMethodModel
             return method.getAnnotation( annotationClass );
         }
 
+        @Override
         public Annotation[] getAnnotations()
         {
             // Add mixin annotations
@@ -251,10 +266,7 @@ public final class CompositeMethodModel
             if( !GenericSpecification.INSTANCE.satisfiedBy( model.mixinClass() ) )
             {
                 mixinAnnotations = model.mixinClass().getAnnotations();
-                for( int i = 0; i < mixinAnnotations.length; i++ )
-                {
-                    annotations.add( mixinAnnotations[ i ] );
-                }
+                annotations.addAll( Arrays.asList( mixinAnnotations ) );
             }
 
             // Add method annotations, but don't include duplicates
@@ -276,9 +288,33 @@ public final class CompositeMethodModel
             return annotations.toArray( new Annotation[ annotations.size() ] );
         }
 
+        @Override
         public Annotation[] getDeclaredAnnotations()
         {
             return new Annotation[ 0 ];
+        }
+
+        // @Override (Since JDK 8)
+        @SuppressWarnings( "unchecked" )
+        public <T extends Annotation> T[] getAnnotations( Class<T> annotationClass )
+        {
+            NullArgumentException.validateNotNull( "annotationClass", annotationClass );
+            return (T[]) Array.newInstance( annotationClass, 0 );
+        }
+
+        // @Override (Since JDK 8)
+        public <T extends Annotation> T getDeclaredAnnotation( Class<T> annotationClass )
+        {
+            NullArgumentException.validateNotNull( "annotationClass", annotationClass );
+            return null;
+        }
+
+        // @Override (Since JDK 8)
+        @SuppressWarnings( "unchecked" )
+        public <T extends Annotation> T[] getDeclaredAnnotations( Class<T> annotationClass )
+        {
+            NullArgumentException.validateNotNull( "annotationClass", annotationClass );
+            return (T[]) Array.newInstance( annotationClass, 0 );
         }
     }
 }

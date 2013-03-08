@@ -49,7 +49,7 @@ public class OrderBy
      * @throws IllegalArgumentException - If property is null
      */
     public OrderBy( final PropertyFunction<?> propertyReference,
-                        final Order order
+                    final Order order
     )
     {
         if( propertyReference == null )
@@ -65,7 +65,7 @@ public class OrderBy
      *
      * @return property; cannot be null
      */
-    public PropertyFunction<?> getPropertyFunction()
+    public PropertyFunction<?> property()
     {
         return propertyReference;
     }

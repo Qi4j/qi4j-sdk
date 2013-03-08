@@ -15,14 +15,9 @@
 package org.qi4j.bootstrap;
 
 import org.qi4j.api.Qi4j;
-import org.qi4j.api.composite.TransientBuilderFactory;
-import org.qi4j.api.object.ObjectFactory;
-import org.qi4j.api.query.QueryBuilderFactory;
-import org.qi4j.api.service.ServiceFinder;
+import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
-import org.qi4j.api.unitofwork.UnitOfWorkFactory;
-import org.qi4j.api.value.ValueBuilderFactory;
 
 /**
  * Base class for Assembler that creates an Application
@@ -45,37 +40,39 @@ public abstract class SingletonAssembler
      * additional layers and modules via the Assembler interface that must be implemented in the subclass of this
      * class.
      *
-     * @throws IllegalStateException Either if the model can not be created from the disk, or some inconsistency in
-     *                               the programming model makes it impossible to create it.
+     * @throws AssemblyException Either if the model can not be created from the disk, or some inconsistency in
+     *                           the programming model makes it impossible to create it.
+     * @throws
      */
     public SingletonAssembler()
-        throws IllegalStateException
+        throws AssemblyException, ActivationException
     {
+// START SNIPPET: actual
         qi4j = new Energy4Java();
-        try
+        applicationInstance = qi4j.newApplication( new ApplicationAssembler()
         {
-            applicationInstance = qi4j.newApplication( new ApplicationAssembler()
+            @Override
+            public ApplicationAssembly assemble( ApplicationAssemblyFactory applicationFactory )
+                throws AssemblyException
             {
-                public ApplicationAssembly assemble( ApplicationAssemblyFactory applicationFactory )
-                    throws AssemblyException
-                {
-                    return applicationFactory.newApplicationAssembly( SingletonAssembler.this );
-                }
-            } );
-        }
-        catch( AssemblyException e )
-        {
-            throw new IllegalStateException( "Could not instantiate application", e );
-        }
+                return applicationFactory.newApplicationAssembly( SingletonAssembler.this );
+            }
+        } );
 
         try
         {
+            beforeActivation( applicationInstance );
             applicationInstance.activate();
         }
         catch( Exception e )
         {
-            throw new IllegalStateException( "Could not activate application", e );
+            if( e instanceof ActivationException )
+            {
+                throw ( (ActivationException) e );
+            }
+            throw new ActivationException( "Could not activate application", e );
         }
+// START SNIPPET: actual
 
         moduleInstance = applicationInstance.findModule( "Layer 1", "Module 1" );
     }
@@ -93,5 +90,10 @@ public abstract class SingletonAssembler
     public final Module module()
     {
         return moduleInstance;
+    }
+
+    protected void beforeActivation( Application application )
+        throws Exception
+    {
     }
 }

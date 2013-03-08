@@ -1,5 +1,6 @@
 /*
  * Copyright 2008 Niclas Hedhman. All rights Reserved.
+ * Copyright 2012 Paul Merlin.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -18,6 +19,7 @@
 
 package org.qi4j.bootstrap;
 
+import org.qi4j.api.activation.Activator;
 import org.qi4j.api.structure.Application;
 
 /**
@@ -77,11 +79,20 @@ public interface ApplicationAssembly
      *
      * @param mode the application mode
      *
-     * @return the current application mode
+     * @return the assembly
      */
     ApplicationAssembly setMode( Application.Mode mode );
 
     ApplicationAssembly setMetaInfo( Object info );
+
+    /**
+     * Set the application activators. Activators are executed in order around the
+     * Application activation and passivation.
+     *
+     * @param activators the application activators
+     * @return the assembly
+     */    
+    ApplicationAssembly withActivators( Class<? extends Activator<Application>>... activators );
 
     <ThrowableType extends Throwable> void visit( AssemblyVisitor<ThrowableType> visitor )
         throws ThrowableType;

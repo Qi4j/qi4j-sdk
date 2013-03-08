@@ -14,16 +14,15 @@
 
 package org.qi4j.api.type;
 
+import java.lang.reflect.Type;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.property.PropertyDescriptor;
 import org.qi4j.api.util.Classes;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.api.value.ValueDescriptor;
 
-import java.lang.reflect.Type;
-
 /**
- * ValueComposite type
+ * ValueComposite ValueType.
  */
 public final class ValueCompositeType
     extends ValueType
@@ -37,7 +36,7 @@ public final class ValueCompositeType
 
     public ValueCompositeType( ValueDescriptor model )
     {
-        super( model.type() );
+        super( model.types() );
         this.model = model;
     }
 

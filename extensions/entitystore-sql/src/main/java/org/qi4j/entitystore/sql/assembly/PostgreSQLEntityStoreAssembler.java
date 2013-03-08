@@ -14,50 +14,19 @@
  */
 package org.qi4j.entitystore.sql.assembly;
 
-import org.qi4j.api.common.Visibility;
+import java.io.IOException;
 import org.qi4j.entitystore.sql.internal.PostgreSQLDatabaseSQLServiceMixin;
 import org.qi4j.entitystore.sql.internal.PostgreSQLStringBuilderMixin;
-import org.qi4j.library.sql.ds.PGSQLDataSourceServiceMixin;
-import org.qi4j.library.sql.ds.assembly.DataSourceAssembler;
 import org.sql.generation.api.vendor.PostgreSQLVendor;
 import org.sql.generation.api.vendor.SQLVendor;
 import org.sql.generation.api.vendor.SQLVendorProvider;
 
-import java.io.IOException;
-
-public class PostgreSQLEntityStoreAssembler extends AbstractSQLEntityStoreAssembler
+/**
+ * PostgreSQL EntityStore assembly.
+ */
+public class PostgreSQLEntityStoreAssembler
+        extends AbstractSQLEntityStoreAssembler<PostgreSQLEntityStoreAssembler>
 {
-
-    public static final String ENTITYSTORE_SERVICE_NAME = "entitystore-postgresql";
-
-    public static final String DATASOURCE_SERVICE_NAME = "datasource-postgresql";
-
-    public PostgreSQLEntityStoreAssembler()
-    {
-        super( new DataSourceAssembler().setDataSourceServiceName( DATASOURCE_SERVICE_NAME ) );
-    }
-
-    public PostgreSQLEntityStoreAssembler( Visibility visibility )
-    {
-        super( visibility, new DataSourceAssembler( PGSQLDataSourceServiceMixin.class )
-            .setDataSourceServiceName( DATASOURCE_SERVICE_NAME ) );
-    }
-
-    public PostgreSQLEntityStoreAssembler( DataSourceAssembler assembler )
-    {
-        super( assembler );
-    }
-
-    public PostgreSQLEntityStoreAssembler( Visibility visibility, DataSourceAssembler assembler )
-    {
-        super( visibility, assembler );
-    }
-
-    @Override
-    protected String getEntityStoreServiceName()
-    {
-        return ENTITYSTORE_SERVICE_NAME;
-    }
 
     @Override
     protected Class<?> getDatabaseSQLServiceSpecializationMixin()
@@ -73,7 +42,7 @@ public class PostgreSQLEntityStoreAssembler extends AbstractSQLEntityStoreAssemb
 
     @Override
     protected SQLVendor getSQLVendor()
-        throws IOException
+            throws IOException
     {
         return SQLVendorProvider.createVendor( PostgreSQLVendor.class );
     }

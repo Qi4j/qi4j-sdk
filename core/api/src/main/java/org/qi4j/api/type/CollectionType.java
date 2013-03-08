@@ -11,34 +11,52 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.api.type;
-
-import org.qi4j.api.util.Classes;
 
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.qi4j.api.util.Classes;
 
 /**
- * Collection type. This handles Collection, List and Set types
+ * Collection ValueType.
+ * <p>This handles Collection, List and Set types.</p>
  */
 public final class CollectionType
     extends ValueType
 {
+
     public static boolean isCollection( Type type )
     {
-        Class cl = Classes.RAW_CLASS.map( type );
+        Class<?> cl = Classes.RAW_CLASS.map( type );
         return cl.equals( Collection.class ) || cl.equals( List.class ) || cl.equals( Set.class );
     }
 
+    public static CollectionType collectionOf( Class<?> collectedType )
+    {
+        return new CollectionType( Collection.class, ValueType.of( collectedType ) );
+    }
+
+    public static CollectionType listOf( Class<?> collectedType )
+    {
+        return new CollectionType( List.class, ValueType.of( collectedType ) );
+    }
+
+    public static CollectionType setOf( Class<?> collectedType )
+    {
+        return new CollectionType( Set.class, ValueType.of( collectedType ) );
+    }
     private ValueType collectedType;
 
     public CollectionType( Class<?> type, ValueType collectedType )
     {
         super( type );
         this.collectedType = collectedType;
+        if( !isCollection( type ) )
+        {
+            throw new IllegalArgumentException( type + " is not a Collection, List or Set." );
+        }
     }
 
     public ValueType collectedType()
@@ -49,6 +67,6 @@ public final class CollectionType
     @Override
     public String toString()
     {
-        return type() + "<" + collectedType + ">";
+        return super.toString() + "<" + collectedType + ">";
     }
 }

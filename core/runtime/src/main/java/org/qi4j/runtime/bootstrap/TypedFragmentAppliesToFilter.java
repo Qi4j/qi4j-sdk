@@ -14,9 +14,8 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import org.qi4j.api.common.AppliesToFilter;
-
 import java.lang.reflect.Method;
+import org.qi4j.api.common.AppliesToFilter;
 
 /**
  * JAVADOC
@@ -24,6 +23,7 @@ import java.lang.reflect.Method;
 final class TypedFragmentAppliesToFilter
     implements AppliesToFilter
 {
+    @Override
     public boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass )
     {
         return method.getDeclaringClass().isAssignableFrom( fragmentClass );

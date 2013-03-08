@@ -11,20 +11,17 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.runtime.value;
 
-import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.property.PropertyDescriptor;
+import org.qi4j.api.composite.Composite;
+import org.qi4j.api.value.NoSuchValueException;
 import org.qi4j.api.value.ValueBuilder;
-import org.qi4j.runtime.association.AssociationInfo;
-import org.qi4j.runtime.association.AssociationInstance;
-import org.qi4j.runtime.association.ManyAssociationInstance;
-import org.qi4j.runtime.property.PropertyInfo;
-import org.qi4j.runtime.property.PropertyInstance;
 import org.qi4j.runtime.structure.ModelModule;
+import org.qi4j.runtime.structure.ModuleInstance;
+
+import static org.qi4j.functional.Iterables.first;
 
 /**
  * Implementation of ValueBuilder
@@ -32,59 +29,49 @@ import org.qi4j.runtime.structure.ModelModule;
 public final class ValueBuilderInstance<T>
     implements ValueBuilder<T>
 {
-    private final ModelModule<ValueModel> model;
+
+    private final ModuleInstance currentModule;
     private ValueInstance prototypeInstance;
 
-    public ValueBuilderInstance( ModelModule<ValueModel> model, ValueInstance prototypeInstance)
+    public ValueBuilderInstance( ModelModule<ValueModel> compositeModelModule, ModuleInstance currentModule, ValueStateModel.StateResolver stateResolver )
     {
-        this.model = model;
-        this.prototypeInstance = prototypeInstance;
+        ValueStateInstance state = new ValueStateInstance( compositeModelModule, currentModule, stateResolver );
+        prototypeInstance = compositeModelModule.model().newValueInstance( compositeModelModule.module(), state );
+        prototypeInstance.prepareToBuild();
+        this.currentModule = currentModule;
     }
 
+    @Override
     public T prototype()
     {
-        if (prototypeInstance == null)
-            throw new IllegalStateException( "ValueBuilder instances cannot be reused" );
-
         return prototypeInstance.<T>proxy();
     }
 
     @Override
     public AssociationStateHolder state()
     {
-        if (prototypeInstance == null)
-            throw new IllegalStateException( "ValueBuilder instances cannot be reused" );
-
         return prototypeInstance.state();
     }
 
+    @Override
     public <K> K prototypeFor( Class<K> mixinType )
     {
-        if (prototypeInstance == null)
-            throw new IllegalStateException( "ValueBuilder instances cannot be reused" );
-
         return prototypeInstance.newProxy( mixinType );
     }
 
+    @Override
     public T newInstance()
         throws ConstructionException
     {
-        if (prototypeInstance == null)
-            throw new IllegalStateException( "ValueBuilder instances cannot be reused" );
+        Class<Composite> valueType = (Class<Composite>) first( prototypeInstance.types() );
 
-        // Set correct info's (immutable) on the state
-        prototypeInstance.prepareBuilderState();
+        ModelModule<ValueModel> valueModel = currentModule.typeLookup().lookupValueModel( valueType );
 
-        // Check that it is valid
-        model.model().checkConstraints( prototypeInstance.state() );
-
-        try
+        if( valueModel == null )
         {
-            return prototypeInstance.<T>proxy();
-        } finally
-        {
-            // Invalidate builder
-            prototypeInstance = null;
+            throw new NoSuchValueException( valueType.getName(), currentModule.name() );
         }
+        return new ValueBuilderWithPrototype<T>( valueModel, currentModule, prototype() ).newInstance();
     }
+
 }

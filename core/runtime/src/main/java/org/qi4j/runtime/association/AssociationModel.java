@@ -14,7 +14,15 @@
 
 package org.qi4j.runtime.association;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.List;
 import org.qi4j.api.association.Association;
+import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.GenericAssociationInfo;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.QualifiedName;
@@ -23,7 +31,6 @@ import org.qi4j.api.constraint.ConstraintViolation;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.entity.Aggregated;
 import org.qi4j.api.entity.Queryable;
-import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.property.Immutable;
 import org.qi4j.api.util.Classes;
 import org.qi4j.bootstrap.BindingException;
@@ -33,11 +40,13 @@ import org.qi4j.runtime.composite.ValueConstraintsInstance;
 import org.qi4j.runtime.model.Binder;
 import org.qi4j.runtime.model.Resolution;
 
-import java.lang.reflect.*;
-import java.util.List;
+import static org.qi4j.functional.Iterables.empty;
+import static org.qi4j.functional.Iterables.first;
 
 /**
- * JAVADOC
+ * Model for an Association.
+ *
+ * <p>Equality is based on the Association accessor object (associated type and name), not on the QualifiedName.</p>
  */
 public final class AssociationModel
     implements AssociationDescriptor, AssociationInfo, Binder, Visitable<AssociationModel>
@@ -68,7 +77,7 @@ public final class AssociationModel
 
     private void initialize()
     {
-        this.type = GenericAssociationInfo.getAssociationType( accessor );
+        this.type = GenericAssociationInfo.associationTypeOf( accessor );
         this.qualifiedName = QualifiedName.fromAccessor( accessor );
         this.immutable = metaInfo.get( Immutable.class ) != null;
         this.aggregated = metaInfo.get( Aggregated.class ) != null;
@@ -77,31 +86,37 @@ public final class AssociationModel
         this.queryable = queryable == null || queryable.value();
     }
 
+    @Override
     public <T> T metaInfo( Class<T> infoType )
     {
         return metaInfo.get( infoType );
     }
 
+    @Override
     public QualifiedName qualifiedName()
     {
         return qualifiedName;
     }
 
+    @Override
     public Type type()
     {
         return type;
     }
 
+    @Override
     public boolean isImmutable()
     {
         return immutable;
     }
 
+    @Override
     public boolean isAggregated()
     {
         return aggregated;
     }
 
+    @Override
     public AccessibleObject accessor()
     {
         return accessor;
@@ -119,11 +134,13 @@ public final class AssociationModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( Visitor<? super AssociationModel, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( Visitor<? super AssociationModel, ThrowableType> visitor )
+        throws ThrowableType
     {
         return visitor.visit( this );
     }
 
+    @Override
     public void checkConstraints( Object value )
         throws ConstraintViolationException
     {
@@ -132,12 +149,13 @@ public final class AssociationModel
             List<ConstraintViolation> violations = constraints.checkConstraints( value );
             if( !violations.isEmpty() )
             {
-                throw new ConstraintViolationException( "", "<unknown>", (Member) accessor, violations );
+                Iterable<Class<?>> empty = empty();
+                throw new ConstraintViolationException( "", empty, (Member) accessor, violations );
             }
         }
     }
 
-    public void checkAssociationConstraints( Association<?> association)
+    public void checkAssociationConstraints( Association<?> association )
         throws ConstraintViolationException
     {
         if( associationConstraints != null )
@@ -151,7 +169,8 @@ public final class AssociationModel
     }
 
     @Override
-    public void bind( Resolution resolution ) throws BindingException
+    public void bind( Resolution resolution )
+        throws BindingException
     {
         builderInfo = new AssociationInfo()
         {
@@ -174,18 +193,22 @@ public final class AssociationModel
             }
 
             @Override
-            public void checkConstraints( Object value ) throws ConstraintViolationException
+            public void checkConstraints( Object value )
+                throws ConstraintViolationException
             {
                 AssociationModel.this.checkConstraints( value );
             }
         };
 
-        if (type instanceof TypeVariable)
+        if( type instanceof TypeVariable )
         {
-            type = Classes.resolveTypeVariable( (TypeVariable) type, ((Member)accessor).getDeclaringClass(), resolution.model().type());
+
+            Class mainType = first( resolution.model().types() );
+            type = Classes.resolveTypeVariable( (TypeVariable) type, ( (Member) accessor ).getDeclaringClass(), mainType );
         }
     }
 
+    @Override
     public boolean equals( Object o )
     {
         if( this == o )
@@ -207,6 +230,7 @@ public final class AssociationModel
         return true;
     }
 
+    @Override
     public int hashCode()
     {
         return accessor.hashCode();
@@ -215,9 +239,13 @@ public final class AssociationModel
     @Override
     public String toString()
     {
-        if (accessor instanceof Field )
-          return ((Field)accessor).toGenericString();
+        if( accessor instanceof Field )
+        {
+            return ( (Field) accessor ).toGenericString();
+        }
         else
-            return ((Method)accessor).toGenericString();
+        {
+            return ( (Method) accessor ).toGenericString();
+        }
     }
 }

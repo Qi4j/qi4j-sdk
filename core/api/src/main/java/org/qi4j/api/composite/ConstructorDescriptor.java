@@ -17,9 +17,9 @@ package org.qi4j.api.composite;
 import java.lang.reflect.Constructor;
 
 /**
- * JAVADOC
+ * Composite constructor descriptor.
  */
 public interface ConstructorDescriptor
 {
-    Constructor constructor();
+    Constructor<?> constructor();
 }

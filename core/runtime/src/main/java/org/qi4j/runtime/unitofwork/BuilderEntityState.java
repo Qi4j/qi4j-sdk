@@ -14,16 +14,15 @@
 
 package org.qi4j.runtime.unitofwork;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.qi4j.api.common.QualifiedName;
-import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
+import org.qi4j.api.util.Classes;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entity.ManyAssociationState;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * JAVADOC
@@ -46,25 +45,30 @@ public final class BuilderEntityState
         manyAssociations = new HashMap<QualifiedName, ManyAssociationState>();
     }
 
+    @Override
     public EntityReference identity()
     {
         return reference;
     }
 
+    @Override
     public String version()
     {
         return "";
     }
 
+    @Override
     public long lastModified()
     {
         return 0;
     }
 
+    @Override
     public void remove()
     {
     }
 
+    @Override
     public EntityStatus status()
     {
         return EntityStatus.NEW;
@@ -73,35 +77,41 @@ public final class BuilderEntityState
     @Override
     public boolean isAssignableTo( Class<?> type )
     {
-        return entityType.type().equals( type );
+        return Classes.exactTypeSpecification( type ).satisfiedBy( entityType );
     }
 
+    @Override
     public EntityDescriptor entityDescriptor()
     {
         return entityType;
     }
 
-    public Object getProperty( QualifiedName stateName )
+    @Override
+    public Object propertyValueOf( QualifiedName stateName )
     {
         return properties.get( stateName );
     }
 
-    public EntityReference getAssociation( QualifiedName stateName )
+    @Override
+    public EntityReference associationValueOf( QualifiedName stateName )
     {
         return associations.get( stateName );
     }
 
-    public void setProperty( QualifiedName stateName, Object newValue )
+    @Override
+    public void setPropertyValue( QualifiedName stateName, Object newValue )
     {
         properties.put( stateName, newValue );
     }
 
-    public void setAssociation( QualifiedName stateName, EntityReference newEntity )
+    @Override
+    public void setAssociationValue( QualifiedName stateName, EntityReference newEntity )
     {
         associations.put( stateName, newEntity );
     }
 
-    public ManyAssociationState getManyAssociation( QualifiedName stateName )
+    @Override
+    public ManyAssociationState manyAssociationValueOf( QualifiedName stateName )
     {
         ManyAssociationState state = manyAssociations.get( stateName );
         if( state == null )
@@ -117,15 +127,15 @@ public final class BuilderEntityState
     {
         for( Map.Entry<QualifiedName, Object> stateNameStringEntry : properties.entrySet() )
         {
-            newEntityState.setProperty( stateNameStringEntry.getKey(), stateNameStringEntry.getValue() );
+            newEntityState.setPropertyValue( stateNameStringEntry.getKey(), stateNameStringEntry.getValue() );
         }
         for( Map.Entry<QualifiedName, EntityReference> stateNameEntityReferenceEntry : associations.entrySet() )
         {
-            newEntityState.setAssociation( stateNameEntityReferenceEntry.getKey(), stateNameEntityReferenceEntry.getValue() );
+            newEntityState.setAssociationValue( stateNameEntityReferenceEntry.getKey(), stateNameEntityReferenceEntry.getValue() );
         }
         for( Map.Entry<QualifiedName, ManyAssociationState> stateNameManyAssociationStateEntry : manyAssociations.entrySet() )
         {
-            ManyAssociationState manyAssoc = newEntityState.getManyAssociation( stateNameManyAssociationStateEntry.getKey() );
+            ManyAssociationState manyAssoc = newEntityState.manyAssociationValueOf( stateNameManyAssociationStateEntry.getKey() );
             int idx = 0;
             for( EntityReference entityReference : stateNameManyAssociationStateEntry.getValue() )
             {

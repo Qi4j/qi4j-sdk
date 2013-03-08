@@ -16,6 +16,21 @@
 */
 package org.qi4j.envisage.print;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
+import java.util.HashSet;
+import java.util.List;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -34,25 +49,10 @@ import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.api.service.ServiceImporter;
 import org.qi4j.api.value.ValueDescriptor;
 import org.qi4j.envisage.graph.GraphDisplay;
-import org.qi4j.envisage.model.descriptor.*;
-import org.qi4j.envisage.model.util.DescriptorUtilities;
 import org.qi4j.envisage.util.TableRow;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
-import java.util.HashSet;
-import java.util.List;
+import org.qi4j.envisage.util.TableRowUtilities;
+import org.qi4j.tools.model.descriptor.*;
+import org.qi4j.tools.model.util.DescriptorUtilities;
 
 public class PDFWriter
 {
@@ -306,7 +306,7 @@ public class PDFWriter
         {
             ServiceDescriptor descriptor = ( (ServiceDetailDescriptor) objectDesciptor ).descriptor();
             writeString( "- identity: " + descriptor.identity() );
-            writeString( "- class: " + descriptor.type().getSimpleName() );
+            writeString( "- class: " + descriptor.toString() );
             writeString( "- visibility: " + descriptor.visibility().toString() );
             writeString( "- startup: " + ( (ServiceDetailDescriptor) objectDesciptor ).descriptor()
                 .isInstantiateOnStartup() );
@@ -314,29 +314,29 @@ public class PDFWriter
         else if( objectDesciptor instanceof EntityDetailDescriptor )
         {
             EntityDescriptor descriptor = ( (EntityDetailDescriptor) objectDesciptor ).descriptor();
-            writeString( "- name: " + descriptor.type().getSimpleName() );
-            writeString( "- class: " + descriptor.type().getSimpleName() );
+            writeString( "- name: " + descriptor.toString());
+            writeString( "- class: " + descriptor.toString() );
             writeString( "- visibility: " + descriptor.visibility().toString() );
         }
         else if( objectDesciptor instanceof ValueDetailDescriptor )
         {
             ValueDescriptor descriptor = ( (ValueDetailDescriptor) objectDesciptor ).descriptor();
-            writeString( "- name: " + descriptor.type().getSimpleName() );
-            writeString( "- class: " + descriptor.type().getSimpleName() );
+            writeString( "- name: " + descriptor.toString());
+            writeString( "- class: " + descriptor.toString() );
             writeString( "- visibility: " + descriptor.visibility().toString() );
         }
         else if( objectDesciptor instanceof ObjectDetailDescriptor )
         {
             ObjectDescriptor descriptor = ( (ObjectDetailDescriptor) objectDesciptor ).descriptor();
-            writeString( "- name: " + descriptor.type().getSimpleName() );
-            writeString( "- class: " + descriptor.type().getSimpleName() );
+            writeString( "- name: " + descriptor.toString());
+            writeString( "- class: " + descriptor.toString());
             writeString( "- visibility: " + descriptor.visibility().toString() );
         }
         else if( objectDesciptor instanceof CompositeDetailDescriptor )
         {
             CompositeDescriptor descriptor = ( (CompositeDetailDescriptor) objectDesciptor ).descriptor();
-            writeString( "- name: " + descriptor.type().getSimpleName() );
-            writeString( "- class: " + descriptor.type().getSimpleName() );
+            writeString( "- name: " + descriptor.toString());
+            writeString( "- class: " + descriptor.toString());
             writeString( "- visibility: " + descriptor.visibility().toString() );
         }
     }
@@ -418,7 +418,7 @@ public class PDFWriter
 
     private String formatParameters( Class<?>[] parameterTypes )
     {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append( "(" );
         boolean first = true;
         int count = 1;
@@ -460,7 +460,7 @@ public class PDFWriter
             Type[] actuals = pType.getActualTypeArguments();
             Type ownerType = pType.getOwnerType();
             Type rawType = pType.getRawType();
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             result.append( ( (Class) rawType ).getSimpleName() );
             result.append( "<" );
             boolean first = true;
@@ -484,7 +484,7 @@ public class PDFWriter
             WildcardType wildcard = (WildcardType) type;
             Type[] lowers = wildcard.getLowerBounds();
             Type[] uppers = wildcard.getUpperBounds();
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             result.append( "? extends " );
             boolean first = true;
             for( Type upper : uppers )
@@ -604,8 +604,8 @@ public class PDFWriter
         }
 
         setFont( normalFont, normalFontSize );
-        writeString( "- name: " + spiDescriptor.type().getSimpleName() );
-        writeString( "- class: " + spiDescriptor.type().getName() );
+        writeString( "- name: " + spiDescriptor.toString());
+        writeString( "- class: " + spiDescriptor.toString() );
         writeString( "- type: " + typeString );
     }
 
@@ -615,7 +615,8 @@ public class PDFWriter
         writeString( "Usage: ", headerLineSpace );
 
         setFont( normalFont, normalFontSize );
-        List<TableRow> rows = DescriptorUtilities.findServiceUsage( (ServiceDetailDescriptor) objectDesciptor );
+        List<ServiceUsage> serviceUsages = DescriptorUtilities.findServiceUsage( (ServiceDetailDescriptor) objectDesciptor );
+        List<TableRow> rows = TableRowUtilities.toTableRows( serviceUsages );
         for( TableRow row : rows )
         {
 
@@ -783,6 +784,7 @@ public class PDFWriter
             description = "PDF - Portable Document Format";
         }
 
+        @Override
         public boolean accept( File f )
         {
             if( f != null )
@@ -814,6 +816,7 @@ public class PDFWriter
             return null;
         }
 
+        @Override
         public String getDescription()
         {
             return description;

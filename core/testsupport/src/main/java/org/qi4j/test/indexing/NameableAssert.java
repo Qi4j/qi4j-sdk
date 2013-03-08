@@ -17,14 +17,18 @@
  */
 package org.qi4j.test.indexing;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.entity.Identity;
 import org.qi4j.test.indexing.model.Nameable;
 
-import java.util.*;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.qi4j.functional.Iterables.toList;
 
 public class NameableAssert
 {
@@ -57,16 +61,6 @@ public class NameableAssert
             Collections.sort( expectedSorted );
         }
         assertEquals( "names", expectedSorted, sortedNames );
-    }
-
-    public static <T> List<T> toList( final Iterable<T> iterable )
-    {
-        final List<T> result = new ArrayList<T>();
-        for( final T element : iterable )
-        {
-            result.add( element );
-        }
-        return result;
     }
 
     public static void trace( Nameable nameable )

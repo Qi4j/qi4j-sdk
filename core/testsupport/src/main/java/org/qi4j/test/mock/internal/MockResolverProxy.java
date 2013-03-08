@@ -17,10 +17,9 @@
  */
 package org.qi4j.test.mock.internal;
 
-import org.qi4j.api.util.NullArgumentException;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import org.qi4j.api.util.NullArgumentException;
 
 /**
  * Proxy to another mock resolver that can be set/changed over time. This allows
@@ -86,6 +85,7 @@ public class MockResolverProxy
      *
      * @see MockResolver#getInvocationHandler(Object, java.lang.reflect.Method, Object[])
      */
+    @Override
     public InvocationHandler getInvocationHandler( final Object proxy, final Method method, final Object[] args )
     {
         return mockResolver.getInvocationHandler( proxy, method, args );

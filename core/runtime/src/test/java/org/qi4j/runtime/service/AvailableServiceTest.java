@@ -14,8 +14,8 @@
 
 package org.qi4j.runtime.service;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
+import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.configuration.ConfigurationComposite;
@@ -32,7 +32,7 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
 import org.qi4j.test.EntityTestAssembler;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -42,28 +42,31 @@ public class AvailableServiceTest
 {
     @Test
     public void givenAvailableServiceWhenCheckServiceReferenceThenReturnTrue()
+        throws ActivationException, AssemblyException
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
             public void assemble( ModuleAssembly module )
-                    throws AssemblyException
+                throws AssemblyException
             {
                 module.services( TestServiceComposite1.class );
             }
         };
 
-        ServiceReference<TestServiceComposite1> serviceRef = assembler.module().findService( TestServiceComposite1.class );
+        ServiceReference<TestServiceComposite1> serviceRef = assembler.module()
+            .findService( TestServiceComposite1.class );
 
         assertThat( "service is available", serviceRef.isAvailable(), equalTo( true ) );
     }
 
     @Test
     public void givenEnablableServiceWhenCheckAvailableThenReturnEnabledStatus()
+        throws ActivationException, AssemblyException
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
             public void assemble( ModuleAssembly module )
-                    throws AssemblyException
+                throws AssemblyException
             {
                 module.services( TestServiceComposite2.class );
                 module.entities( TestServiceConfiguration.class );
@@ -72,11 +75,12 @@ public class AvailableServiceTest
             }
         };
 
-        ServiceReference<TestServiceComposite2> serviceRef = assembler.module().findService( TestServiceComposite2.class );
+        ServiceReference<TestServiceComposite2> serviceRef = assembler.module()
+            .findService( TestServiceComposite2.class );
 
         assertThat( "service is unavailable", serviceRef.isAvailable(), equalTo( false ) );
 
-        serviceRef.get().configuration().enabled().set( true );
+        serviceRef.get().get().enabled().set( true );
         serviceRef.get().save();
 
         assertThat( "service is available", serviceRef.isAvailable(), equalTo( true ) );
@@ -84,11 +88,12 @@ public class AvailableServiceTest
 
     @Test
     public void givenEnablableServiceWhenInjectWithAvailableQualifierThenInjectCorrectly()
+        throws ActivationException, AssemblyException
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
             public void assemble( ModuleAssembly module )
-                    throws AssemblyException
+                throws AssemblyException
             {
                 module.objects( TestObject.class );
                 module.services( TestServiceComposite2.class );
@@ -100,32 +105,33 @@ public class AvailableServiceTest
 
         TestObject object = assembler.module().newObject( TestObject.class );
 
-        assertThat( "service is unavailable", object.getService(), CoreMatchers.<Object>nullValue() );
+        assertThat( "service is unavailable", object.getService(), nullValue() );
 
-        ServiceReference<TestServiceComposite2> serviceRef = assembler.module().findService( TestServiceComposite2.class );
-        serviceRef.get().configuration().enabled().set( true );
+        ServiceReference<TestServiceComposite2> serviceRef = assembler.module()
+            .findService( TestServiceComposite2.class );
+        serviceRef.get().get().enabled().set( true );
         serviceRef.get().save();
 
         object = assembler.module().newObject( TestObject.class );
-        assertThat( "service is available", object.getService(), CoreMatchers.<Object>notNullValue() );
+        assertThat( "service is available", object.getService(), notNullValue() );
     }
 
     // This service has to be asked for availability
-    @Mixins(TestMixin1.class)
+    @Mixins( TestMixin1.class )
     public interface TestServiceComposite1
-            extends TestService, Availability, ServiceComposite
+        extends TestService, Availability, ServiceComposite
     {
     }
 
     // This service has availability set through configuration
-    @Mixins(TestMixin2.class)
+    @Mixins( TestMixin2.class )
     public interface TestServiceComposite2
-            extends TestService, Configuration<TestServiceConfiguration>, ServiceComposite
+        extends TestService, Configuration<TestServiceConfiguration>, ServiceComposite
     {
     }
 
     public interface TestServiceConfiguration
-            extends Enabled, ConfigurationComposite
+        extends Enabled, ConfigurationComposite
     {
     }
 
@@ -135,7 +141,7 @@ public class AvailableServiceTest
     }
 
     public static class TestMixin1
-            implements TestService, Availability
+        implements TestService, Availability
     {
         public String test()
         {
@@ -149,7 +155,7 @@ public class AvailableServiceTest
     }
 
     public static class TestMixin2
-            implements TestService
+        implements TestService
     {
         @This
         Configuration<TestServiceConfiguration> config;
@@ -164,7 +170,8 @@ public class AvailableServiceTest
     {
         @Service
         @Optional
-        @Available TestService service;
+        @Available
+        TestService service;
 
         public TestService getService()
         {

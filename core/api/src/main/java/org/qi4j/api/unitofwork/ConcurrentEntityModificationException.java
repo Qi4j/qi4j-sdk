@@ -29,16 +29,12 @@ public class ConcurrentEntityModificationException
 
     public ConcurrentEntityModificationException( Iterable<EntityComposite> concurrentlyModifiedEntities )
     {
+        super("Entities changed concurrently :" + concurrentlyModifiedEntities);
         this.concurrentlyModifiedEntities = concurrentlyModifiedEntities;
     }
 
     public Iterable<EntityComposite> concurrentlyModifiedEntities()
     {
         return concurrentlyModifiedEntities;
-    }
-
-    public String getMessage()
-    {
-        return "Entities changed concurrently :" + concurrentlyModifiedEntities;
     }
 }

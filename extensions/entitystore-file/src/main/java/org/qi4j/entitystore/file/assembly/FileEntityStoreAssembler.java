@@ -27,13 +27,20 @@ import org.qi4j.spi.uuid.UuidIdentityGeneratorService;
 public class FileEntityStoreAssembler
     implements Assembler
 {
+
     private Visibility visibility;
+
+    public FileEntityStoreAssembler()
+    {
+        this.visibility = Visibility.module;
+    }
 
     public FileEntityStoreAssembler( Visibility visibility )
     {
         this.visibility = visibility;
     }
 
+    @Override
     public void assemble( ModuleAssembly module )
         throws AssemblyException
     {

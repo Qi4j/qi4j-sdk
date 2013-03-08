@@ -13,11 +13,14 @@
  * implied.
  *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 
 package org.qi4j.logging.trace.service;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import org.qi4j.api.Qi4j;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.configuration.Configuration;
@@ -35,9 +38,7 @@ import org.qi4j.logging.trace.records.EntityTraceRecordEntity;
 import org.qi4j.logging.trace.records.ServiceTraceRecordEntity;
 import org.qi4j.logging.trace.records.TraceRecord;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import static org.qi4j.functional.Iterables.first;
 
 public class TraceServiceMixin
     implements TraceService
@@ -47,16 +48,18 @@ public class TraceServiceMixin
     private int counter;
     private Integer traceLevel;
 
+    @Override
     public int traceLevel()
     {
         if( counter++ % 100 == 0 )
         {
             counter = 0;
-            traceLevel = configuration.configuration().traceLevel().get();
+            traceLevel = configuration.get().traceLevel().get();
         }
         return traceLevel;
     }
 
+    @Override
     public void traceSuccess( Class compositeType, Composite object, Method method, Object[] args, Object result, long entryTime, long durationNano )
     {
         UnitOfWork uow = uowf.newUnitOfWork();
@@ -75,6 +78,7 @@ public class TraceServiceMixin
         }
     }
 
+    @Override
     public void traceException( Class compositeType, Composite object, Method method, Object[] args, Throwable t, long entryTime, long durationNano )
     {
         UnitOfWork uow = uowf.newUnitOfWork();
@@ -99,7 +103,8 @@ public class TraceServiceMixin
         {
             EntityComposite entity = (EntityComposite) object;
             String identity = entity.identity().get();
-            EntityComposite source = (EntityComposite) uow.get( Qi4j.DESCRIPTOR_FUNCTION.map( entity ).type(), identity);
+            EntityComposite source = (EntityComposite) uow.get( first( Qi4j.FUNCTION_DESCRIPTOR_FOR
+                                                                           .map( entity ).types() ), identity);
             EntityBuilder<EntityTraceRecordEntity> builder = uow.newEntityBuilder( EntityTraceRecordEntity.class );
             EntityTraceRecordEntity state = builder.instance();
             setStandardStuff( compositeType, method, args, entryTime, durationNano, state, exception );

@@ -14,11 +14,10 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.annotation.Annotation;
 import org.qi4j.api.constraint.ConstraintDescriptor;
 import org.qi4j.functional.Visitable;
 import org.qi4j.functional.Visitor;
-
-import java.lang.annotation.Annotation;
 
 /**
  * JAVADOC
@@ -33,6 +32,7 @@ public abstract class AbstractConstraintModel
         this.annotation = annotation;
     }
 
+    @Override
     public Annotation annotation()
     {
         return annotation;
@@ -41,7 +41,8 @@ public abstract class AbstractConstraintModel
     public abstract ConstraintInstance<?, ?> newInstance();
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( Visitor<? super ConstraintDescriptor, ThrowableType> modelVisitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( Visitor<? super ConstraintDescriptor, ThrowableType> modelVisitor )
+        throws ThrowableType
     {
         return modelVisitor.visit( this );
     }

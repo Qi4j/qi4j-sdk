@@ -29,7 +29,7 @@ import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.library.fileconfig.FileConfiguration;
+import org.qi4j.library.fileconfig.FileConfigurationService;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
 
@@ -49,10 +49,12 @@ public class SolrQueryServiceTest
     {
         module.layer().application().setMode( Application.Mode.test );
 
-        module.services( FileConfiguration.class ).instantiateOnStartup();
+        module.services( FileConfigurationService.class ).instantiateOnStartup();
 
         new EntityTestAssembler().assemble( module );
+        // START SNIPPET: assembly
         new SolrAssembler().assemble( module );
+        // END SNIPPET: assembly
 
         module.entities( TestEntity.class );
     }

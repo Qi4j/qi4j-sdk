@@ -11,15 +11,21 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.api.structure;
 
 /**
- * JAVADOC
+ * Layer Descriptor.
  */
 public interface LayerDescriptor
 {
+
+    /**
+     * @return the Layer's name
+     */
     String name();
 
+    /**
+     * @return Layers used by this Layer
+     */
     UsedLayersDescriptor usedLayers();
 }

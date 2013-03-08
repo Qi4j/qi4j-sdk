@@ -14,19 +14,21 @@
 
 package org.qi4j.api.service.importer;
 
-/**
- * JAVADOC
- */
-
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.service.*;
+import org.qi4j.api.service.ImportedServiceDescriptor;
+import org.qi4j.api.service.ServiceFinder;
+import org.qi4j.api.service.ServiceImporter;
+import org.qi4j.api.service.ServiceImporterException;
+import org.qi4j.api.service.ServiceReference;
 
 /**
  * Use a registered service that implements ServiceImporter to do the actual
  * import. The service id of the service that this importer should delegate to must
  * be set as meta-info on this service. Example:
+ * <pre><code>
  * module.services(MyServiceImporterService.class).identifiedBy("someid");
  * module.importedServices(OtherService.class).importedBy(ServiceInstanceImporter.class).setMetaInfo("someid");
+ * </code></pre>
  */
 public class ServiceInstanceImporter<T>
     implements ServiceImporter<T>
@@ -38,25 +40,22 @@ public class ServiceInstanceImporter<T>
 
     String serviceId;
 
+    @Override
     public T importService( ImportedServiceDescriptor importedServiceDescriptor )
         throws ServiceImporterException
     {
         serviceId = importedServiceDescriptor.metaInfo( String.class );
 
-        return getServiceImporter().importService( importedServiceDescriptor );
+        return serviceImporter().importService( importedServiceDescriptor );
     }
 
-    public boolean isActive( T o )
-    {
-        return getServiceImporter().isActive( o );
-    }
-
+    @Override
     public boolean isAvailable( T instance )
     {
-        return getServiceImporter().isAvailable( instance );
+        return serviceImporter().isAvailable( instance );
     }
 
-    private ServiceImporter<T> getServiceImporter()
+    private ServiceImporter<T> serviceImporter()
     {
         if( service == null )
         {

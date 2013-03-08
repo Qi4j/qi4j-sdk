@@ -14,22 +14,21 @@
 
 package org.qi4j.runtime.composite;
 
-import org.objectweb.asm.*;
-import org.qi4j.api.entity.Lifecycle;
-import org.qi4j.api.mixin.Initializable;
-import org.qi4j.api.service.Activatable;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.util.Methods;
-import org.qi4j.functional.Iterables;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import org.objectweb.asm.*;
+import org.qi4j.api.entity.Lifecycle;
+import org.qi4j.api.mixin.Initializable;
+import org.qi4j.api.util.Classes;
+import org.qi4j.api.util.Methods;
+import org.qi4j.functional.Iterables;
 
 import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Type.getInternalName;
+import static org.qi4j.api.util.Classes.interfacesOf;
 
 /**
  * Generate subclasses of mixins/modifiers that implement all interfaces not in the class itself
@@ -60,12 +59,13 @@ public class FragmentClassLoader
         super( parent );
     }
 
+    @Override
     protected Class findClass( String name )
         throws ClassNotFoundException
     {
         if( name.endsWith( GENERATED_POSTFIX ) )
         {
-            Class baseClass = null;
+            Class baseClass;
             String baseName = name.substring( 0, name.length() - 5 );
             try
             {
@@ -96,6 +96,9 @@ public class FragmentClassLoader
                     }
                 }
             }
+//  To Allow JDK classes to be composed.
+            if( name.startsWith( "java." ))
+                name = "qi4j." + name;
 
             byte[] b = generateClass( name, baseClass );
             return defineClass( name, b, 0, b.length, baseClass.getProtectionDomain() );
@@ -112,17 +115,13 @@ public class FragmentClassLoader
         String baseClassSlash = getInternalName( baseClass );
 
         ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_MAXS );
-        FieldVisitor fv;
-        MethodVisitor mv;
-        AnnotationVisitor av0;
 
         // Class definition start
         cw.visit( jdkVersion, ACC_PUBLIC + ACC_SUPER, classSlash, null, baseClassSlash, null );
 
         // Composite reference
         {
-            fv = cw.visitField( ACC_PUBLIC, "_instance", "Lorg/qi4j/api/composite/CompositeInvoker;", null, null );
-            fv.visitEnd();
+            cw.visitField( ACC_PUBLIC, "_instance", "Lorg/qi4j/api/composite/CompositeInvoker;", null, null ).visitEnd();
         }
 
         // Static Method references
@@ -131,11 +130,10 @@ public class FragmentClassLoader
             int idx = 1;
             for( Method method : baseClass.getMethods() )
             {
-                if( isOverloaded( method, baseClass ) )
+                if( isOverridden(method, baseClass) )
                 {
-                    fv = cw.visitField( ACC_PRIVATE + ACC_STATIC, "m" + idx++, "Ljava/lang/reflect/Method;", null,
-                                        null );
-                    fv.visitEnd();
+                    cw.visitField( ACC_PRIVATE + ACC_STATIC, "m" + idx++, "Ljava/lang/reflect/Method;", null,
+                                        null ).visitEnd();
                     hasProxyMethods = true;
                 }
             }
@@ -147,23 +145,35 @@ public class FragmentClassLoader
             if( Modifier.isPublic( constructor.getModifiers() ) || Modifier.isProtected( constructor.getModifiers() ) )
             {
                 String desc = org.objectweb.asm.commons.Method.getMethod( constructor ).getDescriptor();
-                mv = cw.visitMethod( ACC_PUBLIC, "<init>", desc, null, null );
-                mv.visitCode();
-                mv.visitVarInsn( ALOAD, 0 );
+                MethodVisitor cmv = cw.visitMethod( ACC_PUBLIC, "<init>", desc, null, null );
+                cmv.visitCode();
+                cmv.visitVarInsn(ALOAD, 0);
 
                 int idx = 1;
                 for( Class aClass : constructor.getParameterTypes() )
                 {
-                    // TODO Handle other types than objects (?)
-                    mv.visitVarInsn( ALOAD, idx++ );
+                    final int opcode;
+                    if (aClass.equals(Integer.TYPE)) {
+                        opcode = ILOAD;
+                    } else if (aClass.equals(Long.TYPE)) {
+                        opcode = LLOAD;
+                    } else if (aClass.equals(Float.TYPE)) {
+                        opcode = FLOAD;
+                    } else if (aClass.equals(Double.TYPE)) {
+                        opcode = DLOAD;
+                    } else {
+                        opcode = ALOAD;
+                    }
+                    cmv.visitVarInsn(opcode, idx++);
                 }
 
-                mv.visitMethodInsn( INVOKESPECIAL, baseClassSlash, "<init>", desc );
-                mv.visitInsn( RETURN );
-                mv.visitMaxs( idx, idx );
-                mv.visitEnd();
+                cmv.visitMethodInsn(INVOKESPECIAL, baseClassSlash, "<init>", desc);
+                cmv.visitInsn(RETURN);
+                cmv.visitMaxs(idx, idx);
+                cmv.visitEnd();
             }
         }
+
 
         // Overloaded and unimplemented methods
         if( hasProxyMethods )
@@ -173,7 +183,7 @@ public class FragmentClassLoader
             List<Label> exceptionLabels = new ArrayList<Label>();
             for( Method method : methods )
             {
-                if( isOverloaded( method, baseClass ) )
+                if( isOverridden(method, baseClass) )
                 {
                     idx++;
                     String methodName = method.getName();
@@ -181,7 +191,7 @@ public class FragmentClassLoader
 
                     String[] exceptions = null;
                     {
-                        mv = cw.visitMethod( ACC_PUBLIC, methodName, desc, null, exceptions );
+                        MethodVisitor mv = cw.visitMethod( ACC_PUBLIC, methodName, desc, null, exceptions );
                         if( isInternalQi4jMethod( method, baseClass ) )
                         {
                             // generate a NoOp method...
@@ -305,6 +315,7 @@ public class FragmentClassLoader
                     if( !Modifier.isAbstract( method.getModifiers() ) )
                     {
                         // Add method with _ as prefix
+                        MethodVisitor mv;
                         mv = cw.visitMethod( ACC_PUBLIC, "_" + method.getName(), desc, null, exceptions );
                         mv.visitCode();
                         mv.visitVarInsn( ALOAD, 0 );
@@ -337,6 +348,7 @@ public class FragmentClassLoader
 
             // Class initializer
             {
+                MethodVisitor mv;
                 mv = cw.visitMethod( ACC_STATIC, "<clinit>", "()V", null, null );
                 mv.visitCode();
                 Label l0 = new Label();
@@ -349,7 +361,7 @@ public class FragmentClassLoader
                 int midx = 0;
                 for( Method method : methods )
                 {
-                    if( isOverloaded( method, baseClass ) )
+                    if( isOverridden(method, baseClass) )
                     {
                         method.setAccessible( true );
                         Class methodClass;
@@ -407,13 +419,11 @@ public class FragmentClassLoader
                 mv.visitEnd();
             }
         }
-
         cw.visitEnd();
-
         return cw.toByteArray();
     }
 
-    private static boolean isOverloaded( Method method, Class baseClass )
+    private static boolean isOverridden(Method method, Class baseClass)
     {
         if( Modifier.isAbstract( method.getModifiers() ) )
         {
@@ -444,8 +454,7 @@ public class FragmentClassLoader
 
     private static boolean isInternalQi4jMethod( Method method, Class baseClass )
     {
-        return isDeclaredIn( method, Activatable.class, baseClass )
-               || isDeclaredIn( method, Initializable.class, baseClass )
+        return isDeclaredIn( method, Initializable.class, baseClass )
                || isDeclaredIn( method, Lifecycle.class, baseClass );
     }
 
@@ -470,7 +479,7 @@ public class FragmentClassLoader
     private static Class getInterfaceMethodDeclaration( Method method, Class clazz )
         throws NoSuchMethodException
     {
-        Iterable<Class<?>> interfaces = Iterables.map( Classes.RAW_CLASS, Classes.INTERFACES_OF.map( clazz ));
+        Iterable<Class<?>> interfaces = Iterables.map( Classes.RAW_CLASS, interfacesOf( clazz ) );
         for( Class<?> anInterface : interfaces )
         {
             try
@@ -489,7 +498,7 @@ public class FragmentClassLoader
 
     private static boolean isInterfaceMethod( Method method, Class baseClass )
     {
-        for( Class aClass : Iterables.filter( Methods.HAS_METHODS, Iterables.map( Classes.RAW_CLASS, Classes.INTERFACES_OF.map( baseClass ) ) ))
+        for( Class aClass : Iterables.filter( Methods.HAS_METHODS, Iterables.map( Classes.RAW_CLASS, interfacesOf( baseClass ) ) ) )
         {
             try
             {

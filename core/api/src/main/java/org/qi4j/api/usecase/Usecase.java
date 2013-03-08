@@ -14,19 +14,20 @@
 
 package org.qi4j.api.usecase;
 
-import org.qi4j.api.common.MetaInfo;
-
 import java.io.Serializable;
+import org.qi4j.api.common.MetaInfo;
+import org.qi4j.api.structure.MetaInfoHolder;
 
 /**
  * A Usecase. A Usecase is used as a model for UnitOfWork, and helps
  * implementations decide what to do in certain circumstances.
  */
 public final class Usecase
-    implements Serializable
+    implements Serializable, MetaInfoHolder
 {
     public static final Usecase DEFAULT = new Usecase( "Default", new MetaInfo() );
 
+    private static final long serialVersionUID = 1L;
     private final String name;
     private final MetaInfo metaInfo;
 
@@ -54,6 +55,7 @@ public final class Usecase
      *
      * @return the previously stored metaInfo of the given type for the usecase.
      */
+    @Override
     public <T> T metaInfo( Class<T> infoType )
     {
         return metaInfo.get( infoType );

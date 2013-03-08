@@ -1,3 +1,17 @@
+/*
+ * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package org.qi4j.runtime.service;
 
 import org.junit.Test;
@@ -9,15 +23,13 @@ import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.entitystore.memory.MemoryEntityStoreService;
-import org.qi4j.spi.uuid.UuidIdentityGeneratorService;
 import org.qi4j.test.AbstractQi4jTest;
+import org.qi4j.test.EntityTestAssembler;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -37,7 +49,7 @@ public class ConfigurationTest
         module.objects( this.getClass() );
         module.entities( HelloWorldConfiguration.class );
         module.services( HelloWorldService.class ).identifiedBy( "HelloWorldService" );
-        module.services( MemoryEntityStoreService.class, UuidIdentityGeneratorService.class );
+        new EntityTestAssembler().assemble( module );
     }
 
     @Test
@@ -110,7 +122,7 @@ public class ConfigurationTest
 
     @Mixins( HelloWorldMixin.class )
     public interface HelloWorldService
-        extends HelloWorld, ServiceComposite, Configuration, Activatable
+        extends HelloWorld, ServiceComposite, Configuration
     {
     }
 
@@ -125,24 +137,14 @@ public class ConfigurationTest
     }
 
     public static class HelloWorldMixin
-        implements HelloWorld, Activatable
+        implements HelloWorld
     {
         @This
         Configuration<HelloWorldConfiguration> config;
 
-        public void activate()
-            throws Exception
-        {
-        }
-
-        public void passivate()
-            throws Exception
-        {
-        }
-
         public String sayHello()
         {
-            return config.configuration().phrase() + " " + config.configuration().name();
+            return config.get().phrase() + " " + config.get().name();
         }
     }
 }

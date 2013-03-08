@@ -14,13 +14,17 @@
 
 package org.qi4j.api.constraint;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * This annotation is used by composites and mixins to declare what Constraints
  * can be applied in the Composite.
  * <p/>
- * Constraints implement the {@see Constraint} interface
+ * Constraints implement the {@link Constraint} interface
  */
 @Retention( RetentionPolicy.RUNTIME )
 @Target( { ElementType.TYPE } )

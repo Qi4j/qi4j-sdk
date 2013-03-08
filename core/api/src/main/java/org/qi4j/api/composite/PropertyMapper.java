@@ -1,19 +1,32 @@
 package org.qi4j.api.composite;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import org.qi4j.api.Qi4j;
 import org.qi4j.api.property.GenericPropertyInfo;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.util.Classes;
 import org.qi4j.api.util.Dates;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.*;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.*;
+import org.qi4j.api.value.ValueComposite;
 
 /**
- * Transfer properties to Composite properties
+ * Transfer java.util.Properties to Composite properties
  */
 public final class PropertyMapper
 {
@@ -40,6 +53,7 @@ public final class PropertyMapper
         STRATEGY.put( Map.class, new MapMapper() );
         STRATEGY.put( List.class, new ListMapper() );
         STRATEGY.put( Set.class, new SetMapper() );
+        STRATEGY.put( ValueComposite.class, new ValueCompositeMapper() );
     }
 
     /**
@@ -57,13 +71,13 @@ public final class PropertyMapper
         {
             try
             {
-                Method propertyMethod = composite.getClass()
-                    .getInterfaces()[ 0 ].getMethod( objectObjectEntry.getKey().toString() );
+                String methodName = objectObjectEntry.getKey().toString();
+                Method propertyMethod = composite.getClass().getInterfaces()[ 0 ].getMethod( methodName );
                 propertyMethod.setAccessible( true );
                 Object value = objectObjectEntry.getValue();
-                Type propertyType = GenericPropertyInfo.getPropertyType( propertyMethod );
+                Type propertyType = GenericPropertyInfo.propertyTypeOf( propertyMethod );
 
-                value = mapToType( propertyType, value.toString() );
+                value = mapToType( composite, propertyType, value.toString() );
 
                 @SuppressWarnings( "unchecked" )
                 Property<Object> property = (Property<Object>) propertyMethod.invoke( composite );
@@ -76,21 +90,18 @@ public final class PropertyMapper
             catch( IllegalAccessException e )
             {
                 //noinspection ThrowableInstanceNeverThrown
-                throw (IllegalArgumentException) new IllegalArgumentException( "Could not populate property named " + objectObjectEntry
-                    .getKey() ).initCause( e );
+                throw new IllegalArgumentException( "Could not populate property named " + objectObjectEntry.getKey(), e );
             }
             catch( InvocationTargetException e )
             {
                 //noinspection ThrowableInstanceNeverThrown
                 String message = "Could not populate property named " + objectObjectEntry.getKey();
-                IllegalArgumentException exception = new IllegalArgumentException( message );
-                exception.initCause( e );
-                throw exception;
+                throw new IllegalArgumentException( message, e );
             }
         }
     }
 
-    private static Object mapToType( Type propertyType, Object value )
+    private static Object mapToType( Composite composite, Type propertyType, Object value )
     {
         final String stringValue = value.toString();
         MappingStrategy strategy;
@@ -101,13 +112,17 @@ public final class PropertyMapper
             {
                 strategy = STRATEGY.get( Array.class );
             }
-            else if( Enum.class.isAssignableFrom( Classes.RAW_CLASS.map( propertyType) ) )
+            else if( Enum.class.isAssignableFrom( Classes.RAW_CLASS.map( propertyType ) ) )
             {
                 strategy = STRATEGY.get( Enum.class );
             }
             else
             {
                 strategy = STRATEGY.get( type );
+            }
+            if( strategy == null  ) // If null, try with the ValueComposite Mapper...
+            {
+                strategy = STRATEGY.get( ValueComposite.class );
             }
         }
         else if( propertyType instanceof ParameterizedType )
@@ -149,7 +164,7 @@ public final class PropertyMapper
             throw new IllegalArgumentException( propertyType + " is not supported." );
         }
 
-        return strategy.map( propertyType, stringValue );
+        return strategy.map( composite, propertyType, stringValue );
     }
 
     /**
@@ -187,7 +202,7 @@ public final class PropertyMapper
      *
      * @return properties instance
      */
-    public static Properties getProperties( final Composite composite )
+    public static Properties toJavaProperties( final Composite composite )
     {
         return new Properties()
         {
@@ -313,13 +328,14 @@ public final class PropertyMapper
 
     private interface MappingStrategy
     {
-        Object map( Type type, String value );
+        Object map( Composite composite, Type type, String value );
     }
 
     private static class StringMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return value;
         }
@@ -328,7 +344,8 @@ public final class PropertyMapper
     private static class IntegerMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return new Integer( value.trim() );
         }
@@ -337,7 +354,8 @@ public final class PropertyMapper
     private static class FloatMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return new Float( value.trim() );
         }
@@ -346,7 +364,8 @@ public final class PropertyMapper
     private static class DoubleMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return new Double( value.trim() );
         }
@@ -355,7 +374,8 @@ public final class PropertyMapper
     private static class LongMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return new Long( value.trim() );
         }
@@ -364,7 +384,8 @@ public final class PropertyMapper
     private static class ShortMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return new Short( value.trim() );
         }
@@ -373,7 +394,8 @@ public final class PropertyMapper
     private static class ByteMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return new Byte( value.trim() );
         }
@@ -382,7 +404,8 @@ public final class PropertyMapper
     private static class CharMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return value.trim().charAt( 0 );
         }
@@ -391,7 +414,8 @@ public final class PropertyMapper
     private static class BigDecimalMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return new BigDecimal( value.trim() );
         }
@@ -400,7 +424,8 @@ public final class PropertyMapper
     private static class BigIntegerMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return new BigInteger( value.trim() );
         }
@@ -409,7 +434,8 @@ public final class PropertyMapper
     private static class EnumMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return Enum.valueOf( (Class<Enum>) type, value );
         }
@@ -418,24 +444,37 @@ public final class PropertyMapper
     private static class DateMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( Composite composite, Type type, String value )
         {
             return Dates.fromString( value.trim() );
+        }
+    }
+
+    private static class ValueCompositeMapper
+        implements MappingStrategy
+    {
+        @Override
+        public Object map( Composite composite, Type type, String value )
+        {
+            return Qi4j.FUNCTION_COMPOSITE_INSTANCE_OF.map( composite ).module().newValueFromSerializedState( (Class<Object>) type, value );
         }
     }
 
     private static class ArrayMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( final Composite composite, Type type, String value )
         {
             final Class arrayType = ( (Class) type ).getComponentType();
             final ArrayList result = new ArrayList();
             tokenize( value, false, new TokenizerCallback()
             {
+                @Override
                 public void token( String token )
                 {
-                    result.add( mapToType( arrayType, token ) );
+                    result.add( mapToType( composite, arrayType, token ) );
                 }
             } );
             return result.toArray( (Object[]) Array.newInstance( arrayType, result.size() ) );
@@ -445,7 +484,8 @@ public final class PropertyMapper
     private static class BooleanMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( final Composite composite, Type type, String value )
         {
             return Boolean.valueOf( value.trim() );
         }
@@ -454,15 +494,17 @@ public final class PropertyMapper
     private static class ListMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( final Composite composite, Type type, String value )
         {
             final Type dataType = ( (ParameterizedType) type ).getActualTypeArguments()[ 0 ];
             final Collection result = new ArrayList();
             tokenize( value, false, new TokenizerCallback()
             {
+                @Override
                 public void token( String token )
                 {
-                    result.add( mapToType( dataType, token ) );
+                    result.add( mapToType( composite, dataType, token ) );
                 }
             } );
             return result;
@@ -472,15 +514,17 @@ public final class PropertyMapper
     private static class SetMapper
         implements MappingStrategy
     {
-        public Object map( Type type, String value )
+        @Override
+        public Object map( final Composite composite, Type type, String value )
         {
             final Type dataType = ( (ParameterizedType) type ).getActualTypeArguments()[ 0 ];
             final Collection result = new HashSet();
             tokenize( value, false, new TokenizerCallback()
             {
+                @Override
                 public void token( String token )
                 {
-                    result.add( mapToType( dataType, token ) );
+                    result.add( mapToType( composite, dataType, token ) );
                 }
             } );
             return result;
@@ -490,7 +534,8 @@ public final class PropertyMapper
     private static class MapMapper
         implements MappingStrategy
     {
-        public Object map( Type generictype, String value )
+        @Override
+        public Object map( final Composite composite, Type generictype, String value )
         {
             ParameterizedType type = (ParameterizedType) generictype;
             final Type keyType = type.getActualTypeArguments()[ 0 ];
@@ -501,6 +546,7 @@ public final class PropertyMapper
                 boolean keyArrivingNext = true;
                 String key;
 
+                @Override
                 public void token( String token )
                 {
                     if( keyArrivingNext )
@@ -510,7 +556,7 @@ public final class PropertyMapper
                     }
                     else
                     {
-                        result.put( mapToType( keyType, key ), mapToType( valueType, token ) );
+                        result.put( mapToType( composite, keyType, key ), mapToType( composite, valueType, token ) );
                         keyArrivingNext = true;
                     }
                 }

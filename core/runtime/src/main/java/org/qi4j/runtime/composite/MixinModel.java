@@ -14,33 +14,26 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.List;
 import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.composite.Composite;
 import org.qi4j.api.composite.CompositeInstance;
-import org.qi4j.api.composite.InvalidCompositeException;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.mixin.InitializationException;
 import org.qi4j.api.mixin.MixinDescriptor;
 import org.qi4j.api.property.StateHolder;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.functional.HierarchicalVisitor;
 import org.qi4j.functional.Iterables;
-import org.qi4j.functional.Specification;
 import org.qi4j.functional.VisitableHierarchy;
-import org.qi4j.runtime.bootstrap.AssemblyHelper;
 import org.qi4j.runtime.injection.DependencyModel;
 import org.qi4j.runtime.injection.InjectedFieldsModel;
 import org.qi4j.runtime.injection.InjectedMethodsModel;
 import org.qi4j.runtime.injection.InjectionContext;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import static org.qi4j.functional.Iterables.map;
+import static org.qi4j.functional.Iterables.toList;
 import static org.qi4j.functional.Iterables.unique;
 
 /**
@@ -49,14 +42,14 @@ import static org.qi4j.functional.Iterables.unique;
 public final class MixinModel
     implements MixinDescriptor, VisitableHierarchy<Object, Object>
 {
-    private final Class mixinClass;
-    private final Class instantiationClass;
+    private final Class<?> mixinClass;
+    private final Class<?> instantiationClass;
     private final ConstructorsModel constructorsModel;
     private final InjectedFieldsModel injectedFieldsModel;
     private final InjectedMethodsModel injectedMethodsModel;
     private final Iterable<Class<?>> thisMixinTypes;
 
-    public MixinModel( Class declaredMixinClass, Class instantiationClass )
+    public MixinModel( Class<?> declaredMixinClass, Class<?> instantiationClass )
     {
         injectedFieldsModel = new InjectedFieldsModel( declaredMixinClass );
         injectedMethodsModel = new InjectedMethodsModel( declaredMixinClass );
@@ -68,12 +61,13 @@ public final class MixinModel
         thisMixinTypes = buildThisMixinTypes();
     }
 
-    public Class mixinClass()
+    @Override
+    public Class<?> mixinClass()
     {
         return mixinClass;
     }
 
-    public Class instantiationClass()
+    public Class<?> instantiationClass()
     {
         return instantiationClass;
     }
@@ -85,17 +79,23 @@ public final class MixinModel
 
     public Iterable<DependencyModel> dependencies()
     {
-        return Iterables.flatten( constructorsModel.dependencies(), injectedFieldsModel.dependencies(), injectedMethodsModel.dependencies() );
+        return Iterables.flatten( constructorsModel.dependencies(), injectedFieldsModel.dependencies(), injectedMethodsModel
+            .dependencies() );
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+        throws ThrowableType
     {
-        if (visitor.visitEnter( this ))
+        if( visitor.visitEnter( this ) )
         {
-            if (constructorsModel.accept( visitor ))
-                if (injectedFieldsModel.accept( visitor ))
+            if( constructorsModel.accept( visitor ) )
+            {
+                if( injectedFieldsModel.accept( visitor ) )
+                {
                     injectedMethodsModel.accept( visitor );
+                }
+            }
         }
         return visitor.visitLeave( this );
     }
@@ -141,7 +141,7 @@ public final class MixinModel
             }
             catch( InitializationException e )
             {
-                Class<?> compositeType = compositeInstance.type();
+                List<Class<?>> compositeType = toList( compositeInstance.types() );
                 String message = "Unable to initialize " + mixinClass + " in composite " + compositeType;
                 throw new ConstructionException( message, e );
             }
@@ -178,21 +178,4 @@ public final class MixinModel
         return mixinClass.getName();
     }
 
-    public void activate( Object mixin )
-        throws Exception
-    {
-        if( mixin instanceof Activatable )
-        {
-            ( (Activatable) mixin ).activate();
-        }
-    }
-
-    public void passivate( Object mixin )
-        throws Exception
-    {
-        if( mixin instanceof Activatable )
-        {
-            ( (Activatable) mixin ).passivate();
-        }
-    }
 }

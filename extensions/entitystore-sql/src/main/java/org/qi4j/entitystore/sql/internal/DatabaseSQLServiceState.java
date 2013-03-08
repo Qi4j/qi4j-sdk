@@ -22,12 +22,6 @@ public interface DatabaseSQLServiceState
 {
 
     @Optional
-    public Property<Long> nextEntityPK();
-
-    @Optional
-    public Property<Object> pkLock();
-
-    @Optional
     public Property<String> schemaName();
 
     @Optional

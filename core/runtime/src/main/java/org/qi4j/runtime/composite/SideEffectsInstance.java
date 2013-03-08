@@ -41,6 +41,7 @@ public final class SideEffectsInstance
         this.invoker = invoker;
     }
 
+    @Override
     public Object invoke( Object proxy, Method method, Object[] args )
         throws Throwable
     {
@@ -57,7 +58,12 @@ public final class SideEffectsInstance
         }
     }
 
-    private void invokeSideEffects( Object proxy, Method method, Object[] params, Object result, Throwable originalThrowable )
+    private void invokeSideEffects( Object proxy,
+                                    Method method,
+                                    Object[] params,
+                                    Object result,
+                                    Throwable originalThrowable
+    )
         throws Throwable
     {
         proxyHandler.setProxy( proxy );

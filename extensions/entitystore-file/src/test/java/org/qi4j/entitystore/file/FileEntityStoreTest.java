@@ -19,25 +19,30 @@ package org.qi4j.entitystore.file;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.entitystore.memory.MemoryEntityStoreService;
-import org.qi4j.library.fileconfig.FileConfiguration;
-import org.qi4j.spi.uuid.UuidIdentityGeneratorService;
+import org.qi4j.entitystore.file.assembly.FileEntityStoreAssembler;
+import org.qi4j.library.fileconfig.FileConfigurationService;
+import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
+import org.qi4j.valueserialization.orgjson.OrgJsonValueSerializationAssembler;
 
-/**
- * JAVADOC
- */
 public class FileEntityStoreTest
     extends AbstractEntityStoreTest
 {
+
+    @Override
+    // START SNIPPET: assembly
     public void assemble( ModuleAssembly module )
         throws AssemblyException
     {
+        // END SNIPPET: assembly
         super.assemble( module );
-        module.services( FileConfiguration.class, FileEntityStoreService.class, UuidIdentityGeneratorService.class );
-
+        module.services( FileConfigurationService.class );
         ModuleAssembly config = module.layer().module( "config" );
+        new EntityTestAssembler().assemble( config );
+        // START SNIPPET: assembly
+        new OrgJsonValueSerializationAssembler().assemble( module );
+        new FileEntityStoreAssembler().assemble( module );
         config.entities( FileEntityStoreConfiguration.class ).visibleIn( Visibility.layer );
-        config.services( MemoryEntityStoreService.class );
     }
+    // END SNIPPET: assembly
 }

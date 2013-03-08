@@ -13,22 +13,25 @@
  */
 package org.qi4j.runtime.injection;
 
-import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.common.Optional;
-import org.qi4j.api.composite.DependencyDescriptor;
-import org.qi4j.bootstrap.BindingException;
-import org.qi4j.bootstrap.InvalidInjectionException;
-import org.qi4j.functional.*;
-import org.qi4j.runtime.injection.provider.InjectionProviderException;
-import org.qi4j.runtime.model.Binder;
-import org.qi4j.runtime.model.Resolution;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
+import org.qi4j.api.common.ConstructionException;
+import org.qi4j.api.common.Optional;
+import org.qi4j.api.composite.DependencyDescriptor;
+import org.qi4j.bootstrap.BindingException;
+import org.qi4j.bootstrap.InvalidInjectionException;
+import org.qi4j.functional.Function;
+import org.qi4j.functional.Iterables;
+import org.qi4j.functional.Specification;
+import org.qi4j.functional.Visitable;
+import org.qi4j.functional.Visitor;
+import org.qi4j.runtime.injection.provider.InjectionProviderException;
+import org.qi4j.runtime.model.Binder;
+import org.qi4j.runtime.model.Resolution;
 
 import static org.qi4j.api.util.Annotations.isType;
 import static org.qi4j.functional.Iterables.iterable;
@@ -94,7 +97,8 @@ public final class DependencyModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( Visitor<? super DependencyModel, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( Visitor<? super DependencyModel, ThrowableType> visitor )
+        throws ThrowableType
     {
         return visitor.visit( this );
     }
@@ -171,30 +175,34 @@ public final class DependencyModel
         return type;
     }
 
+    // FIXME This method is unused, remove it.
     private Type extractDependencyType( Type injectionType )
     {
         if( injectionType instanceof ParameterizedType )
         {
-            return ((ParameterizedType)injectionType).getActualTypeArguments()[ 0 ];
+            return ( (ParameterizedType) injectionType ).getActualTypeArguments()[ 0 ];
         }
         else if( injectionType instanceof TypeVariable )
         {
-            return ((TypeVariable)injectionType).getBounds()[ 0 ];
+            return ( (TypeVariable) injectionType ).getBounds()[ 0 ];
         }
         return injectionType;
     }
 
     // Model
+    @Override
     public Annotation injectionAnnotation()
     {
         return injectionAnnotation;
     }
 
+    @Override
     public Type injectionType()
     {
         return injectionType;
     }
 
+    @Override
     public Class<?> injectedClass()
     {
         return injectedClass;
@@ -209,21 +217,25 @@ public final class DependencyModel
      *
      * @return raw injection type.
      */
+    @Override
     public Class<?> rawInjectionType()
     {
         return rawInjectionClass;
     }
 
+    @Override
     public boolean optional()
     {
         return optional;
     }
 
+    @Override
     public Annotation[] annotations()
     {
         return annotations;
     }
 
+    @Override
     public void bind( Resolution resolution )
         throws BindingException
     {
@@ -236,7 +248,9 @@ public final class DependencyModel
             if( injectionProvider == null && !optional )
             {
                 String message =
-                    "[Module "+resolution.module().name()+"] Non-optional @" + rawInjectionClass.getName() + " was not bound in " + injectedClass.getName();
+                    "[Module " + resolution.module()
+                        .name() + "] Non-optional @" + rawInjectionClass.getName() + " was not bound in " + injectedClass
+                        .getName();
                 throw new ConstructionException( message );
             }
         }
@@ -266,12 +280,16 @@ public final class DependencyModel
                 ex = ex.getCause();
             }
 
-            String message = "[Module "+context.module().name()+"] InjectionProvider unable to resolve @" + injectionAnnotation.annotationType().getSimpleName()+" "+injectionType.toString();
+            String message = "[Module " + context.module()
+                .name() + "] InjectionProvider unable to resolve @" + injectionAnnotation.annotationType()
+                .getSimpleName() + " " + injectionType.toString();
             throw new ConstructionException( message, ex );
         }
         if( injectedValue == null && !optional )
         {
-            String message = "[Module "+context.module().name()+"] Non-optional @" + injectionAnnotation.annotationType().getSimpleName()+" "+injectionType.toString() + " was null in " + injectedClass.getName();
+            String message = "[Module " + context.module()
+                .name() + "] Non-optional @" + injectionAnnotation.annotationType()
+                .getSimpleName() + " " + injectionType.toString() + " was null in " + injectedClass.getName();
             throw new ConstructionException( message );
         }
         return getInjectedValue( injectedValue );
@@ -363,6 +381,7 @@ public final class DependencyModel
             this.scope = scope;
         }
 
+        @Override
         public boolean satisfiedBy( DependencyModel model )
         {
             return model.hasScope( scope );

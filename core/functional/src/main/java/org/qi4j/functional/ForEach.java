@@ -10,7 +10,7 @@ import java.util.Iterator;
  * Example: forEach(iterable).filter(specification).map(function).visit(visitor)
  */
 public final class ForEach<T>
-        implements Iterable<T>
+    implements Iterable<T>
 {
     public static <T> ForEach<T> forEach( Iterable<T> iterable )
     {
@@ -24,6 +24,7 @@ public final class ForEach<T>
         this.iterable = iterable;
     }
 
+    @Override
     public Iterator<T> iterator()
     {
         return iterable.iterator();
@@ -34,31 +35,42 @@ public final class ForEach<T>
         return new ForEach<T>( Iterables.filter( specification, iterable ) );
     }
 
-    public <TO> ForEach<TO> map( Function<? super T, TO> function )
+    public <TO> ForEach<TO> map( Function<? /* super T */, TO> function )
     {
         return new ForEach<TO>( Iterables.map( function, iterable ) );
     }
 
     public <TO> ForEach<TO> flatten()
     {
-        return new ForEach<TO>( Iterables.flattenIterables( ((Iterable<Iterable<TO>>)iterable ) ));
+        Iterable<Iterable<TO>> original = iterable();
+        Iterable<TO> iterable1 = Iterables.flattenIterables( original );
+        return new ForEach<TO>( iterable1 );
     }
 
-    public T last() {
+    private <TO> Iterable<Iterable<TO>> iterable()
+    {
+        return (Iterable<Iterable<TO>>) iterable;
+    }
+
+    public T last()
+    {
         T lastItem = null;
-        for( T item : iterable ) {
+        for( T item : iterable )
+        {
             lastItem = item;
         }
         return lastItem;
     }
-    
+
     public <ThrowableType extends Throwable> boolean visit( final Visitor<T, ThrowableType> visitor )
-            throws ThrowableType
+        throws ThrowableType
     {
         for( T item : iterable )
         {
             if( !visitor.visit( item ) )
+            {
                 return false;
+            }
         }
 
         return true;

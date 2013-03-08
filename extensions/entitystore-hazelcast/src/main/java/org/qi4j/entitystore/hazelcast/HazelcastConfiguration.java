@@ -23,14 +23,18 @@ import org.qi4j.api.configuration.ConfigurationComposite;
 import org.qi4j.api.property.Property;
 
 /**
- * @author Paul Merlin <paul@nosphere.org>
+ * Configuration of HazelcastEntityStoreService.
  */
+// START SNIPPET: config
 public interface HazelcastConfiguration
-    extends ConfigurationComposite
+        extends ConfigurationComposite
 {
+
     @UseDefaults
     Property<String> configXmlLocation();
 
     @UseDefaults
     Property<String> mapName();
+
 }
+// END SNIPPET: config

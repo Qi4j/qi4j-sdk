@@ -20,9 +20,10 @@ import com.google.appengine.api.datastore.*;
 import org.qi4j.api.entity.Identity;
 import org.qi4j.api.entity.IdentityGenerator;
 import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.service.Activatable;
+import org.qi4j.api.service.qualifier.Tagged;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.usecase.Usecase;
+import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.io.Input;
 import org.qi4j.io.Output;
 import org.qi4j.io.Receiver;
@@ -36,35 +37,36 @@ import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
  * GAE implementation of SerializationStore
  */
 public class GaeEntityStoreMixin
-        implements Activatable, EntityStore
+        implements GaeEntityStoreActivation, EntityStore
 {
-   private DatastoreService datastoreService;
-   private String uuid;
+   private final ValueSerialization valueSerialization;
+   private final String uuid;
    private long counter;
+   private DatastoreService datastoreService;
 
-   public GaeEntityStoreMixin(@Service IdentityGenerator uuid)
+   public GaeEntityStoreMixin( @Service IdentityGenerator uuid,
+                               @Service @Tagged( ValueSerialization.Formats.JSON ) ValueSerialization valueSerialization )
    {
       System.out.println("Initializing GAE EntityStore.");
       this.uuid = uuid.generate(Identity.class) + ":";
+      this.valueSerialization = valueSerialization;
       counter = 0L;
    }
 
-   public void activate()
+   @Override
+   public void activateGaeEntityStore()
            throws Exception
    {
       datastoreService = DatastoreServiceFactory.getDatastoreService();
    }
 
-   public void passivate()
-           throws Exception
-   {
-   }
-
+    @Override
    public EntityStoreUnitOfWork newUnitOfWork( Usecase usecase, Module module, long currentTime )
    {
-      return new GaeEntityStoreUnitOfWork(datastoreService, generateId(), module, currentTime);
+       return new GaeEntityStoreUnitOfWork( datastoreService, valueSerialization, generateId(), module, currentTime );
    }
 
+    @Override
    public Input<EntityState, EntityStoreException> entityStates(final Module module)
    {
       return new Input<EntityState, EntityStoreException>()
@@ -72,7 +74,9 @@ public class GaeEntityStoreMixin
          @Override
          public <ReceiverThrowableType extends Throwable> void transferTo(Output<? super EntityState, ReceiverThrowableType> output) throws EntityStoreException, ReceiverThrowableType
          {
-            final GaeEntityStoreUnitOfWork euow = new GaeEntityStoreUnitOfWork(datastoreService, generateId(), module, System.currentTimeMillis() );
+            final GaeEntityStoreUnitOfWork euow = new GaeEntityStoreUnitOfWork( datastoreService, valueSerialization,
+                                                                                generateId(), module,
+                                                                                System.currentTimeMillis() );
             Query query = new Query();
             PreparedQuery q = datastoreService.prepare(query);
             final QueryResultIterable<Entity> iterable = q.asQueryResultIterable();
@@ -84,7 +88,7 @@ public class GaeEntityStoreMixin
                {
                   for (Entity entity : iterable)
                   {
-                     EntityState entityState = new GaeEntityState(euow, entity, module);
+                     EntityState entityState = new GaeEntityState( euow, valueSerialization, entity, module );
                      receiver.receive(entityState);
                   }
                }

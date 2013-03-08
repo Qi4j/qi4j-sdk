@@ -4,12 +4,17 @@ import org.qi4j.api.constraint.Constraint;
 import org.qi4j.library.constraints.annotation.MinLength;
 
 /**
- * JAVADOC
+ * Implement @MinLength constraint.
  */
 public class MinLengthConstraint
     implements Constraint<MinLength, String>
 {
-    public boolean isValid( MinLength annotation, String parameter ) throws NullPointerException
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public boolean isValid( MinLength annotation, String parameter )
+        throws NullPointerException
     {
         if( parameter != null )
         {
@@ -18,4 +23,5 @@ public class MinLengthConstraint
 
         return false;
     }
+
 }

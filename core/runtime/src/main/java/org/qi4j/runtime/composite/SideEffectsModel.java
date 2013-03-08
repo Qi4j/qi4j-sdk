@@ -14,6 +14,11 @@
 
 package org.qi4j.runtime.composite;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.qi4j.api.sideeffect.SideEffectsDescriptor;
 import org.qi4j.functional.HierarchicalVisitor;
 import org.qi4j.functional.Iterables;
@@ -21,12 +26,6 @@ import org.qi4j.functional.VisitableHierarchy;
 import org.qi4j.runtime.injection.Dependencies;
 import org.qi4j.runtime.injection.DependencyModel;
 import org.qi4j.runtime.structure.ModuleInstance;
-
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * JAVADOC
@@ -43,13 +42,14 @@ public final class SideEffectsModel
         this.sideEffectModels = sideEffectModels;
     }
 
+    @Override
     public Iterable<DependencyModel> dependencies()
     {
         return Iterables.flattenIterables( Iterables.map( Dependencies.DEPENDENCIES_FUNCTION, sideEffectModels ) );
     }
 
     // Context
-    public SideEffectsInstance newInstance(Method method, ModuleInstance moduleInstance, InvocationHandler invoker )
+    public SideEffectsInstance newInstance( Method method, ModuleInstance moduleInstance, InvocationHandler invoker )
     {
         ProxyReferenceInvocationHandler proxyHandler = new ProxyReferenceInvocationHandler();
         SideEffectInvocationHandlerResult result = new SideEffectInvocationHandlerResult();
@@ -63,14 +63,17 @@ public final class SideEffectsModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+        throws ThrowableType
     {
-        if (modelVisitor.visitEnter( this ))
+        if( modelVisitor.visitEnter( this ) )
         {
             for( SideEffectModel sideEffectModel : sideEffectModels )
             {
-                if (!sideEffectModel.accept( modelVisitor ))
+                if( !sideEffectModel.accept( modelVisitor ) )
+                {
                     break;
+                }
             }
         }
         return modelVisitor.visitLeave( this );

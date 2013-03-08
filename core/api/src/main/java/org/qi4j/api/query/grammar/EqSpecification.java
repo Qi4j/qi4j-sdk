@@ -1,14 +1,14 @@
 package org.qi4j.api.query.grammar;
 
 /**
-* TODO
-*/
+ * Equals Specification.
+ */
 public class EqSpecification<T>
-        extends ComparisonSpecification<T>
+    extends ComparisonSpecification<T>
 {
     public EqSpecification( PropertyFunction<T> property, T value )
     {
-        super(property, value);
+        super( property, value );
     }
 
     @Override

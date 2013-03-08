@@ -1,5 +1,8 @@
 package org.qi4j.library.osgi;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
@@ -8,14 +11,14 @@ import org.qi4j.api.service.ServiceImporter;
 import org.qi4j.api.service.ServiceImporterException;
 import org.qi4j.api.service.ServiceUnavailableException;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
+/**
+ * Import OSGi services in a Qi4j Module.
+ */
 public class OSGiServiceImporter
     implements ServiceImporter
 {
 
+    @Override
     public Object importService( ImportedServiceDescriptor serviceDescriptor )
         throws ServiceImporterException
     {
@@ -26,21 +29,18 @@ public class OSGiServiceImporter
         return Proxy.newProxyInstance( serviceDescriptor.type().getClassLoader(), info.interfaces(), handler );
     }
 
-    public boolean isActive( Object instance )
-    {
-        ServiceTrackerHandler handler = (ServiceTrackerHandler) Proxy.getInvocationHandler( instance );
-        return handler.isActive();
-    }
-
+    @Override
     public boolean isAvailable( Object instance )
     {
         ServiceTrackerHandler handler = (ServiceTrackerHandler) Proxy.getInvocationHandler( instance );
         return handler.isAvailable();
     }
 
-    public static class ServiceTrackerHandler extends ServiceTracker
+    public static class ServiceTrackerHandler
+        extends ServiceTracker
         implements InvocationHandler
     {
+
         private volatile Object service;
         private Class typeToImport;
 
@@ -50,6 +50,7 @@ public class OSGiServiceImporter
             this.typeToImport = typeToImport;
         }
 
+        @Override
         public Object invoke( Object proxy, Method method, Object[] args )
             throws Throwable
         {
@@ -97,9 +98,6 @@ public class OSGiServiceImporter
             return service != null;
         }
 
-        public boolean isActive()
-        {
-            return service != null;
-        }
     }
+
 }

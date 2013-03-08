@@ -51,7 +51,7 @@ public class ClassScanner
      *
      * @return iterable of all concrete classes in the same package as the seedclass, and also all classes in subpackages.
      */
-    public static Iterable<Class<?>> getClasses( final Class<?> seedClass )
+    public static Iterable<Class<?>> findClasses( final Class<?> seedClass )
     {
         CodeSource codeSource = seedClass.getProtectionDomain().getCodeSource();
         if( codeSource == null )
@@ -89,6 +89,7 @@ public class ClassScanner
                     return Iterables.toList( filter( new ValidClass(),
                                                      map( new Function<JarEntry, Class<?>>()
                                                      {
+                                                         @Override
                                                          public Class map( JarEntry jarEntry )
                                                          {
                                                              String name = jarEntry.getName();
@@ -106,6 +107,7 @@ public class ClassScanner
                                                      }
                                                          , filter( new Specification<JarEntry>()
                                                      {
+                                                         @Override
                                                          public boolean satisfiedBy( JarEntry jarEntry )
                                                          {
                                                              return jarEntry.getName()
@@ -127,8 +129,9 @@ public class ClassScanner
         else
         {
             final File path = new File( file, seedClass.getPackage().getName().replace( '.', File.separatorChar ) );
-            Iterable<File> files = getFiles( path, new Specification<File>()
+            Iterable<File> files = findFiles( path, new Specification<File>()
             {
+                @Override
                 public boolean satisfiedBy( File file )
                 {
                     return file.getName().endsWith( ".class" );
@@ -138,6 +141,7 @@ public class ClassScanner
             return filter( new ValidClass(),
                            map( new Function<File, Class<?>>()
                            {
+                               @Override
                                public Class<?> map( File f )
                                {
                                    String fileName = f.getAbsolutePath().substring( file.toString().length() + 1 );
@@ -165,7 +169,7 @@ public class ClassScanner
      *
      * @param regex
      *
-     * @return
+     * @return regex class name specification
      */
     public static Specification<Class<?>> matches( String regex )
     {
@@ -173,6 +177,7 @@ public class ClassScanner
 
         return new Specification<Class<?>>()
         {
+            @Override
             public boolean satisfiedBy( Class<?> aClass )
             {
                 return pattern.matcher( aClass.getName() ).matches();
@@ -180,17 +185,19 @@ public class ClassScanner
         };
     }
 
-    private static Iterable<File> getFiles( File directory, final Specification<File> filter )
+    private static Iterable<File> findFiles( File directory, final Specification<File> filter )
     {
         return flatten( filter( filter, iterable( directory.listFiles() ) ),
                         flattenIterables( map( new Function<File, Iterable<File>>()
                         {
+                            @Override
                             public Iterable<File> map( File file )
                             {
-                                return getFiles( file, filter );
+                                return findFiles( file, filter );
                             }
                         }, filter( new Specification<File>()
                         {
+                            @Override
                             public boolean satisfiedBy( File file )
                             {
                                 return file.isDirectory();
@@ -201,9 +208,10 @@ public class ClassScanner
     private static class ValidClass
         implements Specification<Class<?>>
     {
+        @Override
         public boolean satisfiedBy( Class<?> item )
         {
-            return (item.isInterface() || !Modifier.isAbstract( item.getModifiers() )) && (!item.isEnum() && !item.isAnonymousClass());
+            return ( item.isInterface() || !Modifier.isAbstract( item.getModifiers() ) ) && ( !item.isEnum() && !item.isAnonymousClass() );
         }
     }
 }

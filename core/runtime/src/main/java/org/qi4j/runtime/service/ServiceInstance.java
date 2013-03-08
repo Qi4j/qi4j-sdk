@@ -14,26 +14,27 @@
 
 package org.qi4j.runtime.service;
 
+import java.lang.reflect.Proxy;
+import org.qi4j.api.activation.Activation;
+import org.qi4j.api.activation.ActivationException;
+import org.qi4j.api.activation.PassivationException;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.configuration.Enabled;
-import org.qi4j.api.property.StateHolder;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.api.service.Availability;
 import org.qi4j.api.service.ServiceComposite;
+import org.qi4j.api.util.Classes;
 import org.qi4j.runtime.composite.TransientInstance;
 import org.qi4j.runtime.composite.TransientStateInstance;
 import org.qi4j.runtime.structure.ModuleInstance;
-
-import java.lang.reflect.Proxy;
 
 /**
  * JAVADOC
  */
 public class ServiceInstance
     extends TransientInstance
-    implements Activatable
+    implements Activation
 {
-    public static TransientInstance getCompositeInstance( ServiceComposite composite )
+    public static TransientInstance serviceInstanceOf( ServiceComposite composite )
     {
         return (TransientInstance) Proxy.getInvocationHandler( composite );
     }
@@ -49,27 +50,30 @@ public class ServiceInstance
     {
         super( compositeModel, moduleInstance, mixins, state );
 
-        implementsServiceAvailable = Availability.class.isAssignableFrom( type() );
-        hasEnabledConfiguration = compositeModel.configurationType() != null && Enabled.class.isAssignableFrom( compositeModel
-                                                                                                                    .configurationType() );
+        implementsServiceAvailable =
+            Classes.assignableTypeSpecification( Availability.class ).satisfiedBy( descriptor() );
+        hasEnabledConfiguration = compositeModel.configurationType() != null
+                                  && Enabled.class.isAssignableFrom( compositeModel.configurationType() );
     }
 
+    @Override
     public void activate()
-        throws Exception
+        throws ActivationException
     {
-        ( (ServiceModel) compositeModel ).activate( mixins );
+        // NOOP
     }
 
+    @Override
     public void passivate()
-        throws Exception
+        throws PassivationException
     {
-        ( (ServiceModel) compositeModel ).passivate( mixins );
+        // NOOP
     }
 
     public boolean isAvailable()
     {
         // Check Enabled in configuration first
-        if( hasEnabledConfiguration && !( (Configuration<Enabled>) proxy() ).configuration().enabled().get() )
+        if( hasEnabledConfiguration && !( (Configuration<Enabled>) proxy() ).get().enabled().get() )
         {
             return false;
         }

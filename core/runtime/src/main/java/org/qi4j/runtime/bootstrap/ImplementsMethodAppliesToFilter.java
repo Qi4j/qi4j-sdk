@@ -14,10 +14,9 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import org.qi4j.api.common.AppliesToFilter;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import org.qi4j.api.common.AppliesToFilter;
 
 /**
  * JAVADOC
@@ -25,6 +24,7 @@ import java.lang.reflect.Modifier;
 final class ImplementsMethodAppliesToFilter
     implements AppliesToFilter
 {
+    @Override
     public boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass )
     {
         try

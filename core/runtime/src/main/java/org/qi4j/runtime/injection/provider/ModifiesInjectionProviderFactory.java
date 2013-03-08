@@ -15,6 +15,7 @@ import org.qi4j.runtime.model.Resolution;
 public final class ModifiesInjectionProviderFactory
     implements InjectionProviderFactory
 {
+    @Override
     public InjectionProvider newInjectionProvider( Resolution bindingContext, DependencyModel dependencyModel )
         throws InvalidInjectionException
     {
@@ -27,8 +28,8 @@ public final class ModifiesInjectionProviderFactory
             }
             else
             {
-                throw new InvalidInjectionException( "Composite " + bindingContext.model()
-                    .type() + " does not implement @ConcernFor type " + type.getName() + " in modifier " + dependencyModel.injectedClass().getName() );
+                throw new InvalidInjectionException( "Composite " + bindingContext.model() + " does not implement @ConcernFor type " + type
+                    .getName() + " in modifier " + dependencyModel.injectedClass().getName() );
             }
         }
         else
@@ -38,9 +39,10 @@ public final class ModifiesInjectionProviderFactory
         }
     }
 
-    private class ModifiedInjectionProvider
+    private static class ModifiedInjectionProvider
         implements InjectionProvider
     {
+        @Override
         public Object provideInjection( InjectionContext context )
             throws InjectionProviderException
         {

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,119 +12,99 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.runtime.service;
 
+import java.util.List;
+import org.qi4j.api.activation.Activation;
+import org.qi4j.api.activation.ActivationEventListener;
+import org.qi4j.api.activation.ActivationEventListenerRegistration;
+import org.qi4j.api.activation.ActivationException;
+import org.qi4j.api.activation.PassivationException;
 import org.qi4j.api.common.Visibility;
-import org.qi4j.api.event.ActivationEventListener;
-import org.qi4j.api.event.ActivationEventListenerRegistration;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.functional.Iterables;
 import org.qi4j.functional.Specification;
-import org.qi4j.runtime.structure.ActivationEventListenerSupport;
+import org.qi4j.runtime.activation.ActivationDelegate;
+import org.qi4j.runtime.activation.ActivationEventListenerSupport;
+import org.qi4j.runtime.activation.ActivatorsInstance;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static org.qi4j.api.util.Classes.instanceOf;
+import static org.qi4j.functional.Iterables.filter;
 
 /**
  * JAVADOC
  */
 public class ServicesInstance
-        implements Activatable, ActivationEventListenerRegistration
+    implements Activation, ActivationEventListenerRegistration
 {
     private final ServicesModel servicesModel;
     private final List<ServiceReference> serviceReferences;
-    private final Activator activator;
-    private final Map<String, ServiceReference> mapIdentityServiceReference = new HashMap<String, ServiceReference>();
-    private final ActivationEventListenerSupport eventListenerSupport = new ActivationEventListenerSupport();
+    private final ActivationDelegate activation = new ActivationDelegate( this );
+    private final ActivationEventListenerSupport activationEventSupport = new ActivationEventListenerSupport();
 
     public ServicesInstance( ServicesModel servicesModel, List<ServiceReference> serviceReferences )
     {
         this.servicesModel = servicesModel;
         this.serviceReferences = serviceReferences;
-
         for( ServiceReference serviceReference : serviceReferences )
         {
-            mapIdentityServiceReference.put( serviceReference.identity(), serviceReference );
-            serviceReference.registerActivationEventListener( eventListenerSupport );
+            serviceReference.registerActivationEventListener( activationEventSupport );
         }
-        activator = new Activator();
     }
 
+    @Override
     public void activate()
-            throws Exception
+        throws ActivationException
     {
-        for( final ServiceReference serviceReference : serviceReferences )
-        {
-            if( serviceReference instanceof Activatable )
-            {
-                Activatable eventActivatable = new Activatable()
-                {
-                    @Override
-                    public void activate() throws Exception
-                    {
-                        ((Activatable) serviceReference).activate();
-                    }
-
-                    @Override
-                    public void passivate() throws Exception
-                    {
-                        ((Activatable) serviceReference).passivate();
-                    }
-                };
-
-                activator.activate( eventActivatable );
-            }
-        }
+        Iterable<Activation> activatees = Iterables.<Activation>cast( filter( instanceOf( Activation.class ), serviceReferences ) );
+        activation.activate( ActivatorsInstance.EMPTY, activatees );
     }
 
+    @Override
     public void passivate()
-            throws Exception
+        throws PassivationException
     {
-        activator.passivate();
-    }
-
-    public <T> ServiceReference<T> getServiceWithIdentity( String serviceIdentity )
-    {
-        return mapIdentityServiceReference.get( serviceIdentity );
-    }
-
-    @Override
-    public void registerActivationEventListener( ActivationEventListener listener )
-    {
-        eventListenerSupport.registerActivationEventListener( listener );
-    }
-
-    @Override
-    public void deregisterActivationEventListener( ActivationEventListener listener )
-    {
-        eventListenerSupport.deregisterActivationEventListener( listener );
+        activation.passivate();
     }
 
     public Iterable<ServiceReference> visibleServices( final Visibility visibility )
     {
         return Iterables.filter( new Specification<ServiceReference>()
-                {
-                    @Override
-                    public boolean satisfiedBy( ServiceReference item )
-                    {
-                        return ((ServiceReferenceInstance) item).serviceDescriptor().visibility().ordinal() >= visibility.ordinal();
-                    }
-                }, serviceReferences );
+        {
+            @Override
+            public boolean satisfiedBy( ServiceReference item )
+            {
+                return ( (ServiceReferenceInstance) item ).serviceDescriptor()
+                           .visibility()
+                           .ordinal() >= visibility.ordinal();
+            }
+        }, serviceReferences );
     }
 
     @Override
     public String toString()
     {
-        String str = "{";
-        String sep = "";
+        StringBuilder sb = new StringBuilder( "Services{" );
+        String sep = " ";
         for( ServiceReference serviceReference : serviceReferences )
         {
-            str += sep + serviceReference.identity() + ",active=" + serviceReference.isActive();
+            sb.append( sep ).
+                append( serviceReference.identity() ).
+                append( "(active=" ).append( serviceReference.isActive() ).append( ")" );
             sep = ", ";
         }
-        return str += "}";
+        return sb.append( " }" ).toString();
+    }
+
+    @Override
+    public void registerActivationEventListener( ActivationEventListener listener )
+    {
+        activationEventSupport.registerActivationEventListener( listener );
+    }
+
+    @Override
+    public void deregisterActivationEventListener( ActivationEventListener listener )
+    {
+        activationEventSupport.deregisterActivationEventListener( listener );
     }
 }

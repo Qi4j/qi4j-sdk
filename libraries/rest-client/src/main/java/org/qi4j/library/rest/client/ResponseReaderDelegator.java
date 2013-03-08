@@ -17,6 +17,9 @@
 
 package org.qi4j.library.rest.client;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.mixin.InitializationException;
@@ -27,10 +30,6 @@ import org.restlet.representation.Representation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-
 /**
  * Delegates to a list of potential readers. Register readers on startup.
  */
@@ -40,8 +39,9 @@ public class ResponseReaderDelegator
    List<ResponseReader> responseReaders = new ArrayList<ResponseReader>( );
 
    @Structure
-   Module module;
+   private Module module;
 
+   @Override
    public void initialize() throws InitializationException
    {
       Logger logger = LoggerFactory.getLogger( getClass() );
@@ -69,6 +69,7 @@ public class ResponseReaderDelegator
       responseReaders.add( reader );
    }
 
+   @Override
    public Object readResponse( Response response, Class<?> resultType )
    {
       if (resultType.equals(Representation.class))

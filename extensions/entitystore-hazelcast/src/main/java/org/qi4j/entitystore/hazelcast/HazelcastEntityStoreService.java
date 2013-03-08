@@ -1,5 +1,5 @@
 /*
- * Copyright 2009 Paul Merlin <paul@nosphere.org>.
+ * Copyright 2009 Paul Merlin.
  * Copyright 2011 Niclas Hedhman.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
@@ -18,31 +18,33 @@
  */
 package org.qi4j.entitystore.hazelcast;
 
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.service.Activatable;
+import org.qi4j.api.service.ServiceActivation;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.library.locking.LockingAbstractComposite;
 import org.qi4j.spi.entitystore.ConcurrentModificationCheckConcern;
 import org.qi4j.spi.entitystore.EntityStateVersions;
 import org.qi4j.spi.entitystore.EntityStore;
 import org.qi4j.spi.entitystore.StateChangeNotificationConcern;
-import org.qi4j.spi.entitystore.helpers.MapEntityStoreMixin;
+import org.qi4j.spi.entitystore.helpers.JSONMapEntityStoreActivation;
+import org.qi4j.spi.entitystore.helpers.JSONMapEntityStoreMixin;
 
+/**
+ * Hazelcast EntityStore service.
+ * <p>Based on @{@link JSONMapEntityStoreMixin}.</p>
+ */
 @Concerns( { StateChangeNotificationConcern.class, ConcurrentModificationCheckConcern.class } )
-@Mixins( { MapEntityStoreMixin.class, HazelcastEntityStoreMixin.class } )
+@Mixins( { JSONMapEntityStoreMixin.class, HazelcastEntityStoreMixin.class } )
 public interface HazelcastEntityStoreService
-    extends EntityStore,
+    extends ServiceActivation,
+            JSONMapEntityStoreActivation,
+            EntityStore,
             EntityStateVersions,
             ServiceComposite,
-            Activatable,
             LockingAbstractComposite,
-            Configuration
+            Configuration,
+            HazelcastAccessors
 {
-    HazelcastInstance hazelcastInstanceUsed();
-
-    IMap hazelcastMapUsed();
 }

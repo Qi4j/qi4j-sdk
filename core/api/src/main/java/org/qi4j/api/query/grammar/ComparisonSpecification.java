@@ -4,8 +4,8 @@ import org.qi4j.api.composite.Composite;
 import org.qi4j.api.property.Property;
 
 /**
-* TODO
-*/
+ * Base comparison Specification.
+ */
 public abstract class ComparisonSpecification<T>
     extends ExpressionSpecification
 {
@@ -18,7 +18,7 @@ public abstract class ComparisonSpecification<T>
         this.value = value;
     }
 
-    public PropertyFunction<T> getProperty()
+    public PropertyFunction<T> property()
     {
         return property;
     }
@@ -30,23 +30,28 @@ public abstract class ComparisonSpecification<T>
         {
             Property<T> prop = property.map( item );
 
-            if (prop == null)
+            if( prop == null )
+            {
                 return false;
+            }
 
-            T value = prop.get();
-            if (value == null)
+            T propValue = prop.get();
+            if( propValue == null )
+            {
                 return false;
+            }
 
-            return compare(value);
-        } catch( IllegalArgumentException e )
+            return compare( propValue );
+        }
+        catch( IllegalArgumentException e )
         {
             return false;
         }
     }
 
-    protected abstract boolean compare(T value);
+    protected abstract boolean compare( T value );
 
-    public T getValue()
+    public T value()
     {
         return value;
     }

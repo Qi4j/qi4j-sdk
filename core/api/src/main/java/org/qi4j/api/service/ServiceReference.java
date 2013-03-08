@@ -14,24 +14,34 @@
 
 package org.qi4j.api.service;
 
-import org.qi4j.api.event.ActivationEventListenerRegistration;
+import org.qi4j.api.activation.ActivationEventListenerRegistration;
+import org.qi4j.api.structure.MetaInfoHolder;
+import org.qi4j.api.type.HasTypes;
 
 /**
  * From a ServiceReference you can access and modify metadata about a service.
  * You can also access the actual service through get(), that can then be invoked.
  */
 public interface ServiceReference<T>
-    extends ActivationEventListenerRegistration
+    extends HasTypes, ActivationEventListenerRegistration, MetaInfoHolder
 {
+    /**
+     * @return the service's identity
+     */
     String identity();
 
-    Class<T> type();
-
-    <T> T metaInfo( Class<T> infoType );
-
+    /**
+     * @return the actual service
+     */
     T get();
 
+    /**
+     * @return TRUE if the service is active, otherwise return FALSE
+     */
     boolean isActive();
 
+    /**
+     * @return TRUE if the service is available, otherwise return FALSE
+     */
     boolean isAvailable();
 }

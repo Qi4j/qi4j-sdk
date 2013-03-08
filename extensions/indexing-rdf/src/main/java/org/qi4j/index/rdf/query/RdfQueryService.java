@@ -17,6 +17,7 @@
  */
 package org.qi4j.index.rdf.query;
 
+import java.util.Map;
 import org.openrdf.query.QueryLanguage;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.entity.EntityReference;
@@ -29,8 +30,6 @@ import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.functional.Specification;
 import org.qi4j.spi.query.EntityFinder;
 import org.qi4j.spi.query.EntityFinderException;
-
-import java.util.Map;
 
 /**
  * JAVADOC Add JavaDoc
@@ -54,6 +53,7 @@ public interface RdfQueryService
         @This
         TupleQueryExecutor tupleExecutor;
 
+        @Override
         public Iterable<EntityReference> findEntities( Class<?> resultType,
                                                        Specification<Composite> whereClause,
                                                        OrderBy[] orderBySegments,
@@ -67,20 +67,21 @@ public interface RdfQueryService
 
             if( QuerySpecification.isQueryLanguage( "SERQL", whereClause ))
             {
-                String query = ((QuerySpecification)whereClause).getQuery();
+                String query = ((QuerySpecification)whereClause).query();
                 tupleExecutor.performTupleQuery( QueryLanguage.SERQL, query, variables, collectingCallback );
-                return collectingCallback.getEntities();
+                return collectingCallback.entities();
 
             } else
             {
                 RdfQueryParser rdfQueryParser = queryParserFactory.newQueryParser( language );
-                String query = rdfQueryParser.getQuery( resultType, whereClause, orderBySegments, firstResult, maxResults, variables );
+                String query = rdfQueryParser.constructQuery( resultType, whereClause, orderBySegments, firstResult, maxResults, variables );
 
                 tupleExecutor.performTupleQuery( language, query, variables, collectingCallback );
-                return collectingCallback.getEntities();
+                return collectingCallback.entities();
             }
         }
 
+        @Override
         public EntityReference findEntity( Class<?> resultType, Specification<Composite> whereClause, Map<String, Object> variables )
             throws EntityFinderException
         {
@@ -88,30 +89,31 @@ public interface RdfQueryService
 
             if (QuerySpecification.isQueryLanguage( "SERQL", whereClause))
             {
-                String query = ((QuerySpecification)whereClause).getQuery();
+                String query = ((QuerySpecification)whereClause).query();
                 tupleExecutor.performTupleQuery( QueryLanguage.SERQL, query, variables, singleCallback );
-                return singleCallback.getQualifiedIdentity();
+                return singleCallback.qualifiedIdentity();
             } else
             {
                 RdfQueryParser rdfQueryParser = queryParserFactory.newQueryParser( language );
-                String query = rdfQueryParser.getQuery( resultType, whereClause, null, null, null, variables );
+                String query = rdfQueryParser.constructQuery( resultType, whereClause, null, null, null, variables );
                 tupleExecutor.performTupleQuery( QueryLanguage.SPARQL, query, variables, singleCallback );
-                return singleCallback.getQualifiedIdentity();
+                return singleCallback.qualifiedIdentity();
             }
         }
 
+        @Override
         public long countEntities( Class<?> resultType, Specification<Composite> whereClause, Map<String, Object> variables )
             throws EntityFinderException
         {
             if (QuerySpecification.isQueryLanguage( "SERQL", whereClause ))
             {
-                String query = ((QuerySpecification)whereClause).getQuery();
+                String query = ((QuerySpecification)whereClause).query();
                 return tupleExecutor.performTupleQuery( QueryLanguage.SERQL, query, variables, null );
 
             } else
             {
                 RdfQueryParser rdfQueryParser = queryParserFactory.newQueryParser( language );
-                String query = rdfQueryParser.getQuery( resultType, whereClause, null, null, null, variables );
+                String query = rdfQueryParser.constructQuery( resultType, whereClause, null, null, null, variables );
                 return tupleExecutor.performTupleQuery( language, query, variables, null );
             }
         }

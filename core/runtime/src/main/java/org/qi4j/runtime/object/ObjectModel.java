@@ -17,18 +17,17 @@ package org.qi4j.runtime.object;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
-import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.mixin.InitializationException;
 import org.qi4j.api.object.ObjectDescriptor;
-import org.qi4j.functional.Function;
 import org.qi4j.functional.HierarchicalVisitor;
-import org.qi4j.functional.Specification;
 import org.qi4j.functional.VisitableHierarchy;
 import org.qi4j.runtime.composite.ConstructorsModel;
 import org.qi4j.runtime.injection.InjectedFieldsModel;
 import org.qi4j.runtime.injection.InjectedMethodsModel;
 import org.qi4j.runtime.injection.InjectionContext;
+
+import static org.qi4j.functional.Iterables.iterable;
 
 /**
  * JAVADOC
@@ -57,16 +56,20 @@ public final class ObjectModel
         injectedMethodsModel = new InjectedMethodsModel( objectType );
     }
 
-    public Class<?> type()
+    @Override
+    public Iterable<Class<?>> types()
     {
-        return objectType;
+        Iterable<? extends Class<?>> iterable = iterable( objectType );
+        return (Iterable<Class<?>>) iterable;
     }
 
+    @Override
     public Visibility visibility()
     {
         return visibility;
     }
 
+    @Override
     public <T> T metaInfo( Class<T> infoType )
     {
         return metaInfo.get( infoType );
@@ -79,24 +82,29 @@ public final class ObjectModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+        throws ThrowableType
     {
-        if (visitor.visitEnter( this ))
+        if( visitor.visitEnter( this ) )
         {
-            if (constructorsModel.accept( visitor ))
-                if (injectedFieldsModel.accept( visitor ))
+            if( constructorsModel.accept( visitor ) )
+            {
+                if( injectedFieldsModel.accept( visitor ) )
+                {
                     injectedMethodsModel.accept( visitor );
+                }
+            }
         }
         return visitor.visitLeave( this );
     }
 
     public Object newInstance( InjectionContext injectionContext )
     {
-        Object instance = null;
+        Object instance;
         try
         {
             instance = constructorsModel.newInstance( injectionContext );
-            injectionContext = new InjectionContext( injectionContext.module(), injectionContext.uses(), instance  );
+            injectionContext = new InjectionContext( injectionContext.module(), injectionContext.uses(), instance );
             injectedFieldsModel.inject( injectionContext, instance );
             injectedMethodsModel.inject( injectionContext, instance );
         }

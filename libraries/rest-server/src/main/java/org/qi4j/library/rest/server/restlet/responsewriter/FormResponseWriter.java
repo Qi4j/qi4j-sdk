@@ -46,8 +46,10 @@ public class FormResponseWriter
 {
     private static final List<MediaType> supportedMediaTypes = Arrays.asList( MediaType.TEXT_HTML, MediaType.APPLICATION_JSON );
 
-    private @Service Configuration cfg;
+    @Service
+    private Configuration cfg;
 
+    @Override
     public boolean writeResponse( final Object result, final Response response )
         throws ResourceException
     {
@@ -57,9 +59,7 @@ public class FormResponseWriter
             if( MediaType.APPLICATION_JSON.equals( type ) )
             {
                 JSONObject json = new JSONObject();
-
                 Form form = (Form) result;
-
                 try
                 {
                     for( Parameter parameter : form )
@@ -80,9 +80,8 @@ public class FormResponseWriter
                     e.printStackTrace();
                 }
 
-                StringRepresentation representation = new StringRepresentation( json.toString(),
-                                                                                MediaType.APPLICATION_JSON );
-
+                StringRepresentation representation
+                    = new StringRepresentation( json.toString(), MediaType.APPLICATION_JSON );
                 response.setEntity( representation );
 
                 return true;
@@ -98,7 +97,6 @@ public class FormResponseWriter
                         Map<String, Object> root = new HashMap<String, Object>();
                         root.put( "request", response.getRequest() );
                         root.put( "response", response );
-
                         root.put( "result", result );
                         try
                         {
@@ -115,7 +113,6 @@ public class FormResponseWriter
                 return true;
             }
         }
-
         return false;
     }
 }

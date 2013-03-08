@@ -14,6 +14,10 @@
  */
 package org.qi4j.entitystore.sql.internal;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.sql.DataSource;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
@@ -25,19 +29,14 @@ import org.qi4j.api.structure.Application.Mode;
 import org.qi4j.api.util.NullArgumentException;
 import org.qi4j.library.sql.common.SQLConfiguration;
 import org.qi4j.library.sql.common.SQLUtil;
-import org.qi4j.library.sql.ds.DataSourceService;
 import org.qi4j.spi.entitystore.EntityStoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sql.generation.api.vendor.SQLVendor;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-@SuppressWarnings("ProtectedField")
+@SuppressWarnings( "ProtectedField" )
 public abstract class DatabaseSQLServiceCoreMixin
-    implements DatabaseSQLService
+        implements DatabaseSQLService
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( DatabaseSQLServiceCoreMixin.class );
@@ -46,7 +45,7 @@ public abstract class DatabaseSQLServiceCoreMixin
     private Application application;
 
     @Service
-    private DataSourceService dataSourceService;
+    private DataSource dataSource;
 
     @This
     private DatabaseSQLServiceState state;
@@ -63,74 +62,52 @@ public abstract class DatabaseSQLServiceCoreMixin
     @This
     private Configuration<SQLConfiguration> configuration;
 
+    @Override
     public Connection getConnection()
-        throws SQLException
+            throws SQLException
     {
-        return dataSourceService.getDataSource().getConnection();
+        return dataSource.getConnection();
     }
 
-    protected String getConfiguredSchemaName( String defaultSchemaName )
-    {
-        String result = this.configuration.configuration().schemaName().get();
-        if( result == null )
-        {
-            NullArgumentException.validateNotNull( "default schema name", defaultSchemaName );
-            result = defaultSchemaName;
-        }
-        return result;
-    }
-
+    @Override
     public void startDatabase()
-        throws Exception
+            throws Exception
     {
         Connection connection = getConnection();
         String schema = this.getConfiguredSchemaName( SQLs.DEFAULT_SCHEMA_NAME );
-        if( schema == null )
-        {
+        if ( schema == null ) {
             throw new EntityStoreException( "Schema name must not be null." );
-        }
-        else
-        {
+        } else {
             state.schemaName().set( schema );
             state.vendor().set( this.descriptor.metaInfo( SQLVendor.class ) );
 
-            this.sqlStrings.init();
+            sqlStrings.init();
 
-            if( !spi.schemaExists( connection ) )
-            {
+            if ( !spi.schemaExists( connection ) ) {
+                LOGGER.debug( "Database Schema '{}' NOT found!", schema );
                 Statement stmt = null;
-                try
-                {
+                try {
                     stmt = connection.createStatement();
-                    for( String sql : sqlStrings.buildSQLForSchemaCreation() )
-                    {
+                    for ( String sql : sqlStrings.buildSQLForSchemaCreation() ) {
                         stmt.execute( sql );
                     }
-                }
-                finally
-                {
+                } finally {
                     SQLUtil.closeQuietly( stmt );
                 }
-                LOGGER.trace( "Schema {} created", schema );
+                LOGGER.debug( "Database Schema '{}' created", schema );
             }
 
-            if( !spi.tableExists( connection ) )
-            {
+            if ( !spi.tableExists( connection ) ) {
                 Statement stmt = null;
-                try
-                {
+                try {
                     stmt = connection.createStatement();
-                    for( String sql : sqlStrings.buildSQLForTableCreation() )
-                    {
+                    for ( String sql : sqlStrings.buildSQLForTableCreation() ) {
                         stmt.execute( sql );
                     }
-                    for( String sql : sqlStrings.buildSQLForIndexCreation() )
-                    {
+                    for ( String sql : sqlStrings.buildSQLForIndexCreation() ) {
                         stmt.execute( sql );
                     }
-                }
-                finally
-                {
+                } finally {
                     SQLUtil.closeQuietly( stmt );
                 }
                 LOGGER.trace( "Table {} created", SQLs.TABLE_NAME );
@@ -138,41 +115,40 @@ public abstract class DatabaseSQLServiceCoreMixin
 
             connection.setAutoCommit( false );
 
-            state.pkLock().set( new Object() );
-            synchronized( state.pkLock().get() )
-            {
-                state.nextEntityPK().set( spi.readNextEntityPK( connection ) );
-            }
-
         }
 
         SQLUtil.closeQuietly( connection );
 
     }
 
+    @Override
     public void stopDatabase()
-        throws Exception
+            throws Exception
     {
-        if( Mode.production == application.mode() )
-        {
+        if ( Mode.production == application.mode() ) {
             // NOOP
         }
     }
 
-    public Long newPKForEntity()
+    /**
+     * Configuration is optional at both assembly and runtime.
+     */
+    protected String getConfiguredSchemaName( String defaultSchemaName )
     {
-        if( state.pkLock().get() == null || state.nextEntityPK().get() == null )
-        {
-            throw new EntityStoreException(
-                "New PK asked for entity, but database service has not been initialized properly." );
+        if ( configuration == null ) {
+            NullArgumentException.validateNotNull( "default schema name", defaultSchemaName );
+            LOGGER.debug( "No configuration, will use default schema name: '{}'", defaultSchemaName );
+            return defaultSchemaName;
         }
-        synchronized( state.pkLock().get() )
-        {
-            Long result = state.nextEntityPK().get();
-            Long next = result + 1;
-            state.nextEntityPK().set( next );
-            return result;
+        String result = configuration.get().schemaName().get();
+        if ( result == null ) {
+            NullArgumentException.validateNotNull( "default schema name", defaultSchemaName );
+            result = defaultSchemaName;
+            LOGGER.debug( "No database schema name in configuration, will use default: '{}'", defaultSchemaName );
+        } else {
+            LOGGER.debug( "Will use configured database schema name: '{}'", result );
         }
+        return result;
     }
 
 }

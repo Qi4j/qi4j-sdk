@@ -24,7 +24,8 @@ public final class UnsynchronizedCompositeMethodInstancePool
 {
     private CompositeMethodInstance first = null;
 
-    public CompositeMethodInstance getInstance()
+    @Override
+    public CompositeMethodInstance obtainInstance()
     {
         CompositeMethodInstance instance = first;
         if( instance != null )
@@ -34,7 +35,8 @@ public final class UnsynchronizedCompositeMethodInstancePool
         return instance;
     }
 
-    public void returnInstance( CompositeMethodInstance instance )
+    @Override
+    public void releaseInstance( CompositeMethodInstance instance )
     {
         instance.setNext( first );
         first = instance;

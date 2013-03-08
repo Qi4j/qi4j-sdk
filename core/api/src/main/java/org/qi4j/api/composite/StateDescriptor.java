@@ -17,17 +17,15 @@ package org.qi4j.api.composite;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.property.PropertyDescriptor;
 
-import java.util.Set;
-
 /**
- * JAVADOC
+ * Composite State Descriptor.
  */
 public interface StateDescriptor
 {
-    PropertyDescriptor getPropertyByName( String name )
+    PropertyDescriptor findPropertyModelByName( String name )
         throws IllegalArgumentException;
 
-    PropertyDescriptor getPropertyByQualifiedName( QualifiedName name )
+    PropertyDescriptor findPropertyModelByQualifiedName( QualifiedName name )
         throws IllegalArgumentException;
 
     Iterable<? extends PropertyDescriptor> properties();

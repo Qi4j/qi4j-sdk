@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010, Stanislav Muhametsin. All Rights Reserved.
+ * Copyright (c) 2010, Paul Merlin. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +14,26 @@
  */
 package org.qi4j.entitystore.sql;
 
-import org.json.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import org.json.JSONWriter;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.cache.CacheOptions;
 import org.qi4j.api.common.Optional;
@@ -23,27 +43,35 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.This;
-import org.qi4j.api.json.JSONDeserializer;
-import org.qi4j.api.json.JSONWriterSerializer;
 import org.qi4j.api.property.PropertyDescriptor;
-import org.qi4j.api.service.Activatable;
+import org.qi4j.api.service.ServiceActivation;
+import org.qi4j.api.service.qualifier.Tagged;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
+import org.qi4j.api.type.ValueType;
 import org.qi4j.api.unitofwork.EntityTypeNotFoundException;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.api.usecase.UsecaseBuilder;
+import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.entitystore.sql.internal.DatabaseSQLService;
 import org.qi4j.entitystore.sql.internal.DatabaseSQLService.EntityValueResult;
+import org.qi4j.entitystore.sql.internal.SQLEntityState;
+import org.qi4j.entitystore.sql.internal.SQLEntityState.DefaultSQLEntityState;
+import org.qi4j.functional.Visitor;
 import org.qi4j.io.Input;
 import org.qi4j.io.Output;
 import org.qi4j.io.Receiver;
 import org.qi4j.io.Sender;
-import org.qi4j.library.sql.api.SQLEntityState;
-import org.qi4j.library.sql.api.SQLEntityState.DefaultSQLEntityState;
 import org.qi4j.library.sql.common.SQLUtil;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
-import org.qi4j.spi.entitystore.*;
+import org.qi4j.spi.entitystore.DefaultEntityStoreUnitOfWork;
+import org.qi4j.spi.entitystore.EntityNotFoundException;
+import org.qi4j.spi.entitystore.EntityStore;
+import org.qi4j.spi.entitystore.EntityStoreException;
+import org.qi4j.spi.entitystore.EntityStoreSPI;
+import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
+import org.qi4j.spi.entitystore.StateCommitter;
 import org.qi4j.spi.entitystore.helpers.DefaultEntityState;
 import org.qi4j.spi.entitystore.helpers.MapEntityStore;
 import org.qi4j.spi.entitystore.helpers.Migration;
@@ -51,21 +79,18 @@ import org.qi4j.spi.entitystore.helpers.StateStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.*;
+import static org.qi4j.functional.Iterables.first;
 
 /**
- * Most of this code is copy-paste from {@link org.qi4j.spi.entitystore.helpers.MapEntityStoreMixin}. TODO refactor stuff that has to do with general
- * things than actual MapEntityStore from {@link org.qi4j.spi.entitystore.helpers.MapEntityStoreMixin} so that this class could extend some
- * "AbstractJSONEntityStoreMixin".
- *
+ * SQL EntityStore core Mixin.
  */
+// TODO Rewrite reusing JSONMapEntityStoreMixin
+// Old notes:
+//      Most of this code is copy-paste from {@link org.qi4j.spi.entitystore.helpers.MapEntityStoreMixin}.
+//      Refactor stuff that has to do with general things than actual MapEntityStore from MapEntityStoreMixin
+//      so that this class could extend some "AbstractJSONEntityStoreMixin".
 public class SQLEntityStoreMixin
-    implements EntityStore, EntityStoreSPI, StateStore, Activatable
+    implements EntityStore, EntityStoreSPI, StateStore, ServiceActivation
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( SQLEntityStoreMixin.class );
@@ -79,33 +104,41 @@ public class SQLEntityStoreMixin
     @Structure
     private Application application;
 
+    @Service
+    @Tagged( ValueSerialization.Formats.JSON )
+    private ValueSerialization valueSerialization;
+
     @Optional
     @Service
     private Migration migration;
 
     private String uuid;
 
-    private Integer count;
+    private AtomicInteger count = new AtomicInteger();
 
-    public void activate()
+    @Override
+    public void activateService()
         throws Exception
     {
         uuid = UUID.randomUUID().toString() + "-";
-        count = 0;
+        count.set( 0 );
         database.startDatabase();
     }
 
-    public void passivate()
+    @Override
+    public void passivateService()
         throws Exception
     {
         database.stopDatabase();
     }
 
+    @Override
     public StateCommitter applyChanges( final EntityStoreUnitOfWork unitofwork, final Iterable<EntityState> states )
     {
         return new StateCommitter()
         {
 
+            @Override
             public void commit()
             {
                 Connection connection = null;
@@ -115,6 +148,7 @@ public class SQLEntityStoreMixin
                 try
                 {
                     connection = database.getConnection();
+                    connection.setAutoCommit( false );
                     insertPS = database.prepareInsertEntityStatement( connection );
                     updatePS = database.prepareUpdateEntityStatement( connection );
                     removePS = database.prepareRemoveEntityStatement( connection );
@@ -143,7 +177,7 @@ public class SQLEntityStoreMixin
                             }
                             else if( EntityStatus.NEW.equals( status ) )
                             {
-                                database.populateInsertEntityStatement( insertPS, entityPK, defState.identity(),
+                                database.populateInsertEntityStatement( insertPS, defState.identity(),
                                                                         writer.toString(), unitofwork.currentTime() );
                                 insertPS.addBatch();
                             }
@@ -189,6 +223,7 @@ public class SQLEntityStoreMixin
                 }
             }
 
+            @Override
             public void cancel()
             {
             }
@@ -196,7 +231,8 @@ public class SQLEntityStoreMixin
         };
     }
 
-    public EntityState getEntityState( EntityStoreUnitOfWork unitOfWork, EntityReference entityRef )
+    @Override
+    public EntityState entityStateOf( EntityStoreUnitOfWork unitOfWork, EntityReference entityRef )
     {
         EntityValueResult valueResult = getValue( entityRef );
         return new DefaultSQLEntityState( readEntityState( (DefaultEntityStoreUnitOfWork) unitOfWork,
@@ -205,71 +241,109 @@ public class SQLEntityStoreMixin
                                           valueResult.getEntityOptimisticLock() );
     }
 
+    @Override
     public EntityState newEntityState( EntityStoreUnitOfWork unitOfWork, EntityReference entityRef, EntityDescriptor entityDescriptor )
     {
         return new DefaultSQLEntityState( new DefaultEntityState( (DefaultEntityStoreUnitOfWork) unitOfWork,
                                                                   entityRef,
-                                                                  entityDescriptor ),
-                                          database.newPKForEntity(),
-                                          null );
+                                                                  entityDescriptor ) );
     }
 
+    @Override
     public EntityStoreUnitOfWork newUnitOfWork( Usecase usecase, Module module, long currentTime )
     {
         return new DefaultEntityStoreUnitOfWork( entityStoreSPI, newUnitOfWorkId(), module, usecase, currentTime );
     }
 
+    @Override
     public Input<EntityState, EntityStoreException> entityStates( final Module module )
     {
         return new Input<EntityState, EntityStoreException>()
         {
-           @Override
-           public <ReceiverThrowableType extends Throwable> void transferTo(Output<? super EntityState, ReceiverThrowableType> output) throws EntityStoreException, ReceiverThrowableType
-           {
+
+            @Override
+            public <ReceiverThrowableType extends Throwable> void transferTo( Output<? super EntityState, ReceiverThrowableType> output )
+                    throws EntityStoreException, ReceiverThrowableType
+            {
                 output.receiveFrom( new Sender<EntityState, EntityStoreException>()
                 {
-                   @Override
-                   public <ReceiverThrowableType extends Throwable> void sendTo(Receiver<? super EntityState, ReceiverThrowableType> receiver) throws ReceiverThrowableType, EntityStoreException
-                   {
-                        Connection connection = null;
-                        PreparedStatement ps = null;
-                        ResultSet rs = null;
-                        UsecaseBuilder builder = UsecaseBuilder.buildUsecase( "qi4j.entitystore.sql.visit" );
-                        Usecase usecase = builder.with( CacheOptions.NEVER ).newUsecase();
-                        final DefaultEntityStoreUnitOfWork uow = new DefaultEntityStoreUnitOfWork( entityStoreSPI, newUnitOfWorkId(),
-                                                                                                   module, usecase, System.currentTimeMillis() );
-                        try
+
+                    @Override
+                    public <ReceiverThrowableType extends Throwable> void sendTo( final Receiver<? super EntityState, ReceiverThrowableType> receiver )
+                            throws ReceiverThrowableType, EntityStoreException
+                    {
+
+                        queryAllEntities( module, new EntityStatesVisitor()
                         {
-                            connection = database.getConnection();
-                            ps = database.prepareGetAllEntitiesStatement( connection );
-                            database.populateGetAllEntitiesStatement( ps );
-                            rs = ps.executeQuery();
-                            while( rs.next() )
+
+                            @Override
+                            public boolean visit( EntityState visited )
+                                    throws SQLException
                             {
-                                receiver.receive( readEntityState( uow, database.getEntityValue( rs ).getReader() ) );
+
+                                try {
+                                    receiver.receive( visited );
+                                } catch ( Throwable receiverThrowableType ) {
+                                    throw new SQLException( receiverThrowableType );
+                                }
+                                return true;
+
                             }
-                        }
-                        catch( SQLException sqle )
-                        {
-                            throw new EntityStoreException( sqle );
-                        }
-                        finally
-                        {
-                            SQLUtil.closeQuietly( rs );
-                            SQLUtil.closeQuietly( ps );
-                            SQLUtil.closeQuietly( connection );
-                        }
+
+                        } );
 
                     }
-                });
+
+                } );
             }
+
         };
     }
 
-    @SuppressWarnings( "ValueOfIncrementOrDecrementUsed" )
+    private void queryAllEntities( Module module, EntityStatesVisitor entityStatesVisitor )
+    {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        UsecaseBuilder builder = UsecaseBuilder.buildUsecase( "qi4j.entitystore.sql.visit" );
+        Usecase usecase = builder.withMetaInfo( CacheOptions.NEVER ).newUsecase();
+        final DefaultEntityStoreUnitOfWork uow = new DefaultEntityStoreUnitOfWork( entityStoreSPI,
+                                                                                   newUnitOfWorkId(), module, usecase,
+                                                                                   System.currentTimeMillis() );
+        try {
+
+            connection = database.getConnection();
+            ps = database.prepareGetAllEntitiesStatement( connection );
+            database.populateGetAllEntitiesStatement( ps );
+            rs = ps.executeQuery();
+            while ( rs.next() ) {
+                DefaultEntityState entityState = readEntityState( uow, database.getEntityValue( rs ).getReader() );
+                if ( !entityStatesVisitor.visit( entityState ) ) {
+                    return;
+                }
+            }
+
+        } catch ( SQLException ex ) {
+
+            throw new EntityStoreException( ex );
+
+        } finally {
+
+            SQLUtil.closeQuietly( rs );
+            SQLUtil.closeQuietly( ps );
+            SQLUtil.closeQuietly( connection );
+
+        }
+    }
+
+    private interface EntityStatesVisitor
+            extends Visitor<EntityState, SQLException>
+    {
+    }
+
     protected String newUnitOfWorkId()
     {
-        return uuid + Integer.toHexString( count++ );
+        return uuid + Integer.toHexString( count.incrementAndGet() );
     }
 
     protected DefaultEntityState readEntityState( DefaultEntityStoreUnitOfWork unitOfWork, Reader entityState )
@@ -286,8 +360,7 @@ public class SQLEntityStoreMixin
             String identity = jsonObject.getString( "identity" );
 
             // Check if version is correct
-            String currentAppVersion = jsonObject.optString( MapEntityStore.JSONKeys.application_version.name(),
-                                                             "0.0" );
+            String currentAppVersion = jsonObject.optString( MapEntityStore.JSONKeys.application_version.name(), "0.0" );
             if( !currentAppVersion.equals( application.version() ) )
             {
                 if( migration != null )
@@ -317,7 +390,6 @@ public class SQLEntityStoreMixin
 
             Map<QualifiedName, Object> properties = new HashMap<QualifiedName, Object>();
             JSONObject props = jsonObject.getJSONObject( "properties" );
-            JSONDeserializer deserializer = new JSONDeserializer( module );
             for( PropertyDescriptor propertyDescriptor : entityDescriptor.state().properties() )
             {
                 Object jsonValue;
@@ -333,13 +405,13 @@ public class SQLEntityStoreMixin
                     status = EntityStatus.UPDATED;
                     continue;
                 }
-                if( jsonValue == JSONObject.NULL )
+                if( JSONObject.NULL.equals( jsonValue ) )
                 {
                     properties.put( propertyDescriptor.qualifiedName(), null );
                 }
                 else
                 {
-                    Object value = deserializer.deserialize( jsonValue, propertyDescriptor.valueType() );
+                    Object value = valueSerialization.deserialize( propertyDescriptor.valueType(), jsonValue.toString() );
                     properties.put( propertyDescriptor.qualifiedName(), value );
                 }
             }
@@ -397,7 +469,8 @@ public class SQLEntityStoreMixin
         }
     }
 
-    public JSONObject getState( String id )
+    @Override
+    public JSONObject jsonStateOf( String id )
         throws IOException
     {
         Reader reader = getValue( EntityReference.parseEntityReference( id ) ).getReader();
@@ -455,23 +528,34 @@ public class SQLEntityStoreMixin
             JSONWriter properties = json.object().
                 key( "identity" ).value( state.identity().identity() ).
                 key( "application_version" ).value( application.version() ).
-                key( "type" ).value( state.entityDescriptor().type().getName() ).
+                key( "type" ).value( first( state.entityDescriptor().types() ).getName() ).
                 key( "version" ).value( version ).
                 key( "modified" ).value( state.lastModified() ).
                 key( "properties" ).object();
 
-            JSONWriterSerializer serializer = new JSONWriterSerializer( json );
             for( PropertyDescriptor persistentProperty : state.entityDescriptor().state().properties() )
             {
                 Object value = state.properties().get( persistentProperty.qualifiedName() );
                 json.key( persistentProperty.qualifiedName().name() );
-                if( value == null )
+                if( value == null || ValueType.isPrimitiveValue( value ) )
                 {
-                    json.value( null );
+                    json.value( value );
                 }
                 else
                 {
-                    serializer.serialize( value, persistentProperty.valueType() );
+                    String serialized = valueSerialization.serialize( value );
+                    if( serialized.startsWith( "{" ) )
+                    {
+                        json.value( new JSONObject( serialized ) );
+                    }
+                    else if( serialized.startsWith( "[" ) )
+                    {
+                        json.value( new JSONArray( serialized ) );
+                    }
+                    else
+                    {
+                        json.value( serialized );
+                    }
                 }
             }
 

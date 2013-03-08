@@ -45,15 +45,14 @@ import org.restlet.resource.ResourceException;
 /**
  * JAVADOC
  */
-public class TableResponseWriter
-    extends AbstractResponseWriter
+public class TableResponseWriter extends AbstractResponseWriter
 {
     private static final List<MediaType> supportedMediaTypes = Arrays.asList( MediaType.TEXT_HTML, MediaType.APPLICATION_JSON );
 
-    private
     @Service
-    Configuration cfg;
+    private Configuration cfg;
 
+    @Override
     public boolean writeResponse( final Object result, final Response response )
         throws ResourceException
     {
@@ -93,16 +92,13 @@ public class TableResponseWriter
                                 }
                             }
 
-                            json.object().
-                                key( "version" ).value( "0.6" );
+                            json.object().key( "version" ).value( "0.6" );
                             if( reqId != null )
                             {
                                 json.key( "reqId" ).value( reqId );
                             }
                             json.key( "status" ).value( "ok" );
-
                             json.key( "table" ).object();
-
                             List<Column> columnList = tableValue.cols().get();
                             json.key( "cols" ).array();
                             for( Column columnValue : columnList )
@@ -193,7 +189,7 @@ public class TableResponseWriter
                         }
                         catch( TemplateException e )
                         {
-                            throw new IOException(e);
+                            throw new IOException( e );
                         }
                     }
                 };
@@ -202,7 +198,6 @@ public class TableResponseWriter
                 return true;
             }
         }
-
         return false;
     }
 }

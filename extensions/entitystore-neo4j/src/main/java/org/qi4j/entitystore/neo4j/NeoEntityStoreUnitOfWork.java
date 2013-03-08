@@ -1,17 +1,19 @@
 package org.qi4j.entitystore.neo4j;
 
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
 import org.neo4j.graphdb.Node;
 import org.neo4j.index.IndexService;
 import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.structure.Module;
+import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entitystore.*;
 
-import javax.transaction.Transaction;
-import javax.transaction.TransactionManager;
+import static org.qi4j.functional.Iterables.first;
 
 public class NeoEntityStoreUnitOfWork
     implements EntityStoreUnitOfWork,
@@ -22,6 +24,7 @@ public class NeoEntityStoreUnitOfWork
 
     private final EmbeddedGraphDatabase neo;
     private final IndexService indexService;
+    private final ValueSerialization valueSerialization;
     private long currentTime;
     private final TransactionManager tm;
 
@@ -29,12 +32,13 @@ public class NeoEntityStoreUnitOfWork
     private final String identity;
     private final Module module;
 
-    NeoEntityStoreUnitOfWork( EmbeddedGraphDatabase neo, IndexService indexService,
+    NeoEntityStoreUnitOfWork( EmbeddedGraphDatabase neo, IndexService indexService, ValueSerialization valueSerialization,
                               String identity, Module module,
                               long currentTime )
     {
         this.neo = neo;
         this.indexService = indexService;
+        this.valueSerialization = valueSerialization;
         this.currentTime = currentTime;
         this.tm = this.neo.getConfig().getTxModule().getTxManager();
         this.transaction = beginTransaction();
@@ -42,17 +46,20 @@ public class NeoEntityStoreUnitOfWork
         this.module = module;
     }
 
+    @Override
     public StateCommitter applyChanges()
         throws EntityStoreException
     {
         return this;
     }
 
+    @Override
     public long currentTime()
     {
         return currentTime;
     }
 
+    @Override
     public void discard()
     {
         cancel();
@@ -69,19 +76,21 @@ public class NeoEntityStoreUnitOfWork
         return node;
     }
 
-    public EntityState getEntityState( EntityReference anIdentity )
+    @Override
+    public EntityState entityStateOf( EntityReference anIdentity )
         throws EntityStoreException, EntityNotFoundException
     {
-        return new NeoEntityState( this, getEntityStateNode( anIdentity ),
+        return new NeoEntityState( valueSerialization, this, getEntityStateNode( anIdentity ),
                                    EntityStatus.LOADED );
     }
 
+    @Override
     public EntityState newEntityState( EntityReference anIdentity,
                                        EntityDescriptor entityDescriptor
     )
         throws EntityStoreException
     {
-        String type = entityDescriptor.type().getName();
+        String type = first(entityDescriptor.types()).getName();
         Node typeNode = indexService.getSingleNode( ENTITY_TYPE, type );
         if( typeNode == null )
         {
@@ -99,9 +108,10 @@ public class NeoEntityStoreUnitOfWork
         node.createRelationshipTo( typeNode, RelTypes.IS_OF_TYPE );
         node.setProperty( NeoEntityState.ENTITY_ID, anIdentity.identity() );
         indexService.index( node, ENTITY_STATE_ID, anIdentity.identity() );
-        return new NeoEntityState( this, node, EntityStatus.NEW );
+        return new NeoEntityState( valueSerialization, this, node, EntityStatus.NEW );
     }
 
+    @Override
     public void cancel()
     {
         try
@@ -115,6 +125,7 @@ public class NeoEntityStoreUnitOfWork
         }
     }
 
+    @Override
     public void commit()
     {
         try
@@ -181,6 +192,7 @@ public class NeoEntityStoreUnitOfWork
         return indexService;
     }
 
+    @Override
     public String identity()
     {
         return identity;

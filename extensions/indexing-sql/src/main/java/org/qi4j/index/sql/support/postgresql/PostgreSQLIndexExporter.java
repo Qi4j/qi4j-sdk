@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010, Stanislav Muhametsin. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,37 +12,32 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.index.sql.support.postgresql;
 
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
+import javax.sql.DataSource;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.injection.scope.Uses;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.index.sql.support.common.GenericDatabaseExplorer;
 import org.qi4j.index.sql.support.common.GenericDatabaseExplorer.ColumnInfo;
 import org.qi4j.index.sql.support.common.GenericDatabaseExplorer.DatabaseProcessor;
 import org.qi4j.index.sql.support.common.GenericDatabaseExplorer.ForeignKeyInfo;
 import org.qi4j.index.sql.support.skeletons.SQLDBState;
-import org.qi4j.library.sql.ds.DataSourceService;
+import org.qi4j.library.sql.common.SQLUtil;
 import org.qi4j.spi.query.IndexExporter;
 import org.sql.generation.api.vendor.SQLVendor;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * 
- * @author Stanislav Muhametsin
- */
 public class PostgreSQLIndexExporter
-    implements IndexExporter, Activatable
+    implements IndexExporter
 {
 
     @This
@@ -50,21 +46,8 @@ public class PostgreSQLIndexExporter
     @Uses
     private ServiceDescriptor descriptor;
 
-    private SQLVendor _vendor;
-
     @Service
-    private DataSourceService _dataSource;
-
-    public void activate()
-        throws Exception
-    {
-        this._vendor = this.descriptor.metaInfo( SQLVendor.class );
-    }
-
-    public void passivate()
-        throws Exception
-    {
-    }
+    private DataSource _dataSource;
 
     private static final String SEPARATOR = "-----------------------------------------------";
 
@@ -91,56 +74,68 @@ public class PostgreSQLIndexExporter
         _typeStrings.put( Types.VARBINARY, "VARBINARY" );
     }
 
+    @Override
     public void exportFormalToWriter( final PrintWriter out )
         throws IOException,
         UnsupportedOperationException
     {
+        Connection connection = null;
         try
         {
-            GenericDatabaseExplorer.visitDatabaseTables( this._dataSource.getDataSource().getConnection(), null,
+            connection = this._dataSource.getConnection();
+            GenericDatabaseExplorer.visitDatabaseTables( connection, null,
                 this._state.schemaName().get(), null, new DatabaseProcessor()
                 {
 
+                    @Override
                     public void endProcessColumns( String schemaName, String tableName, String tableRemarks )
                     {
                         out.write( "</columns>" + "\n" );
                     }
 
+                    @Override
                     public void endProcessRows( String schemaName, String tableName, String tableRemarks )
                     {
                         out.write( "</rows>" + "\n" );
                     }
 
+                    @Override
                     public void endProcessTableInfo( String schemaName, String tableName, String tableRemarks )
                     {
                         out.write( "</table>" + "\n" );
                     }
 
+                    @Override
                     public void endProcessSchemaInfo( String schemaName )
                     {
                         out.write( "</schema>" + "\n" );
                     }
 
+                    @Override
                     public void endProcessRowInfo( String schemaName, String tableName, Object[] rowContents )
                     {
                         out.write( "</row>" + "\n" );
                     }
 
+                    @Override
                     public void endProcessColumnInfo( String schemaName, String tableName, ColumnInfo colInfo,
                         ForeignKeyInfo fkInfo )
                     {
                     }
 
+                    @Override
                     public void beginProcessTableInfo( String schemaName, String tableName, String tableRemarks )
                     {
                         out.write( "<table name=\"" + tableName + "\" remarks=\"" + tableRemarks + "\">" + "\n" );
                     }
 
+                    @Override
                     public void beginProcessColumns( String schemaName, String tableName, String tableRemarks )
                     {
                         out.write( "<columns>" + "\n" );
                     }
 
+                    @Override
                     public void beginProcessColumnInfo( String schemaName, String tableName, ColumnInfo colInfo,
                         ForeignKeyInfo fkInfo )
                     {
@@ -170,16 +165,19 @@ public class PostgreSQLIndexExporter
                         out.write( "/>" + "\n" );
                     }
 
+                    @Override
                     public void beginProcessSchemaInfo( String schemaName )
                     {
                         out.write( "<schema name=\"" + schemaName + "\">" + "\n" );
                     }
 
+                    @Override
                     public void beginProcessRows( String schemaName, String tableName, String tableRemarks )
                     {
                         out.write( "<rows>" + "\n" );
                     }
 
+                    @Override
                     public void beginProcessRowInfo( String schemaName, String tableName, Object[] rowContents )
                     {
                         out.write( "<row>" + "\n" );
@@ -188,51 +186,62 @@ public class PostgreSQLIndexExporter
                             out.write( "<value index=\"" + x + "\" >" + rowContents[x] + "</value>" + "\n" );
                         }
                     }
-                }, this._vendor );
+                }, this.descriptor.metaInfo( SQLVendor.class ) );
         }
         catch( SQLException sqle )
         {
             // TODO Just wrap around for now...
             throw new IOException( sqle );
+        } finally {
+            SQLUtil.closeQuietly( connection );
         }
     }
 
+    @Override
     public void exportReadableToStream( final PrintStream out )
         throws IOException,
         UnsupportedOperationException
     {
+        Connection connection = null;
         try
         {
-            GenericDatabaseExplorer.visitDatabaseTables( this._dataSource.getDataSource().getConnection(), null,
+            connection = this._dataSource.getConnection();
+            GenericDatabaseExplorer.visitDatabaseTables( connection, null,
                 this._state.schemaName().get(), null, new DatabaseProcessor()
                 {
 
+                    @Override
                     public void endProcessTableInfo( String schemaName, String tableName, String tableRemarks )
                     {
                         out.print( "\n\n\n" );
                     }
 
+                    @Override
                     public void endProcessSchemaInfo( String schemaName )
                     {
                         out.print( "\n\n" );
                     }
 
+                    @Override
                     public void endProcessRowInfo( String schemaName, String tableName, Object[] rowContents )
                     {
 
                     }
 
+                    @Override
                     public void endProcessColumnInfo( String schemaName, String tableName, ColumnInfo colInfo,
                         ForeignKeyInfo fkInfo )
                     {
 
                     }
 
+                    @Override
                     public void endProcessColumns( String schemaName, String tableName, String tableRemarks )
                     {
                         out.print( SEPARATOR + "\n" + SEPARATOR + "\n" );
                     }
 
+                    @Override
                     public void endProcessRows( String schemaName, String tableName, String tableRemarks )
                     {
                         out.print( SEPARATOR + "\n" + SEPARATOR + "\n" );
@@ -257,6 +266,7 @@ public class PostgreSQLIndexExporter
                         return result;
                     }
 
+                    @Override
                     public void beginProcessColumnInfo( String schemaName, String tableName, ColumnInfo colInfo,
                         ForeignKeyInfo fkInfo )
                     {
@@ -271,12 +281,14 @@ public class PostgreSQLIndexExporter
                         out.print( "\n" );
                     }
 
+                    @Override
                     public void beginProcessTableInfo( String schemaName, String tableName, String tableRemarks )
                     {
                         out.print( "Table: " + schemaName + "." + tableName
                             + (tableRemarks == null ? "" : " (" + tableRemarks + ")") + "\n" );
                     }
 
+                    @Override
                     public void beginProcessSchemaInfo( String schemaName )
                     {
                         out.print( //
@@ -285,6 +297,7 @@ public class PostgreSQLIndexExporter
                         );
                     }
 
+                    @Override
                     public void beginProcessRowInfo( String schemaName, String tableName, Object[] rowContents )
                     {
                         for( Integer x = 0; x < rowContents.length; ++x )
@@ -299,21 +312,25 @@ public class PostgreSQLIndexExporter
                         out.print( "\n" );
                     }
 
+                    @Override
                     public void beginProcessColumns( String schemaName, String tableName, String tableRemarks )
                     {
                         out.print( SEPARATOR + "\n" + SEPARATOR + "\n" );
                     }
 
+                    @Override
                     public void beginProcessRows( String schemaName, String tableName, String tableRemarks )
                     {
 
                     }
-                }, this._vendor );
+                }, this.descriptor.metaInfo( SQLVendor.class ) );
         }
         catch( SQLException sqle )
         {
             // TODO Just wrap around for now...
             throw new IOException( sqle );
+        } finally {
+            SQLUtil.closeQuietly( connection );
         }
     }
 }

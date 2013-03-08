@@ -14,6 +14,7 @@
 
 package org.qi4j.api.value;
 
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.qi4j.api.association.Association;
@@ -32,10 +33,10 @@ import org.qi4j.library.constraints.annotation.MaxLength;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
 
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for ValueComposites
@@ -44,6 +45,7 @@ public class ValueCompositeTest
     extends AbstractQi4jTest
 {
 
+    @Override
     public void assemble( ModuleAssembly module )
         throws AssemblyException
     {
@@ -71,7 +73,7 @@ public class ValueCompositeTest
         builder.newInstance();
 
         // Check that @UseDefaults works for ValueComposites
-        assertEquals("{\"val1\":\"\"}", some.another().get().toString());
+        assertEquals( "{\"val1\":\"\"}", some.another().get().toString() );
     }
 
     @Test
@@ -81,9 +83,6 @@ public class ValueCompositeTest
         SomeValue prototype = builder.prototype();
         prototype.other().set( "test" );
         SomeValue instance = builder.newInstance();
-        builder = module.newValueBuilder( SomeValue.class );
-        prototype = builder.prototype();
-        prototype.other().set( "test" );
         SomeValue other = builder.newInstance();
         Assert.assertFalse( "Instances should not be the same.", instance == other );
         Assert.assertEquals( "Equal values.", instance, other );
@@ -96,10 +95,6 @@ public class ValueCompositeTest
         SomeValue prototype = builder.prototype();
         prototype.other().set( "test" );
         SomeValue instance = builder.newInstance();
-
-        builder = module.newValueBuilder( SomeValue.class );
-        prototype = builder.prototype();
-        prototype.other().set( "test" );
         SomeValue other = builder.newInstance();
         Assert.assertFalse( "Instances should not be the same.", instance == other );
         Assert.assertEquals( "Equal values.", instance.hashCode(), other.hashCode() );
@@ -207,7 +202,8 @@ public class ValueCompositeTest
     }
 
     @Test
-    public void givenValueWithAssociationsWhenNewUoWThenCanRead() throws UnitOfWorkCompletionException
+    public void givenValueWithAssociationsWhenNewUoWThenCanRead()
+        throws UnitOfWorkCompletionException
     {
         ValueBuilder<SomeValue> builder = module.newValueBuilder( SomeValue.class );
         builder.prototype().anotherList().get().add( module.newValue( AnotherValue.class ) );
@@ -235,7 +231,7 @@ public class ValueCompositeTest
 
             unitOfWork = module.newUnitOfWork();
 
-            AssociationValue newAssociationValue = module.newValueFromJSON( AssociationValue.class, json );
+            AssociationValue newAssociationValue = module.newValueFromSerializedState( AssociationValue.class, json );
 
             Assert.assertEquals( associationValue.some().get(), newAssociationValue.some().get() );
         }

@@ -16,144 +16,70 @@ package org.qi4j.test;
 
 import org.junit.After;
 import org.junit.Before;
-import org.qi4j.api.Qi4j;
-import org.qi4j.api.structure.Application;
-import org.qi4j.api.structure.ApplicationDescriptor;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.unitofwork.UnitOfWork;
-import org.qi4j.bootstrap.*;
-import org.qi4j.spi.Qi4jSPI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.qi4j.bootstrap.ApplicationAssembly;
+import org.qi4j.bootstrap.Assembler;
+import org.qi4j.bootstrap.AssemblyException;
+import org.qi4j.bootstrap.LayerAssembly;
+import org.qi4j.bootstrap.ModuleAssembly;
 
 /**
  * Base class for Composite tests.
  */
-public abstract class AbstractQi4jTest
-        implements Assembler
+public abstract class AbstractQi4jTest extends AbstractQi4jBaseTest
+    implements Assembler
 {
-    protected Qi4j api;
-    protected Qi4jSPI spi;
-
-    protected Energy4Java qi4j;
-    protected ApplicationDescriptor applicationModel;
-    protected Application application;
     protected Module module;
 
-    private Logger log;
-
     @Before
+    @Override
     public void setUp()
-            throws Exception
+        throws Exception
     {
-        qi4j = new Energy4Java();
-        applicationModel = newApplication();
-        if( applicationModel == null )
+        super.setUp();
+        if( application == null )
         {
-            // An AssemblyException has occurred that the Test wants to check for.
-            return;
+            return; // failure in Assembly.
         }
-        application = newApplicationInstance(applicationModel);
-        initApplication( application );
-        api = spi = qi4j.spi();
-        application.activate();
-
-        // Assume only one module
         module = application.findModule( "Layer 1", "Module 1" );
-
-        // Inject this test instance
         module.injectTo( this );
     }
 
-    protected Application newApplicationInstance(ApplicationDescriptor applicationModel)
+    @Override
+    protected void defineApplication( ApplicationAssembly applicationAssembly )
+        throws AssemblyException
     {
-        return applicationModel.newInstance( qi4j.api() );
-    }
-
-    protected ApplicationDescriptor newApplication()
-            throws AssemblyException
-    {
-        ApplicationAssembler assembler = new ApplicationAssembler()
-        {
-            public ApplicationAssembly assemble( ApplicationAssemblyFactory applicationFactory )
-                    throws AssemblyException
-            {
-                return applicationFactory.newApplicationAssembly( new Assembler()
-                {
-                    @Override
-                    public void assemble( ModuleAssembly module ) throws AssemblyException
-                    {
-                        module.layer().application().setMode( Application.Mode.test );
-                        module.objects( AbstractQi4jTest.this.getClass() ); // Register test class
-                        AbstractQi4jTest.this.assemble( module );
-                    }
-                } );
-            }
-        };
-
-        try
-        {
-            return qi4j.newApplicationModel( assembler );
-        } catch( AssemblyException e )
-        {
-            assemblyException( e );
-            return null;
-        }
-    }
-
-    /**
-     * This method is called when there was an AssemblyException in the creation of the Qi4j application model.
-     * <p/>
-     * Override this method to catch valid failures to place into satisfiedBy suites.
-     *
-     * @param exception the exception thrown.
-     * @throws AssemblyException The default implementation of this method will simply re-throw the exception.
-     */
-    protected void assemblyException( AssemblyException exception )
-            throws AssemblyException
-    {
-        throw exception;
-    }
-
-    protected void initApplication( Application app )
-            throws Exception
-    {
+        LayerAssembly layer = applicationAssembly.layer( "Layer 1" );
+        ModuleAssembly module = layer.module( "Module 1" );
+        module.objects( AbstractQi4jTest.this.getClass() );
+        assemble( module );
     }
 
     @After
+    @Override
     public void tearDown()
-            throws Exception
+        throws Exception
     {
-        if( module != null && module.isUnitOfWorkActive())
+        if( module != null && module.isUnitOfWorkActive() )
         {
-            while( module.isUnitOfWorkActive())
+            while( module.isUnitOfWorkActive() )
             {
                 UnitOfWork uow = module.currentUnitOfWork();
                 if( uow.isOpen() )
                 {
+                    System.err.println( "UnitOfWork not cleaned up:" + uow.usecase().name() );
                     uow.discard();
                 }
                 else
                 {
-                    throw new InternalError( "I have seen a case where a UoW is on the stack, but not opened." );
+                    throw new InternalError( "I have seen a case where a UoW is on the stack, but not opened. First is: " + uow
+                        .usecase()
+                        .name() );
                 }
             }
             new Exception( "UnitOfWork not properly cleaned up" ).printStackTrace();
         }
-
-        if( application != null )
-        {
-            application.passivate();
-        }
-    }
-
-    protected Logger getLog()
-    {
-        if( this.log == null )
-        {
-            this.log = LoggerFactory.getLogger( this.getClass() );
-        }
-
-        return this.log;
+        super.tearDown();
     }
 }

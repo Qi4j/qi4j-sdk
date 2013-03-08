@@ -14,14 +14,21 @@
 
 package org.qi4j.runtime.property;
 
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.List;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.QualifiedName;
-import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.constraint.ConstraintViolation;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.entity.Queryable;
 import org.qi4j.api.property.DefaultValues;
 import org.qi4j.api.property.GenericPropertyInfo;
+import org.qi4j.api.property.InvalidPropertyTypeException;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.property.PropertyDescriptor;
 import org.qi4j.api.structure.Module;
@@ -36,14 +43,13 @@ import org.qi4j.runtime.model.Binder;
 import org.qi4j.runtime.model.Resolution;
 import org.qi4j.runtime.types.ValueTypeFactory;
 
-import java.lang.reflect.*;
-import java.util.List;
-
-import static org.qi4j.api.util.Classes.RAW_CLASS;
-import static org.qi4j.api.util.Classes.TYPE_OF;
+import static org.qi4j.functional.Iterables.empty;
+import static org.qi4j.functional.Iterables.first;
 
 /**
- * JAVADOC
+ * Model for a Property.
+ *
+ * <p>Equality is based on the Property accessor object (property type and name), not on the QualifiedName.</p>
  */
 public class PropertyModel
     implements PropertyDescriptor, PropertyInfo, Binder, Visitable<PropertyModel>
@@ -70,13 +76,25 @@ public class PropertyModel
 
     private final boolean queryable;
 
-    public PropertyModel( AccessibleObject accessor, boolean immutable, boolean useDefaults, ValueConstraintsInstance constraints,
-                          MetaInfo metaInfo, Object initialValue
+    public PropertyModel( AccessibleObject accessor,
+                          boolean immutable,
+                          boolean useDefaults,
+                          ValueConstraintsInstance constraints,
+                          MetaInfo metaInfo,
+                          Object initialValue
     )
     {
+        if( accessor instanceof Method )
+        {
+            Method m = (Method) accessor;
+            if( !m.getReturnType().equals( Property.class ) )
+            {
+                throw new InvalidPropertyTypeException( accessor );
+            }
+        }
         this.immutable = immutable;
         this.metaInfo = metaInfo;
-        type = GenericPropertyInfo.getPropertyType( accessor );
+        type = GenericPropertyInfo.propertyTypeOf( accessor );
         this.accessor = accessor;
         qualifiedName = QualifiedName.fromAccessor( accessor );
 
@@ -90,6 +108,7 @@ public class PropertyModel
         this.queryable = queryable == null || queryable.value();
     }
 
+    @Override
     public <T> T metaInfo( Class<T> infoType )
     {
         return metaInfo.get( infoType );
@@ -100,16 +119,19 @@ public class PropertyModel
         return qualifiedName.name();
     }
 
+    @Override
     public QualifiedName qualifiedName()
     {
         return qualifiedName;
     }
 
+    @Override
     public Type type()
     {
         return type;
     }
 
+    @Override
     public AccessibleObject accessor()
     {
         return accessor;
@@ -121,6 +143,7 @@ public class PropertyModel
         return valueType;
     }
 
+    @Override
     public boolean isImmutable()
     {
         return immutable;
@@ -131,11 +154,13 @@ public class PropertyModel
         return builderInfo;
     }
 
+    @Override
     public boolean queryable()
     {
         return queryable;
     }
 
+    @Override
     public Object initialValue( Module module )
     {
         // Use supplied value from assembly
@@ -144,12 +169,13 @@ public class PropertyModel
         // Check for @UseDefaults annotation
         if( value == null && useDefaults )
         {
-            if (valueType instanceof ValueCompositeType )
+            if( valueType instanceof ValueCompositeType )
             {
-                return module.newValue( valueType().type() );
-            } else
+                return module.newValue( first( valueType().types() ) );
+            }
+            else
             {
-                value = DefaultValues.getDefaultValue( type );
+                value = DefaultValues.getDefaultValueOf( type );
             }
         }
 
@@ -157,24 +183,30 @@ public class PropertyModel
     }
 
     @Override
-    public void bind( Resolution resolution ) throws BindingException
+    public void bind( Resolution resolution )
+        throws BindingException
     {
-        valueType = ValueTypeFactory.instance().newValueType( type(), ((Member)accessor()).getDeclaringClass(), resolution.model().type(), resolution.layer(), resolution.module() );
+        ValueTypeFactory factory = ValueTypeFactory.instance();
+        Class<?> declaringClass = ( (Member) accessor() ).getDeclaringClass();
+        Class<?> mainType = first( resolution.model().types() );
+        valueType = factory.newValueType( type(), declaringClass, mainType, resolution.layer(), resolution.module() );
 
         builderInfo = new BuilderPropertyInfo();
 
-        if (type instanceof TypeVariable)
+        if( type instanceof TypeVariable )
         {
-            type = Classes.resolveTypeVariable( (TypeVariable) type, ((Member)accessor).getDeclaringClass(), resolution.model().type());
+            type = Classes.resolveTypeVariable( (TypeVariable) type, declaringClass, mainType );
         }
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( Visitor<? super PropertyModel, ThrowableType> visitor ) throws ThrowableType
+    public <ThrowableType extends Throwable> boolean accept( Visitor<? super PropertyModel, ThrowableType> visitor )
+        throws ThrowableType
     {
         return visitor.visit( this );
     }
 
+    @Override
     public void checkConstraints( Object value )
         throws ConstraintViolationException
     {
@@ -183,7 +215,8 @@ public class PropertyModel
             List<ConstraintViolation> violations = constraints.checkConstraints( value );
             if( !violations.isEmpty() )
             {
-                throw new ConstraintViolationException( "<new instance>", "<unknown>", ((Member)accessor), violations );
+                Iterable<Class<?>> empty = empty();
+                throw new ConstraintViolationException( "<new instance>", empty, ( (Member) accessor ), violations );
             }
         }
     }
@@ -213,10 +246,14 @@ public class PropertyModel
     @Override
     public String toString()
     {
-        if (accessor instanceof Field)
-          return ((Field)accessor).toGenericString();
+        if( accessor instanceof Field )
+        {
+            return ( (Field) accessor ).toGenericString();
+        }
         else
-            return ((Method)accessor).toGenericString();
+        {
+            return ( (Method) accessor ).toGenericString();
+        }
     }
 
     private class BuilderPropertyInfo implements PropertyInfo
@@ -240,14 +277,16 @@ public class PropertyModel
         }
 
         @Override
-        public void checkConstraints( Object value ) throws ConstraintViolationException
+        public void checkConstraints( Object value )
+            throws ConstraintViolationException
         {
             if( constraints != null )
             {
                 List<ConstraintViolation> violations = constraints.checkConstraints( value );
                 if( !violations.isEmpty() )
                 {
-                    throw new ConstraintViolationException( "<new instance>", "<unknown>", ((Member)accessor), violations );
+                    Iterable<Class<?>> empty = empty();
+                    throw new ConstraintViolationException( "<new instance>", empty, ( (Member) accessor ), violations );
                 }
             }
         }

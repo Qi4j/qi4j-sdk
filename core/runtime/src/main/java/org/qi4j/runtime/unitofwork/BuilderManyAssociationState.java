@@ -14,12 +14,11 @@
 
 package org.qi4j.runtime.unitofwork;
 
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.spi.entity.ManyAssociationState;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.qi4j.api.entity.EntityReference;
+import org.qi4j.spi.entity.ManyAssociationState;
 
 /**
  * Default implementation of ManyAssociationState that also
@@ -35,16 +34,19 @@ public final class BuilderManyAssociationState
         references = new ArrayList<EntityReference>();
     }
 
+    @Override
     public int count()
     {
         return references.size();
     }
 
+    @Override
     public boolean contains( EntityReference entityReference )
     {
         return references.contains( entityReference );
     }
 
+    @Override
     public boolean add( int i, EntityReference entityReference )
     {
         if( references.contains( entityReference ) )
@@ -56,16 +58,19 @@ public final class BuilderManyAssociationState
         return true;
     }
 
+    @Override
     public boolean remove( EntityReference entityReference )
     {
         return references.remove( entityReference );
     }
 
+    @Override
     public EntityReference get( int i )
     {
         return references.get( i );
     }
 
+    @Override
     public Iterator<EntityReference> iterator()
     {
         return references.iterator();

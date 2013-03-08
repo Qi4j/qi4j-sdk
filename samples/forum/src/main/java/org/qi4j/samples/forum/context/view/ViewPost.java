@@ -21,7 +21,7 @@ public class ViewPost
     ReplyTopic replyTopic = new ReplyTopic();
     Poster poster = new Poster();
 
-    public org.qi4j.samples.forum.context.view.ViewPost bind( @Uses Topic topic, @Uses Post post, @Uses User user )
+    public ViewPost bind( @Uses Topic topic, @Uses Post post, @Uses User user )
     {
         viewPost.bind( post );
         replyTopic.bind( topic );
@@ -55,7 +55,7 @@ public class ViewPost
             post.replyTo().set( viewPost.self() );
 
             self().lastPost().set( post );
-            Numbers.add( self().postCount(), 1);
+            Numbers.add( self().postCount(), 1 );
 
             return post;
         }

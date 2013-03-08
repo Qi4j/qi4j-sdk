@@ -5,8 +5,8 @@ import org.qi4j.functional.Specification;
 import org.qi4j.functional.Specifications;
 
 /**
-* TODO
-*/
+ * NOT Specification.
+ */
 public class NotSpecification implements Specification<Composite>
 {
     private Specification<Composite> operand;
@@ -16,7 +16,7 @@ public class NotSpecification implements Specification<Composite>
         this.operand = operand;
     }
 
-    public Specification<Composite> getOperand()
+    public Specification<Composite> operand()
     {
         return operand;
     }
@@ -30,6 +30,6 @@ public class NotSpecification implements Specification<Composite>
     @Override
     public String toString()
     {
-        return "!"+operand.toString();
+        return "!" + operand.toString();
     }
 }

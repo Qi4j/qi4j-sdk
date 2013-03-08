@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2007, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +15,20 @@
 
 package org.qi4j.runtime.bootstrap;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.service.qualifier.ServiceTags;
 import org.qi4j.bootstrap.ServiceDeclaration;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static java.util.Arrays.asList;
 
 /**
  * Declaration of a Service. Created by {@link org.qi4j.runtime.bootstrap.ModuleAssemblyImpl#services(Class[])}.
  */
 public final class ServiceDeclarationImpl
-        implements ServiceDeclaration
+    implements ServiceDeclaration
 {
     private Iterable<ServiceAssemblyImpl> serviceAssemblies;
 
@@ -35,6 +37,7 @@ public final class ServiceDeclarationImpl
         this.serviceAssemblies = serviceAssemblies;
     }
 
+    @Override
     public ServiceDeclaration visibleIn( Visibility visibility )
     {
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
@@ -44,6 +47,7 @@ public final class ServiceDeclarationImpl
         return this;
     }
 
+    @Override
     public ServiceDeclaration identifiedBy( String identity )
     {
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
@@ -59,27 +63,23 @@ public final class ServiceDeclarationImpl
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
         {
             ServiceTags previousTags = serviceAssembly.metaInfo.get( ServiceTags.class );
-            if (previousTags != null)
+            if( previousTags != null )
             {
                 List<String> tagList = new ArrayList<String>();
-                for( String tag : previousTags.tags() )
-                {
-                    tagList.add( tag );
-                }
-                for( String tag : tags )
-                {
-                    tagList.add( tag );
-                }
-                serviceAssembly.metaInfo.set( new ServiceTags( tagList.toArray( new String[tagList.size()] )) );
-            } else
+                tagList.addAll( asList( previousTags.tags() ) );
+                tagList.addAll( asList( tags ) );
+                serviceAssembly.metaInfo.set( new ServiceTags( tagList.toArray( new String[ tagList.size() ] ) ) );
+            }
+            else
             {
-                serviceAssembly.metaInfo.set( new ServiceTags(tags) );
+                serviceAssembly.metaInfo.set( new ServiceTags( tags ) );
             }
         }
 
         return this;
     }
 
+    @Override
     public ServiceDeclaration instantiateOnStartup()
     {
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
@@ -89,6 +89,7 @@ public final class ServiceDeclarationImpl
         return this;
     }
 
+    @Override
     public ServiceDeclaration setMetaInfo( Object serviceAttribute )
     {
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
@@ -98,39 +99,53 @@ public final class ServiceDeclarationImpl
         return this;
     }
 
+    @Override
     public ServiceDeclaration withConcerns( Class<?>... concerns )
     {
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
         {
-            serviceAssembly.concerns.addAll( Arrays.asList( concerns ) );
+            serviceAssembly.concerns.addAll( asList( concerns ) );
         }
         return this;
     }
 
+    @Override
     public ServiceDeclaration withSideEffects( Class<?>... sideEffects )
     {
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
         {
-            serviceAssembly.sideEffects.addAll( Arrays.asList( sideEffects ) );
+            serviceAssembly.sideEffects.addAll( asList( sideEffects ) );
         }
         return this;
     }
 
+    @Override
     public ServiceDeclaration withMixins( Class<?>... mixins )
     {
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
         {
-            serviceAssembly.mixins.addAll( Arrays.asList( mixins ) );
+            serviceAssembly.mixins.addAll( asList( mixins ) );
         }
         return this;
     }
 
+    @Override
     public ServiceDeclaration withTypes( Class<?>... types )
     {
         for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
         {
-            serviceAssembly.types.addAll( Arrays.asList( types ) );
+            serviceAssembly.types.addAll( asList( types ) );
         }
         return this;
     }
+
+    @Override
+    public ServiceDeclaration withActivators( Class<? extends Activator<?>>... activators )
+    {
+        for ( ServiceAssemblyImpl serviceAssembly : serviceAssemblies ) {
+            serviceAssembly.activators.addAll( asList( activators ) );
+        }
+        return this;
+    }
+
 }

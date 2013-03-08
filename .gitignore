@@ -1,4 +1,3 @@
-*.iws
 .idea
 .idea/**
 *.iws
@@ -7,3 +6,10 @@
 build/
 out/
 .gradle/
+derby.log
+*.classpath
+*.project
+*.settings
+*pom.xml
+*target/
+.nb-gradle-properties

@@ -19,14 +19,15 @@ package org.qi4j.entitystore.voldemort;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.service.Activatable;
+import org.qi4j.api.service.ServiceActivation;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.library.locking.LockingAbstractComposite;
 import org.qi4j.spi.entitystore.ConcurrentModificationCheckConcern;
 import org.qi4j.spi.entitystore.EntityStateVersions;
 import org.qi4j.spi.entitystore.EntityStore;
 import org.qi4j.spi.entitystore.StateChangeNotificationConcern;
-import org.qi4j.spi.entitystore.helpers.MapEntityStoreMixin;
+import org.qi4j.spi.entitystore.helpers.JSONMapEntityStoreActivation;
+import org.qi4j.spi.entitystore.helpers.JSONMapEntityStoreMixin;
 import org.qi4j.spi.entitystore.helpers.StateStore;
 
 /**
@@ -34,13 +35,14 @@ import org.qi4j.spi.entitystore.helpers.StateStore;
  */
 
 @Concerns( { StateChangeNotificationConcern.class, ConcurrentModificationCheckConcern.class } )
-@Mixins( { MapEntityStoreMixin.class, VoldemortEntityStoreMixin.class } )
+@Mixins( { JSONMapEntityStoreMixin.class, VoldemortEntityStoreMixin.class } )
 public interface VoldemortEntityStoreService
     extends EntityStore,
             EntityStateVersions,
-        StateStore,
+            StateStore,
             ServiceComposite,
-            Activatable,
+            ServiceActivation,
+            JSONMapEntityStoreActivation,
             LockingAbstractComposite,
             Configuration
 

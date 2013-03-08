@@ -1,10 +1,14 @@
 package org.qi4j.runtime.injection.provider;
 
-import org.qi4j.api.association.*;
+import org.qi4j.api.association.AbstractAssociation;
+import org.qi4j.api.association.Association;
+import org.qi4j.api.association.AssociationDescriptor;
+import org.qi4j.api.association.AssociationStateDescriptor;
+import org.qi4j.api.association.AssociationStateHolder;
+import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.composite.StateDescriptor;
 import org.qi4j.api.composite.StatefulCompositeDescriptor;
 import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.association.AssociationStateDescriptor;
 import org.qi4j.api.injection.scope.State;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.property.PropertyDescriptor;
@@ -24,6 +28,7 @@ import org.qi4j.runtime.model.Resolution;
 public final class StateInjectionProviderFactory
     implements InjectionProviderFactory
 {
+    @Override
     public InjectionProvider newInjectionProvider( Resolution resolution, DependencyModel dependencyModel )
         throws InvalidInjectionException
     {
@@ -57,7 +62,7 @@ public final class StateInjectionProviderFactory
                 name = annotation.value();
             }
 
-            PropertyDescriptor propertyDescriptor = descriptor.getPropertyByName( name );
+            PropertyDescriptor propertyDescriptor = descriptor.findPropertyModelByName( name );
 
             // Check if property exists
             if( propertyDescriptor == null )
@@ -129,6 +134,7 @@ public final class StateInjectionProviderFactory
             this.propertyDescriptor = propertyDescriptor;
         }
 
+        @Override
         public Object provideInjection( InjectionContext context )
             throws InjectionProviderException
         {
@@ -154,11 +160,12 @@ public final class StateInjectionProviderFactory
             this.associationDescriptor = associationDescriptor;
         }
 
+        @Override
         public Object provideInjection( InjectionContext context )
             throws InjectionProviderException
         {
             AbstractAssociation abstractAssociation = ( (AssociationStateHolder) context.state() ).associationFor( associationDescriptor
-                    .accessor() );
+                                                                                                                       .accessor() );
             if( abstractAssociation != null )
             {
                 return abstractAssociation;
@@ -180,11 +187,12 @@ public final class StateInjectionProviderFactory
             this.manyAssociationDescriptor = manyAssociationDescriptor;
         }
 
+        @Override
         public Object provideInjection( InjectionContext context )
             throws InjectionProviderException
         {
             ManyAssociation abstractAssociation = ( (AssociationStateHolder) context.state() ).manyAssociationFor( manyAssociationDescriptor
-                    .accessor() );
+                                                                                                                       .accessor() );
             if( abstractAssociation != null )
             {
                 return abstractAssociation;
@@ -199,6 +207,7 @@ public final class StateInjectionProviderFactory
     static private class StateInjectionProvider
         implements InjectionProvider
     {
+        @Override
         public Object provideInjection( InjectionContext context )
             throws InjectionProviderException
         {
@@ -210,6 +219,7 @@ public final class StateInjectionProviderFactory
         implements InjectionProvider
     {
 
+        @Override
         public Object provideInjection( InjectionContext context )
             throws InjectionProviderException
         {

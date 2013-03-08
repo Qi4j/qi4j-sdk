@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008, Niclas Hedhman. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +15,10 @@
 
 package org.qi4j.runtime.entity;
 
+import java.lang.reflect.Method;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.common.MetaInfo;
-import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.constraint.ConstraintViolationException;
@@ -40,14 +41,12 @@ import org.qi4j.spi.entitystore.EntityAlreadyExistsException;
 import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
+import static org.qi4j.functional.Iterables.*;
 
 /**
  * JAVADOC
  */
-public final class EntityModel
-    extends CompositeModel
+public final class EntityModel extends CompositeModel
     implements EntityDescriptor
 {
     private static final Method IDENTITY_METHOD;
@@ -66,21 +65,23 @@ public final class EntityModel
 
     private final boolean queryable;
 
-    public EntityModel( Class<?> type,
-                        Iterable<Class<?>> types,
-                         Visibility visibility,
-                         MetaInfo info,
-                         EntityMixinsModel mixinsModel,
-                         EntityStateModel stateModel,
-                         CompositeMethodsModel compositeMethodsModel
+    public EntityModel( Iterable<Class<?>> types,
+                        Visibility visibility,
+                        MetaInfo info,
+                        EntityMixinsModel mixinsModel,
+                        EntityStateModel stateModel,
+                        CompositeMethodsModel compositeMethodsModel
     )
     {
-        super( type, types, visibility, info, mixinsModel, stateModel, compositeMethodsModel );
+        super( types, visibility, info, mixinsModel, stateModel, compositeMethodsModel );
 
-        final Queryable queryable = Iterables.first( Iterables.<Queryable, Annotation>cast(Iterables.filter( Annotations.isType( Queryable.class ), Iterables.flattenIterables( Iterables.map( Annotations.ANNOTATIONS_OF, types ) ) )));
+        final Queryable queryable = first( Iterables.<Queryable>cast(
+                filter( Annotations.isType( Queryable.class ),
+                        flattenIterables( map( Annotations.ANNOTATIONS_OF, types ) ) ) ) );
         this.queryable = queryable == null || queryable.value();
     }
 
+    @Override
     public boolean queryable()
     {
         return queryable;
@@ -90,11 +91,6 @@ public final class EntityModel
     public EntityStateModel state()
     {
         return (EntityStateModel) super.state();
-    }
-
-    public boolean hasRole( Class roleType )
-    {
-        return roleType.isAssignableFrom( proxyClass );
     }
 
     public EntityInstance newInstance( ModuleUnitOfWork uow, ModuleInstance moduleInstance, EntityState state )
@@ -126,8 +122,8 @@ public final class EntityModel
             EntityState entityState = store.newEntityState( identity, this );
 
             // Set identity property
-            PropertyDescriptor persistentPropertyDescriptor = state().getProperty( IDENTITY_METHOD );
-            entityState.setProperty( persistentPropertyDescriptor.qualifiedName(), identity.identity() );
+            PropertyDescriptor persistentPropertyDescriptor = state().propertyModelFor( IDENTITY_METHOD );
+            entityState.setPropertyValue( persistentPropertyDescriptor.qualifiedName(), identity.identity() );
 
             return entityState;
         }
@@ -141,19 +137,13 @@ public final class EntityModel
         }
     }
 
-    @Override
-    public String toString()
-    {
-        return type().getName();
-    }
-
     public void initState( ModuleInstance module, EntityState entityState )
     {
         {
             // Set new properties to default value
             for( PropertyModel propertyDescriptor : state().properties() )
             {
-                entityState.setProperty( propertyDescriptor.qualifiedName(), propertyDescriptor.initialValue( module ) );
+                entityState.setPropertyValue( propertyDescriptor.qualifiedName(), propertyDescriptor.initialValue( module ) );
             }
         }
 
@@ -161,7 +151,7 @@ public final class EntityModel
             // Set new manyAssociations to null
             for( AssociationDescriptor associationDescriptor : state().associations() )
             {
-                entityState.setAssociation( associationDescriptor.qualifiedName(), null );
+                entityState.setAssociationValue( associationDescriptor.qualifiedName(), null );
             }
         }
 
@@ -169,7 +159,7 @@ public final class EntityModel
             // Set new many-manyAssociations to empty
             for( AssociationDescriptor associationDescriptor : state().manyAssociations() )
             {
-                entityState.getManyAssociation( associationDescriptor.qualifiedName() );
+                entityState.manyAssociationValueOf( associationDescriptor.qualifiedName() );
             }
         }
     }

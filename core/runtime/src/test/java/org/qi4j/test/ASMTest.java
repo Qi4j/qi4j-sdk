@@ -14,48 +14,42 @@
 
 package org.qi4j.test;
 
-import org.junit.Test;
-import org.objectweb.asm.*;
-import org.objectweb.asm.util.ASMifierClassVisitor;
-import org.qi4j.api.composite.CompositeInvoker;
-import org.qi4j.api.property.StateHolder;
-import org.qi4j.runtime.composite.FragmentClassLoader;
-
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.util.ASMifier;
+import org.objectweb.asm.util.TraceClassVisitor;
+import org.qi4j.api.composite.CompositeInvoker;
+import org.qi4j.runtime.composite.FragmentClassLoader;
+import org.qi4j.runtime.composite.QI256Test;
 
 import static org.objectweb.asm.Opcodes.*;
 
-/**
- * JAVADOC
- */
 public class ASMTest
 {
     @Test
     public void generateASM()
         throws Exception
     {
-        ASMifierClassVisitor.main( new String[]{ SomeMixin_Stubx.class.getName() } );
+        ASMifier.main( new String[]{ SomeMixin_Stubx.class.getName() } );
     }
 
     @Test
-//    @Ignore
     public void createClass()
         throws Exception
     {
-/*
-        byte[] asm = generateClass();
-
-        byte[] cl = FragmentClassLoader.generateClass( QI256Test.TestTransient.TestTransientMixin.class.getName() + "_Stub", QI256Test.TestTransient.TestTransientMixin.class );
-
-        ClassReader cr = new ClassReader( cl );
-        cr.accept( new ASMifierClassVisitor( new PrintWriter( System.out, true ) ),
-                ASMifierClassVisitor.getDefaultAttributes(),
-                0 );
-*/
-
-        //       Assert.assertArrayEquals( asm, cl );
 
         FragmentClassLoader classLoader = new FragmentClassLoader( SomeMixin.class.getClassLoader() );
 
@@ -148,9 +142,23 @@ public class ASMTest
         System.out.println( instance.testConcern() );
     }
 
-    // This is the code generated from the manual stub
+    @Test
+    @Ignore( "This was dead commented code, ~70% of this source file ... What should we do about this!?!" )
+    public void fragmentClassLoaderGenerateClassTest()
+        throws Exception
+    {
+        byte[] asm = generateClass();
+        byte[] cl = FragmentClassLoader.generateClass(
+            QI256Test.TestTransient.TestTransientMixin.class.getName() + "_Stub",
+            QI256Test.TestTransient.TestTransientMixin.class );
 
-    public static byte[] generateClass()
+        new ClassReader( cl ).accept( new TraceClassVisitor( new PrintWriter( System.out, true ) ), 0 );
+
+        Assert.assertArrayEquals( asm, cl );
+    }
+
+    // This is the code generated from the manual stub
+    private static byte[] generateClass()
     {
         ClassWriter cw = new ClassWriter( 0 );
         FieldVisitor fv;

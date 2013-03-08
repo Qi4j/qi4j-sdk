@@ -14,15 +14,14 @@
 
 package org.qi4j.spi.entitystore.helpers;
 
+import java.io.IOException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 /**
- * JAVADOC
+ * StateStore SPI.
  */
 public interface StateStore
 {
-    JSONObject getState( String id )
+    JSONObject jsonStateOf( String id )
         throws IOException;
 }

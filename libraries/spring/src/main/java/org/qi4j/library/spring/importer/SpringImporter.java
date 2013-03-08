@@ -34,6 +34,7 @@ public class SpringImporter
      * @return a service instance
      * @throws ServiceImporterException
      */
+    @Override
     public Object importService( ImportedServiceDescriptor serviceDescriptor ) throws ServiceImporterException
     {
         try
@@ -48,11 +49,7 @@ public class SpringImporter
         }
     }
 
-    public boolean isActive( Object instance )
-    {
-        return true;
-    }
-
+    @Override
     public boolean isAvailable( Object instance )
     {
         return true;

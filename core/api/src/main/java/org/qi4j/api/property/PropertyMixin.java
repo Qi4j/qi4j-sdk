@@ -14,16 +14,16 @@
 
 package org.qi4j.api.property;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.AppliesToFilter;
 import org.qi4j.api.injection.scope.State;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-
 /**
  * Generic mixin for properties.
  */
+// START SNIPPET: actual
 @AppliesTo( { PropertyMixin.PropertyFilter.class } )
 public final class PropertyMixin
     implements InvocationHandler
@@ -31,18 +31,24 @@ public final class PropertyMixin
     @State
     private StateHolder state;
 
+    @Override
     public Object invoke( Object proxy, Method method, Object[] args )
         throws Throwable
     {
         return state.propertyFor( method );
     }
 
+    /**
+     * Filter Property methods to apply generic Property Mixin.
+     */
     public static class PropertyFilter
         implements AppliesToFilter
     {
+        @Override
         public boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> modifierClass )
         {
             return Property.class.isAssignableFrom( method.getReturnType() );
         }
     }
 }
+// END SNIPPET: actual

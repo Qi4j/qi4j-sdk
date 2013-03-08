@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2007, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,41 +15,46 @@
 
 package org.qi4j.runtime.bootstrap;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.InvalidApplicationException;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.service.ServiceImporter;
 import org.qi4j.api.service.importer.InstanceImporter;
 import org.qi4j.bootstrap.ImportedServiceAssembly;
+import org.qi4j.functional.Iterables;
+import org.qi4j.runtime.activation.ActivatorsModel;
 import org.qi4j.runtime.service.ImportedServiceModel;
 
-import java.util.List;
-
 /**
- * Declaration of an imported Service. Created by {@link org.qi4j.runtime.bootstrap.ModuleAssemblyImpl#importedServices(Class[])}.
+ * Declaration of an imported Service.
+ *
+ * Created by {@link org.qi4j.runtime.bootstrap.ModuleAssemblyImpl#importedServices(Class[])}.
  */
 public final class ImportedServiceAssemblyImpl
     implements ImportedServiceAssembly
 {
-    private Class serviceType;
+    private Class<?> serviceType;
     private ModuleAssemblyImpl moduleAssembly;
     Class<? extends ServiceImporter> serviceProvider = InstanceImporter.class;
     String identity;
+    boolean importOnStartup = false;
     MetaInfo metaInfo = new MetaInfo();
     Visibility visibility = Visibility.module;
+    List<Class<? extends Activator<?>>> activators = new ArrayList<Class<? extends Activator<?>>>();
 
-    public ImportedServiceAssemblyImpl( Class serviceType,
-                                        ModuleAssemblyImpl moduleAssembly
-    )
+    public ImportedServiceAssemblyImpl( Class<?> serviceType, ModuleAssemblyImpl moduleAssembly )
     {
         this.serviceType = serviceType;
         this.moduleAssembly = moduleAssembly;
     }
 
     @Override
-    public Class<?> type()
+    public Iterable<Class<?>> types()
     {
-        return serviceType;
+        return Iterables.<Class<?>>iterable( serviceType );
     }
 
     void addImportedServiceModel( List<ImportedServiceModel> serviceModels )
@@ -65,7 +71,9 @@ public final class ImportedServiceAssemblyImpl
                                                                           visibility,
                                                                           serviceProvider,
                                                                           id,
+                                                                          importOnStartup,
                                                                           new MetaInfo( metaInfo ).withAnnotations( serviceType ),
+                                                                          new ActivatorsModel( activators ),
                                                                           moduleAssembly.name() );
             serviceModels.add( serviceModel );
         }

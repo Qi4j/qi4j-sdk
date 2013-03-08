@@ -15,7 +15,7 @@ public class PropertyWrapper
         this.next = next;
     }
 
-    public Property<Object> getNext()
+    public Property<Object> next()
     {
         return next;
     }
@@ -27,7 +27,8 @@ public class PropertyWrapper
     }
 
     @Override
-    public void set( Object newValue ) throws IllegalArgumentException, IllegalStateException
+    public void set( Object newValue )
+        throws IllegalArgumentException, IllegalStateException
     {
         next.set( newValue );
     }

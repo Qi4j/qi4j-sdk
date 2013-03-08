@@ -4,28 +4,39 @@ import org.qi4j.api.composite.Composite;
 import org.qi4j.api.property.Property;
 
 /**
- * TODO
+ * Regular expression match Specification.
  */
 public class MatchesSpecification
-        extends ExpressionSpecification
+    extends ExpressionSpecification
 {
     private PropertyFunction<String> property;
-    private String regexp;
+    private Object value;
 
     public MatchesSpecification( PropertyFunction<String> property, String regexp )
     {
         this.property = property;
-        this.regexp = regexp;
+        this.value = regexp;
     }
 
-    public PropertyFunction<String> getProperty()
+    public MatchesSpecification( PropertyFunction<String> property, Variable variable )
+    {
+        this.property = property;
+        this.value = variable;
+    }
+
+    public PropertyFunction<String> property()
     {
         return property;
     }
 
-    public String getRegexp()
+    public Object value()
     {
-        return regexp;
+        return value;
+    }
+
+    public String regexp()
+    {
+        return ( String ) value;
     }
 
     @Override
@@ -33,17 +44,20 @@ public class MatchesSpecification
     {
         Property<String> prop = property.map( item );
 
-        if (prop == null)
+        if( prop == null )
+        {
             return false;
+        }
 
         String val = prop.get();
 
-        if (val == null)
+        if( val == null )
+        {
             return false;
+        }
 
-        return val.matches( regexp );
+        return val.matches( ( String ) value );
     }
-
 
     @Override
     public String toString()
@@ -53,7 +67,7 @@ public class MatchesSpecification
             .append( property )
             .append( " matches " )
             .append( "\"" )
-            .append( regexp )
+            .append( value )
             .append( "\"" )
             .append( " )" )
             .toString();

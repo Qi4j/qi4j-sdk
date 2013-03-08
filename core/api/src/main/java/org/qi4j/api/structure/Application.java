@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008, Niclas Hedhman.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +15,37 @@
 
 package org.qi4j.api.structure;
 
-import org.qi4j.api.event.ActivationEventListenerRegistration;
-import org.qi4j.api.service.Activatable;
+import org.qi4j.api.activation.Activation;
+import org.qi4j.api.activation.ActivationEventListenerRegistration;
 
 /**
  * The Application represents a whole Qi4j application.
  */
 public interface Application
-    extends ActivationEventListenerRegistration, Activatable
+    extends ActivationEventListenerRegistration, Activation, MetaInfoHolder
 {
+    /**
+     * Application modes.
+     */
     public enum Mode
     {
-        // Application modes
-        test,           // Should be used for unit test runs. Created files etc. should be cleaned up between runs
-        development,    // Should be used during development. Typically create in-memory databases etc.
-        staging,        // Should be used in QA environments, and other production-like settings where different set of external resources are utilized.
-        production      // Should be used in production. All databases are persistent on disk etc.
+        /**
+         * Should be used for unit test runs. Created files etc. should be cleaned up between runs.
+         */
+        test,
+        /**
+         * Should be used during development. Typically create in-memory databases etc.
+         */
+        development,
+        /**
+         * Should be used in QA environments, and other production-like settings where different set of external
+         * resources are utilized.
+         */
+        staging,
+        /**
+         * Should be used in production. All databases are persistent on disk etc.
+         */
+        production
     }
 
     String name();
@@ -43,8 +59,6 @@ public interface Application
     String version();
 
     Mode mode();
-
-    <T> T metaInfo( Class<T> infoType );
 
     Layer findLayer( String layerName )
         throws IllegalArgumentException;

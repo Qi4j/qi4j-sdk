@@ -14,20 +14,38 @@
 
 package org.qi4j.api.common;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.service.*;
-import org.qi4j.api.structure.Application;
-import org.qi4j.bootstrap.*;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.List;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.qi4j.api.injection.scope.Service;
+import org.qi4j.api.injection.scope.Structure;
+import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.service.ImportedServiceDescriptor;
+import org.qi4j.api.service.ServiceActivation;
+import org.qi4j.api.service.ServiceComposite;
+import org.qi4j.api.service.ServiceFinder;
+import org.qi4j.api.service.ServiceImporter;
+import org.qi4j.api.service.ServiceImporterException;
+import org.qi4j.api.service.ServiceReference;
+import org.qi4j.api.structure.Application;
+import org.qi4j.bootstrap.ApplicationAssembler;
+import org.qi4j.bootstrap.ApplicationAssembly;
+import org.qi4j.bootstrap.ApplicationAssemblyFactory;
+import org.qi4j.bootstrap.Assembler;
+import org.qi4j.bootstrap.AssemblyException;
+import org.qi4j.bootstrap.Energy4Java;
+import org.qi4j.bootstrap.LayerAssembly;
+import org.qi4j.bootstrap.LayerName;
+import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.bootstrap.ModuleName;
+import org.qi4j.functional.Iterables;
+
+import static org.qi4j.functional.Iterables.first;
+import static org.qi4j.functional.Iterables.toArray;
 
 /**
  * Sample of how a plugin architecture could work.
@@ -37,7 +55,7 @@ import java.util.List;
 public class PluginTest
 {
     @Test
-    @Ignore( "Must fix the TODOs below." )
+    @Ignore( "Must fix the TODOs below. This example relied on ability to set Service MetaInfo at runtime, it seems it's not possible anymore." )
     public void testPlugins()
         throws Exception
     {
@@ -55,19 +73,19 @@ public class PluginTest
             throws AssemblyException
         {
             return applicationFactory.newApplicationAssembly( new Assembler[][][]
+                                                              {
                                                                   {
                                                                       {
-                                                                          {
-                                                                              new PluginAssembler(),
-                                                                              new UIAssembler(),
-                                                                          }
-                                                                      },
-                                                                      {
-                                                                          {
-                                                                              new ServiceAssembler()
-                                                                          }
+                                                                          new PluginAssembler(),
+                                                                          new UIAssembler(),
                                                                       }
-                                                                  } );
+                                                                  },
+                                                                  {
+                                                                      {
+                                                                          new ServiceAssembler()
+                                                                      }
+                                                                  }
+                                                              } );
         }
     }
 
@@ -90,10 +108,10 @@ public class PluginTest
 
     @Mixins( PluginTesterService.PluginTesterMixin.class )
     interface PluginTesterService
-        extends Activatable, ServiceComposite
+        extends ServiceActivation, ServiceComposite
     {
         class PluginTesterMixin
-            implements Activatable
+            implements ServiceActivation
         {
             @Service
             Plugin plugin;
@@ -101,14 +119,14 @@ public class PluginTest
             @Service
             PluginsService plugins;
 
-            public void activate()
+            public void activateService()
                 throws Exception
             {
                 // Use plugin
                 System.out.println( plugin.say( "Hello", "World" ) );
 
                 // Restart plugin
-                plugins.passivate();
+                plugins.passivateService();
 
                 // Plugin is now unavailable
                 try
@@ -120,13 +138,13 @@ public class PluginTest
                     // Ignore
                 }
 
-                plugins.activate();
+                plugins.activateService();
 
                 // Use plugin
                 System.out.println( plugin.say( "Hello", "World" ) );
             }
 
-            public void passivate()
+            public void passivateService()
                 throws Exception
             {
             }
@@ -188,10 +206,10 @@ public class PluginTest
 
     @Mixins( PluginsService.PluginsMixin.class )
     interface PluginsService
-        extends Activatable, ServiceComposite
+        extends ServiceComposite, ServiceActivation
     {
         class PluginsMixin
-            implements Activatable
+            implements ServiceActivation
         {
             @Structure
             ServiceFinder finder;
@@ -199,7 +217,7 @@ public class PluginTest
             ServiceReference<Plugin> plugin;
             private Application app;
 
-            public void activate()
+            public void activateService()
                 throws Exception
             {
                 Energy4Java runtime = new Energy4Java();
@@ -212,7 +230,7 @@ public class PluginTest
 //                finder.findService(Plugin.class).metaInfo().add(ServiceFinder.class, pluginFinder);
             }
 
-            public void passivate()
+            public void passivateService()
                 throws Exception
             {
                 // TODO: Niclas wrote: No clue how all this Test is supposed to work, and can't figure out to create a workaround for this.
@@ -276,27 +294,27 @@ public class PluginTest
         public Object importService( final ImportedServiceDescriptor serviceDescriptor )
             throws ServiceImporterException
         {
-            return Proxy.newProxyInstance( serviceDescriptor.type()
-                                               .getClassLoader(), new Class[]{ serviceDescriptor.type() }, new InvocationHandler()
-            {
-                public Object invoke( Object proxy, Method method, Object[] args )
-                    throws Throwable
+            final Class<?> mainType = first( serviceDescriptor.types() );
+            
+            Class[] interfaces = toArray( Class.class, Iterables.<Class>cast( serviceDescriptor.types() ) );
+            return Proxy.newProxyInstance(
+                mainType.getClassLoader(),
+                interfaces,
+                new InvocationHandler()
                 {
-                    ServiceFinder finder = serviceDescriptor.metaInfo( ServiceFinder.class );
-                    if( finder == null )
+                    public Object invoke( Object proxy, Method method, Object[] args )
+                        throws Throwable
                     {
-                        throw new ServiceImporterException( "No ServiceFinder specified for imported service " + serviceDescriptor
-                            .identity() );
+                        ServiceFinder finder = serviceDescriptor.metaInfo( ServiceFinder.class );
+                        if( finder == null )
+                        {
+                            throw new ServiceImporterException( "No ServiceFinder specified for imported service " + serviceDescriptor
+                                .identity() );
+                        }
+                        Object service = finder.findService( mainType ).get();
+                        return method.invoke( service, args );
                     }
-                    Object service = finder.findService( serviceDescriptor.type() ).get();
-                    return method.invoke( service, args );
-                }
-            } );
-        }
-
-        public boolean isActive( Object instance )
-        {
-            return true;
+                } );
         }
 
         public boolean isAvailable( Object instance )

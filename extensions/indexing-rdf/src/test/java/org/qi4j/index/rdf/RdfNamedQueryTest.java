@@ -18,6 +18,7 @@
 package org.qi4j.index.rdf;
 
 import org.qi4j.api.composite.Composite;
+import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.functional.Specification;
@@ -27,6 +28,7 @@ import org.qi4j.library.rdf.entity.EntityStateSerializer;
 import org.qi4j.library.rdf.entity.EntityTypeSerializer;
 import org.qi4j.library.rdf.repository.MemoryRepositoryService;
 import org.qi4j.test.indexing.AbstractNamedQueryTest;
+import org.qi4j.valueserialization.orgjson.OrgJsonValueSerializationService;
 
 public class RdfNamedQueryTest extends AbstractNamedQueryTest
 {
@@ -48,6 +50,7 @@ public class RdfNamedQueryTest extends AbstractNamedQueryTest
     {
         super.assemble( module );
         module.services( MemoryRepositoryService.class, RdfQueryParserFactory.class ).instantiateOnStartup();
+        module.services( OrgJsonValueSerializationService.class ).taggedWith( ValueSerialization.Formats.JSON );
         module.objects( EntityStateSerializer.class, EntityTypeSerializer.class );
         module.services( RdfIndexingEngineService.class );
     }
@@ -242,14 +245,7 @@ public class RdfNamedQueryTest extends AbstractNamedQueryTest
             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" + "SELECT DISTINCT ?identity\n"
             + "WHERE {\n" + "?entityType rdfs:subClassOf <urn:qi4j:type:org.qi4j.test.indexing.model.Domain>. \n"
             + "?entity rdf:type ?entityType. \n" + "?entity ns0:identity ?identity. \n" + "?entity ns1:name ?v0. \n"
-            + "FILTER (?v0 = ?domain)\n" + "}", // script24
+            + "FILTER (?v0 = ?domain)\n" + "}" // script24
 
-        "", // script25
-        "", // script26
-        "", // script27
-        "", // script28
-        "", // script29
-        "", // script30
-        "" // script31
     };
 }

@@ -14,6 +14,10 @@
 
 package org.qi4j.spi.entitystore;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
@@ -22,13 +26,8 @@ import org.qi4j.api.usecase.Usecase;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 /**
- * JAVADOC
+ * Entity versions state.
  */
 @Mixins( EntityStateVersions.EntityStateVersionsMixin.class )
 public interface EntityStateVersions
@@ -40,6 +39,9 @@ public interface EntityStateVersions
     void checkForConcurrentModification( Iterable<EntityState> loaded, Module module, long currentTime )
         throws ConcurrentEntityStateModificationException;
 
+    /**
+     * Entity versions state mixin.
+     */
     class EntityStateVersionsMixin
         implements EntityStateVersions
     {
@@ -48,6 +50,7 @@ public interface EntityStateVersions
 
         private final Map<EntityReference, String> versions = new WeakHashMap<EntityReference, String>();
 
+        @Override
         public synchronized void forgetVersions( Iterable<EntityState> states )
         {
             for( EntityState state : states )
@@ -56,12 +59,17 @@ public interface EntityStateVersions
             }
         }
 
+        @Override
         public synchronized void rememberVersion( EntityReference identity, String version )
         {
             versions.put( identity, version );
         }
 
-        public synchronized void checkForConcurrentModification( Iterable<EntityState> loaded, Module module, long currentTime )
+        @Override
+        public synchronized void checkForConcurrentModification( Iterable<EntityState> loaded,
+                                                                 Module module,
+                                                                 long currentTime
+        )
             throws ConcurrentEntityStateModificationException
         {
             List<EntityReference> changed = null;
@@ -76,7 +84,7 @@ public interface EntityStateVersions
                 if( storeVersion == null )
                 {
                     EntityStoreUnitOfWork unitOfWork = store.newUnitOfWork( Usecase.DEFAULT, module, currentTime );
-                    EntityState state = unitOfWork.getEntityState( entityState.identity() );
+                    EntityState state = unitOfWork.entityStateOf( entityState.identity() );
                     storeVersion = state.version();
                     unitOfWork.discard();
                 }

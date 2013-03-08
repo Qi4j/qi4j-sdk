@@ -1,12 +1,10 @@
 package org.qi4j.runtime.value;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.value.ValueBuilder;
-import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
@@ -14,7 +12,6 @@ import org.qi4j.test.AbstractQi4jTest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-@Ignore( "Wait for fix for QI-328")
 public class ValueCompositeBasicsTest
     extends AbstractQi4jTest
 {
@@ -30,6 +27,7 @@ public class ValueCompositeBasicsTest
     {
         ValueBuilder<SomeValue> builder = module.newValueBuilder( SomeValue.class );
         builder.prototypeFor( SomeInternalState.class ).name().set( "Niclas" );
+        assertEquals("Niclas", builder.prototype().name());
         SomeValue value1 = builder.newInstance();
         SomeValue value2 = builder.newInstance();
         builder.prototypeFor( SomeInternalState.class ).name().set( "Niclas2" );
@@ -44,7 +42,7 @@ public class ValueCompositeBasicsTest
         ValueBuilder<SomeValue> builder = module.newValueBuilder( SomeValue.class );
         builder.prototypeFor( SomeInternalState.class ).name().set( "Niclas" );
         SomeValue underTest = builder.newInstance();
-        assertEquals( "{name: \"Niclas\"}", underTest.toString() );
+        assertEquals( "{\"name\":\"Niclas\"}", underTest.toString() );
     }
 
     @Test
@@ -53,7 +51,7 @@ public class ValueCompositeBasicsTest
         ValueBuilder<SomeValue> builder = module.newValueBuilder( SomeValue.class );
         builder.prototypeFor( SomeInternalState.class ).name().set( "Niclas" );
         SomeValue underTest = builder.newInstance();
-        assertEquals( "{name: \"Niclas\"}", underTest.toString() );
+        assertEquals( "{\"name\":\"Niclas\"}", underTest.toString() );
     }
 
     public abstract static class SomeMixin
@@ -71,7 +69,7 @@ public class ValueCompositeBasicsTest
 
     @Mixins( SomeMixin.class )
     public interface SomeValue
-        extends ValueComposite
+        //extends ValueComposite
     {
         String name();
     }

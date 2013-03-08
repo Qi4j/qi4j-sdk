@@ -20,10 +20,9 @@
  */
 package org.qi4j.api.query;
 
+import java.io.Serializable;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.grammar.OrderBy;
-
-import java.io.Serializable;
 
 /**
  * This represents a Query in an indexing system. It is created from a
@@ -48,9 +47,24 @@ public interface Query<T>
      */
     Query<T> orderBy( OrderBy... segments );
 
+    /**
+     * Append an ordering rule to the existing segments.
+     *
+     * @param property the property to order by
+     * @param order the order to apply
+     *
+     * @return the Query
+     */
     Query<T> orderBy( final Property<?> property, final OrderBy.Order order );
 
-    Query<T> orderBy( Property<?> property);
+    /**
+     * Append an ascending ordering rule to the existing segments.
+     *
+     * @param property the property to order by
+     *
+     * @return the Query
+     */
+    Query<T> orderBy( Property<?> property );
 
     /**
      * Set the index of the first result. Default is 0 (zero).
@@ -75,7 +89,7 @@ public interface Query<T>
      * Get the first Entity that matches the criteria. This
      * executes the Query.
      *
-     * @return the first found Entity
+     * @return the first found Entity or null if none were found
      *
      * @throws QueryExecutionException if the query fails
      */

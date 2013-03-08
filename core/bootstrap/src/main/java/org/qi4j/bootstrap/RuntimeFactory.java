@@ -1,12 +1,19 @@
 package org.qi4j.bootstrap;
 
+/**
+ * Qi4j runtime factory.
+ */
 public interface RuntimeFactory
 {
     Qi4jRuntime createRuntime();
 
+    /**
+     * Standalone application Qi4j runtime factory.
+     */
     public final class StandaloneApplicationRuntimeFactory
         implements RuntimeFactory
     {
+        @Override
         public Qi4jRuntime createRuntime()
         {
             ClassLoader loader = getClass().getClassLoader();
@@ -22,12 +29,12 @@ public interface RuntimeFactory
             catch( InstantiationException e )
             {
                 System.err.println( "Invalid Qi4j Runtime class. If you are providing your own Qi4j Runtime, please " +
-                                    "contact qi4j-dev@lists.ops4j.org for assistance." );
+                                    "contact qi4j-dev at Google Groups for assistance." );
             }
             catch( IllegalAccessException e )
             {
                 System.err.println( "Invalid Qi4j Runtime class. If you are providing your own Qi4j Runtime, please " +
-                                    "contact qi4j-dev@lists.ops4j.org for assistance." );
+                                    "contact qi4j-dev at Google Groups for assistance." );
             }
             return null;
         }

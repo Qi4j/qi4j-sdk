@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008, Niclas Hedhman.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -11,16 +12,15 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.api.structure;
 
+import org.qi4j.api.activation.ActivationEventListenerRegistration;
 import org.qi4j.api.composite.TransientBuilderFactory;
 import org.qi4j.api.composite.TransientDescriptor;
 import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.event.ActivationEventListenerRegistration;
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.object.ObjectFactory;
 import org.qi4j.api.object.ObjectDescriptor;
+import org.qi4j.api.object.ObjectFactory;
 import org.qi4j.api.query.QueryBuilderFactory;
 import org.qi4j.api.service.ServiceFinder;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
@@ -34,42 +34,46 @@ import org.qi4j.api.value.ValueDescriptor;
  */
 public interface Module
     extends ActivationEventListenerRegistration,
-        TransientBuilderFactory,
-        ObjectFactory,
-        ValueBuilderFactory,
-        UnitOfWorkFactory,
-        QueryBuilderFactory,
-        ServiceFinder
+            MetaInfoHolder,
+            ObjectFactory,
+            TransientBuilderFactory,
+            ValueBuilderFactory,
+            UnitOfWorkFactory,
+            QueryBuilderFactory,
+            ServiceFinder
 {
+
+    /**
+     * @return the Module's name
+     */
     String name();
 
-    <T> T metaInfo( Class<T> infoType );
-
-    @Deprecated
-    TransientBuilderFactory transientBuilderFactory();
-
-    @Deprecated
-    ObjectFactory objectFactory();
-
-    @Deprecated
-    ValueBuilderFactory valueBuilderFactory();
-
-    @Deprecated
-    UnitOfWorkFactory unitOfWorkFactory();
-
-    @Deprecated
-    QueryBuilderFactory queryBuilderFactory();
-
-    @Deprecated
-    ServiceFinder serviceFinder();
-
+    /**
+     * @return the Module's ClassLoader
+     */
     ClassLoader classLoader();
 
+    /**
+     * @param typeName name of a transient composite type
+     * @return the descriptor for a transient composite or null if the class could not be found or the transient composite is not visible
+     */
     TransientDescriptor transientDescriptor( String typeName );
 
+    /**
+     * @param typeName name of an entity composite type
+     * @return the descriptor for an entity composite or null if the class could not be found or the entity composite is not visible
+     */
     EntityDescriptor entityDescriptor( String typeName );
 
+    /**
+     * @param typeName name of an object type
+     * @return the descriptor for an object or null if the class could not be found or the object is not visible
+     */
     ObjectDescriptor objectDescriptor( String typeName );
 
+    /**
+     * @param typeName name of a value composite type
+     * @return the descriptor for a value composite or null if the class could not be found or the value composite is not visible
+     */
     ValueDescriptor valueDescriptor( String typeName );
 }

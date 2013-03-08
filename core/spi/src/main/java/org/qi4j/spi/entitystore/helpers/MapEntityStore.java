@@ -11,54 +11,97 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.spi.entitystore.helpers;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.io.Input;
 import org.qi4j.spi.entitystore.EntityNotFoundException;
 import org.qi4j.spi.entitystore.EntityStoreException;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-
 /**
- * JAVADOC
+ * MapEntityStore.
  */
 public interface MapEntityStore
 {
-    // JSON keys for values in the stored data
 
+    /**
+     * JSON keys for values in the stored data.
+     */
     enum JSONKeys
     {
-        identity,           // Identity of the entity
-        application_version,// Version of the application which last updated the entity
-        type,               // Type of the entity
-        version,            // Version of the entity
-        modified,           // When entity was last modified according to System.currentTimeMillis()
-        properties,         // Map of properties
-        associations,       // Map of associations
-        manyassociations    // Map of manyassociations
+
+        /**
+         * Identity of the entity.
+         */
+        identity,
+        /**
+         * Version of the application which last updated the entity.
+         */
+        application_version,
+        /**
+         * Type of the entity.
+         */
+        type,
+        /**
+         * Version of the entity.
+         */
+        version,
+        /**
+         * When entity was last modified according to System.currentTimeMillis().
+         */
+        modified,
+        /**
+         * Map of properties.
+         */
+        properties,
+        /**
+         * Map of associations.
+         */
+        associations,
+        /**
+         * Map of manyassociations.
+         */
+        manyassociations
     }
 
+    /**
+     * @return Entity state Reader
+     */
     Reader get( EntityReference entityReference )
         throws EntityStoreException;
 
+    /**
+     * @return All entities state Readers
+     */
     Input<Reader, IOException> entityStates();
 
     void applyChanges( MapChanges changes )
         throws IOException;
 
+    /**
+     * Changes to be applied on a MapEntityStore.
+     */
     interface MapChanges
     {
+
+        /**
+         * Visitable MapChanges.
+         */
         void visitMap( MapChanger changer )
             throws IOException;
+
     }
 
+    /**
+     * MapEntityStore changes applier.
+     */
     interface MapChanger
     {
+
         Writer newEntity( EntityReference ref, EntityDescriptor entityDescriptor )
             throws IOException;
 
@@ -67,5 +110,7 @@ public interface MapEntityStore
 
         void removeEntity( EntityReference ref, EntityDescriptor entityDescriptor )
             throws EntityNotFoundException;
+
     }
+
 }

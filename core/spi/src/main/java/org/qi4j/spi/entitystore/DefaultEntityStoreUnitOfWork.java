@@ -14,16 +14,15 @@
 
 package org.qi4j.spi.entitystore;
 
+import java.util.LinkedList;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.spi.entity.EntityState;
 
-import java.util.LinkedList;
-
 /**
- * JAVADOC
+ * Default EntityStore UnitOfWork.
  */
 public final class DefaultEntityStoreUnitOfWork
     implements EntityStoreUnitOfWork
@@ -39,7 +38,8 @@ public final class DefaultEntityStoreUnitOfWork
                                          String identity,
                                          Module module,
                                          Usecase usecase,
-                                         long currentTime )
+                                         long currentTime
+    )
     {
         this.entityStoreSPI = entityStoreSPI;
         this.identity = identity;
@@ -48,6 +48,7 @@ public final class DefaultEntityStoreUnitOfWork
         this.currentTime = currentTime;
     }
 
+    @Override
     public String identity()
     {
         return identity;
@@ -58,6 +59,7 @@ public final class DefaultEntityStoreUnitOfWork
         return module;
     }
 
+    @Override
     public long currentTime()
     {
         return currentTime;
@@ -70,6 +72,7 @@ public final class DefaultEntityStoreUnitOfWork
 
     // EntityStore
 
+    @Override
     public EntityState newEntityState( EntityReference anIdentity, EntityDescriptor descriptor )
         throws EntityStoreException
     {
@@ -78,20 +81,23 @@ public final class DefaultEntityStoreUnitOfWork
         return state;
     }
 
-    public EntityState getEntityState( EntityReference anIdentity )
+    @Override
+    public EntityState entityStateOf( EntityReference anIdentity )
         throws EntityStoreException, EntityNotFoundException
     {
-        EntityState entityState = entityStoreSPI.getEntityState( this, anIdentity );
+        EntityState entityState = entityStoreSPI.entityStateOf( this, anIdentity );
         states.add( entityState );
         return entityState;
     }
 
+    @Override
     public StateCommitter applyChanges()
         throws EntityStoreException
     {
         return entityStoreSPI.applyChanges( this, states );
     }
 
+    @Override
     public void discard()
     {
     }

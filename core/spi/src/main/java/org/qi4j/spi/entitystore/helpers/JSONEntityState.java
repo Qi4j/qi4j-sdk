@@ -1,4 +1,7 @@
-/*  Copyright 2007 Niclas Hedhman.
+/*
+ * Copyright 2007, Niclas Hedhman. All Rights Reserved.
+ * Copyright 2009, Rickard Öberg. All Rights Reserved.
+ * Copyright 2013, Paul Merlin. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +25,10 @@ import org.json.JSONObject;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
-import org.qi4j.api.json.JSONDeserializer;
-import org.qi4j.api.json.JSONObjectSerializer;
 import org.qi4j.api.property.PropertyDescriptor;
-import org.qi4j.api.structure.Module;
+import org.qi4j.api.type.ValueType;
+import org.qi4j.api.value.ValueSerialization;
+import org.qi4j.api.value.ValueSerializationException;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entity.ManyAssociationState;
@@ -55,22 +58,25 @@ public final class JSONEntityState
         JSON_KEY_MODIFIED
     };
 
-    protected DefaultEntityStoreUnitOfWork unitOfWork;
-    protected EntityStatus status;
-    protected String version;
-
-    protected long lastModified;
+    private final DefaultEntityStoreUnitOfWork unitOfWork;
+    private final ValueSerialization valueSerialization;
+    private final String version;
     private final EntityReference identity;
     private final EntityDescriptor entityDescriptor;
-    protected JSONObject state;
 
-    public JSONEntityState( DefaultEntityStoreUnitOfWork unitOfWork,
-                            EntityReference identity,
-                            EntityDescriptor entityDescriptor,
-                            JSONObject initialState
-    )
+    private EntityStatus status;
+    private long lastModified;
+    private JSONObject state;
+
+    /* package */ JSONEntityState( DefaultEntityStoreUnitOfWork unitOfWork,
+                                   ValueSerialization valueSerialization,
+                                   EntityReference identity,
+                                   EntityDescriptor entityDescriptor,
+                                   JSONObject initialState )
     {
-        this( unitOfWork, "",
+        this( unitOfWork,
+              valueSerialization,
+              "",
               unitOfWork.currentTime(),
               identity,
               EntityStatus.NEW,
@@ -78,16 +84,18 @@ public final class JSONEntityState
               initialState );
     }
 
-    public JSONEntityState( DefaultEntityStoreUnitOfWork unitOfWork,
-                            String version,
-                            long lastModified,
-                            EntityReference identity,
-                            EntityStatus status,
-                            EntityDescriptor entityDescriptor,
-                            JSONObject state
+    /* package */ JSONEntityState( DefaultEntityStoreUnitOfWork unitOfWork,
+                                   ValueSerialization valueSerialization,
+                                   String version,
+                                   long lastModified,
+                                   EntityReference identity,
+                                   EntityStatus status,
+                                   EntityDescriptor entityDescriptor,
+                                   JSONObject state
     )
     {
         this.unitOfWork = unitOfWork;
+        this.valueSerialization = valueSerialization;
         this.version = version;
         this.lastModified = lastModified;
         this.identity = identity;
@@ -98,42 +106,47 @@ public final class JSONEntityState
 
     // EntityState implementation
 
+    @Override
     public final String version()
     {
         return version;
     }
 
+    @Override
     public long lastModified()
     {
         return lastModified;
     }
 
+    @Override
     public EntityReference identity()
     {
         return identity;
     }
 
-    public Object getProperty( QualifiedName stateName )
+    @Override
+    public Object propertyValueOf( QualifiedName stateName )
     {
         try
         {
             Object json = state.getJSONObject( JSON_KEY_PROPERTIES ).opt( stateName.name() );
-            if( json == null || json == JSONObject.NULL )
+            if( JSONObject.NULL.equals( json ) )
             {
                 return null;
             }
             else
             {
-                Module module = unitOfWork.module();
-                PropertyDescriptor descriptor = entityDescriptor.state().getPropertyByQualifiedName( stateName );
-
-                if (descriptor == null)
+                PropertyDescriptor descriptor = entityDescriptor.state().findPropertyModelByQualifiedName( stateName );
+                if( descriptor == null )
+                {
                     return null;
-
-                JSONDeserializer deserializer = new JSONDeserializer( module );
-
-                return deserializer.deserialize( json, descriptor.valueType() );
+                }
+                return valueSerialization.deserialize( descriptor.valueType(), json.toString() );
             }
+        }
+        catch( ValueSerializationException e )
+        {
+            throw new EntityStoreException( e );
         }
         catch( JSONException e )
         {
@@ -141,27 +154,39 @@ public final class JSONEntityState
         }
     }
 
-    public void setProperty( QualifiedName stateName, Object newValue )
+    @Override
+    public void setPropertyValue( QualifiedName stateName, Object newValue )
     {
         try
         {
             Object jsonValue;
-            if( newValue == null )
+            if( newValue == null || ValueType.isPrimitiveValue( newValue ) )
             {
-                jsonValue = JSONObject.NULL;
+                jsonValue = newValue;
             }
             else
             {
-                PropertyDescriptor persistentPropertyDescriptor = entityDescriptor.state()
-                    .getPropertyByQualifiedName( stateName );
-
-                JSONObjectSerializer serializer = new JSONObjectSerializer();
-                serializer.serialize( newValue, persistentPropertyDescriptor.valueType() );
-                jsonValue = serializer.getRoot();
+                String serialized = valueSerialization.serialize( newValue );
+                if( serialized.startsWith( "{" ) )
+                {
+                    jsonValue = new JSONObject( serialized );
+                }
+                else if( serialized.startsWith( "[" ) )
+                {
+                    jsonValue = new JSONArray( serialized );
+                }
+                else
+                {
+                    jsonValue = serialized;
+                }
             }
             cloneStateIfGlobalStateLoaded();
             state.getJSONObject( JSON_KEY_PROPERTIES ).put( stateName.name(), jsonValue );
             markUpdated();
+        }
+        catch( ValueSerializationException e )
+        {
+            throw new EntityStoreException( e );
         }
         catch( JSONException e )
         {
@@ -180,7 +205,8 @@ public final class JSONEntityState
         return new JSONObject( jsonObject, names );
     }
 
-    public EntityReference getAssociation( QualifiedName stateName )
+    @Override
+    public EntityReference associationValueOf( QualifiedName stateName )
     {
         try
         {
@@ -200,7 +226,8 @@ public final class JSONEntityState
         }
     }
 
-    public void setAssociation( QualifiedName stateName, EntityReference newEntity )
+    @Override
+    public void setAssociationValue( QualifiedName stateName, EntityReference newEntity )
     {
         try
         {
@@ -215,7 +242,8 @@ public final class JSONEntityState
         }
     }
 
-    public ManyAssociationState getManyAssociation( QualifiedName stateName )
+    @Override
+    public ManyAssociationState manyAssociationValueOf( QualifiedName stateName )
     {
         try
         {
@@ -234,11 +262,13 @@ public final class JSONEntityState
         }
     }
 
+    @Override
     public void remove()
     {
         status = EntityStatus.REMOVED;
     }
 
+    @Override
     public EntityStatus status()
     {
         return status;
@@ -250,6 +280,7 @@ public final class JSONEntityState
         return entityDescriptor.isAssignableTo( type );
     }
 
+    @Override
     public EntityDescriptor entityDescriptor()
     {
         return entityDescriptor;

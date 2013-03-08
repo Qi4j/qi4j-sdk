@@ -1,20 +1,20 @@
 package org.qi4j.api.query.grammar;
 
 /**
- * TODO
+ * Less or equals Specification.
  */
 public class LeSpecification<T>
-        extends ComparisonSpecification<T>
+    extends ComparisonSpecification<T>
 {
     public LeSpecification( PropertyFunction<T> property, T value )
     {
-        super(property, value);
+        super( property, value );
     }
 
     @Override
     protected boolean compare( T value )
     {
-        return ((Comparable) value).compareTo( this.value ) <= 0;
+        return ( (Comparable) value ).compareTo( this.value ) <= 0;
     }
 
     @Override

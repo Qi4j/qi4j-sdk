@@ -13,12 +13,11 @@
  */
 package org.qi4j.api.service.qualifier;
 
-import org.qi4j.api.service.ServiceReference;
-import org.qi4j.functional.Specification;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import org.qi4j.api.service.ServiceReference;
+import org.qi4j.functional.Specification;
 
 /**
  * Filter services based on Meta Info being declared on the Service. Meta Info of any type can be set on the service
@@ -56,13 +55,19 @@ public @interface HasMetaInfo
      */
     boolean anded() default false;
 
+    /**
+     * HasMetaInfo Annotation Qualifier.
+     * See {@see HasMetaInfo}.
+     */
     public static class HasMetaInfoQualifier
         implements AnnotationQualifier<HasMetaInfo>
     {
+        @Override
         public <T> Specification<ServiceReference<?>> qualifier( final HasMetaInfo hasMetaInfo )
         {
             return new Specification<ServiceReference<?>>()
             {
+                @Override
                 public boolean satisfiedBy( ServiceReference<?> service )
                 {
                     for( Class metaInfoType : hasMetaInfo.value() )

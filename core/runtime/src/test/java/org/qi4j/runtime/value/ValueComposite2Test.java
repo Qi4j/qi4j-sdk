@@ -17,8 +17,10 @@
  */
 package org.qi4j.runtime.value;
 
+import java.security.Guard;
 import org.junit.Assert;
 import org.junit.Test;
+import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.composite.InvalidValueCompositeException;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
@@ -33,12 +35,11 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
 
-import java.security.Guard;
-
 public class ValueComposite2Test
 {
     @Test
     public void testServiceAndStructureInjectionsAllowedInValueComposite()
+        throws ActivationException, AssemblyException
     {
         SingletonAssembler app = new SingletonAssembler()
         {
@@ -57,8 +58,9 @@ public class ValueComposite2Test
         Assert.assertEquals( value.other().get(), "Abc" );
     }
 
-    @Test( expected = InvalidValueCompositeException.class )
-    public void testNoUsesAllowedInValueComposite()
+    @Test( expected = AssemblyException.class )
+    public void testUsesAnnotationIsNotAllowedInValueComposite()
+        throws ActivationException, AssemblyException
     {
         new SingletonAssembler()
         {

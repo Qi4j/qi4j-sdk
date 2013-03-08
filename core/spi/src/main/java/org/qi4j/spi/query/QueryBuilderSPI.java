@@ -3,9 +3,9 @@ package org.qi4j.spi.query;
 import org.qi4j.api.query.Query;
 
 /**
- * TODO
+ * QueryBuilder SPI.
  */
 public interface QueryBuilderSPI<T>
 {
-    Query<T> newQuery(QuerySource querySource );
+    Query<T> newQuery( QuerySource querySource );
 }

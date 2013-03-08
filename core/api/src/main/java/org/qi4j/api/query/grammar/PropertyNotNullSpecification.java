@@ -4,19 +4,19 @@ import org.qi4j.api.composite.Composite;
 import org.qi4j.api.property.Property;
 
 /**
- * TODO
+ * Property not null Specification.
  */
 public class PropertyNotNullSpecification<T>
-        extends ExpressionSpecification
+    extends ExpressionSpecification
 {
-    PropertyFunction<T> property;
+    private PropertyFunction<T> property;
 
     public PropertyNotNullSpecification( PropertyFunction<T> property )
     {
         this.property = property;
     }
 
-    public PropertyFunction<T> getProperty()
+    public PropertyFunction<T> property()
     {
         return property;
     }
@@ -26,8 +26,10 @@ public class PropertyNotNullSpecification<T>
     {
         Property<T> prop = property.map( item );
 
-        if (prop == null)
+        if( prop == null )
+        {
             return false;
+        }
 
         return prop.get() != null;
     }
@@ -35,6 +37,6 @@ public class PropertyNotNullSpecification<T>
     @Override
     public String toString()
     {
-        return property.toString()+ "is not null";
+        return property.toString() + "is not null";
     }
 }

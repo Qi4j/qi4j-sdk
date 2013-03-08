@@ -5,11 +5,12 @@ import org.qi4j.functional.Specification;
 import org.qi4j.functional.Specifications;
 
 /**
-* TODO
-*/
+ * OR Specification.
+ */
 public class OrSpecification
     extends BinarySpecification
 {
+
     public OrSpecification( Iterable<Specification<Composite>> operands )
     {
         super( operands );
@@ -24,15 +25,14 @@ public class OrSpecification
     @Override
     public String toString()
     {
-        String str = "(";
+        StringBuilder sb = new StringBuilder( "(" );
         String or = "";
         for( Specification<Composite> operand : operands )
         {
-            str += or+operand;
+            sb.append( or ).append( operand );
             or = " or ";
         }
-        str+=")";
-
-        return str;
+        return sb.append( ")" ).toString();
     }
+
 }

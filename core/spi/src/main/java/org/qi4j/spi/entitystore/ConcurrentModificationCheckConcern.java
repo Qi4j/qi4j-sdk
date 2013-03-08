@@ -14,6 +14,8 @@
 
 package org.qi4j.spi.entitystore;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.qi4j.api.Qi4j;
 import org.qi4j.api.concern.ConcernOf;
 import org.qi4j.api.entity.EntityDescriptor;
@@ -23,9 +25,6 @@ import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.spi.entity.EntityState;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Concern that helps EntityStores do concurrent modification checks.
@@ -45,13 +44,14 @@ public abstract class ConcurrentModificationCheckConcern
     @Structure
     private Qi4j api;
 
+    @Override
     public EntityStoreUnitOfWork newUnitOfWork( Usecase usecase, Module module, long currentTime )
     {
         final EntityStoreUnitOfWork uow = next.newUnitOfWork( usecase, module, currentTime );
         return new ConcurrentCheckingEntityStoreUnitOfWork( uow, api.dereference( versions ), module, currentTime );
     }
 
-    private class ConcurrentCheckingEntityStoreUnitOfWork
+    private static class ConcurrentCheckingEntityStoreUnitOfWork
         implements EntityStoreUnitOfWork
     {
         private final EntityStoreUnitOfWork uow;
@@ -64,7 +64,8 @@ public abstract class ConcurrentModificationCheckConcern
         public ConcurrentCheckingEntityStoreUnitOfWork( EntityStoreUnitOfWork uow,
                                                         EntityStateVersions versions,
                                                         Module module,
-                                                        long currentTime )
+                                                        long currentTime
+        )
         {
             this.uow = uow;
             this.versions = versions;
@@ -72,6 +73,7 @@ public abstract class ConcurrentModificationCheckConcern
             this.currentTime = currentTime;
         }
 
+        @Override
         public String identity()
         {
             return uow.identity();
@@ -83,12 +85,14 @@ public abstract class ConcurrentModificationCheckConcern
             return uow.currentTime();
         }
 
+        @Override
         public EntityState newEntityState( EntityReference anIdentity, EntityDescriptor entityDescriptor )
             throws EntityStoreException
         {
             return uow.newEntityState( anIdentity, entityDescriptor );
         }
 
+        @Override
         public StateCommitter applyChanges()
             throws EntityStoreException
         {
@@ -98,12 +102,14 @@ public abstract class ConcurrentModificationCheckConcern
 
             return new StateCommitter()
             {
+                @Override
                 public void commit()
                 {
                     committer.commit();
                     versions.forgetVersions( loaded );
                 }
 
+                @Override
                 public void cancel()
                 {
                     committer.cancel();
@@ -112,6 +118,7 @@ public abstract class ConcurrentModificationCheckConcern
             };
         }
 
+        @Override
         public void discard()
         {
             try
@@ -124,10 +131,11 @@ public abstract class ConcurrentModificationCheckConcern
             }
         }
 
-        public EntityState getEntityState( EntityReference anIdentity )
+        @Override
+        public EntityState entityStateOf( EntityReference anIdentity )
             throws EntityStoreException, EntityNotFoundException
         {
-            EntityState entityState = uow.getEntityState( anIdentity );
+            EntityState entityState = uow.entityStateOf( anIdentity );
             versions.rememberVersion( entityState.identity(), entityState.version() );
             loaded.add( entityState );
             return entityState;

@@ -3,32 +3,31 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *  
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
  * implied.
- * 
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 package org.qi4j.spi.entitystore.helpers;
 
-import org.qi4j.api.common.QualifiedName;
-import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.spi.entity.EntityState;
-import org.qi4j.spi.entity.EntityStatus;
-import org.qi4j.spi.entity.ManyAssociationState;
-import org.qi4j.spi.entitystore.DefaultEntityStoreUnitOfWork;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.qi4j.api.common.QualifiedName;
+import org.qi4j.api.entity.EntityDescriptor;
+import org.qi4j.api.entity.EntityReference;
+import org.qi4j.api.util.Classes;
+import org.qi4j.spi.entity.EntityState;
+import org.qi4j.spi.entity.EntityStatus;
+import org.qi4j.spi.entity.ManyAssociationState;
+import org.qi4j.spi.entitystore.DefaultEntityStoreUnitOfWork;
 
 /**
  * Standard implementation of EntityState.
@@ -88,44 +87,52 @@ public final class DefaultEntityState
 
     // EntityState implementation
 
+    @Override
     public final String version()
     {
         return version;
     }
 
+    @Override
     public long lastModified()
     {
         return lastModified;
     }
 
+    @Override
     public EntityReference identity()
     {
         return identity;
     }
 
-    public Object getProperty( QualifiedName stateName )
+    @Override
+    public Object propertyValueOf( QualifiedName stateName )
     {
         return properties.get( stateName );
     }
 
-    public void setProperty( QualifiedName stateName, Object newValue )
+    @Override
+    public void setPropertyValue( QualifiedName stateName, Object newValue )
     {
         properties.put( stateName, newValue );
         markUpdated();
     }
 
-    public EntityReference getAssociation( QualifiedName stateName )
+    @Override
+    public EntityReference associationValueOf( QualifiedName stateName )
     {
         return associations.get( stateName );
     }
 
-    public void setAssociation( QualifiedName stateName, EntityReference newEntity )
+    @Override
+    public void setAssociationValue( QualifiedName stateName, EntityReference newEntity )
     {
         associations.put( stateName, newEntity );
         markUpdated();
     }
 
-    public ManyAssociationState getManyAssociation( QualifiedName stateName )
+    @Override
+    public ManyAssociationState manyAssociationValueOf( QualifiedName stateName )
     {
         List<EntityReference> manyAssociationState = manyAssociations.get( stateName );
         if( manyAssociationState == null )
@@ -164,21 +171,25 @@ public final class DefaultEntityState
         entityState.lastModified = lastModified;
     }
 
+    @Override
     public void remove()
     {
         status = EntityStatus.REMOVED;
     }
 
+    @Override
     public EntityStatus status()
     {
         return status;
     }
 
-    public boolean isAssignableTo( Class<?> type)
+    @Override
+    public boolean isAssignableTo( Class<?> type )
     {
-        return entityDescriptor.type().equals( type );
+        return Classes.exactTypeSpecification( type ).satisfiedBy( entityDescriptor );
     }
 
+    @Override
     public EntityDescriptor entityDescriptor()
     {
         return entityDescriptor;

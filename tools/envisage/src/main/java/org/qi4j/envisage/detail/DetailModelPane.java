@@ -16,13 +16,12 @@
 */
 package org.qi4j.envisage.detail;
 
-import org.qi4j.envisage.event.LinkEvent;
-import org.qi4j.envisage.event.LinkListener;
-import org.qi4j.envisage.model.descriptor.*;
-
-import javax.swing.*;
 import java.awt.*;
 import java.util.ResourceBundle;
+import javax.swing.*;
+import org.qi4j.envisage.event.LinkEvent;
+import org.qi4j.envisage.event.LinkListener;
+import org.qi4j.tools.model.descriptor.*;
 
 public class DetailModelPane
     extends JPanel
@@ -87,6 +86,7 @@ public class DetailModelPane
     {
         SwingUtilities.invokeLater( new Runnable()
         {
+            @Override
             public void run()
             {
                 setDescriptorImpl( objectDescriptor );

@@ -13,7 +13,7 @@
  * implied.
  *
  * See the License for the specific language governing permissions and
- * limitations under the License. 
+ * limitations under the License.
  */
 package org.qi4j.library.uid.sequence;
 
@@ -32,6 +32,7 @@ public class PersistedSequencingMixin
     @Structure private UnitOfWorkFactory uowf;
     @This private Configuration<Sequence> sequence;
 
+    @Override
     public Long newSequenceValue()
         throws SequencingException
     {
@@ -45,7 +46,7 @@ public class PersistedSequencingMixin
                 {
                     try
                     {
-                        Property<Long> property = sequence.configuration().currentValue();
+                        Property<Long> property = sequence.get().currentValue();
                         long value = property.get();
                         value = value + 1;
                         property.set( value );
@@ -67,11 +68,12 @@ public class PersistedSequencingMixin
         }
     }
 
+    @Override
     public Long currentSequenceValue()
     {
         synchronized( this )
         {
-            return sequence.configuration().currentValue().get();
+            return sequence.get().currentValue().get();
         }
     }
 }

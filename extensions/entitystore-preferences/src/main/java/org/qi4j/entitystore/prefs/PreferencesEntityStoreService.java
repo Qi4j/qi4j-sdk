@@ -16,7 +16,7 @@ package org.qi4j.entitystore.prefs;
 
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.service.Activatable;
+import org.qi4j.api.service.ServiceActivation;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.spi.entitystore.ConcurrentModificationCheckConcern;
 import org.qi4j.spi.entitystore.EntityStateVersions;
@@ -39,12 +39,12 @@ import org.qi4j.spi.entitystore.EntityStore;
  * <p/>
  * The main use of the EntityStore is for storage of ConfigurationComposites for ServiceComposites.
  *
- * @see ServiceComposite
+ * @see org.qi4j.api.service.ServiceComposite
  * @see org.qi4j.api.configuration.Configuration
  */
 @Concerns( ConcurrentModificationCheckConcern.class )
 @Mixins( PreferencesEntityStoreMixin.class )
 public interface PreferencesEntityStoreService
-    extends EntityStore, ServiceComposite, EntityStateVersions, Activatable
+    extends EntityStore, ServiceComposite, EntityStateVersions, ServiceActivation
 {
 }

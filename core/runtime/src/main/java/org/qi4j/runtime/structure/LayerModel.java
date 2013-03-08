@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2012, Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +15,15 @@
 
 package org.qi4j.runtime.structure;
 
+import java.util.List;
+import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.common.MetaInfo;
+import org.qi4j.api.structure.Layer;
 import org.qi4j.api.structure.LayerDescriptor;
 import org.qi4j.functional.HierarchicalVisitor;
 import org.qi4j.functional.VisitableHierarchy;
-
-import java.util.List;
+import org.qi4j.runtime.activation.ActivatorsInstance;
+import org.qi4j.runtime.activation.ActivatorsModel;
 
 /**
  * JAVADOC
@@ -31,20 +35,24 @@ public final class LayerModel
     private final String name;
     private MetaInfo metaInfo;
     private final UsedLayersModel usedLayersModel;
+    private final ActivatorsModel<Layer> activatorsModel;
     private final List<ModuleModel> modules;
 
     public LayerModel( String name,
                        MetaInfo metaInfo,
                        UsedLayersModel usedLayersModel,
+                       ActivatorsModel<Layer> activatorsModel,
                        List<ModuleModel> modules
     )
     {
         this.name = name;
         this.metaInfo = metaInfo;
         this.usedLayersModel = usedLayersModel;
+        this.activatorsModel = activatorsModel;
         this.modules = modules;
     }
 
+    @Override
     public String name()
     {
         return name;
@@ -60,20 +68,30 @@ public final class LayerModel
         return modules;
     }
 
+    @Override
     public UsedLayersModel usedLayers()
     {
         return usedLayersModel;
     }
 
-    @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor ) throws ThrowableType
+    public ActivatorsInstance<Layer> newActivatorsInstance()
+        throws ActivationException
     {
-        if (modelVisitor.visitEnter( this ))
+        return new ActivatorsInstance<Layer>( activatorsModel.newInstances() );
+    }
+
+    @Override
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+        throws ThrowableType
+    {
+        if( modelVisitor.visitEnter( this ) )
         {
             for( ModuleModel module : modules )
             {
-                if (!module.accept( modelVisitor ))
+                if( !module.accept( modelVisitor ) )
+                {
                     break;
+                }
             }
         }
         return modelVisitor.visitLeave( this );

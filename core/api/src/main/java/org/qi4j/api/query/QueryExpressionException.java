@@ -15,14 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.qi4j.api.query;
 
+/**
+ * Throw this exception if a QueryExpression is invalid.
+ */
 public class QueryExpressionException
     extends QueryException
 {
+
+    private static final long serialVersionUID = 1L;
+
     public QueryExpressionException( String message )
     {
         super( message );
     }
+
 }

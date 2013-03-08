@@ -1,0 +1,69 @@
+[[howto-create-constraint,Create a Constraint]]
+= Create a Constraint =
+
+Constraints are defined in <<def-constraint>>.
+
+== Method Constraint ==
+
+Method Constraints are declared with annotations on the method argument. The annotation itself is custom, and it is possible to make your own.
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/createConstraint/Dialer.java
+tag=dialer
+-----------
+
+In the code above we say that we want the argument to the callPhoneNumber() method to be a valid phone number. This annotation is not built-in, so we need to declare it.
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/createConstraint/PhoneNumber.java
+tag=annotation
+-----------
+
+We then need to provide the Constraint implementation.
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/createConstraint/PhoneNumberConstraint.java
+tag=constraint
+-----------
+
+We also need to include the Constraint on the Composites we want to have them present.
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/createConstraint/DialerComposite.java
+tag=composite
+-----------
+
+If a Constraint is violated, then a ConstraintViolationException is thrown. The Exception contains ALL violations found
+in the method invocation. Concerns can be used to catch and report these violations.
+
+[snippet,java]
+----
+source=manual/src/main/java/org/qi4j/manual/recipes/createConstraint/ParameterViolationConcern.java
+tag=report
+----
+
+== Property Constraint ==
+
+Property Constraints are declared on the Property method.
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/createConstraint/HasPhoneNumber.java
+tag=property
+-----------
+
+In this case, the Constraint associated with the phoneNumber() method, will be called before the set() method on that
+Property is called. If there is a constraint violation, the Exception thrown will be part of the caller, and not the
+composite containing the Property, so a reporting constraint on the containing Composite will not see it. If you want
+the containing Composite to handle the Constraint Violation, then you need to add a Concern on the Property itself,
+which can be done like this;
+
+[snippet,java]
+-----------
+source=manual/src/main/java/org/qi4j/manual/recipes/createConstraint/PhoneNumberParameterViolationConcern.java
+tag=property
+-----------

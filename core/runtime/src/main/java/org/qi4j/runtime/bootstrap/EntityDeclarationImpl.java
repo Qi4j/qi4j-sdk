@@ -17,7 +17,7 @@ package org.qi4j.runtime.bootstrap;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.EntityDeclaration;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 
 /**
  * Declaration of a Composite. Created by {@link org.qi4j.bootstrap.ModuleAssembly#transients(Class[])}.
@@ -27,11 +27,12 @@ public final class EntityDeclarationImpl
 {
     private Iterable<EntityAssemblyImpl> entities;
 
-    public EntityDeclarationImpl( Iterable<EntityAssemblyImpl> entities)
+    public EntityDeclarationImpl( Iterable<EntityAssemblyImpl> entities )
     {
         this.entities = entities;
     }
 
+    @Override
     public EntityDeclaration setMetaInfo( Object info )
     {
         for( EntityAssemblyImpl entity : entities )
@@ -41,6 +42,7 @@ public final class EntityDeclarationImpl
         return this;
     }
 
+    @Override
     public EntityDeclaration visibleIn( Visibility visibility )
     {
         for( EntityAssemblyImpl entity : entities )
@@ -50,38 +52,42 @@ public final class EntityDeclarationImpl
         return this;
     }
 
+    @Override
     public EntityDeclaration withConcerns( Class<?>... concerns )
     {
         for( EntityAssemblyImpl entity : entities )
         {
-            entity.concerns.addAll( Arrays.asList( concerns ) );
+            entity.concerns.addAll( asList( concerns ) );
         }
         return this;
     }
 
+    @Override
     public EntityDeclaration withSideEffects( Class<?>... sideEffects )
     {
         for( EntityAssemblyImpl entity : entities )
         {
-            entity.sideEffects.addAll( Arrays.asList( sideEffects ) );
+            entity.sideEffects.addAll( asList( sideEffects ) );
         }
         return this;
     }
 
+    @Override
     public EntityDeclaration withMixins( Class<?>... mixins )
     {
         for( EntityAssemblyImpl entity : entities )
         {
-            entity.mixins.addAll( Arrays.asList( mixins ) );
+            entity.mixins.addAll( asList( mixins ) );
         }
         return this;
     }
 
+    @Override
     public EntityDeclaration withTypes( Class<?>... types )
     {
         for( EntityAssemblyImpl entity : entities )
         {
-            entity.types.addAll( Arrays.asList( types ) );
+            entity.types.addAll( asList( types ) );
         }
         return this;
     }

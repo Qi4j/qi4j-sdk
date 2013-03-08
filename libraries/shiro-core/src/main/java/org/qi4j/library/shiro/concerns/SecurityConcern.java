@@ -13,6 +13,11 @@
  */
 package org.qi4j.library.shiro.concerns;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
@@ -26,12 +31,6 @@ import org.qi4j.library.shiro.Shiro;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 @AppliesTo( { RequiresAuthentication.class,
               RequiresGuest.class,
               RequiresPermissions.class,
@@ -43,31 +42,39 @@ public class SecurityConcern
 {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( Shiro.LOGGER_NAME );
+
     @Optional
     @Invocation
     private RequiresAuthentication requiresAuthentication;
+
     @Optional
     @Invocation
     private RequiresGuest requiresGuest;
+
     @Optional
     @Invocation
     private RequiresPermissions requiresPermissions;
+
     @Optional
     @Invocation
     private RequiresRoles requiresRoles;
+
     @Optional
     @Invocation
     private RequiresUser requiresUser;
 
+    @Override
     public Object invoke( Object proxy, Method method, Object[] args )
             throws Throwable
     {
         Subject subject = SecurityUtils.getSubject();
+
         handleRequiresGuest( subject );
         handleRequiresUser( subject );
         handleRequiresAuthentication( subject );
         handleRequiresRoles( subject );
         handleRequiresPermissions( subject );
+
         return next.invoke( proxy, method, args );
     }
 
@@ -77,7 +84,7 @@ public class SecurityConcern
             LOGGER.debug( "SecurityConcern::RequiresGuest" );
             if ( subject.getPrincipal() != null ) {
                 throw new UnauthenticatedException(
-                        "Attempting to perform a guest-only operation.  The current Subject is "
+                        "Attempting to perform a guest-only operation. The current Subject is "
                         + "not a guest (they have been authenticated or remembered from a previous login).  Access "
                         + "denied." );
 
@@ -93,7 +100,7 @@ public class SecurityConcern
             LOGGER.debug( "SecurityConcern::RequiresUser" );
             if ( subject.getPrincipal() == null ) {
                 throw new UnauthenticatedException(
-                        "Attempting to perform a user-only operation.  The current Subject is "
+                        "Attempting to perform a user-only operation. The current Subject is "
                         + "not a user (they haven't been authenticated or remembered from a previous login).  "
                         + "Access denied." );
             }

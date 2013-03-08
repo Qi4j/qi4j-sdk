@@ -16,27 +16,43 @@
  */
 package org.qi4j.entitystore.file;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.This;
-import org.qi4j.api.service.Activatable;
-import org.qi4j.io.*;
+import org.qi4j.io.Files;
+import org.qi4j.io.Input;
+import org.qi4j.io.Output;
+import org.qi4j.io.Receiver;
+import org.qi4j.io.Sender;
 import org.qi4j.library.fileconfig.FileConfiguration;
 import org.qi4j.spi.entitystore.BackupRestore;
 import org.qi4j.spi.entitystore.EntityNotFoundException;
 import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.entitystore.helpers.MapEntityStore;
 
-import java.io.*;
-
 /**
- * JDBM implementation of MapEntityStore
+ * FileEntityStore implementation of MapEntityStore.
  */
 public class FileEntityStoreMixin
-    implements Activatable, MapEntityStore, BackupRestore
+    implements FileEntityStoreActivation, MapEntityStore, BackupRestore
 {
     @Optional
     @Service
@@ -48,16 +64,16 @@ public class FileEntityStoreMixin
     private File dataDirectory;
     private int slices;
 
-    @SuppressWarnings( { "ResultOfMethodCallIgnored" } )
-    public void activate()
+    @Override
+    public void initialize()
         throws Exception
     {
-        String pathName = config.configuration().directory().get();
+        String pathName = config.get().directory().get();
         if( pathName == null )
         {
             if( fileConfiguration != null )
             {
-                pathName = new File( fileConfiguration.dataDirectory(), config.configuration()
+                pathName = new File( fileConfiguration.dataDirectory(), config.get()
                     .identity()
                     .get() ).getAbsolutePath();
             }
@@ -70,8 +86,10 @@ public class FileEntityStoreMixin
         dataDirectory = new File( rootDirectory, "data" );
         if( !dataDirectory.exists() )
         {
-            boolean success = dataDirectory.mkdirs();
-            new Object();
+            if( !dataDirectory.mkdirs() )
+            {
+                throw new IOException( "Unable to create directory " + dataDirectory );
+            }
         }
         File slicesFile = new File( dataDirectory, "slices" );
         if( slicesFile.exists() )
@@ -80,7 +98,7 @@ public class FileEntityStoreMixin
         }
         if( slices < 1 )
         {
-            Integer slicesConf = config.configuration().slices().get();
+            Integer slicesConf = config.get().slices().get();
             if( slicesConf == null )
             {
                 slices = 10;
@@ -142,11 +160,7 @@ public class FileEntityStoreMixin
         }
     }
 
-    public void passivate()
-        throws Exception
-    {
-    }
-
+    @Override
     public Reader get( EntityReference entityReference )
         throws EntityStoreException
     {
@@ -181,6 +195,7 @@ public class FileEntityStoreMixin
         return baos.toByteArray();
     }
 
+    @Override
     public void applyChanges( MapChanges changes )
         throws IOException
     {
@@ -188,6 +203,7 @@ public class FileEntityStoreMixin
         {
             changes.visitMap( new MapChanger()
             {
+                @Override
                 public Writer newEntity( final EntityReference ref, EntityDescriptor descriptor )
                     throws IOException
                 {
@@ -205,6 +221,7 @@ public class FileEntityStoreMixin
                     };
                 }
 
+                @Override
                 public Writer updateEntity( final EntityReference ref, EntityDescriptor descriptor )
                     throws IOException
                 {
@@ -222,7 +239,7 @@ public class FileEntityStoreMixin
                     };
                 }
 
-                @SuppressWarnings( { "ResultOfMethodCallIgnored" } )
+                @Override
                 public void removeEntity( EntityReference ref, EntityDescriptor descriptor )
                     throws EntityNotFoundException
                 {
@@ -243,13 +260,12 @@ public class FileEntityStoreMixin
             }
             else
             {
-                IOException exception = new IOException();
-                exception.initCause( e );
-                throw exception;
+                throw new IOException( e );
             }
         }
     }
 
+    @Override
     public Input<String, IOException> backup()
     {
         return new Input<String, IOException>()
@@ -278,6 +294,7 @@ public class FileEntityStoreMixin
         };
     }
 
+    @Override
     public Output<String, IOException> restore()
     {
         return new Output<String, IOException>()
@@ -288,6 +305,7 @@ public class FileEntityStoreMixin
             {
                 sender.sendTo( new Receiver<String, IOException>()
                 {
+                    @Override
                     public void receive( String item )
                         throws IOException
                     {
@@ -301,6 +319,7 @@ public class FileEntityStoreMixin
         };
     }
 
+    @Override
     public Input<Reader, IOException> entityStates()
     {
         return new Input<Reader, IOException>()
@@ -391,7 +410,7 @@ public class FileEntityStoreMixin
         BufferedOutputStream bos = null;
 
         // Write to tempfile first
-        File tempFile = File.createTempFile( "data",".json" );
+        File tempFile = Files.createTemporayFileOf( dataFile );
         tempFile.deleteOnExit();
 
         try

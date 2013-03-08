@@ -18,16 +18,22 @@
 
 package org.qi4j.index.rdf.indexing;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.openrdf.model.*;
 import org.openrdf.model.impl.GraphImpl;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
+import org.qi4j.api.activation.ActivatorAdapter;
+import org.qi4j.api.activation.Activators;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.service.Activatable;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.util.Classes;
 import org.qi4j.library.rdf.entity.EntityStateSerializer;
@@ -36,23 +42,34 @@ import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entitystore.StateChangeListener;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import static org.qi4j.functional.Iterables.first;
 
 @Mixins( RdfIndexingService.RdfEntityIndexerMixin.class )
+@Activators( RdfIndexingService.Activator.class )
 public interface RdfIndexingService
-    extends StateChangeListener, Activatable
+    extends StateChangeListener
 {
+    void initialize();
+
     File dataDir();
+
+    class Activator extends ActivatorAdapter<ServiceReference<RdfIndexingService>>
+    {
+
+        @Override
+        public void afterActivation( ServiceReference<RdfIndexingService> activated )
+                throws Exception
+        {
+            activated.get().initialize();
+        }
+
+    }
 
     /**
      * JAVADOC Add JavaDoc
      */
-    class RdfEntityIndexerMixin
-        implements RdfIndexingService, Activatable
+    abstract class RdfEntityIndexerMixin
+        implements RdfIndexingService
     {
         @Service
         private ServiceReference<Repository> repository;
@@ -66,17 +83,13 @@ public interface RdfIndexingService
         private Set<EntityDescriptor> indexedEntityTypes;
         private ValueFactory valueFactory;
 
-        public void activate()
-            throws Exception
+        @Override
+        public void initialize()
         {
             indexedEntityTypes = new HashSet<EntityDescriptor>();
         }
 
-        public void passivate()
-            throws Exception
-        {
-        }
-
+        @Override
         public void notifyChanges( Iterable<EntityState> entityStates )
         {
             try
@@ -192,7 +205,7 @@ public interface RdfIndexingService
         {
             if( entityType.queryable() )
             {
-                final URI compositeURI = getValueFactory().createURI( Classes.toURI(entityType.type()) );
+                final URI compositeURI = getValueFactory().createURI( Classes.toURI(first( entityType.types() )) );
                 // remove composite type if already present
                 connection.clear( compositeURI );
 
@@ -210,6 +223,7 @@ public interface RdfIndexingService
             return valueFactory;
         }
 
+        @Override
         public File dataDir()
         {
             return repository.get().getDataDir();

@@ -14,11 +14,10 @@
 
 package org.qi4j.migration.assembly;
 
-import org.qi4j.api.util.ListMap;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.qi4j.api.util.ListMap;
 
 /**
  * Set of migration rules.
@@ -37,13 +36,13 @@ public class MigrationRules<T extends AbstractMigrationRule>
         rules.add( migrationRule.fromVersion() + "->" + migrationRule.toVersion(), migrationRule );
     }
 
-    public Iterable<T> getRules( String fromVersion, String toVersion )
+    public Iterable<T> rulesBetweenVersions( String fromVersion, String toVersion )
     {
         try
         {
             String ruleToVersion = findHighestToVersion( toVersion );
 
-            return getMigrationRules( fromVersion, ruleToVersion );
+            return migrationRules( fromVersion, ruleToVersion );
         }
         catch( IllegalArgumentException e )
         {
@@ -51,7 +50,7 @@ public class MigrationRules<T extends AbstractMigrationRule>
         }
     }
 
-    private List<T> getMigrationRules( String fromVersion, String toVersion )
+    private List<T> migrationRules( String fromVersion, String toVersion )
     {
         List<String> list = versionChanges.get( toVersion );
 
@@ -69,7 +68,7 @@ public class MigrationRules<T extends AbstractMigrationRule>
             }
             else
             {
-                List<T> migrationRules = getMigrationRules( fromVersion, possibleFromVersion );
+                List<T> migrationRules = migrationRules( fromVersion, possibleFromVersion );
                 if( migrationRules == null )
                 {
                     continue; // Wrong transition - try another one
