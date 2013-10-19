@@ -44,8 +44,17 @@ import org.qi4j.spi.query.EntityFinderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.elasticsearch.index.query.FilterBuilders.*;
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.FilterBuilders.andFilter;
+import static org.elasticsearch.index.query.FilterBuilders.existsFilter;
+import static org.elasticsearch.index.query.FilterBuilders.missingFilter;
+import static org.elasticsearch.index.query.FilterBuilders.notFilter;
+import static org.elasticsearch.index.query.FilterBuilders.rangeFilter;
+import static org.elasticsearch.index.query.FilterBuilders.regexpFilter;
+import static org.elasticsearch.index.query.FilterBuilders.termFilter;
+import static org.elasticsearch.index.query.QueryBuilders.filteredQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.index.query.QueryBuilders.wrapperQuery;
+
 
 @Mixins( ElasticSearchFinder.Mixin.class )
 public interface ElasticSearchFinder
@@ -130,8 +139,8 @@ public interface ElasticSearchFinder
             // Execute
             SearchResponse response = request.execute().actionGet();
 
-            if ( response.hits().totalHits() == 1 ) {
-                return EntityReference.parseEntityReference( response.hits().getAt( 0 ).id() );
+            if ( response.getHits().totalHits() == 1 ) {
+                return EntityReference.parseEntityReference( response.getHits().getAt( 0 ).id() );
             }
 
             return null;
@@ -157,7 +166,7 @@ public interface ElasticSearchFinder
             // Execute
             CountResponse count = request.execute().actionGet();
 
-            return count.count();
+            return count.getCount();
         }
 
         private static AndFilterBuilder baseFilters( Class<?> resultType )
@@ -249,7 +258,8 @@ public interface ElasticSearchFinder
 
             } else {
 
-                throw new UnsupportedOperationException( "Query specification unsupported by Elastic Search: "
+                throw new UnsupportedOperationException( "Query specification unsupported by Elastic Search "
+                                                         + "(New Query API support missing?): "
                                                          + spec.getClass() + ": " + spec );
 
             }
@@ -311,8 +321,8 @@ public interface ElasticSearchFinder
                 addFilter( orFilterBuilder, filterBuilder );
 
             } else {
-                throw new UnsupportedOperationException( "Query specification unsupported by Elastic Search: "
-                                                         + spec.getClass() + ": " + spec );
+                throw new UnsupportedOperationException( "Binary Query specification is nor an AndSpecification "
+                                                         + "nor an OrSpecification, cannot continue." );
             }
         }
 
@@ -385,7 +395,8 @@ public interface ElasticSearchFinder
 
             } else {
 
-                throw new UnsupportedOperationException( "Query specification unsupported by Elastic Search: "
+                throw new UnsupportedOperationException( "Query specification unsupported by Elastic Search "
+                                                         + "(New Query API support missing?): "
                                                          + spec.getClass() + ": " + spec );
 
             }
@@ -443,10 +454,9 @@ public interface ElasticSearchFinder
                                                   Map<String, Object> variables )
         {
             LOGGER.trace( "Processing MatchesSpecification {}", spec );
-            // https://github.com/elasticsearch/elasticsearch/issues/988
-            // http://elasticsearch-users.115913.n3.nabble.com/Regex-Query-td3301347.html
-            throw new UnsupportedOperationException( "Query specification unsupported by Elastic Search: "
-                                                     + spec.getClass() + ": " + spec );
+            String name = spec.property().toString();
+            String regexp = toString( spec.regexp(), variables );
+            addFilter( regexpFilter(name , regexp ), filterBuilder );
         }
 
         private void processPropertyNotNullSpecification( FilterBuilder filterBuilder,
