@@ -20,8 +20,15 @@ package org.qi4j.library.rest.admin;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.structure.Module;
-import org.qi4j.api.unitofwork.*;
-import org.restlet.*;
+import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
+import org.qi4j.api.unitofwork.UnitOfWork;
+import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
+import org.qi4j.api.unitofwork.UnitOfWorkException;
+import org.restlet.Application;
+import org.restlet.Context;
+import org.restlet.Request;
+import org.restlet.Response;
+import org.restlet.Restlet;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.resource.Finder;
@@ -94,7 +101,8 @@ public class RestApplication
         return router;
     }
 
-    private Finder createFinder( Class<? extends ServerResource> resource )
+    @Override
+    public Finder createFinder( Class<? extends ServerResource> resource )
     {
         Finder finder = module.newObject( Finder.class );
         finder.setTargetClass( resource );
