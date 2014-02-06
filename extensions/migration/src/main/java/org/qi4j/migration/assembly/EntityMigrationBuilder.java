@@ -11,18 +11,29 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.migration.assembly;
 
-import org.qi4j.migration.operation.*;
+import java.util.Map;
+import org.qi4j.migration.operation.AddAssociation;
+import org.qi4j.migration.operation.AddManyAssociation;
+import org.qi4j.migration.operation.AddNamedAssociation;
+import org.qi4j.migration.operation.AddProperty;
+import org.qi4j.migration.operation.RemoveAssociation;
+import org.qi4j.migration.operation.RemoveManyAssociation;
+import org.qi4j.migration.operation.RemoveNamedAssociation;
+import org.qi4j.migration.operation.RemoveProperty;
+import org.qi4j.migration.operation.RenameAssociation;
+import org.qi4j.migration.operation.RenameManyAssociation;
+import org.qi4j.migration.operation.RenameNamedAssociation;
+import org.qi4j.migration.operation.RenameProperty;
 
 /**
  * Fluent API for creating migration rules for specific entity types.
  */
 public class EntityMigrationBuilder
 {
-    private VersionMigrationBuilder migrationBuilder;
-    private String[] entityTypes;
+    private final VersionMigrationBuilder migrationBuilder;
+    private final String[] entityTypes;
 
     public EntityMigrationBuilder( VersionMigrationBuilder migrationBuilder, String[] entityTypes )
     {
@@ -41,7 +52,6 @@ public class EntityMigrationBuilder
     }
 
     // Operations on entities
-
     /**
      * Add rule to rename an Entity property.
      *
@@ -52,10 +62,11 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder renameProperty( String from, String to )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new RenameProperty( from, to ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new RenameProperty( from, to ) ) );
 
         return this;
     }
@@ -70,10 +81,11 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder addProperty( String property, Object defaultValue )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new AddProperty( property, defaultValue ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new AddProperty( property, defaultValue ) ) );
 
         return this;
     }
@@ -88,10 +100,11 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder removeProperty( String property, String defaultValue )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new RemoveProperty( property, defaultValue ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new RemoveProperty( property, defaultValue ) ) );
 
         return this;
     }
@@ -106,10 +119,11 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder renameAssociation( String from, String to )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new RenameAssociation( from, to ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new RenameAssociation( from, to ) ) );
 
         return this;
     }
@@ -124,10 +138,11 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder addAssociation( String association, String defaultReference )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new AddAssociation( association, defaultReference ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new AddAssociation( association, defaultReference ) ) );
 
         return this;
     }
@@ -142,10 +157,11 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder removeAssociation( String association, String defaultReference )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new RemoveAssociation( association, defaultReference ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new RemoveAssociation( association, defaultReference ) ) );
 
         return this;
     }
@@ -154,22 +170,23 @@ public class EntityMigrationBuilder
      * Add rule to add an Entity many-association.
      *
      * @param association       to be added
-     * @param defaultReferences default reference
+     * @param defaultReferences default references
      *
      * @return the builder
      */
     public EntityMigrationBuilder addManyAssociation( String association, String... defaultReferences )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new AddManyAssociation( association, defaultReferences ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new AddManyAssociation( association, defaultReferences ) ) );
 
         return this;
     }
 
     /**
-     * Add rule to remove an Entity association
+     * Add rule to remove an Entity many-association
      *
      * @param association       to be removed
      * @param defaultReferences default value (used for downgrading)
@@ -178,10 +195,11 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder removeManyAssociation( String association, String... defaultReferences )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new RemoveManyAssociation( association, defaultReferences ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new RemoveManyAssociation( association, defaultReferences ) ) );
 
         return this;
     }
@@ -196,10 +214,68 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder renameManyAssociation( String from, String to )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    new RenameManyAssociation( from, to ) ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new RenameManyAssociation( from, to ) ) );
+
+        return this;
+    }
+
+    /**
+     * Add rule to add an Entity named-association.
+     *
+     * @param association       to be added
+     * @param defaultReferences default references
+     *
+     * @return the builder
+     */
+    public EntityMigrationBuilder addNamedAssociation( String association, Map<String, String> defaultReferences )
+    {
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new AddNamedAssociation( association, defaultReferences ) ) );
+
+        return this;
+    }
+
+    /**
+     * Add rule to remove an Entity named-association
+     *
+     * @param association       to be removed
+     * @param defaultReferences default value (used for downgrading)
+     *
+     * @return the builder
+     */
+    public EntityMigrationBuilder removeNamedAssociation( String association, Map<String, String> defaultReferences )
+    {
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new RemoveNamedAssociation( association, defaultReferences ) ) );
+
+        return this;
+    }
+
+    /**
+     * Add rule to rename an Entity named-association.
+     *
+     * @param from many-assocation name
+     * @param to   many-association name
+     *
+     * @return the builder
+     */
+    public EntityMigrationBuilder renameNamedAssociation( String from, String to )
+    {
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              new RenameNamedAssociation( from, to ) ) );
 
         return this;
     }
@@ -213,10 +289,11 @@ public class EntityMigrationBuilder
      */
     public EntityMigrationBuilder custom( EntityMigrationOperation operationEntity )
     {
-        migrationBuilder.builder.entityMigrationRules().addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
-                                                                                    migrationBuilder.toVersion,
-                                                                                    entityTypes,
-                                                                                    operationEntity ) );
+        migrationBuilder.builder.entityMigrationRules().
+            addRule( new EntityMigrationRule( migrationBuilder.fromVersion,
+                                              migrationBuilder.toVersion,
+                                              entityTypes,
+                                              operationEntity ) );
 
         return this;
     }

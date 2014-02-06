@@ -79,20 +79,24 @@ import static org.qi4j.api.util.Classes.interfacesOf;
 public class TransientClassLoader
     extends ClassLoader
 {
-    private static int jdkVersion = Opcodes.V1_5;
+    private static final int JDK_VERSION;
     public static final String GENERATED_POSTFIX = "_Proxy";
 
     static
     {
         String jdkString = System.getProperty( "java.specification.version" );
-
-        if( jdkString.equals( "1.6" ) )
+        switch( jdkString )
         {
-            jdkVersion = Opcodes.V1_6;
-        }
-        else if( jdkString.equals( "1.7" ) )
-        {
-            jdkVersion = Opcodes.V1_7;
+            case "1.7":
+                JDK_VERSION = Opcodes.V1_7;
+                break;
+            case "1.6":
+                JDK_VERSION = Opcodes.V1_6;
+                break;
+            case "1.5":
+            default:
+                JDK_VERSION = Opcodes.V1_5;
+                break;
         }
     }
 
@@ -102,6 +106,7 @@ public class TransientClassLoader
     }
 
     @Override
+    @SuppressWarnings( "raw" )
     protected Class findClass( String name )
         throws ClassNotFoundException
     {
@@ -147,6 +152,7 @@ public class TransientClassLoader
         return getClass().getClassLoader().loadClass( name );
     }
 
+    @SuppressWarnings( "raw" )
     public static byte[] generateClass( String name, Class baseClass )
         throws ClassNotFoundException
     {
@@ -159,7 +165,7 @@ public class TransientClassLoader
         AnnotationVisitor av0;
 
         // Class definition start
-        cw.visit( jdkVersion, ACC_PUBLIC + ACC_SUPER, classSlash, null, baseClassSlash, null );
+        cw.visit( JDK_VERSION, ACC_PUBLIC + ACC_SUPER, classSlash, null, baseClassSlash, null );
 
         // Composite reference
         {
@@ -208,7 +214,7 @@ public class TransientClassLoader
         // Overloaded and unimplemented methods
         Method[] methods = baseClass.getMethods();
         int idx = 0;
-        List<Label> exceptionLabels = new ArrayList<Label>();
+        List<Label> exceptionLabels = new ArrayList<>();
         for( Method method : methods )
         {
             if( isOverloaded( method, baseClass ) )
@@ -435,6 +441,7 @@ public class TransientClassLoader
         return cw.toByteArray();
     }
 
+    @SuppressWarnings( "raw" )
     private static boolean isOverloaded( Method method, Class baseClass )
     {
         if( Modifier.isFinal( method.getModifiers() ) )
@@ -447,12 +454,14 @@ public class TransientClassLoader
         }
     }
 
+    @SuppressWarnings( "raw" )
     private static boolean isInternalQi4jMethod( Method method, Class baseClass )
     {
         return isDeclaredIn( method, Initializable.class, baseClass )
                || isDeclaredIn( method, Lifecycle.class, baseClass );
     }
 
+    @SuppressWarnings( {"raw", "unchecked"} )
     private static boolean isDeclaredIn( Method method, Class clazz, Class baseClass )
     {
         if( !clazz.isAssignableFrom( baseClass ) )
@@ -471,6 +480,7 @@ public class TransientClassLoader
         }
     }
 
+    @SuppressWarnings( "raw" )
     private static Class getInterfaceMethodDeclaration( Method method, Class clazz )
         throws NoSuchMethodException
     {
@@ -491,6 +501,7 @@ public class TransientClassLoader
         throw new NoSuchMethodException( method.getName() );
     }
 
+    @SuppressWarnings( {"raw", "unchecked"} )
     private static boolean isInterfaceMethod( Method method, Class baseClass )
     {
         for( Class aClass : Iterables.filter( Methods.HAS_METHODS, Iterables.map( Classes.RAW_CLASS, interfacesOf( baseClass ) ) ) )
@@ -779,6 +790,7 @@ public class TransientClassLoader
         }
     }
 
+    @SuppressWarnings( "raw" )
     public static boolean isGenerated( Class clazz )
     {
         return clazz.getName().endsWith( GENERATED_POSTFIX );
@@ -789,12 +801,14 @@ public class TransientClassLoader
         return object.getClass().getName().endsWith( GENERATED_POSTFIX );
     }
 
+    @SuppressWarnings( "raw" )
     public Class loadFragmentClass( Class fragmentClass )
         throws ClassNotFoundException
     {
         return loadClass( fragmentClass.getName().replace( '$', '_' ) + GENERATED_POSTFIX );
     }
 
+    @SuppressWarnings( "raw" )
     public static Class getSourceClass( Class fragmentClass )
     {
         return fragmentClass.getName().endsWith( GENERATED_POSTFIX ) ? fragmentClass.getSuperclass() : fragmentClass;

@@ -11,10 +11,10 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.migration;
 
 import java.util.Arrays;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ public class MigrationEventLogger
     @Override
     public void propertyAdded( String entity, String name, Object value )
     {
-        logger.info( "Added property " + name + " with value " + (value==null?"null":value.toString()) + " in " + entity );
+        logger.info( "Added property " + name + " with value " + ( value == null ? "null" : value.toString() ) + " in " + entity );
     }
 
     @Override
@@ -78,6 +78,24 @@ public class MigrationEventLogger
     public void manyAssociationRenamed( String entity, String from, String to )
     {
         logger.info( "Renamed many-association from " + from + " to " + to + " in " + entity );
+    }
+
+    @Override
+    public void namedAssociationAdded( String entity, String name, Map<String, String> value )
+    {
+        logger.info( "Added named-association " + name + " with values " + value + " in " + entity );
+    }
+
+    @Override
+    public void namedAssociationRemoved( String entity, String name )
+    {
+        logger.info( "Removed named-association " + name + " in " + entity );
+    }
+
+    @Override
+    public void namedAssociationRenamed( String entity, String from, String to )
+    {
+        logger.info( "Renamed named-association from " + from + " to " + to + " in " + entity );
     }
 
     @Override

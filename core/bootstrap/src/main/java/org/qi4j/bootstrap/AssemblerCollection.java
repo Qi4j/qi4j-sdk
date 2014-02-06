@@ -33,10 +33,11 @@ public final class AssemblerCollection
         this.assemblers = Arrays.asList( assemblers );
     }
 
+    @SafeVarargs
     public AssemblerCollection( Class<? extends Assembler>... assemblyClasses )
         throws AssemblyException
     {
-        assemblers = new ArrayList<Assembler>();
+        assemblers = new ArrayList<>();
         for( Class<? extends Assembler> assemblyClass : assemblyClasses )
         {
             try

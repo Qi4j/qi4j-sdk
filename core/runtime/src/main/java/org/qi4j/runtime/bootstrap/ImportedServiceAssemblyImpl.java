@@ -36,14 +36,15 @@ import org.qi4j.runtime.service.ImportedServiceModel;
 public final class ImportedServiceAssemblyImpl
     implements ImportedServiceAssembly
 {
-    private Class<?> serviceType;
-    private ModuleAssemblyImpl moduleAssembly;
+    private final Class<?> serviceType;
+    private final ModuleAssemblyImpl moduleAssembly;
+    @SuppressWarnings( "raw" )
     Class<? extends ServiceImporter> serviceProvider = InstanceImporter.class;
     String identity;
     boolean importOnStartup = false;
     MetaInfo metaInfo = new MetaInfo();
     Visibility visibility = Visibility.module;
-    List<Class<? extends Activator<?>>> activators = new ArrayList<Class<? extends Activator<?>>>();
+    List<Class<? extends Activator<?>>> activators = new ArrayList<>();
 
     public ImportedServiceAssemblyImpl( Class<?> serviceType, ModuleAssemblyImpl moduleAssembly )
     {
@@ -57,6 +58,7 @@ public final class ImportedServiceAssemblyImpl
         return Iterables.<Class<?>>iterable( serviceType );
     }
 
+    @SuppressWarnings( {"raw", "unchecked"} )
     void addImportedServiceModel( List<ImportedServiceModel> serviceModels )
     {
         try
@@ -83,6 +85,7 @@ public final class ImportedServiceAssemblyImpl
         }
     }
 
+    @SuppressWarnings( "raw" )
     private String generateId( List<ImportedServiceModel> serviceModels, Class serviceType )
     {
         // Find identity that is not yet used

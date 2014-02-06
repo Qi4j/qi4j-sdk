@@ -32,9 +32,9 @@ import org.qi4j.index.rdf.RdfIndexingEngineService;
 import org.qi4j.library.rdf.entity.EntityStateSerializer;
 import org.qi4j.library.rdf.entity.EntityTypeSerializer;
 import org.qi4j.library.rdf.repository.MemoryRepositoryService;
-import org.qi4j.sample.dcicargo.pathfinder.api.GraphTraversalService;
-import org.qi4j.sample.dcicargo.pathfinder.internal.GraphDAO;
-import org.qi4j.sample.dcicargo.pathfinder.internal.GraphTraversalServiceImpl;
+import org.qi4j.sample.dcicargo.pathfinder_b.api.GraphTraversalService;
+import org.qi4j.sample.dcicargo.pathfinder_b.internal.GraphDAO;
+import org.qi4j.sample.dcicargo.pathfinder_b.internal.GraphTraversalServiceImpl;
 import org.qi4j.sample.dcicargo.sample_b.bootstrap.DCISampleApplication_b;
 import org.qi4j.sample.dcicargo.sample_b.bootstrap.sampledata.BaseDataService;
 import org.qi4j.sample.dcicargo.sample_b.bootstrap.sampledata.SampleDataService;
@@ -99,6 +99,7 @@ import static org.qi4j.api.structure.Application.Mode.development;
 public class Assembler
     implements ApplicationAssembler
 {
+    @Override
     public ApplicationAssembly assemble( ApplicationAssemblyFactory applicationFactory )
         throws AssemblyException
     {
@@ -155,7 +156,8 @@ public class Assembler
 
         bootstrapModule
             .addServices(
-                BaseDataService.class );
+                BaseDataService.class )
+            .instantiateOnStartup();
 
         bootstrapModule
             .addServices(
@@ -270,9 +272,6 @@ public class Assembler
             .objects(
                 EntityStateSerializer.class,
                 EntityTypeSerializer.class );
-
-        indexingModule
-            .services( OrgJsonValueSerializationService.class );
 
         indexingModule
             .services(

@@ -12,18 +12,32 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.index.sql.postgresql;
 
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.spi.query.EntityFinderException;
 import org.qi4j.test.indexing.AbstractQueryTest;
 
-@Ignore("should pass with actual DB running")
-public class PostgreSQLQueryTest extends AbstractQueryTest
+import static org.qi4j.test.util.Assume.assumeConnectivity;
+
+/**
+ * PostgreSQL Query Tests.
+ * <p>Many features are not supported.</p>
+ */
+// See org.qi4j.index.sql.support.skeletons.SQLCompatEntityStateWrapper that filter out unsupported properties.
+public class PostgreSQLQueryTest
+    extends AbstractQueryTest
 {
+    @BeforeClass
+    public static void beforePostgreSQLQueryTests()
+    {
+        assumeConnectivity( "localhost", 5432 );
+    }
+
     @Override
     public void assemble( ModuleAssembly mainModule )
         throws AssemblyException
@@ -40,7 +54,7 @@ public class PostgreSQLQueryTest extends AbstractQueryTest
         {
             super.setUp();
         }
-        catch ( Exception e )
+        catch( Exception e )
         {
             // Let's check if exception was because database was not available
             if( this.module != null )
@@ -55,17 +69,196 @@ public class PostgreSQLQueryTest extends AbstractQueryTest
     }
 
     @Test
-    public void ignoredScript29()
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script04_ne()
+        throws EntityFinderException
     {
-        // PostgreSQL indexing engine supports complex value indexing.
-        super.script29();
+        super.script04_ne();
     }
 
     @Test
-    public void ignoredScript23()
-        throws Exception
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script12_ne()
+        throws EntityFinderException
     {
-        // This test doesn't seem to sporadically fail anymore, at least for this test.
-        super.script23();
+        super.script04_ne();
+    }
+
+    @Test
+    @Ignore( "NamedAssociation are not supported by SQL Indexing" )
+    @Override
+    public void script35()
+    {
+        super.script35();
+    }
+
+    @Test
+    @Ignore( "NamedAssociation are not supported by SQL Indexing" )
+    @Override
+    public void script36()
+    {
+        super.script36();
+    }
+
+    @Test
+    @Ignore( "Queries on Enums are not supported by SQL Indexing" )
+    @Override
+    public void script38()
+    {
+        super.script38();
+    }
+
+    @Test
+    @Ignore( "Queries on Enums and NeSpecification are not supported by SQL Indexing" )
+    @Override
+    public void script39()
+    {
+        super.script39();
+    }
+
+    @Test
+    @Ignore( "Date is not supported by SQL Indexing" )
+    @Override
+    public void script40_Date()
+    {
+        super.script40_Date();
+    }
+
+    @Test
+    @Ignore( "DateTime is not supported by SQL Indexing" )
+    @Override
+    public void script40_DateTime()
+    {
+        super.script40_DateTime();
+    }
+
+    @Test
+    @Ignore( "LocalDate is not supported by SQL Indexing" )
+    @Override
+    public void script40_LocalDate()
+    {
+        super.script40_LocalDate();
+    }
+
+    @Test
+    @Ignore( "LocalDateTime is not supported by SQL Indexing" )
+    @Override
+    public void script40_LocalDateTime()
+    {
+        super.script40_LocalDateTime();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script41_Date()
+    {
+        super.script41_Date();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script41_DateTime()
+    {
+        super.script41_DateTime();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script41_LocalDate()
+    {
+        super.script41_LocalDate();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script41_LocalDateTime()
+    {
+        super.script41_LocalDateTime();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script42_Date()
+    {
+        super.script42_Date();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script42_DateTime()
+    {
+        super.script42_DateTime();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script42_LocalDate()
+    {
+        super.script42_LocalDate();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script42_LocalDateTime()
+    {
+        super.script42_LocalDateTime();
+    }
+
+    @Test
+    @Ignore( "Date is not supported by SQL Indexing" )
+    @Override
+    public void script43_Date()
+    {
+        super.script43_Date();
+    }
+
+    @Test
+    @Ignore( "DateTime is not supported by SQL Indexing" )
+    @Override
+    public void script43_DateTime()
+    {
+        super.script43_DateTime();
+    }
+
+    @Test
+    @Ignore( "LocalDate is not supported by SQL Indexing" )
+    @Override
+    public void script43_LocalDate()
+    {
+        super.script43_LocalDate();
+    }
+
+    @Test
+    @Ignore( "LocalDateTime is not supported by SQL Indexing" )
+    @Override
+    public void script43_LocalDateTime()
+    {
+        super.script43_LocalDateTime();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script51_BigInteger()
+    {
+        super.script51_BigInteger();
+    }
+
+    @Test
+    @Ignore( "NeSpecification is not supported by SQL Indexing" )
+    @Override
+    public void script51_BigDecimal()
+    {
+        super.script51_BigDecimal();
     }
 }

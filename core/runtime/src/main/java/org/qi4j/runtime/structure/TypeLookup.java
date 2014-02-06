@@ -42,7 +42,14 @@ import org.qi4j.runtime.value.ValueModel;
 
 import static org.qi4j.api.util.Classes.RAW_CLASS;
 import static org.qi4j.api.util.Classes.interfacesOf;
-import static org.qi4j.functional.Iterables.*;
+import static org.qi4j.functional.Iterables.cast;
+import static org.qi4j.functional.Iterables.filter;
+import static org.qi4j.functional.Iterables.first;
+import static org.qi4j.functional.Iterables.flatten;
+import static org.qi4j.functional.Iterables.flattenIterables;
+import static org.qi4j.functional.Iterables.iterable;
+import static org.qi4j.functional.Iterables.toList;
+import static org.qi4j.functional.Iterables.unique;
 
 /**
  * Central place for Composite Type lookups.
@@ -72,13 +79,13 @@ public class TypeLookup
         this.moduleInstance = moduleInstance;
 
         // Eager instance objects
-        objectModels = new ConcurrentHashMap<Class<?>, ModelModule<ObjectModel>>();
-        transientModels = new ConcurrentHashMap<Class<?>, ModelModule<TransientModel>>();
-        valueModels = new ConcurrentHashMap<Class<?>, ModelModule<ValueModel>>();
-        allEntityModels = new ConcurrentHashMap<Class<?>, Iterable<ModelModule<EntityModel>>>();
-        unambiguousEntityModels = new ConcurrentHashMap<Class<?>, ModelModule<EntityModel>>();
-        serviceReferences = new ConcurrentHashMap<Type, ServiceReference<?>>();
-        servicesReferences = new ConcurrentHashMap<Type, Iterable<ServiceReference<?>>>();
+        objectModels = new ConcurrentHashMap<>();
+        transientModels = new ConcurrentHashMap<>();
+        valueModels = new ConcurrentHashMap<>();
+        allEntityModels = new ConcurrentHashMap<>();
+        unambiguousEntityModels = new ConcurrentHashMap<>();
+        serviceReferences = new ConcurrentHashMap<>();
+        servicesReferences = new ConcurrentHashMap<>();
     }
 
     /**
@@ -95,6 +102,7 @@ public class TypeLookup
      * @param type  Looked up Type
      * @return      First matching Object Model
      */
+    @SuppressWarnings( { "raw", "unchecked" } )
     /* package */ ModelModule<ObjectModel> lookupObjectModel( final Class type )
     {
         ModelModule<ObjectModel> model = objectModels.get( type );
@@ -141,6 +149,7 @@ public class TypeLookup
      * @param type  Looked up Type
      * @return      First matching Transient Model
      */
+    @SuppressWarnings( { "raw", "unchecked" } )
     /* package */ ModelModule<TransientModel> lookupTransientModel( final Class type )
     {
         ModelModule<TransientModel> model = transientModels.get( type );
@@ -186,6 +195,7 @@ public class TypeLookup
      * @param type  Looked up Type
      * @return      First matching Value Model
      */
+    @SuppressWarnings( { "raw", "unchecked" } )
     public ModelModule<ValueModel> lookupValueModel( final Class type )
     {
         ModelModule<ValueModel> model = valueModels.get( type );
@@ -235,6 +245,7 @@ public class TypeLookup
      * @param type  Looked up Type
      * @return      First matching Entity Model
      */
+    @SuppressWarnings( { "raw", "unchecked" } )
     /* package */ ModelModule<EntityModel> lookupEntityModel( final Class type )
     {
         ModelModule<EntityModel> model = unambiguousEntityModels.get( type );
@@ -288,6 +299,7 @@ public class TypeLookup
      * @param type  Looked up Type
      * @return      All matching Entity Models
      */
+    @SuppressWarnings( { "raw", "unchecked" } )
     /* package */ Iterable<ModelModule<EntityModel>> lookupEntityModels( final Class type )
     {
         Iterable<ModelModule<EntityModel>> models = allEntityModels.get( type );
@@ -369,6 +381,7 @@ public class TypeLookup
      * @param serviceType   Looked up Type
      * @return              All matching ServiceReferences
      */
+    @SuppressWarnings( "unchecked" )
     /* package */ <T> Iterable<ServiceReference<T>> lookupServiceReferences( final Type serviceType )
     {
         Iterable<ServiceReference<?>> serviceRefs = servicesReferences.get( serviceType );
@@ -397,6 +410,7 @@ public class TypeLookup
         return cast( serviceRefs );
     }
 
+    @SuppressWarnings( { "raw", "unchecked" } )
     private static <T extends ModelDescriptor> Iterable<ModelModule<T>> findModels( Specification<Iterable<Class<?>>> specification,
                                                                                     Iterable<ModelModule<T>>... models )
     {
@@ -405,6 +419,7 @@ public class TypeLookup
         return filter( spec, flattened );
     }
 
+    @SuppressWarnings( { "raw", "unchecked" } )
     private static Iterable<ServiceReference<?>> findServiceReferences( Specification<Iterable<Class<?>>> specification,
                                                                         Iterable<ServiceReference<?>>... references )
     {
@@ -417,6 +432,7 @@ public class TypeLookup
      * Check if the list of models contains several ones with the same visibility. If yes, then
      * throw an AmbiguousTypeException
      */
+    @SuppressWarnings( "raw" )
     private static <T extends ModelDescriptor> Iterable<ModelModule<T>> ambiguousTypeCheck( final Class type,
                                                                                             final Iterable<ModelModule<T>> models )
     {
@@ -428,7 +444,7 @@ public class TypeLookup
             {
                 ModelModule<T> current = null;
                 List<ModelModule<T>> ambiguous = null;
-                List<ModelModule<T>> results = new ArrayList<ModelModule<T>>();
+                List<ModelModule<T>> results = new ArrayList<>();
                 for( ModelModule<T> model : models )
                 {
                     if( current != null && !model.equals( current ) )
@@ -437,7 +453,7 @@ public class TypeLookup
                         {
                             if( ambiguous == null )
                             {
-                                ambiguous = new ArrayList<ModelModule<T>>();
+                                ambiguous = new ArrayList<>();
                             }
                             ambiguous.add( model );
                         }

@@ -17,11 +17,11 @@
  */
 package org.qi4j.lib.swing.binding;
 
-
-import javax.swing.*;
 import java.util.Set;
+import javax.swing.JComponent;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.property.Property;
 
 public interface SwingAdapter
@@ -40,18 +40,23 @@ public interface SwingAdapter
 
     void fromSetAssociationToSwing( JComponent component, ManyAssociation<?> property );
 
+    void fromSwingToNamedAssociation( JComponent component, NamedAssociation<?> namedAssociation );
+
+    void fromNamedAssociationToSwing( JComponent component, NamedAssociation<?> namedAssociation );
+
     public class Capabilities
     {
-        public Class<? extends JComponent> component;
-        public Class<?> type;
-        public boolean property;
-        public boolean association;
-        public boolean listAssociation;
-        public boolean setAssociation;
+        public final Class<? extends JComponent> component;
+        public final Class<?> type;
+        public final boolean property;
+        public final boolean association;
+        public final boolean listAssociation;
+        public final boolean setAssociation;
+        public final boolean namedAssociation;
 
         public Capabilities( Class<? extends JComponent> component, Class<?> type,
                              boolean property, boolean association, boolean setAssociation,
-                             boolean listAssociation )
+                             boolean listAssociation, boolean namedAssociation )
         {
             this.component = component;
             this.type = type;
@@ -59,6 +64,8 @@ public interface SwingAdapter
             this.association = association;
             this.listAssociation = listAssociation;
             this.setAssociation = setAssociation;
+            this.namedAssociation = namedAssociation;
         }
     }
+
 }

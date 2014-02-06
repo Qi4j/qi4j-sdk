@@ -1,3 +1,21 @@
+/*
+ * Copyright 2007-2011 Rickard Öberg.
+ * Copyright 2007-2010 Niclas Hedhman.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * ied.
+ *
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.qi4j.api.query.grammar;
 
 import java.lang.reflect.AccessibleObject;
@@ -23,20 +41,23 @@ import static org.qi4j.api.util.Classes.typeOf;
 public class PropertyFunction<T>
     implements Function<Composite, Property<T>>
 {
-    private PropertyFunction<?> traversedProperty;
-    private AssociationFunction<?> traversedAssociation;
-    private ManyAssociationFunction<?> traversedManyAssociation;
+    private final PropertyFunction<?> traversedProperty;
+    private final AssociationFunction<?> traversedAssociation;
+    private final ManyAssociationFunction<?> traversedManyAssociation;
+    private final NamedAssociationFunction<?> traversedNamedAssociation;
     private final AccessibleObject accessor;
 
     public PropertyFunction( PropertyFunction<?> traversedProperty,
                              AssociationFunction<?> traversedAssociation,
                              ManyAssociationFunction<?> traversedManyAssociation,
+                             NamedAssociationFunction<?> traversedNamedAssociation,
                              AccessibleObject accessor
     )
     {
         this.traversedProperty = traversedProperty;
         this.traversedAssociation = traversedAssociation;
         this.traversedManyAssociation = traversedManyAssociation;
+        this.traversedNamedAssociation = traversedNamedAssociation;
         this.accessor = accessor;
 
         // Verify that the property accessor is not marked as non queryable
@@ -58,6 +79,7 @@ public class PropertyFunction<T>
         {
             throw new QueryExpressionException( "Unsupported property type:" + propertyTypeAsType );
         }
+        @SuppressWarnings( "unchecked" )
         Class<T> type = (Class<T>) propertyTypeAsType;
         NotQueryableException.throwIfNotQueryable( type );
     }
@@ -75,6 +97,11 @@ public class PropertyFunction<T>
     public ManyAssociationFunction<?> traversedManyAssociation()
     {
         return traversedManyAssociation;
+    }
+
+    public NamedAssociationFunction<?> traversedNamedAssociation()
+    {
+        return traversedNamedAssociation;
     }
 
     public AccessibleObject accessor()
@@ -109,6 +136,10 @@ public class PropertyFunction<T>
             else if( traversedManyAssociation != null )
             {
                 throw new IllegalArgumentException( "Cannot evaluate a ManyAssociation" );
+            }
+            else if( traversedNamedAssociation != null )
+            {
+                throw new IllegalArgumentException( "Cannot evaluate a NamedAssociation" );
             }
 
             if( target == null )

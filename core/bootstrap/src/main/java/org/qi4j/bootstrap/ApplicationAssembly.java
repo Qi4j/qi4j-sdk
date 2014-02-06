@@ -38,6 +38,16 @@ public interface ApplicationAssembly
     LayerAssembly layer( String name );
 
     /**
+     * Get an assembly for a particular Module. If this is called many times with the same names, then the same module
+     * is affected.
+     *
+     * @param layerName The name of the Layer
+     * @param moduleName The name of the Module to retrieve or create.
+     * @return The ModuleAssembly for the Module.
+     */
+    ModuleAssembly module( String layerName, String moduleName );
+    
+    /**
      * Get the currently set name of the application
      *
      * @return the name of the application
@@ -91,7 +101,8 @@ public interface ApplicationAssembly
      *
      * @param activators the application activators
      * @return the assembly
-     */    
+     */
+    @SuppressWarnings( { "unchecked","varargs" } )
     ApplicationAssembly withActivators( Class<? extends Activator<Application>>... activators );
 
     <ThrowableType extends Throwable> void visit( AssemblyVisitor<ThrowableType> visitor )

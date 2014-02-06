@@ -1,18 +1,22 @@
 /*
- * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
- * Copyright 2012, Paul Merlin.
+ * Copyright (c) 2008-2011, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008-2013, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2012-2014, Paul Merlin. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed  under the  Apache License,  Version 2.0  (the "License");
+ * you may not use  this file  except in  compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed  under the  License is distributed on an "AS IS" BASIS,
+ * WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+ * implied.
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
-
 package org.qi4j.runtime.service;
 
 import java.lang.reflect.AccessibleObject;
@@ -27,7 +31,9 @@ import org.qi4j.api.entity.Identity;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.service.ServiceDescriptor;
+import org.qi4j.api.structure.Module;
 import org.qi4j.api.util.Classes;
+import org.qi4j.functional.HierarchicalVisitor;
 import org.qi4j.functional.Specifications;
 import org.qi4j.runtime.activation.ActivatorsInstance;
 import org.qi4j.runtime.activation.ActivatorsModel;
@@ -71,6 +77,7 @@ public final class ServiceModel extends CompositeModel
     private final String identity;
     private final boolean instantiateOnStartup;
     private final ActivatorsModel<?> activatorsModel;
+    @SuppressWarnings( "raw" )
     private final Class configurationType;
 
     public ServiceModel( Iterable<Class<?>> types,
@@ -106,22 +113,44 @@ public final class ServiceModel extends CompositeModel
         return identity;
     }
 
-    public ActivatorsInstance<?> newActivatorsInstance() throws Exception
+    @SuppressWarnings( {"raw", "unchecked"} )
+    public ActivatorsInstance<?> newActivatorsInstance( Module module ) throws Exception
     {
-        return new ActivatorsInstance( activatorsModel.newInstances() );
+        return new ActivatorsInstance( activatorsModel.newInstances( module ) );
     }
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public <T> Class<T> configurationType()
     {
         return configurationType;
     }
 
+    @Override
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+        throws ThrowableType
+    {
+        if( visitor.visitEnter( this ) )
+        {
+            if( activatorsModel.accept( visitor ) )
+            {
+                if( compositeMethodsModel.accept( visitor ) )
+                {
+                    if( stateModel.accept( visitor ) )
+                    {
+                        mixinsModel.accept( visitor );
+                    }
+                }
+            }
+        }
+        return visitor.visitLeave( this );
+    }
+    
     public ServiceInstance newInstance( final ModuleInstance module )
     {
         Object[] mixins = mixinsModel.newMixinHolder();
 
-        Map<AccessibleObject, Property<?>> properties = new HashMap<AccessibleObject, Property<?>>();
+        Map<AccessibleObject, Property<?>> properties = new HashMap<>();
         for( PropertyModel propertyModel : stateModel.properties() )
         {
             Object initialValue = propertyModel.initialValue( module );
@@ -130,7 +159,7 @@ public final class ServiceModel extends CompositeModel
                 initialValue = identity;
             }
 
-            Property property = new PropertyInstance<Object>( propertyModel, initialValue );
+            Property<?> property = new PropertyInstance<>( propertyModel, initialValue );
             properties.put( propertyModel.accessor(), property );
         }
 
@@ -155,6 +184,7 @@ public final class ServiceModel extends CompositeModel
         return super.toString() + ":" + identity;
     }
 
+    @SuppressWarnings( { "raw", "unchecked" } )
     public Class calculateConfigurationType()
     {
         Class injectionClass = null;
