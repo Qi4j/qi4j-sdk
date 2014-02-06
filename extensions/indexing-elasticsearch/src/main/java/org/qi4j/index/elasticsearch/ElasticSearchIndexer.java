@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Paul Merlin.
+ * Copyright 2012-2014 Paul Merlin.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -40,10 +40,12 @@ import org.qi4j.api.usecase.UsecaseBuilder;
 import org.qi4j.api.util.Classes;
 import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.api.value.ValueSerializer;
+import org.qi4j.api.value.ValueSerializer.Options;
 import org.qi4j.functional.Iterables;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entity.ManyAssociationState;
+import org.qi4j.spi.entity.NamedAssociationState;
 import org.qi4j.spi.entitystore.EntityStore;
 import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.entitystore.StateChangeListener;
@@ -84,7 +86,7 @@ public interface ElasticSearchIndexer
         public void notifyChanges( Iterable<EntityState> changedStates )
         {
             // All updated or new states
-            Map<String, EntityState> newStates = new HashMap<String, EntityState>();
+            Map<String, EntityState> newStates = new HashMap<>();
             for( EntityState eState : changedStates )
             {
                 if( eState.status() == EntityStatus.UPDATED || eState.status() == EntityStatus.NEW )
@@ -93,9 +95,11 @@ public interface ElasticSearchIndexer
                 }
             }
 
-            EntityStoreUnitOfWork uow = entityStore.newUnitOfWork( UsecaseBuilder.newUsecase( "Load associations for indexing" ),
-                                                                   module,
-                                                                   System.currentTimeMillis() );
+            EntityStoreUnitOfWork uow = entityStore.newUnitOfWork(
+                UsecaseBuilder.newUsecase( "Load associations for indexing" ),
+                module,
+                System.currentTimeMillis()
+            );
 
             // Bulk index request builder
             BulkRequestBuilder bulkBuilder = support.client().prepareBulk();
@@ -146,7 +150,7 @@ public interface ElasticSearchIndexer
                     throw new ElasticSearchIndexException( bulkResponse.buildFailureMessage() );
                 }
 
-                LOGGER.debug( "Indexing changed Entity states took {}ms", bulkResponse.tookInMillis() );
+                LOGGER.debug( "Indexing changed Entity states took {}ms", bulkResponse.getTookInMillis() );
 
                 // Refresh index
                 support.client().admin().indices().prepareRefresh( support.index() ).execute().actionGet();
@@ -173,8 +177,9 @@ public interface ElasticSearchIndexer
          *  "_identity": "ENTITY-IDENTITY",
          *  "_types": [ "All", "Entity", "types" ],
          *  "property.name": property.value,
-         *  "association.name": "ASSOCIATED-IDENTITY",
-         *  "manyassociation.name": [ "ASSOCIATED", "IDENTITIES" ]
+         *  "association.name": { "identity": "ASSOCIATED-IDENTITY" }
+         *  "manyassociation.name": [ { "identity": "ASSOCIATED" }, { "identity": "IDENTITIES" } ]
+         *  "namedassociation.name": [ { "_named": "NAMED", "identity": "IDENTITY" } }
          * }
          * </pre>
          */
@@ -202,8 +207,8 @@ public interface ElasticSearchIndexer
                         }
                         else
                         {
+                            String serialized = valueSerializer.serialize( new Options().withoutTypeInfo(), value );
                             // TODO Theses tests are pretty fragile, find a better way to fix this, Jackson API should behave better
-                            String serialized = valueSerializer.serialize( value );
                             if( serialized.startsWith( "{" ) )
                             {
                                 json.put( key, new JSONObject( serialized ) );
@@ -280,6 +285,45 @@ public interface ElasticSearchIndexer
                             else
                             {
                                 array.put( new JSONObject( Collections.singletonMap( "identity", associated.identity() ) ) );
+                            }
+                        }
+                        json.put( key, array );
+                    }
+                }
+
+                // NamedAssociations
+                for( AssociationDescriptor namedAssocDesc : entityType.state().namedAssociations() )
+                {
+                    if( namedAssocDesc.queryable() )
+                    {
+                        String key = namedAssocDesc.qualifiedName().name();
+                        JSONArray array = new JSONArray();
+                        NamedAssociationState associateds = state.namedAssociationValueOf( namedAssocDesc.qualifiedName() );
+                        for( String name : associateds )
+                        {
+                            if( namedAssocDesc.isAggregated() || support.indexNonAggregatedAssociations() )
+                            {
+                                String identity = associateds.get( name ).identity();
+                                if( newStates.containsKey( identity ) )
+                                {
+                                    JSONObject obj = new JSONObject( toJSON( newStates.get( identity ), newStates, uow ) );
+                                    obj.put( "_named", name );
+                                    array.put( obj );
+                                }
+                                else
+                                {
+                                    EntityState assocState = uow.entityStateOf( EntityReference.parseEntityReference( identity ) );
+                                    JSONObject obj = new JSONObject( toJSON( assocState, newStates, uow ) );
+                                    obj.put( "_named", name );
+                                    array.put( obj );
+                                }
+                            }
+                            else
+                            {
+                                JSONObject obj = new JSONObject();
+                                obj.put( "_named", name );
+                                obj.put( "identity", associateds.get( name ).identity() );
+                                array.put( obj );
                             }
                         }
                         json.put( key, array );

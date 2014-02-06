@@ -1,5 +1,6 @@
 /*
  * Copyright 2009 Niclas Hedhman.
+ * Copyright 2013 Paul Merlin.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -15,64 +16,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.qi4j.api.activation;
 
-import java.io.PrintStream;
-import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * Thrown when unable to passivate.
  *
- * Printed StackTrace contains all causes in order.
+ * Printed StackTrace contains all causes in order as suppressed exceptions.
  */
-public class PassivationException
+public final class PassivationException
     extends Exception
 {
-    private static final long serialVersionUID = 1L;
-    private Exception[] causes;
 
-    public PassivationException( List<Exception> exceptions )
+    private static final long serialVersionUID = 1L;
+    private final List<Exception> causes;
+
+    /**
+     * Create new PassivationException.
+     * @param exceptions All exceptions encountered during passivation, in order
+     */
+    public PassivationException( Collection<Exception> exceptions )
     {
-        causes = new Exception[ exceptions.size() ];
-        exceptions.toArray( causes );
+        super( "Passivation Exception - [has " + exceptions.size() + " cause(s)]" );
+        for( Throwable cause : exceptions )
+        {
+            addSuppressed( cause );
+        }
+        this.causes = new ArrayList<>( exceptions );
     }
 
-    public Exception[] causes()
+    /**
+     * @return All exceptions encountered during passivation, in order
+     */
+    public List<Exception> causes()
     {
         return causes;
     }
 
-    @Override
-    public void printStackTrace( PrintStream stream )
-    {
-        synchronized( stream )
-        {
-            int counter = 1;
-            super.printStackTrace( stream );
-            for( Exception exc : causes )
-            {
-                counter++;
-                stream.print( "Cause " + counter + " : " );
-                exc.printStackTrace( stream );
-            }
-        }
-    }
-
-    @Override
-    public void printStackTrace( PrintWriter writer )
-    {
-        synchronized( writer )
-        {
-            int counter = 1;
-            super.printStackTrace( writer );
-            for( Exception exc : causes )
-            {
-                counter++;
-                writer.print( "Cause " + counter + " : " );
-                exc.printStackTrace( writer );
-            }
-        }
-    }
 }

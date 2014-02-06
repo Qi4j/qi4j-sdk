@@ -29,9 +29,12 @@ import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.test.AbstractQi4jTest;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNot.not;
 import static org.joda.time.DateTimeZone.UTC;
-import static org.junit.Assert.*;
+import static org.joda.time.DateTimeZone.forID;
+import static org.joda.time.DateTimeZone.forOffsetHours;
+import static org.junit.Assert.assertThat;
 
 /**
  * Assert that ValueSerialization behaviour on plain values is correct.
@@ -150,46 +153,54 @@ public abstract class AbstractPlainValueSerializationTest
     @Test
     public void givenBigIntegerValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = valueSerialization.serialize( new BigInteger( "42" ) );
-        assertThat( serialized, equalTo( "42" ) );
+        BigInteger bigInteger = new BigInteger( "42424242424242424242424242" );
+        assertThat( bigInteger, not( equalTo( BigInteger.valueOf( bigInteger.longValue() ) ) ) );
+
+        String serialized = valueSerialization.serialize( bigInteger );
+        assertThat( serialized, equalTo( "42424242424242424242424242" ) );
 
         BigInteger deserialized = valueSerialization.deserialize( BigInteger.class, serialized );
-        assertThat( deserialized, equalTo( new BigInteger( "42" ) ) );
+        assertThat( deserialized, equalTo( bigInteger ) );
     }
 
     @Test
     public void givenBigDecimalValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = valueSerialization.serialize( new BigDecimal( "42" ) );
-        assertThat( serialized, equalTo( "42" ) );
+        BigDecimal bigDecimal = new BigDecimal( "42.2376931348623157e+309" );
+        assertThat( bigDecimal.doubleValue(), equalTo( Double.POSITIVE_INFINITY ) );
+        
+        String serialized = valueSerialization.serialize( bigDecimal );
+        assertThat( serialized, equalTo( "4.22376931348623157E+310" ) );
 
         BigDecimal deserialized = valueSerialization.deserialize( BigDecimal.class, serialized );
-        assertThat( deserialized, equalTo( new BigDecimal( "42" ) ) );
+        assertThat( deserialized, equalTo( bigDecimal ) );
     }
 
     @Test
     public void givenDateValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = valueSerialization.serialize( new DateTime( "2020-03-04T13:24:35", UTC ).toDate() );
-        assertThat( serialized, equalTo( "2020-03-04T13:24:35.000Z" ) );
+        String serialized = valueSerialization.serialize( new DateTime( "2020-03-04T13:24:35", forID( "CET" ) ).toDate() );
+        assertThat( serialized, equalTo( "2020-03-04T12:24:35.000Z" ) );
 
         Date deserialized = valueSerialization.deserialize( Date.class, serialized );
-        assertThat( deserialized, equalTo( new DateTime( "2020-03-04T13:24:35", UTC ).toDate() ) );
+        assertThat( deserialized, equalTo( new DateTime( "2020-03-04T13:24:35", forID( "CET" ) ).toDate() ) );
+        assertThat( deserialized, equalTo( new DateTime( "2020-03-04T12:24:35", UTC ).toDate() ) );
     }
 
     @Test
     public void givenDateTimeValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = valueSerialization.serialize( new DateTime( "2020-03-04T13:24:35", UTC ) );
-        assertThat( serialized, equalTo( "2020-03-04T13:24:35.000Z" ) );
+        String serialized = valueSerialization.serialize( new DateTime( "2020-03-04T13:24:35", forOffsetHours( 1 ) ) );
+        assertThat( serialized, equalTo( "2020-03-04T13:24:35.000+01:00" ) );
         DateTime deserialized = valueSerialization.deserialize( DateTime.class, serialized );
-        assertThat( deserialized, equalTo( new DateTime( "2020-03-04T13:24:35", UTC ) ) );
+        assertThat( deserialized, equalTo( new DateTime( "2020-03-04T13:24:35", forOffsetHours( 1 ) ) ) );
     }
 
     @Test
     public void givenLocalDateTimeValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = valueSerialization.serialize( new LocalDateTime( "2020-03-04T13:23:00", UTC ) );
+        // Serialized without TimeZone
+        String serialized = valueSerialization.serialize( new LocalDateTime( "2020-03-04T13:23:00", forID( "CET" ) ) );
         assertThat( serialized, equalTo( "2020-03-04T13:23:00.000" ) );
 
         LocalDateTime deserialized = valueSerialization.deserialize( LocalDateTime.class, serialized );

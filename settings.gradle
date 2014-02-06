@@ -6,7 +6,6 @@ include "core:functional",
         "core:bootstrap",
         "core:runtime",
         'libraries:alarm',
-        'libraries:cache',
         'libraries:circuitbreaker',
         'libraries:constraints',
         'libraries:conversion',
@@ -16,6 +15,7 @@ include "core:functional",
         'libraries:eventsourcing-rest',
         'libraries:fileconfig',
         'libraries:http',
+        'libraries:invocation-cache',
         'libraries:lang-beanshell',
         'libraries:lang-groovy',
         'libraries:lang-javascript',
@@ -49,6 +49,7 @@ include "core:functional",
         'libraries:uid',
         'libraries:uowfile',
         'extensions:cache-ehcache',
+        'extensions:cache-memcache',
         'extensions:entitystore-memory',
         'extensions:entitystore-file',
         'extensions:entitystore-gae',
@@ -85,6 +86,7 @@ include "core:functional",
         'tools:entity-viewer',
         'tools:model-detail',
         'tools:envisage',
+        'tools:shell',
 //        'tools:qidea',
         'tutorials:cargo',
         'tutorials:composites',
@@ -94,36 +96,37 @@ include "core:functional",
         'tutorials:introduction:tenminutes',
         'tutorials:introduction:thirtyminutes',
 //        'tutorials:introduction:twohours',
-'tutorials:services',
-'tests:complex:gae',
-'tests:regression',
-'tests:performance'
+        'tutorials:services',
+        'tests:complex:gae',
+        'tests:regression',
+        'tests:performance'
+
 rootProject.name = "org.qi4j"
 
 validateProject(rootProject, "")
 
 def validateProject(project, parentName)
 {
-  assert project.projectDir.isDirectory()
-  if( new File("$project.projectDir/src/main/java").exists() )
-  {
-    assert project.buildFile.isFile()
-  }
-  if( parentName == 'org.qi4j.libraries' )
-  {
-    parentName = 'org.qi4j.library'
-  }
-  if( parentName.endsWith('s') )
-  {
-    parentName = parentName.substring(0, parentName.length() - 1)
-  }
-  if( parentName.length() > 0 )
-  {
-    project.name = parentName + "." + project.name
-  }
-  println "Project: " + project.name
-  project.children.each { child ->
-    validateProject(child, project.name)
-  }
+    assert project.projectDir.isDirectory()
+    if( new File("$project.projectDir/src/main/java").exists() )
+    {
+        assert project.buildFile.isFile()
+    }
+    if( parentName == 'org.qi4j.libraries' )
+    {
+        parentName = 'org.qi4j.library'
+    }
+    if( parentName.endsWith('s') )
+    {
+        parentName = parentName.substring(0, parentName.length() - 1)
+    }
+    if( parentName.length() > 0 )
+    {
+        project.name = parentName + "." + project.name
+    }
+    println "Project: " + project.name
+    project.children.each { child ->
+        validateProject(child, project.name)
+    }
 }
 

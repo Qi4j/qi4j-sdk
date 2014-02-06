@@ -11,7 +11,6 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.runtime;
 
 import java.lang.reflect.InvocationHandler;
@@ -22,6 +21,7 @@ import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.association.AssociationWrapper;
 import org.qi4j.api.association.ManyAssociationWrapper;
+import org.qi4j.api.association.NamedAssociationWrapper;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.CompositeInstance;
@@ -68,8 +68,8 @@ import static org.qi4j.runtime.composite.TransientInstance.compositeInstanceOf;
 public final class Qi4jRuntimeImpl
     implements Qi4jSPI, Qi4jRuntime
 {
-    private ApplicationAssemblyFactory applicationAssemblyFactory;
-    private ApplicationModelFactory applicationModelFactory;
+    private final ApplicationAssemblyFactory applicationAssemblyFactory;
+    private final ApplicationModelFactory applicationModelFactory;
 
     public Qi4jRuntimeImpl()
     {
@@ -104,6 +104,7 @@ public final class Qi4jRuntimeImpl
     // API
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public <T> T dereference( T composite )
     {
         InvocationHandler handler = getInvocationHandler( composite );
@@ -153,18 +154,19 @@ public final class Qi4jRuntimeImpl
         }
         else if( compositeOrServiceReferenceOrUow instanceof ServiceReferenceInstance )
         {
-            ServiceReferenceInstance reference = (ServiceReferenceInstance) compositeOrServiceReferenceOrUow;
+            ServiceReferenceInstance<?> reference = (ServiceReferenceInstance<?>) compositeOrServiceReferenceOrUow;
             return reference.module();
         }
         else if( compositeOrServiceReferenceOrUow instanceof ImportedServiceReferenceInstance )
         {
-            ImportedServiceReferenceInstance importedServiceReference =
-                (ImportedServiceReferenceInstance) compositeOrServiceReferenceOrUow;
+            ImportedServiceReferenceInstance<?> importedServiceReference
+                                                = (ImportedServiceReferenceInstance<?>) compositeOrServiceReferenceOrUow;
             return importedServiceReference.module();
         }
-        throw new IllegalArgumentException( "Wrong type. Must be one of " + Arrays.asList(
-            ValueComposite.class, ServiceComposite.class, TransientComposite.class,
-            ServiceComposite.class, ServiceReference.class, UnitOfWork.class ) );
+        throw new IllegalArgumentException( "Wrong type. Must be one of "
+                                            + Arrays.asList( TransientComposite.class, ValueComposite.class,
+                                                             ServiceComposite.class, ServiceReference.class,
+                                                             UnitOfWork.class ) );
     }
 
     @Override
@@ -197,18 +199,18 @@ public final class Qi4jRuntimeImpl
         }
         else if( compositeOrServiceReference instanceof ServiceReferenceInstance )
         {
-            ServiceReferenceInstance reference = (ServiceReferenceInstance) compositeOrServiceReference;
+            ServiceReferenceInstance<?> reference = (ServiceReferenceInstance<?>) compositeOrServiceReference;
             return reference.serviceDescriptor();
         }
         else if( compositeOrServiceReference instanceof ImportedServiceReferenceInstance )
         {
-            ImportedServiceReferenceInstance importedServiceReference =
-                (ImportedServiceReferenceInstance) compositeOrServiceReference;
+            ImportedServiceReferenceInstance<?> importedServiceReference
+                                                = (ImportedServiceReferenceInstance<?>) compositeOrServiceReference;
             return importedServiceReference.serviceDescriptor();
         }
-        throw new IllegalArgumentException( "Wrong type. Must be one of " + Arrays.asList(
-            ValueComposite.class, ServiceComposite.class, TransientComposite.class,
-            ServiceComposite.class, ServiceReference.class ) );
+        throw new IllegalArgumentException( "Wrong type. Must be one of "
+                                            + Arrays.asList( TransientComposite.class, ValueComposite.class,
+                                                             ServiceComposite.class, ServiceReference.class ) );
     }
 
     @Override
@@ -275,7 +277,7 @@ public final class Qi4jRuntimeImpl
     {
         if( service instanceof ServiceReferenceInstance )
         {
-            ServiceReferenceInstance ref = (ServiceReferenceInstance) service;
+            ServiceReferenceInstance<?> ref = (ServiceReferenceInstance<?>) service;
             return ref.serviceDescriptor();
         }
         if( service instanceof ServiceComposite )
@@ -283,19 +285,19 @@ public final class Qi4jRuntimeImpl
             ServiceComposite composite = (ServiceComposite) service;
             return (ServiceDescriptor) ServiceInstance.serviceInstanceOf( composite ).descriptor();
         }
-        String message = "Wrong type. Must be subtype of " + ServiceComposite.class + " or " + ServiceReference.class;
-        throw new IllegalArgumentException( message );
+        throw new IllegalArgumentException( "Wrong type. Must be subtype of "
+                                            + ServiceComposite.class + " or " + ServiceReference.class );
     }
 
     @Override
-    public PropertyDescriptor propertyDescriptorFor( Property property )
+    public PropertyDescriptor propertyDescriptorFor( Property<?> property )
     {
         while( property instanceof PropertyWrapper )
         {
             property = ( (PropertyWrapper) property ).next();
         }
 
-        return (PropertyDescriptor) ( (PropertyInstance) property ).propertyInfo();
+        return (PropertyDescriptor) ( (PropertyInstance<?>) property ).propertyInfo();
     }
 
     @Override
@@ -309,6 +311,11 @@ public final class Qi4jRuntimeImpl
         while( association instanceof ManyAssociationWrapper )
         {
             association = ( (ManyAssociationWrapper) association ).next();
+        }
+        
+        while( association instanceof NamedAssociationWrapper )
+        {
+            association = ( (NamedAssociationWrapper) association ).next();
         }
 
         return (AssociationDescriptor) ( (AbstractAssociationInstance) association ).associationInfo();

@@ -29,9 +29,9 @@ import org.qi4j.api.property.Property;
  * Declaration of a Property or Association.
  */
 public final class MetaInfoDeclaration
-    implements StateDeclarations, AssociationDeclarations, ManyAssociationDeclarations
+    implements StateDeclarations, AssociationDeclarations, ManyAssociationDeclarations, NamedAssociationDeclarations
 {
-    Map<Class<?>, InfoHolder<?>> mixinPropertyDeclarations = new HashMap<Class<?>, InfoHolder<?>>();
+    Map<Class<?>, InfoHolder<?>> mixinPropertyDeclarations = new HashMap<>();
 
     public MetaInfoDeclaration()
     {
@@ -39,10 +39,11 @@ public final class MetaInfoDeclaration
 
     public <T> MixinDeclaration<T> on( Class<T> mixinType )
     {
+        @SuppressWarnings( "unchecked" )
         InfoHolder<T> propertyDeclarationHolder = (InfoHolder<T>) mixinPropertyDeclarations.get( mixinType );
         if( propertyDeclarationHolder == null )
         {
-            propertyDeclarationHolder = new InfoHolder<T>( mixinType );
+            propertyDeclarationHolder = new InfoHolder<>( mixinType );
             mixinPropertyDeclarations.put( mixinType, propertyDeclarationHolder );
         }
         return propertyDeclarationHolder;
@@ -115,16 +116,17 @@ public final class MetaInfoDeclaration
         }
 
         private final Class<T> mixinType;
-        private final Map<AccessibleObject, MethodInfo> methodInfos = new HashMap<AccessibleObject, MethodInfo>();
+        private final Map<AccessibleObject, MethodInfo> methodInfos = new HashMap<>();
         // temporary holder
         private MetaInfo metaInfo = null;
 
-        public InfoHolder( Class<T> mixinType )
+        private InfoHolder( Class<T> mixinType )
         {
             this.mixinType = mixinType;
         }
 
         @Override
+        @SuppressWarnings( "raw" )
         public Object invoke( Object o, Method method, Object[] objects )
             throws Throwable
         {
@@ -198,6 +200,7 @@ public final class MetaInfoDeclaration
         // DSL Interface
 
         @Override
+        @SuppressWarnings( "raw" )
         public T declareDefaults()
         {
             return mixinType.cast(

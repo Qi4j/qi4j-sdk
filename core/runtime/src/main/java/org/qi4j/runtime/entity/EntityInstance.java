@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2008-2009, Rickard Öberg. All Rights Reserved.
- * Copyright (c) 2009, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2009-2013, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2014, Paul Merlin. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +13,6 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.runtime.entity;
 
 import java.lang.reflect.Method;
@@ -23,6 +23,7 @@ import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateDescriptor;
 import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.constraint.ConstraintViolationException;
@@ -89,6 +90,7 @@ public final class EntityInstance
     }
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public <T> T proxy()
     {
         return (T) proxy;
@@ -198,7 +200,7 @@ public final class EntityInstance
 
         if( status() == EntityStatus.REMOVED )
         {
-            throw new NoSuchEntityException( identity );
+            throw new NoSuchEntityException( identity, entityModel.types() );
         }
 
         mixins = entityModel.newMixinHolder();
@@ -266,13 +268,13 @@ public final class EntityInstance
     {
         // Calculate aggregated Entities
         AssociationStateDescriptor stateDescriptor = entityModel.state();
-        Set<Object> aggregatedEntities = new HashSet<Object>();
+        Set<Object> aggregatedEntities = new HashSet<>();
         Iterable<? extends AssociationDescriptor> associations = stateDescriptor.associations();
         for( AssociationDescriptor association : associations )
         {
             if( association.isAggregated() )
             {
-                Association assoc = state.associationFor( association.accessor() );
+                Association<?> assoc = state.associationFor( association.accessor() );
                 Object aggregatedEntity = assoc.get();
                 if( aggregatedEntity != null )
                 {
@@ -285,10 +287,22 @@ public final class EntityInstance
         {
             if( association.isAggregated() )
             {
-                ManyAssociation manyAssoc = state.manyAssociationFor( association.accessor() );
+                ManyAssociation<?> manyAssoc = state.manyAssociationFor( association.accessor() );
                 for( Object entity : manyAssoc )
                 {
                     aggregatedEntities.add( entity );
+                }
+            }
+        }
+        Iterable<? extends AssociationDescriptor> namedAssociations = stateDescriptor.namedAssociations();
+        for( AssociationDescriptor association : namedAssociations )
+        {
+            if( association.isAggregated() )
+            {
+                NamedAssociation<?> namedAssoc = state.namedAssociationFor( association.accessor() );
+                for( String name : namedAssoc )
+                {
+                    aggregatedEntities.add( namedAssoc.get( name ) );
                 }
             }
         }

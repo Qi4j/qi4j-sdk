@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2008-2012, Rickard Öberg. All Rights Reserved.
- * Copyright (c) 2008-2012, Niclas Hedhman. All Rights Reserved.
- * Copyright (c) 2012, Paul Merlin.
+ * Copyright (c) 2008-2013, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2012-2014, Paul Merlin. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import org.qi4j.api.activation.Activation;
-import org.qi4j.api.activation.ActivationEvent;
 import org.qi4j.api.activation.ActivationEventListener;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.PassivationException;
@@ -68,7 +67,6 @@ import org.qi4j.functional.Function2;
 import org.qi4j.functional.Specification;
 import org.qi4j.functional.Specifications;
 import org.qi4j.runtime.activation.ActivationDelegate;
-import org.qi4j.runtime.activation.ActivationEventListenerSupport;
 import org.qi4j.runtime.composite.TransientBuilderInstance;
 import org.qi4j.runtime.composite.TransientModel;
 import org.qi4j.runtime.composite.TransientStateInstance;
@@ -99,8 +97,15 @@ import org.qi4j.spi.entitystore.EntityStore;
 import org.qi4j.spi.metrics.MetricsProviderAdapter;
 import org.qi4j.valueserialization.orgjson.OrgJsonValueSerialization;
 
-import static org.qi4j.api.util.Classes.*;
-import static org.qi4j.functional.Iterables.*;
+import static org.qi4j.api.util.Classes.RAW_CLASS;
+import static org.qi4j.api.util.Classes.modelTypeSpecification;
+import static org.qi4j.functional.Iterables.cast;
+import static org.qi4j.functional.Iterables.filter;
+import static org.qi4j.functional.Iterables.first;
+import static org.qi4j.functional.Iterables.flatten;
+import static org.qi4j.functional.Iterables.iterable;
+import static org.qi4j.functional.Iterables.map;
+import static org.qi4j.functional.Iterables.toList;
 
 /**
  * Instance of a Qi4j Module. Contains the various composites for this Module.
@@ -120,7 +125,6 @@ public class ModuleInstance
     private final ImportedServicesInstance importedServices;
     // Eager instance objects
     private final ActivationDelegate activation;
-    private final ActivationEventListenerSupport activationEventSupport;
     private final TypeLookup typeLookup;
     private final QueryBuilderFactory queryBuilderFactory;
     private final ClassLoader classLoader;
@@ -148,15 +152,14 @@ public class ModuleInstance
 
         // Eager instance objects
         activation = new ActivationDelegate( this );
-        activationEventSupport = new ActivationEventListenerSupport();
         typeLookup = new TypeLookup( this );
         queryBuilderFactory = new QueryBuilderFactoryImpl( this );
         classLoader = new ModuleClassLoader( this, Thread.currentThread().getContextClassLoader() );
         entityFunction = new EntityFunction( this );
 
         // Activation
-        services.registerActivationEventListener( activationEventSupport );
-        importedServices.registerActivationEventListener( activationEventSupport );
+        services.registerActivationEventListener( activation );
+        importedServices.registerActivationEventListener( activation );
     }
 
     @Override
@@ -307,17 +310,17 @@ public class ModuleInstance
             throw new NoSuchTransientException( mixinType.getName(), name() );
         }
 
-        Map<AccessibleObject, Property<?>> properties = new HashMap<AccessibleObject, Property<?>>();
+        Map<AccessibleObject, Property<?>> properties = new HashMap<>();
         for( PropertyModel propertyModel : modelModule.model().state().properties() )
         {
-            Property<?> property = new PropertyInstance<Object>( propertyModel.getBuilderInfo(),
-                                                                 propertyModel.initialValue( modelModule.module() ) );
+            Property<?> property = new PropertyInstance<>( propertyModel.getBuilderInfo(),
+                                                           propertyModel.initialValue( modelModule.module() ) );
             properties.put( propertyModel.accessor(), property );
         }
 
         TransientStateInstance state = new TransientStateInstance( properties );
 
-        return new TransientBuilderInstance<T>( modelModule, state, UsesInstance.EMPTY_USES );
+        return new TransientBuilderInstance<>( modelModule, state, UsesInstance.EMPTY_USES );
     }
 
     @Override
@@ -348,18 +351,20 @@ public class ModuleInstance
         }
 
         ValueStateModel.StateResolver stateResolver = new InitialStateResolver( compositeModelModule.module() );
-        return new ValueBuilderInstance<T>( compositeModelModule, this, stateResolver );
+        return new ValueBuilderInstance<>( compositeModelModule, this, stateResolver );
     }
 
     @Override
     public <T> ValueBuilder<T> newValueBuilderWithState( Class<T> mixinType,
                                                          Function<PropertyDescriptor, Object> propertyFunction,
                                                          Function<AssociationDescriptor, EntityReference> associationFunction,
-                                                         Function<AssociationDescriptor, Iterable<EntityReference>> manyAssociationFunction )
+                                                         Function<AssociationDescriptor, Iterable<EntityReference>> manyAssociationFunction,
+                                                         Function<AssociationDescriptor, Map<String, EntityReference>> namedAssociationFunction )
     {
         NullArgumentException.validateNotNull( "propertyFunction", propertyFunction );
         NullArgumentException.validateNotNull( "associationFunction", associationFunction );
         NullArgumentException.validateNotNull( "manyAssociationFunction", manyAssociationFunction );
+        NullArgumentException.validateNotNull( "namedAssociationFunction", namedAssociationFunction );
 
         ModelModule<ValueModel> compositeModelModule = typeLookup.lookupValueModel( mixinType );
 
@@ -368,8 +373,8 @@ public class ModuleInstance
             throw new NoSuchValueException( mixinType.getName(), name() );
         }
 
-        ValueStateModel.StateResolver stateResolver = new FunctionStateResolver( propertyFunction, associationFunction, manyAssociationFunction );
-        return new ValueBuilderWithState<T>( compositeModelModule, this, stateResolver );
+        ValueStateModel.StateResolver stateResolver = new FunctionStateResolver( propertyFunction, associationFunction, manyAssociationFunction, namedAssociationFunction );
+        return new ValueBuilderWithState<>( compositeModelModule, this, stateResolver );
     }
 
     private static class InitialStateResolver
@@ -378,7 +383,7 @@ public class ModuleInstance
 
         private final ModuleInstance module;
 
-        public InitialStateResolver( ModuleInstance module )
+        private InitialStateResolver( ModuleInstance module )
         {
             this.module = module;
         }
@@ -398,8 +403,15 @@ public class ModuleInstance
         @Override
         public List<EntityReference> getManyAssociationState( AssociationDescriptor associationDescriptor )
         {
-            return new ArrayList<EntityReference>();
+            return new ArrayList<>();
         }
+
+        @Override
+        public Map<String, EntityReference> getNamedAssociationState( AssociationDescriptor associationDescriptor )
+        {
+            return new HashMap<>();
+        }
+        
     }
 
     private static class FunctionStateResolver
@@ -409,14 +421,17 @@ public class ModuleInstance
         private final Function<PropertyDescriptor, Object> propertyFunction;
         private final Function<AssociationDescriptor, EntityReference> associationFunction;
         private final Function<AssociationDescriptor, Iterable<EntityReference>> manyAssociationFunction;
+        private final Function<AssociationDescriptor, Map<String, EntityReference>> namedAssociationFunction;
 
         private FunctionStateResolver( Function<PropertyDescriptor, Object> propertyFunction,
                                        Function<AssociationDescriptor, EntityReference> associationFunction,
-                                       Function<AssociationDescriptor, Iterable<EntityReference>> manyAssociationFunction )
+                                       Function<AssociationDescriptor, Iterable<EntityReference>> manyAssociationFunction,
+                                       Function<AssociationDescriptor, Map<String, EntityReference>> namedAssociationFunction )
         {
             this.propertyFunction = propertyFunction;
             this.associationFunction = associationFunction;
             this.manyAssociationFunction = manyAssociationFunction;
+            this.namedAssociationFunction = namedAssociationFunction;
         }
 
         @Override
@@ -436,9 +451,17 @@ public class ModuleInstance
         {
             return toList( manyAssociationFunction.map( associationDescriptor ) );
         }
+
+        @Override
+        public Map<String, EntityReference> getNamedAssociationState( AssociationDescriptor associationDescriptor )
+        {
+            return namedAssociationFunction.map( associationDescriptor );
+        }
+
     }
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public <T> ValueBuilder<T> newValueBuilderWithPrototype( T prototype )
     {
         NullArgumentException.validateNotNull( "prototype", prototype );
@@ -453,7 +476,7 @@ public class ModuleInstance
             throw new NoSuchValueException( valueType.getName(), name() );
         }
 
-        return new ValueBuilderWithPrototype<T>( modelModule, this, prototype );
+        return new ValueBuilderWithPrototype<>( modelModule, this, prototype );
     }
 
     @Override
@@ -563,34 +586,32 @@ public class ModuleInstance
 
     // Implementation of Activation
     @Override
+    @SuppressWarnings( "unchecked" )
     public void activate()
         throws ActivationException
     {
-        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.ACTIVATING ) );
         activation.activate( model.newActivatorsInstance(), iterable( services, importedServices ) );
-        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.ACTIVATED ) );
     }
 
     @Override
     public void passivate()
         throws PassivationException
     {
-        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.PASSIVATING ) );
         activation.passivate();
-        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.PASSIVATED ) );
     }
 
     @Override
     public void registerActivationEventListener( ActivationEventListener listener )
     {
-        activationEventSupport.registerActivationEventListener( listener );
+        activation.registerActivationEventListener( listener );
     }
 
     @Override
     public void deregisterActivationEventListener( ActivationEventListener listener )
     {
-        activationEventSupport.deregisterActivationEventListener( listener );
+        activation.deregisterActivationEventListener( listener );
     }
+
 
     // Other methods
     /* package */ ModuleModel model()
@@ -737,7 +758,7 @@ public class ModuleInstance
     {
 
         private final ModuleInstance moduleInstance;
-        private final Map<String, Class<?>> classes = new ConcurrentHashMap<String, Class<?>>();
+        private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 
         private ModuleClassLoader( ModuleInstance moduleInstance, ClassLoader classLoader )
         {

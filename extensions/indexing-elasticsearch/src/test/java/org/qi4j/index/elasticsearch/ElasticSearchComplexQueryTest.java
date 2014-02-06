@@ -20,6 +20,7 @@ package org.qi4j.index.elasticsearch;
 import java.io.File;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
@@ -28,24 +29,28 @@ import org.qi4j.library.fileconfig.FileConfigurationOverride;
 import org.qi4j.library.fileconfig.FileConfigurationService;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.indexing.AbstractComplexQueryTest;
+import org.qi4j.test.util.DelTreeAfter;
 
-import static org.junit.Assume.assumeTrue;
+import static org.qi4j.test.util.Assume.assumeNoIbmJdk;
 
 @Ignore( "ElasticSearch Index/Query do not support Complex Queries, ie. queries by 'example values'" )
 public class ElasticSearchComplexQueryTest
-        extends AbstractComplexQueryTest
+    extends AbstractComplexQueryTest
 {
+
+    private static final File DATA_DIR = new File( "build/tmp/es-complex-query-test" );
+    @Rule
+    public final DelTreeAfter delTreeAfter = new DelTreeAfter( DATA_DIR );
 
     @BeforeClass
     public static void beforeClass_IBMJDK()
     {
-        // Ignore this test on IBM JDK
-        assumeTrue( !( System.getProperty( "java.vendor" ).contains( "IBM" ) ) );
+        assumeNoIbmJdk();
     }
 
     @Override
     public void assemble( ModuleAssembly module )
-            throws AssemblyException
+        throws AssemblyException
     {
         super.assemble( module );
 
@@ -54,15 +59,19 @@ public class ElasticSearchComplexQueryTest
         new EntityTestAssembler().assemble( config );
 
         // Index/Query
-        new ESFilesystemIndexQueryAssembler().withConfigModule( config ).withConfigVisibility( Visibility.layer ).assemble( module );
+        new ESFilesystemIndexQueryAssembler().
+            withConfigModule( config ).
+            withConfigVisibility( Visibility.layer ).
+            assemble( module );
         ElasticSearchConfiguration esConfig = config.forMixin( ElasticSearchConfiguration.class ).declareDefaults();
         esConfig.indexNonAggregatedAssociations().set( Boolean.TRUE );
 
         // FileConfig
-        FileConfigurationOverride override = new FileConfigurationOverride().withData( new File( "build/qi4j-data" ) ).
-                withLog( new File( "build/qi4j-logs" ) ).withTemporary( new File( "build/qi4j-temp" ) );
-        module.services( FileConfigurationService.class ).
-                setMetaInfo( override );
+        FileConfigurationOverride override = new FileConfigurationOverride().
+            withData( new File( DATA_DIR, "qi4j-data" ) ).
+            withLog( new File( DATA_DIR, "qi4j-logs" ) ).
+            withTemporary( new File( DATA_DIR, "qi4j-temp" ) );
+        module.services( FileConfigurationService.class ).setMetaInfo( override );
     }
 
     @Override

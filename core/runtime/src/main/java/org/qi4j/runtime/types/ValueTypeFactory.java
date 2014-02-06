@@ -36,6 +36,7 @@ import org.qi4j.functional.Iterables;
 import org.qi4j.functional.Specifications;
 import org.qi4j.runtime.association.AssociationsModel;
 import org.qi4j.runtime.association.ManyAssociationsModel;
+import org.qi4j.runtime.association.NamedAssociationsModel;
 import org.qi4j.runtime.composite.CompositeMethodsModel;
 import org.qi4j.runtime.composite.MixinsModel;
 import org.qi4j.runtime.property.PropertiesModel;
@@ -55,6 +56,7 @@ public class ValueTypeFactory
         return instance;
     }
 
+    @SuppressWarnings( {"raw", "unchecked"} )
     public ValueType newValueType( Type type,
                                    Class declaringClass,
                                    Class compositeType,
@@ -124,7 +126,12 @@ public class ValueTypeFactory
                     // Create default model
                     MixinsModel mixinsModel = new MixinsModel();
                     Iterable valueComposite = (Iterable) Iterables.iterable( ValueComposite.class );
-                    model = new ValueModel( valueComposite, Visibility.application, new MetaInfo(), mixinsModel, new ValueStateModel( new PropertiesModel(), new AssociationsModel(), new ManyAssociationsModel() ), new CompositeMethodsModel( mixinsModel ) );
+                    ValueStateModel valueStateModel = new ValueStateModel( new PropertiesModel(),
+                                                                           new AssociationsModel(),
+                                                                           new ManyAssociationsModel(),
+                                                                           new NamedAssociationsModel() );
+                    model = new ValueModel( valueComposite, Visibility.application, new MetaInfo(),
+                                            mixinsModel, valueStateModel, new CompositeMethodsModel( mixinsModel ) );
                 }
                 else
                 {
@@ -146,6 +153,7 @@ public class ValueTypeFactory
         return valueType;
     }
 
+    @SuppressWarnings( "raw" )
     private static class ValueFinder
         extends HierarchicalVisitorAdapter<Object, Object, RuntimeException>
     {

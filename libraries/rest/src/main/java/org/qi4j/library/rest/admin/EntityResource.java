@@ -17,11 +17,17 @@
  */
 package org.qi4j.library.rest.admin;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.openrdf.model.Statement;
 import org.openrdf.rio.RDFHandlerException;
 import org.qi4j.api.association.AssociationDescriptor;
@@ -36,17 +42,29 @@ import org.qi4j.api.usecase.Usecase;
 import org.qi4j.api.usecase.UsecaseBuilder;
 import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.api.value.ValueSerializationException;
+import org.qi4j.functional.Iterables;
 import org.qi4j.library.rdf.entity.EntityStateSerializer;
 import org.qi4j.library.rdf.serializer.RdfXmlSerializer;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.ManyAssociationState;
+import org.qi4j.spi.entity.NamedAssociationState;
 import org.qi4j.spi.entitystore.ConcurrentEntityStateModificationException;
 import org.qi4j.spi.entitystore.EntityNotFoundException;
 import org.qi4j.spi.entitystore.EntityStore;
 import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.entitystore.helpers.JSONEntityState;
-import org.restlet.data.*;
-import org.restlet.representation.*;
+import org.restlet.data.CharacterSet;
+import org.restlet.data.Form;
+import org.restlet.data.Language;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Status;
+import org.restlet.data.Tag;
+import org.restlet.representation.EmptyRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Variant;
+import org.restlet.representation.WriterRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
@@ -110,7 +128,9 @@ public class EntityResource
     protected Representation get( Variant variant )
         throws ResourceException
     {
-        EntityStoreUnitOfWork uow = entityStore.newUnitOfWork( UsecaseBuilder.newUsecase( "Get entity" ), module, System.currentTimeMillis() );
+        EntityStoreUnitOfWork uow = entityStore.newUnitOfWork( UsecaseBuilder.newUsecase( "Get entity" ),
+                                                               module,
+                                                               System.currentTimeMillis() );
 
         try
         {
@@ -184,7 +204,9 @@ public class EntityResource
                 throws IOException
             {
                 PrintWriter out = new PrintWriter( writer );
-                out.println( "<html><head><title>" + entity.identity() + "</title><link rel=\"alternate\" type=\"application/rdf+xml\" href=\"" + entity.identity() + ".rdf\"/></head><body>" );
+                out.println( "<html><head><title>" + entity.identity() + "</title>"
+                             + "<link rel=\"alternate\" type=\"application/rdf+xml\" "
+                             + "href=\"" + entity.identity() + ".rdf\"/></head><body>" );
                 out.println( "<h1>" + entity.identity() + "</h1>" );
 
                 out.println( "<form method=\"post\" action=\"" + getRequest().getResourceRef().getPath() + "\">\n" );
@@ -204,7 +226,8 @@ public class EntityResource
                                  + "type=\"text\" "
                                  + ( persistentProperty.isImmutable() ? "readonly=\"true\" " : "" )
                                  + "name=\"" + persistentProperty.qualifiedName() + "\" "
-                                 + "value=\"" + ( value == null ? "" : valueSerialization.serialize( value ) ) + "\"/></td></tr>" );
+                                 + "value=\"" + ( value == null ? "" : valueSerialization.serialize( value ) )
+                                 + "\"/></td></tr>" );
                 }
                 out.println( "</table></fieldset>\n" );
 
@@ -235,7 +258,7 @@ public class EntityResource
                     String value = "";
                     for( EntityReference identity : identities )
                     {
-                        value += identity.toString() + "\n";
+                        value += identity.identity() + "\n";
                     }
 
                     out.println( "<tr><td>"
@@ -250,6 +273,30 @@ public class EntityResource
                                  + "</textarea></td></tr>" );
                 }
                 out.println( "</table></fieldset>\n" );
+
+                out.println( "<fieldset><legend>NamedAssociations</legend>\n<table>" );
+                for( AssociationDescriptor associationType : descriptor.state().namedAssociations() )
+                {
+                    NamedAssociationState identities = entity.namedAssociationValueOf( associationType.qualifiedName() );
+                    String value = "";
+                    for( String name : identities )
+                    {
+                        value += name + "\n" + identities.get( name ).identity() + "\n";
+                    }
+
+                    out.println( "<tr><td>"
+                                 + "<label for=\"" + associationType.qualifiedName() + "\" >"
+                                 + associationType.qualifiedName().name()
+                                 + "</label></td>\n"
+                                 + "<td><textarea "
+                                 + "rows=\"10\" "
+                                 + "cols=\"80\" "
+                                 + "name=\"" + associationType.qualifiedName() + "\" >"
+                                 + value
+                                 + "</textarea></td></tr>" );
+                }
+                out.println( "</table></fieldset>\n" );
+
                 out.println( "<input type=\"submit\" value=\"Update\"/></form>\n" );
 
                 out.println( "</body></html>\n" );
@@ -328,7 +375,9 @@ public class EntityResource
                     }
                     else
                     {
-                        entity.setPropertyValue( persistentProperty.qualifiedName(), valueSerialization.deserialize( persistentProperty.valueType(), formValue ) );
+                        entity.setPropertyValue(
+                            persistentProperty.qualifiedName(),
+                            valueSerialization.deserialize( persistentProperty.valueType(), formValue ) );
                     }
                 }
             }
@@ -336,13 +385,14 @@ public class EntityResource
             for( AssociationDescriptor associationType : descriptor.state().associations() )
             {
                 String newStringAssociation = form.getFirstValue( associationType.qualifiedName().name() );
-                if( newStringAssociation == null || newStringAssociation.equals( "" ) )
+                if( newStringAssociation == null || newStringAssociation.isEmpty() )
                 {
                     entity.setAssociationValue( associationType.qualifiedName(), null );
                 }
                 else
                 {
-                    entity.setAssociationValue( associationType.qualifiedName(), EntityReference.parseEntityReference( newStringAssociation ) );
+                    entity.setAssociationValue( associationType.qualifiedName(),
+                                                EntityReference.parseEntityReference( newStringAssociation ) );
                 }
             }
             for( AssociationDescriptor associationType : descriptor.state().manyAssociations() )
@@ -399,12 +449,65 @@ public class EntityResource
                     // Ignore
                 }
             }
+            for( AssociationDescriptor associationType : descriptor.state().namedAssociations() )
+            {
+                String newStringAssociation = form.getFirstValue( associationType.qualifiedName().name() );
+                NamedAssociationState namedAssociation = entity.namedAssociationValueOf( associationType.qualifiedName() );
+                if( newStringAssociation == null )
+                {
+                    // Remove "left-overs"
+                    for( String name : namedAssociation )
+                    {
+                        namedAssociation.remove( name );
+                    }
+                    continue;
+                }
+                Set<String> names = new HashSet<>();
+                BufferedReader bufferedReader = new BufferedReader( new StringReader( newStringAssociation ) );
+                String line;
+                try
+                {
+                    while( ( line = bufferedReader.readLine() ) != null )
+                    {
+                        String name = line;
+                        line = bufferedReader.readLine();
+                        if( line == null )
+                        {
+                            break;
+                        }
+                        String identity = line;
+                        EntityReference reference = new EntityReference( identity );
+                        try
+                        {
+                            unitOfWork.entityStateOf( reference );
+
+                            namedAssociation.remove( name );
+                            namedAssociation.put( name, reference );
+
+                            names.add( name );
+                        }
+                        catch( EntityNotFoundException e )
+                        {
+                            // Ignore this entity - doesn't exist
+                        }
+                    }
+
+                    // Remove "left-overs"
+                    for( String assocName : Iterables.toList( namedAssociation ) )
+                    {
+                        if( !names.contains( assocName ) )
+                        {
+                            namedAssociation.remove( assocName );
+                        }
+                    }
+                }
+                catch( IOException e )
+                {
+                    // Ignore
+                }
+            }
         }
-        catch( ValueSerializationException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
-        }
-        catch( IllegalArgumentException e )
+        catch( ValueSerializationException | IllegalArgumentException e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }

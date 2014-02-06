@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2008-2011, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008-2013, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2014, Paul Merlin. All Rights Reserved.
+ *
+ * Licensed  under the  Apache License,  Version 2.0  (the "License");
+ * you may not use  this file  except in  compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed  under the  License is distributed on an "AS IS" BASIS,
+ * WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+ * implied.
+ *
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
+ */
 package org.qi4j.runtime.entity;
 
 import java.lang.reflect.AccessibleObject;
@@ -8,6 +27,7 @@ import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.property.PropertyDescriptor;
@@ -20,6 +40,8 @@ import org.qi4j.runtime.association.AssociationInstance;
 import org.qi4j.runtime.association.AssociationModel;
 import org.qi4j.runtime.association.ManyAssociationInstance;
 import org.qi4j.runtime.association.ManyAssociationModel;
+import org.qi4j.runtime.association.NamedAssociationInstance;
+import org.qi4j.runtime.association.NamedAssociationModel;
 import org.qi4j.runtime.composite.ConstraintsCheck;
 import org.qi4j.runtime.property.PropertyModel;
 import org.qi4j.runtime.unitofwork.BuilderEntityState;
@@ -31,14 +53,13 @@ import org.qi4j.spi.entity.EntityState;
 public final class EntityStateInstance
     implements AssociationStateHolder
 {
-    protected Map<AccessibleObject, Object> state;
+    private Map<AccessibleObject, Object> state;
 
     private final EntityStateModel stateModel;
     private EntityState entityState;
-    protected Function2<EntityReference, Type, Object> entityFunction;
+    private final Function2<EntityReference, Type, Object> entityFunction;
 
-    public EntityStateInstance( EntityStateModel stateModel, final UnitOfWork uow, EntityState entityState
-    )
+    public EntityStateInstance( EntityStateModel stateModel, final UnitOfWork uow, EntityState entityState )
     {
         this.stateModel = stateModel;
         this.entityState = entityState;
@@ -54,6 +75,7 @@ public final class EntityStateInstance
     }
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public <T> Property<T> propertyFor( AccessibleObject accessor )
         throws IllegalArgumentException
     {
@@ -64,12 +86,11 @@ public final class EntityStateInstance
         if( property == null )
         {
             PropertyModel entityPropertyModel = stateModel.propertyModelFor( accessor );
-            if( entityPropertyModel == null )
-            {
-                throw new IllegalArgumentException( "No such property:" + accessor );
-            }
-
-            property = new EntityPropertyInstance<T>( entityState instanceof BuilderEntityState ? entityPropertyModel.getBuilderInfo() : entityPropertyModel, entityState );
+            property = new EntityPropertyInstance<>(
+                entityState instanceof BuilderEntityState
+                ? entityPropertyModel.getBuilderInfo()
+                : entityPropertyModel,
+                entityState );
             state.put( accessor, property );
         }
 
@@ -90,6 +111,7 @@ public final class EntityStateInstance
     }
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public <T> Association<T> associationFor( AccessibleObject accessor )
         throws IllegalArgumentException
     {
@@ -99,12 +121,12 @@ public final class EntityStateInstance
         if( association == null )
         {
             final AssociationModel associationModel = stateModel.getAssociation( accessor );
-            if( associationModel == null )
-            {
-                throw new IllegalArgumentException( "No such association:" + accessor );
-            }
-
-            association = new AssociationInstance<T>( entityState instanceof BuilderEntityState ? associationModel.getBuilderInfo() : associationModel, entityFunction, new Property<EntityReference>()
+            association = new AssociationInstance<>(
+                entityState instanceof BuilderEntityState
+                ? associationModel.getBuilderInfo()
+                : associationModel,
+                entityFunction,
+                new Property<EntityReference>()
             {
                 @Override
                 public EntityReference get()
@@ -139,6 +161,7 @@ public final class EntityStateInstance
     }
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public <T> ManyAssociation<T> manyAssociationFor( AccessibleObject accessor )
     {
         Map<AccessibleObject, Object> state = state();
@@ -147,14 +170,13 @@ public final class EntityStateInstance
 
         if( manyAssociation == null )
         {
-            final ManyAssociationModel associationModel = stateModel.getManyAssociation( accessor );
-            if( associationModel == null )
-            {
-                throw new IllegalArgumentException( "No such many-association:" + accessor );
-            }
-
-            manyAssociation = new ManyAssociationInstance<T>( entityState instanceof BuilderEntityState ? associationModel
-                .getBuilderInfo() : associationModel, entityFunction, entityState.manyAssociationValueOf( associationModel.qualifiedName() ) );
+            ManyAssociationModel associationModel = stateModel.getManyAssociation( accessor );
+            manyAssociation = new ManyAssociationInstance<>(
+                entityState instanceof BuilderEntityState
+                ? associationModel.getBuilderInfo()
+                : associationModel,
+                entityFunction,
+                entityState.manyAssociationValueOf( associationModel.qualifiedName() ) );
             state.put( accessor, manyAssociation );
         }
 
@@ -174,19 +196,56 @@ public final class EntityStateInstance
         }, stateModel.manyAssociations() );
     }
 
+    @Override
+    @SuppressWarnings( "unchecked" )
+    public <T> NamedAssociation<T> namedAssociationFor( AccessibleObject accessor )
+    {
+        Map<AccessibleObject, Object> state = state();
+
+        NamedAssociation<T> namedAssociation = (NamedAssociation<T>) state.get( accessor );
+
+        if( namedAssociation == null )
+        {
+            NamedAssociationModel associationModel = stateModel.getNamedAssociation( accessor );
+            namedAssociation = new NamedAssociationInstance<>(
+                entityState instanceof BuilderEntityState
+                ? associationModel.getBuilderInfo()
+                : associationModel,
+                entityFunction,
+                entityState.namedAssociationValueOf( associationModel.qualifiedName() ) );
+            state.put( accessor, namedAssociation );
+        }
+
+        return namedAssociation;
+    }
+
+    @Override
+    public Iterable<? extends NamedAssociation<?>> allNamedAssociations()
+    {
+        return Iterables.map( new Function<AssociationDescriptor, NamedAssociation<?>>()
+        {
+            @Override
+            public NamedAssociation<?> map( AssociationDescriptor associationDescriptor )
+            {
+                return namedAssociationFor( associationDescriptor.accessor() );
+            }
+        }, stateModel.namedAssociations() );
+    }
+
     public void checkConstraints()
     {
         for( PropertyDescriptor propertyDescriptor : stateModel.properties() )
         {
-            ( (ConstraintsCheck) propertyDescriptor ).checkConstraints( this.<Object>propertyFor( propertyDescriptor.accessor() )
-                                                                            .get() );
+            ConstraintsCheck constraints = (ConstraintsCheck) propertyDescriptor;
+            Property<Object> property = this.propertyFor( propertyDescriptor.accessor() );
+            constraints.checkConstraints( property.get() );
         }
 
         for( AssociationDescriptor associationDescriptor : stateModel.associations() )
         {
-            ( (ConstraintsCheck) associationDescriptor ).checkConstraints( this.<Object>associationFor( associationDescriptor
-                                                                                                            .accessor() )
-                                                                               .get() );
+            ConstraintsCheck constraints = (ConstraintsCheck) associationDescriptor;
+            Association<Object> association = this.associationFor( associationDescriptor.accessor() );
+            constraints.checkConstraints( association.get() );
         }
 
         // TODO Should ManyAssociations be checked too?
@@ -196,7 +255,7 @@ public final class EntityStateInstance
     {
         if( state == null )
         {
-            state = new HashMap<AccessibleObject, Object>();
+            state = new HashMap<>();
         }
 
         return state;

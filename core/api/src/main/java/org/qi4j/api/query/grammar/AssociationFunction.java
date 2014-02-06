@@ -1,3 +1,21 @@
+/*
+ * Copyright 2007-2011 Rickard Öberg.
+ * Copyright 2007-2010 Niclas Hedhman.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * ied.
+ *
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.qi4j.api.query.grammar;
 
 import java.lang.reflect.AccessibleObject;
@@ -8,6 +26,7 @@ import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.association.GenericAssociationInfo;
 import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.query.QueryExpressionException;
@@ -22,22 +41,26 @@ import static org.qi4j.api.util.Classes.typeOf;
 public class AssociationFunction<T>
     implements Function<Composite, Association<T>>
 {
-    private AssociationFunction<?> traversedAssociation;
-    private ManyAssociationFunction<?> traversedManyAssociation;
+    private final AssociationFunction<?> traversedAssociation;
+    private final ManyAssociationFunction<?> traversedManyAssociation;
+    private final NamedAssociationFunction<?> traversedNamedAssociation;
     private final AccessibleObject accessor;
 
     public AssociationFunction( AssociationFunction<?> traversedAssociation,
                                 ManyAssociationFunction<?> traversedManyAssociation,
+                                NamedAssociationFunction<?> traversedNamedAssociation,
                                 AccessibleObject accessor
     )
     {
         this.traversedAssociation = traversedAssociation;
         this.traversedManyAssociation = traversedManyAssociation;
+        this.traversedNamedAssociation = traversedNamedAssociation;
         this.accessor = accessor;
 
         Type returnType = typeOf( accessor );
-        if( !Association.class.isAssignableFrom( Classes.RAW_CLASS.map( returnType ) ) &&
-            !ManyAssociation.class.isAssignableFrom( Classes.RAW_CLASS.map( returnType ) ) )
+        if( !Association.class.isAssignableFrom( Classes.RAW_CLASS.map( returnType ) )
+            && !ManyAssociation.class.isAssignableFrom( Classes.RAW_CLASS.map( returnType ) )
+            && !NamedAssociation.class.isAssignableFrom( Classes.RAW_CLASS.map( returnType ) ) )
         {
             throw new QueryExpressionException( "Unsupported association type:" + returnType );
         }
@@ -56,6 +79,11 @@ public class AssociationFunction<T>
     public ManyAssociationFunction<?> traversedManyAssociation()
     {
         return traversedManyAssociation;
+    }
+
+    public NamedAssociationFunction<?> traversedNamedAssociation()
+    {
+        return traversedNamedAssociation;
     }
 
     public AccessibleObject accessor()
@@ -81,6 +109,10 @@ public class AssociationFunction<T>
             else if( traversedManyAssociation != null )
             {
                 throw new IllegalArgumentException( "Cannot evaluate a ManyAssociation" );
+            }
+            else if( traversedNamedAssociation != null )
+            {
+                throw new IllegalArgumentException( "Cannot evaluate a NamedAssociation" );
             }
 
             if( target == null )

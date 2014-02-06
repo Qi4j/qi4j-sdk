@@ -11,7 +11,6 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.functional;
 
 import java.lang.reflect.Array;
@@ -37,7 +36,8 @@ public final class Iterables
 {
     private static Logger debugLogger = LoggerFactory.getLogger( Iterables.class );
 
-    private static Iterable EMPTY = new Iterable()
+    @SuppressWarnings( "raw" )
+    private static final Iterable EMPTY = new Iterable()
     {
         Iterator iterator = new Iterator()
         {
@@ -66,6 +66,7 @@ public final class Iterables
         }
     };
 
+    @SuppressWarnings( "unchecked" )
     public static <T> Iterable<T> empty()
     {
         return EMPTY;
@@ -148,7 +149,7 @@ public final class Iterables
 
                 return new Iterator<T>()
                 {
-                    private final Set<T> items = new HashSet<T>();
+                    private final Set<T> items = new HashSet<>();
                     private T nextItem;
 
                     @Override
@@ -205,9 +206,10 @@ public final class Iterables
         return c;
     }
 
+    @SuppressWarnings( "unchecked" )
     public static <X> Iterable<X> filter( Specification<? /* super X*/> specification, Iterable<X> i )
     {
-        return new FilterIterable<X>( i, ( Specification<? super X> ) specification );
+        return new FilterIterable<>( i, (Specification<? super X>) specification );
     }
 
     public static <X> X first( Iterable<X> i )
@@ -288,13 +290,13 @@ public final class Iterables
         return list;
     }
 
-    public static <T> boolean matchesAny( Specification<? /* super T */> specification, Iterable<T> iterable )
+    public static <T> boolean matchesAny( Specification<? super T> specification, Iterable<T> iterable )
     {
         boolean result = false;
 
         for( T item : iterable )
         {
-            if( ( ( Specification<? super T> )specification ).satisfiedBy( item ) )
+            if( ( (Specification<? super T>) specification ).satisfiedBy( item ) )
             {
                 result = true;
                 break;
@@ -320,15 +322,16 @@ public final class Iterables
 
     public static <X> Iterable<X> flatten( Iterable<?>... multiIterator )
     {
-        return new FlattenIterable<X, Iterable<X>>( Iterables.<Iterable<X>>cast( Arrays.asList( multiIterator ) ) );
+        return new FlattenIterable<>( Iterables.<Iterable<X>>cast( Arrays.asList( multiIterator ) ) );
     }
 
     public static <X, I extends Iterable<? extends X>> Iterable<X> flattenIterables( Iterable<I> multiIterator )
     // public static <X> Iterable<X> flattenIterables( Iterable<Iterable<?>> multiIterator )
     {
-        return new FlattenIterable<X, Iterable<X>>( Iterables.<Iterable<X>>cast( multiIterator ) );
+        return new FlattenIterable<>( Iterables.<Iterable<X>>cast( multiIterator ) );
     }
 
+    @SafeVarargs
     public static <T> Iterable<T> mix( final Iterable<T>... iterables )
     {
         return new Iterable<T>()
@@ -401,14 +404,15 @@ public final class Iterables
         };
     }
 
+    @SuppressWarnings( "unchecked" )
     public static <FROM, TO> Iterable<TO> map( Function<? /* super FROM */, TO> function, Iterable<FROM> from )
     {
-        return new MapIterable<FROM, TO>( from, ( Function<FROM, TO> ) function );
+        return new MapIterable<>( from, (Function<FROM, TO>) function );
     }
 
     public static <T> Iterable<T> iterable( Enumeration<T> enumeration )
     {
-        List<T> list = new ArrayList<T>();
+        List<T> list = new ArrayList<>();
         while( enumeration.hasMoreElements() )
         {
             T item = enumeration.nextElement();
@@ -418,11 +422,13 @@ public final class Iterables
         return list;
     }
 
+    @SafeVarargs
     public static <T> Iterable<T> iterable( T... items )
     {
         return Arrays.asList( items );
     }
 
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> Iterable<T> cast( Iterable<?> iterable )
     {
         Iterable iter = iterable;
@@ -434,6 +440,7 @@ public final class Iterables
         return new Function<FROM, TO>()
         {
             @Override
+            @SuppressWarnings( "unchecked" )
             public TO map( FROM from )
             {
                 return (TO) from;
@@ -560,6 +567,7 @@ public final class Iterables
         };
     }
 
+    @SafeVarargs
     public static <T> Iterable<T> debug( String format,
                                          final Iterable<T> iterable,
                                          final Function<T, String>... functions
@@ -581,8 +589,8 @@ public final class Iterables
                     String[] mapped = new String[ functions.length ];
                     for( int i = 0; i < functions.length; i++ )
                     {
-                        Function<T, String> function = functions[ i ];
-                        mapped[ i ] = function.map( t );
+                        Function<T, String> function = functions[i];
+                        mapped[i] = function.map( t );
                         debugLogger.info( msgFormat.format( mapped ) );
                     }
                 }
@@ -594,7 +602,7 @@ public final class Iterables
 
     public static <T> Iterable<T> cache( Iterable<T> iterable )
     {
-        return new CacheIterable<T>( iterable );
+        return new CacheIterable<>( iterable );
     }
 
     public static <T> String toString( Iterable<T> iterable )
@@ -604,7 +612,7 @@ public final class Iterables
             @Override
             public String map( T t )
             {
-                return t == null ?"[null]" : t.toString();
+                return t == null ? "[null]" : t.toString();
             }
         }, "," );
     }
@@ -635,17 +643,18 @@ public final class Iterables
         return toArray( Object.class, iterable );
     }
 
+    @SuppressWarnings( "unchecked" )
     public static <T> T[] toArray( Class<T> componentType, Iterable<T> iterable )
     {
         if( iterable == null )
         {
             return null;
         }
-
         List<T> list = toList( iterable );
         return list.toArray( (T[]) Array.newInstance( componentType, list.size() ) );
     }
 
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <X extends Comparable> Iterable<X> sort( Iterable<X> iterable )
     {
         List<X> list = toList( iterable );
@@ -666,7 +675,7 @@ public final class Iterables
         private final Iterable<FROM> from;
         private final Function<? super FROM, TO> function;
 
-        public MapIterable( Iterable<FROM> from, Function<? super FROM, TO> function )
+        private MapIterable( Iterable<FROM> from, Function<? super FROM, TO> function )
         {
             this.from = from;
             this.function = function;
@@ -675,7 +684,7 @@ public final class Iterables
         @Override
         public Iterator<TO> iterator()
         {
-            return new MapIterator<FROM, TO>( from.iterator(), function );
+            return new MapIterator<>( from.iterator(), function );
         }
 
         static class MapIterator<FROM, TO>
@@ -684,7 +693,7 @@ public final class Iterables
             private final Iterator<FROM> fromIterator;
             private final Function<? super FROM, TO> function;
 
-            public MapIterator( Iterator<FROM> fromIterator, Function<? super FROM, TO> function )
+            private MapIterator( Iterator<FROM> fromIterator, Function<? super FROM, TO> function )
             {
                 this.fromIterator = fromIterator;
                 this.function = function;
@@ -709,16 +718,17 @@ public final class Iterables
                 fromIterator.remove();
             }
         }
+
     }
 
     private static class FilterIterable<T>
         implements Iterable<T>
     {
-        private Iterable<T> iterable;
+        private final Iterable<T> iterable;
 
-        private Specification<? super T> specification;
+        private final Specification<? super T> specification;
 
-        private  FilterIterable( Iterable<T> iterable, Specification<? super T> specification )
+        private FilterIterable( Iterable<T> iterable, Specification<? super T> specification )
         {
             this.iterable = iterable;
             this.specification = specification;
@@ -727,15 +737,15 @@ public final class Iterables
         @Override
         public Iterator<T> iterator()
         {
-            return new FilterIterator<T>( iterable.iterator(), specification );
+            return new FilterIterator<>( iterable.iterator(), specification );
         }
 
         private static class FilterIterator<T>
             implements Iterator<T>
         {
-            private Iterator<T> iterator;
+            private final Iterator<T> iterator;
 
-            private Specification<? super T> specification;
+            private final Specification<? super T> specification;
 
             private T currentValue;
             boolean finished = false;
@@ -794,8 +804,8 @@ public final class Iterables
             @Override
             public boolean hasNext()
             {
-                return !finished &&
-                       ( !nextConsumed || moveToNextValid() );
+                return !finished
+                       && ( !nextConsumed || moveToNextValid() );
             }
 
             @Override
@@ -803,12 +813,13 @@ public final class Iterables
             {
             }
         }
+
     }
 
     private static class FlattenIterable<T, I extends Iterable<? extends T>>
         implements Iterable<T>
     {
-        private Iterable<I> iterable;
+        private final Iterable<I> iterable;
 
         private FlattenIterable( Iterable<I> iterable )
         {
@@ -818,16 +829,16 @@ public final class Iterables
         @Override
         public Iterator<T> iterator()
         {
-            return new FlattenIterator<T, I>( iterable.iterator() );
+            return new FlattenIterator<>( iterable.iterator() );
         }
 
         static class FlattenIterator<T, I extends Iterable<? extends T>>
             implements Iterator<T>
         {
-            private Iterator<I> iterator;
+            private final Iterator<I> iterator;
             private Iterator<? extends T> currentIterator;
 
-            public FlattenIterator( Iterator<I> iterator )
+            private FlattenIterator( Iterator<I> iterator )
             {
                 this.iterator = iterator;
                 currentIterator = null;
@@ -849,8 +860,8 @@ public final class Iterables
                     }
                 }
 
-                while( !currentIterator.hasNext() &&
-                       iterator.hasNext() )
+                while( !currentIterator.hasNext()
+                       && iterator.hasNext() )
                 {
                     currentIterator = iterator.next().iterator();
                 }
@@ -875,12 +886,13 @@ public final class Iterables
                 currentIterator.remove();
             }
         }
+
     }
 
     private static class CacheIterable<T>
         implements Iterable<T>
     {
-        private Iterable<T> iterable;
+        private final Iterable<T> iterable;
         private Iterable<T> cache;
 
         private CacheIterable( Iterable<T> iterable )
@@ -900,7 +912,7 @@ public final class Iterables
 
             return new Iterator<T>()
             {
-                List<T> iteratorCache = new ArrayList<T>();
+                List<T> iteratorCache = new ArrayList<>();
 
                 @Override
                 public boolean hasNext()
@@ -929,4 +941,9 @@ public final class Iterables
             };
         }
     }
+
+    private Iterables()
+    {
+    }
+
 }

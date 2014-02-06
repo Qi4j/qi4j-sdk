@@ -1,5 +1,7 @@
 /*
- * Copyright 2008 Niclas Hedhman.
+ * Copyright (c) 2008-2011, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008-2013, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2014, Paul Merlin. All Rights Reserved.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -13,7 +15,7 @@
  * implied.
  *
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License. 
  */
 package org.qi4j.api.association;
 
@@ -37,7 +39,15 @@ public interface AssociationStateDescriptor extends StateDescriptor
     AssociationDescriptor getManyAssociationByQualifiedName( QualifiedName name )
         throws IllegalArgumentException;
 
+    AssociationDescriptor getNamedAssociationByName( String name )
+        throws IllegalArgumentException;
+
+    AssociationDescriptor getNamedAssociationByQualifiedName( QualifiedName name )
+        throws IllegalArgumentException;
+
     Iterable<? extends AssociationDescriptor> associations();
 
     Iterable<? extends AssociationDescriptor> manyAssociations();
+
+    Iterable<? extends AssociationDescriptor> namedAssociations();
 }

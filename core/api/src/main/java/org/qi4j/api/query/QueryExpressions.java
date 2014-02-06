@@ -1,8 +1,9 @@
 /*
- * Copyright 2007 Rickard Öberg.
- * Copyright 2007 Niclas Hedhman.
+ * Copyright 2007-2011 Rickard Öberg.
+ * Copyright 2007-2010 Niclas Hedhman.
  * Copyright 2008 Alin Dreghiciu.
- * Copyright 2012 Paul Merlin.
+ * Copyright 2012 Stanislav Muhametsin.
+ * Copyright 2012-2014 Paul Merlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +18,6 @@
  *
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package org.qi4j.api.query;
 
@@ -31,6 +31,7 @@ import java.util.Collection;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.GenericAssociationInfo;
 import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.entity.Identity;
 import org.qi4j.api.injection.scope.State;
@@ -50,6 +51,9 @@ import org.qi4j.api.query.grammar.LtSpecification;
 import org.qi4j.api.query.grammar.ManyAssociationContainsSpecification;
 import org.qi4j.api.query.grammar.ManyAssociationFunction;
 import org.qi4j.api.query.grammar.MatchesSpecification;
+import org.qi4j.api.query.grammar.NamedAssociationContainsNameSpecification;
+import org.qi4j.api.query.grammar.NamedAssociationContainsSpecification;
+import org.qi4j.api.query.grammar.NamedAssociationFunction;
 import org.qi4j.api.query.grammar.NeSpecification;
 import org.qi4j.api.query.grammar.NotSpecification;
 import org.qi4j.api.query.grammar.OrSpecification;
@@ -62,6 +66,7 @@ import org.qi4j.api.query.grammar.Variable;
 import org.qi4j.api.util.NullArgumentException;
 import org.qi4j.functional.Specification;
 
+import static org.qi4j.functional.Iterables.first;
 import static org.qi4j.functional.Iterables.prepend;
 
 /**
@@ -101,8 +106,8 @@ public final class QueryExpressions
         if( clazz.isInterface() )
         {
             return clazz.cast( Proxy.newProxyInstance( clazz.getClassLoader(),
-                                                       new Class<?>[] { clazz },
-                                                       new TemplateHandler<T>( null, null, null ) ) );
+                                                       array( clazz ),
+                                                       new TemplateHandler<T>( null, null, null, null ) ) );
         }
         else
         {
@@ -117,28 +122,35 @@ public final class QueryExpressions
                         {
                             field.set( mixin,
                                        Proxy.newProxyInstance( field.getType().getClassLoader(),
-                                                               new Class<?>[]{ field.getType() },
-                                                               new PropertyReferenceHandler<T>( new PropertyFunction<T>( null, null, null, field ) ) ) );
+                                                               array( field.getType() ),
+                                                               new PropertyReferenceHandler<>( new PropertyFunction<T>( null, null, null, null, field ) ) ) );
                         }
                         else if( field.getType().equals( Association.class ) )
                         {
                             field.set( mixin,
                                        Proxy.newProxyInstance( field.getType().getClassLoader(),
-                                                               new Class<?>[]{ field.getType() },
-                                                               new AssociationReferenceHandler<T>( new AssociationFunction<T>( null, null, field ) ) ) );
+                                                               array( field.getType() ),
+                                                               new AssociationReferenceHandler<>( new AssociationFunction<T>( null, null, null, field ) ) ) );
                         }
-                        else if( field.getType().equals( Property.class ) )
+                        else if( field.getType().equals( ManyAssociation.class ) )
                         {
                             field.set( mixin,
                                        Proxy.newProxyInstance( field.getType().getClassLoader(),
-                                                               new Class<?>[]{ field.getType() },
-                                                               new ManyAssociationReferenceHandler<T>( new ManyAssociationFunction<T>( null, null, field ) ) ) );
+                                                               array( field.getType() ),
+                                                               new ManyAssociationReferenceHandler<>( new ManyAssociationFunction<T>( null, null, null, field ) ) ) );
+                        }
+                        else if( field.getType().equals( NamedAssociation.class ) )
+                        {
+                            field.set( mixin,
+                                       Proxy.newProxyInstance( field.getType().getClassLoader(),
+                                                               array( field.getType() ),
+                                                               new NamedAssociationReferenceHandler<>( new NamedAssociationFunction<T>( null, null, null, field ) ) ) );
                         }
                     }
                 }
                 return mixin;
             }
-            catch( Throwable e )
+            catch( IllegalAccessException | IllegalArgumentException | InstantiationException | SecurityException e )
             {
                 throw new IllegalArgumentException( "Cannot use class as template", e );
             }
@@ -159,14 +171,23 @@ public final class QueryExpressions
         NullArgumentException.validateNotNull( "Mixin class", mixinType );
         NullArgumentException.validateNotNull( "Association", association );
         return mixinType.cast( Proxy.newProxyInstance( mixinType.getClassLoader(),
-                                                       new Class<?>[]{ mixinType },
-                                                       new TemplateHandler<T>( null, association( association ), null ) ) );
+                                                       array( mixinType ),
+                                                       new TemplateHandler<T>( null,
+                                                                               association( association ),
+                                                                               null,
+                                                                               null ) ) );
     }
 
     public static <T> T oneOf( final ManyAssociation<T> association )
     {
         NullArgumentException.validateNotNull( "Association", association );
         return association.get( 0 );
+    }
+
+    public static <T> T oneOf( final NamedAssociation<T> association )
+    {
+        NullArgumentException.validateNotNull( "Association", association );
+        return association.get( first( association ) );
     }
 
     /**
@@ -193,7 +214,7 @@ public final class QueryExpressions
     @SuppressWarnings( "unchecked" )
     public static <T> PropertyFunction<T> property( Property<T> property )
     {
-        return ( ( PropertyReferenceHandler<T> ) Proxy.getInvocationHandler( property ) ).property();
+        return ( (PropertyReferenceHandler<T>) Proxy.getInvocationHandler( property ) ).property();
     }
 
     /**
@@ -215,10 +236,10 @@ public final class QueryExpressions
             {
                 throw new IllegalArgumentException( "Field must be of type Property<?>" );
             }
-            return ( Property<T> ) Proxy.newProxyInstance(
-                    mixinClass.getClassLoader(),
-                    new Class<?>[]{ field.getType() },
-                    new PropertyReferenceHandler<T>( new PropertyFunction<T>( null, null, null, field ) ) );
+            return (Property<T>) Proxy.newProxyInstance(
+                mixinClass.getClassLoader(),
+                array( field.getType() ),
+                new PropertyReferenceHandler<>( new PropertyFunction<T>( null, null, null, null, field ) ) );
         }
         catch( NoSuchFieldException e )
         {
@@ -237,7 +258,7 @@ public final class QueryExpressions
     @SuppressWarnings( "unchecked" )
     public static <T> AssociationFunction<T> association( Association<T> association )
     {
-        return ( ( AssociationReferenceHandler<T> ) Proxy.getInvocationHandler( association ) ).association();
+        return ( (AssociationReferenceHandler<T>) Proxy.getInvocationHandler( association ) ).association();
     }
 
     /**
@@ -251,11 +272,24 @@ public final class QueryExpressions
     @SuppressWarnings( "unchecked" )
     public static <T> ManyAssociationFunction<T> manyAssociation( ManyAssociation<T> association )
     {
-        return ( ( ManyAssociationReferenceHandler<T> ) Proxy.getInvocationHandler( association ) ).manyAssociation();
+        return ( (ManyAssociationReferenceHandler<T>) Proxy.getInvocationHandler( association ) ).manyAssociation();
+    }
+
+    /**
+     * Create a new Query Template NamedAssociationFunction.
+     *
+     * @param <T> type of the NamedAssociation
+     * @param association a NamedAssociation
+     *
+     * @return a new Query Template NamedAssociationFunction
+     */
+    @SuppressWarnings( "unchecked" )
+    public static <T> NamedAssociationFunction<T> namedAssociation( NamedAssociation<T> association )
+    {
+        return ( (NamedAssociationReferenceHandler<T>) Proxy.getInvocationHandler( association ) ).namedAssociation();
     }
 
     // And/Or/Not ------------------------------------------------------------|
-
     /**
      * Create a new AND specification.
      *
@@ -265,6 +299,7 @@ public final class QueryExpressions
      *
      * @return a new AND specification
      */
+    @SafeVarargs
     public static AndSpecification and( Specification<Composite> left,
                                         Specification<Composite> right,
                                         Specification<Composite>... optionalRight
@@ -276,18 +311,14 @@ public final class QueryExpressions
     /**
      * Create a new OR specification.
      *
-     * @param left first operand
-     * @param right second operand
-     * @param optionalRight optional operands
+     * @param specs operands
      *
      * @return a new OR specification
      */
-    public static OrSpecification or( Specification<Composite> left,
-                                      Specification<Composite> right,
-                                      Specification<Composite>... optionalRight
-    )
+    @SafeVarargs
+    public static OrSpecification or( Specification<Composite>... specs )
     {
-        return new OrSpecification( prepend( left, prepend( right, Arrays.asList( optionalRight ) ) ) );
+        return new OrSpecification( Arrays.asList( specs ) );
     }
 
     /**
@@ -314,7 +345,7 @@ public final class QueryExpressions
      */
     public static <T> EqSpecification<T> eq( Property<T> property, T value )
     {
-        return new EqSpecification<T>( property( property ), value );
+        return new EqSpecification<>( property( property ), value );
     }
 
     /**
@@ -325,6 +356,7 @@ public final class QueryExpressions
      *
      * @return a new EQUALS specification for a Property using a named Variable.
      */
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> EqSpecification<T> eq( Property<T> property, Variable variable )
     {
         return new EqSpecification( property( property ), variable );
@@ -340,11 +372,12 @@ public final class QueryExpressions
      */
     public static <T> EqSpecification<String> eq( Association<T> association, T value )
     {
-        return new EqSpecification<String>( new PropertyFunction<String>( null,
-                                                                          association( association ),
-                                                                          null,
-                                                                          IDENTITY_METHOD ),
-                                            value.toString() );
+        return new EqSpecification<>( new PropertyFunction<String>( null,
+                                                                    association( association ),
+                                                                    null,
+                                                                    null,
+                                                                    IDENTITY_METHOD ),
+                                      value.toString() );
     }
 
     /**
@@ -357,7 +390,7 @@ public final class QueryExpressions
      */
     public static <T> GeSpecification<T> ge( Property<T> property, T value )
     {
-        return new GeSpecification<T>( property( property ), value );
+        return new GeSpecification<>( property( property ), value );
     }
 
     /**
@@ -368,6 +401,7 @@ public final class QueryExpressions
      *
      * @return a new GREATER OR EQUALS specification for a Property using a named Variable.
      */
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> GeSpecification<T> ge( Property<T> property, Variable variable )
     {
         return new GeSpecification( property( property ), variable );
@@ -383,7 +417,7 @@ public final class QueryExpressions
      */
     public static <T> GtSpecification<T> gt( Property<T> property, T value )
     {
-        return new GtSpecification<T>( property( property ), value );
+        return new GtSpecification<>( property( property ), value );
     }
 
     /**
@@ -394,6 +428,7 @@ public final class QueryExpressions
      *
      * @return a new GREATER THAN specification for a Property using a named Variable.
      */
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> GtSpecification<T> gt( Property<T> property, Variable variable )
     {
         return new GtSpecification( property( property ), variable );
@@ -409,7 +444,7 @@ public final class QueryExpressions
      */
     public static <T> LeSpecification<T> le( Property<T> property, T value )
     {
-        return new LeSpecification<T>( property( property ), value );
+        return new LeSpecification<>( property( property ), value );
     }
 
     /**
@@ -420,6 +455,7 @@ public final class QueryExpressions
      *
      * @return a new LESS OR EQUALS specification for a Property using a named Variable.
      */
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> LeSpecification<T> le( Property<T> property, Variable variable )
     {
         return new LeSpecification( property( property ), variable );
@@ -435,7 +471,7 @@ public final class QueryExpressions
      */
     public static <T> LtSpecification<T> lt( Property<T> property, T value )
     {
-        return new LtSpecification<T>( property( property ), value );
+        return new LtSpecification<>( property( property ), value );
     }
 
     /**
@@ -446,6 +482,7 @@ public final class QueryExpressions
      *
      * @return a new LESSER THAN specification for a Property using a named Variable.
      */
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> LtSpecification<T> lt( Property<T> property, Variable variable )
     {
         return new LtSpecification( property( property ), variable );
@@ -461,7 +498,7 @@ public final class QueryExpressions
      */
     public static <T> NeSpecification<T> ne( Property<T> property, T value )
     {
-        return new NeSpecification<T>( property( property ), value );
+        return new NeSpecification<>( property( property ), value );
     }
 
     /**
@@ -472,6 +509,7 @@ public final class QueryExpressions
      *
      * @return a new NOT EQUALS specification for a Property using a named Variable.
      */
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> NeSpecification<T> ne( Property<T> property, Variable variable )
     {
         return new NeSpecification( property( property ), variable );
@@ -514,7 +552,7 @@ public final class QueryExpressions
      */
     public static <T> PropertyNotNullSpecification<T> isNotNull( Property<T> property )
     {
-        return new PropertyNotNullSpecification<T>( property( property ) );
+        return new PropertyNotNullSpecification<>( property( property ) );
     }
 
     /**
@@ -526,7 +564,7 @@ public final class QueryExpressions
      */
     public static <T> PropertyNullSpecification<T> isNull( Property<T> property )
     {
-        return new PropertyNullSpecification<T>( property( property ) );
+        return new PropertyNullSpecification<>( property( property ) );
     }
 
     /**
@@ -538,7 +576,7 @@ public final class QueryExpressions
      */
     public static <T> AssociationNotNullSpecification<T> isNotNull( Association<T> association )
     {
-        return new AssociationNotNullSpecification<T>( association( association ) );
+        return new AssociationNotNullSpecification<>( association( association ) );
     }
 
     /**
@@ -550,7 +588,7 @@ public final class QueryExpressions
      */
     public static <T> AssociationNullSpecification<T> isNull( Association<T> association )
     {
-        return new AssociationNullSpecification<T>( association( association ) );
+        return new AssociationNullSpecification<>( association( association ) );
     }
 
     // Collections -----------------------------------------------------------|
@@ -567,7 +605,7 @@ public final class QueryExpressions
                                                                Iterable<T> values )
     {
         NullArgumentException.validateNotNull( "Values", values );
-        return new ContainsAllSpecification<T>( property( collectionProperty ), values );
+        return new ContainsAllSpecification<>( property( collectionProperty ), values );
     }
 
     /**
@@ -578,9 +616,10 @@ public final class QueryExpressions
      *
      * @return a new CONTAINS ALL specification for a Collection Property using named Variables.
      */
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> ContainsAllSpecification<T> containsAllVariables(
-            Property<? extends Collection<T>> collectionProperty,
-            Iterable<Variable> variables )
+        Property<? extends Collection<T>> collectionProperty,
+        Iterable<Variable> variables )
     {
         NullArgumentException.validateNotNull( "Variables", variables );
         return new ContainsAllSpecification( property( collectionProperty ), variables );
@@ -598,7 +637,7 @@ public final class QueryExpressions
                                                          T value )
     {
         NullArgumentException.validateNotNull( "Value", value );
-        return new ContainsSpecification<T>( property( collectionProperty ), value );
+        return new ContainsSpecification<>( property( collectionProperty ), value );
     }
 
     /**
@@ -609,6 +648,7 @@ public final class QueryExpressions
      *
      * @return a new CONTAINS specification for a Collection Property using named Variables.
      */
+    @SuppressWarnings( {"raw", "unchecked"} )
     public static <T> ContainsSpecification<T> contains( Property<? extends Collection<T>> collectionProperty,
                                                          Variable variable )
     {
@@ -624,14 +664,39 @@ public final class QueryExpressions
      *
      * @return a new CONTAINS specification for a ManyAssociation.
      */
-    public static <T> ManyAssociationContainsSpecification<T> contains( ManyAssociation<T> manyAssoc,
-                                                                        T value )
+    public static <T> ManyAssociationContainsSpecification<T> contains( ManyAssociation<T> manyAssoc, T value )
     {
-        return new ManyAssociationContainsSpecification<T>( manyAssociation( manyAssoc ), value );
+        return new ManyAssociationContainsSpecification<>( manyAssociation( manyAssoc ), value );
+    }
+
+    /**
+     * Create a new CONTAINS specification for a NamedAssociation.
+     *
+     * @param namedAssoc  a NamedAssociation
+     * @param value the value
+     *
+     * @return a new CONTAINS specification for a NamedAssociation.
+     */
+    public static <T> NamedAssociationContainsSpecification<T> contains( NamedAssociation<T> namedAssoc, T value )
+    {
+        return new NamedAssociationContainsSpecification<>( namedAssociation( namedAssoc ), value );
+    }
+
+    /**
+     * Create a new CONTAINS NAME specification for a NamedAssociation.
+     *
+     * @param namedAssoc  a NamedAssociation
+     * @param name the name
+     *
+     * @return a new CONTAINS NAME specification for a NamedAssociation.
+     */
+    public static <T> NamedAssociationContainsNameSpecification<T> containsName( NamedAssociation<T> namedAssoc,
+                                                                                 String name )
+    {
+        return new NamedAssociationContainsNameSpecification<>( namedAssociation( namedAssoc ), name );
     }
 
     // Ordering --------------------------------------------------------------|
-
     /**
      * Create a new Query ascending order segment for a Property.
      *
@@ -664,18 +729,21 @@ public final class QueryExpressions
     private static class TemplateHandler<T>
         implements InvocationHandler
     {
-        private PropertyFunction<?> compositeProperty;
-        private AssociationFunction<?> compositeAssociation;
-        private ManyAssociationFunction<?> compositeManyAssociation;
+        private final PropertyFunction<?> compositeProperty;
+        private final AssociationFunction<?> compositeAssociation;
+        private final ManyAssociationFunction<?> compositeManyAssociation;
+        private final NamedAssociationFunction<?> compositeNamedAssociation;
 
-        private TemplateHandler( PropertyFunction<?> CompositeProperty,
-                                 AssociationFunction<?> CompositeAssociation,
-                                 ManyAssociationFunction<?> CompositeManyAssociation
+        private TemplateHandler( PropertyFunction<?> compositeProperty,
+                                 AssociationFunction<?> compositeAssociation,
+                                 ManyAssociationFunction<?> compositeManyAssociation,
+                                 NamedAssociationFunction<?> compositeNamedAssociation
         )
         {
-            this.compositeProperty = CompositeProperty;
-            this.compositeAssociation = CompositeAssociation;
-            this.compositeManyAssociation = CompositeManyAssociation;
+            this.compositeProperty = compositeProperty;
+            this.compositeAssociation = compositeAssociation;
+            this.compositeManyAssociation = compositeManyAssociation;
+            this.compositeNamedAssociation = compositeNamedAssociation;
         }
 
         @Override
@@ -685,30 +753,43 @@ public final class QueryExpressions
             if( Property.class.isAssignableFrom( method.getReturnType() ) )
             {
                 return Proxy.newProxyInstance(
-                        method.getReturnType().getClassLoader(),
-                        new Class<?>[]{ method.getReturnType() },
-                        new PropertyReferenceHandler<T>( new PropertyFunction<T>( compositeProperty,
-                                                                                  compositeAssociation,
-                                                                                  compositeManyAssociation,
-                                                                                  method ) ) );
+                    method.getReturnType().getClassLoader(),
+                    array( method.getReturnType() ),
+                    new PropertyReferenceHandler<>( new PropertyFunction<T>( compositeProperty,
+                                                                             compositeAssociation,
+                                                                             compositeManyAssociation,
+                                                                             compositeNamedAssociation,
+                                                                             method ) ) );
             }
             else if( Association.class.isAssignableFrom( method.getReturnType() ) )
             {
                 return Proxy.newProxyInstance(
-                        method.getReturnType().getClassLoader(),
-                        new Class<?>[]{ method.getReturnType() },
-                        new AssociationReferenceHandler<T>( new AssociationFunction<T>( compositeAssociation,
-                                                                                        compositeManyAssociation,
-                                                                                        method ) ) );
+                    method.getReturnType().getClassLoader(),
+                    array( method.getReturnType() ),
+                    new AssociationReferenceHandler<>( new AssociationFunction<T>( compositeAssociation,
+                                                                                   compositeManyAssociation,
+                                                                                   compositeNamedAssociation,
+                                                                                   method ) ) );
             }
             else if( ManyAssociation.class.isAssignableFrom( method.getReturnType() ) )
             {
                 return Proxy.newProxyInstance(
-                        method.getReturnType().getClassLoader(),
-                        new Class<?>[]{ method.getReturnType() },
-                        new ManyAssociationReferenceHandler<T>( new ManyAssociationFunction<T>( compositeAssociation,
-                                                                                                compositeManyAssociation,
-                                                                                                method ) ) );
+                    method.getReturnType().getClassLoader(),
+                    array( method.getReturnType() ),
+                    new ManyAssociationReferenceHandler<>( new ManyAssociationFunction<T>( compositeAssociation,
+                                                                                           compositeManyAssociation,
+                                                                                           compositeNamedAssociation,
+                                                                                           method ) ) );
+            }
+            else if( NamedAssociation.class.isAssignableFrom( method.getReturnType() ) )
+            {
+                return Proxy.newProxyInstance(
+                    method.getReturnType().getClassLoader(),
+                    array( method.getReturnType() ),
+                    new NamedAssociationReferenceHandler<>( new NamedAssociationFunction<T>( compositeAssociation,
+                                                                                             compositeManyAssociation,
+                                                                                             compositeNamedAssociation,
+                                                                                             method ) ) );
             }
 
             return null;
@@ -718,7 +799,7 @@ public final class QueryExpressions
     private static class PropertyReferenceHandler<T>
         implements InvocationHandler
     {
-        private PropertyFunction<T> property;
+        private final PropertyFunction<T> property;
 
         private PropertyReferenceHandler( PropertyFunction<T> property )
         {
@@ -740,8 +821,8 @@ public final class QueryExpressions
                 if( propertyType.getClass().equals( Class.class ) )
                 {
                     return Proxy.newProxyInstance( method.getDeclaringClass().getClassLoader(),
-                                                   new Class<?>[]{ (Class<?>) propertyType, PropertyReference.class },
-                                                   new TemplateHandler<T>( property, null, null ) );
+                                                   array( (Class<?>) propertyType, PropertyReference.class ),
+                                                   new TemplateHandler<T>( property, null, null, null ) );
                 }
             }
 
@@ -752,7 +833,7 @@ public final class QueryExpressions
     private static class AssociationReferenceHandler<T>
         implements InvocationHandler
     {
-        private AssociationFunction<T> association;
+        private final AssociationFunction<T> association;
 
         private AssociationReferenceHandler( AssociationFunction<T> association )
         {
@@ -774,8 +855,8 @@ public final class QueryExpressions
                 if( associationType.getClass().equals( Class.class ) )
                 {
                     return Proxy.newProxyInstance( method.getDeclaringClass().getClassLoader(),
-                                                   new Class<?>[]{ (Class) associationType, PropertyReference.class },
-                                                   new TemplateHandler<T>( null, association, null ) );
+                                                   array( (Class) associationType, PropertyReference.class ),
+                                                   new TemplateHandler<T>( null, association, null, null ) );
                 }
             }
 
@@ -786,9 +867,9 @@ public final class QueryExpressions
     private static class ManyAssociationReferenceHandler<T>
         implements InvocationHandler
     {
-        private ManyAssociationFunction<T> manyAssociation;
+        private final ManyAssociationFunction<T> manyAssociation;
 
-        public ManyAssociationReferenceHandler( ManyAssociationFunction<T> manyAssociation )
+        private ManyAssociationReferenceHandler( ManyAssociationFunction<T> manyAssociation )
         {
             this.manyAssociation = manyAssociation;
         }
@@ -808,12 +889,56 @@ public final class QueryExpressions
                 if( manyAssociationType.getClass().equals( Class.class ) )
                 {
                     return Proxy.newProxyInstance( method.getDeclaringClass().getClassLoader(),
-                                                   new Class<?>[]{ (Class) manyAssociationType, PropertyReference.class },
-                                                   new TemplateHandler<T>( null, null, manyAssociation ) );
+                                                   array( (Class) manyAssociationType, PropertyReference.class ),
+                                                   new TemplateHandler<T>( null, null, manyAssociation, null ) );
                 }
             }
 
             return null;
         }
+    }
+
+    private static class NamedAssociationReferenceHandler<T>
+        implements InvocationHandler
+    {
+        private final NamedAssociationFunction<T> namedAssociation;
+
+        private NamedAssociationReferenceHandler( NamedAssociationFunction<T> namedAssociation )
+        {
+            this.namedAssociation = namedAssociation;
+        }
+
+        public NamedAssociationFunction<T> namedAssociation()
+        {
+            return namedAssociation;
+        }
+
+        @Override
+        public Object invoke( Object o, final Method method, Object[] objects )
+            throws Throwable
+        {
+            if( method.equals( NamedAssociation.class.getMethod( "get", String.class ) ) )
+            {
+                Type namedAssociationType = GenericAssociationInfo.associationTypeOf( namedAssociation.accessor() );
+                if( namedAssociationType.getClass().equals( Class.class ) )
+                {
+                    return Proxy.newProxyInstance( method.getDeclaringClass().getClassLoader(),
+                                                   array( (Class) namedAssociationType, PropertyReference.class ),
+                                                   new TemplateHandler<T>( null, null, null, namedAssociation ) );
+                }
+            }
+
+            return null;
+        }
+    }
+
+    @SafeVarargs
+    private static <T> T[] array( T... array )
+    {
+        return array;
+    }
+
+    private QueryExpressions()
+    {
     }
 }

@@ -38,7 +38,11 @@ include::../../../../extensions/valueserialization-stax/src/docs/vs-stax.txt[]
 
 :leveloffset: 2
 
-include::../../../../extensions/cache-ehcache/src/docs/ehcache.txt[]
+include::../../../../extensions/cache-ehcache/src/docs/cache-ehcache.txt[]
+
+:leveloffset: 2
+
+include::../../../../extensions/cache-memcache/src/docs/cache-memcache.txt[]
 
 :leveloffset: 2
 

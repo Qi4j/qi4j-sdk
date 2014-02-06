@@ -1,18 +1,22 @@
 /*
- * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
- * Copyright 2012, Paul Merlin.
+ * Copyright (c) 2008-2011, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008-2013, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2012-2014, Paul Merlin. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed  under the  Apache License,  Version 2.0  (the "License");
+ * you may not use  this file  except in  compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed  under the  License is distributed on an "AS IS" BASIS,
+ * WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+ * implied.
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
-
 package org.qi4j.runtime.service;
 
 import java.lang.reflect.InvocationHandler;
@@ -23,8 +27,8 @@ import org.qi4j.api.service.ImportedServiceDescriptor;
 import org.qi4j.api.service.ServiceImporter;
 import org.qi4j.api.service.ServiceImporterException;
 import org.qi4j.api.structure.Module;
-import org.qi4j.functional.Visitable;
-import org.qi4j.functional.Visitor;
+import org.qi4j.functional.HierarchicalVisitor;
+import org.qi4j.functional.VisitableHierarchy;
 import org.qi4j.runtime.activation.ActivatorsInstance;
 import org.qi4j.runtime.activation.ActivatorsModel;
 
@@ -34,17 +38,19 @@ import static org.qi4j.functional.Iterables.iterable;
  * JAVADOC
  */
 public final class ImportedServiceModel
-    implements ImportedServiceDescriptor, Visitable<ImportedServiceModel>
+    implements ImportedServiceDescriptor, VisitableHierarchy<Object, Object>
 {
     private final Class<?> type;
     private final Visibility visibility;
+    @SuppressWarnings( "raw" )
     private final Class<? extends ServiceImporter> serviceImporter;
     private final String identity;
     private final boolean importOnStartup;
     private final MetaInfo metaInfo;
     private final ActivatorsModel<?> activatorsModel;
-    private String moduleName;
+    private final String moduleName;
 
+    @SuppressWarnings( "raw" )
     public ImportedServiceModel( Class serviceType,
                                  Visibility visibility,
                                  Class<? extends ServiceImporter> serviceImporter,
@@ -71,6 +77,7 @@ public final class ImportedServiceModel
     }
 
     @Override
+    @SuppressWarnings( "unchecked" )
     public Iterable<Class<?>> types()
     {
         Iterable<? extends Class<?>> iterable = iterable( type );
@@ -90,6 +97,7 @@ public final class ImportedServiceModel
     }
 
     @Override
+    @SuppressWarnings( "raw" )
     public Class<? extends ServiceImporter> serviceImporter()
     {
         return serviceImporter;
@@ -112,9 +120,11 @@ public final class ImportedServiceModel
         return moduleName;
     }
 
-    public ActivatorsInstance<?> newActivatorsInstance() throws Exception
+    @SuppressWarnings( {"raw", "unchecked"} )
+    public ActivatorsInstance<?> newActivatorsInstance( Module module )
+        throws Exception
     {
-        return new ActivatorsInstance( activatorsModel.newInstances() );
+        return new ActivatorsInstance( activatorsModel.newInstances( module ) );
     }
 
     @Override
@@ -124,19 +134,24 @@ public final class ImportedServiceModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( Visitor<? super ImportedServiceModel, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
         throws ThrowableType
     {
-        return visitor.visit( this );
+        if( visitor.visitEnter( this ) )
+        {
+            activatorsModel.accept( visitor );
+        }
+        return visitor.visitLeave( this );
     }
 
+    @SuppressWarnings( {"raw", "unchecked"} )
     public <T> ImportedServiceInstance<T> importInstance( Module module )
     {
         ServiceImporter importer = module.newObject( serviceImporter );
         try
         {
             T instance = (T) importer.importService( this );
-            return new ImportedServiceInstance<T>( instance, importer );
+            return new ImportedServiceInstance<>( instance, importer );
         }
         catch( ServiceImporterException e )
         {
@@ -148,6 +163,7 @@ public final class ImportedServiceModel
         }
     }
 
+    @SuppressWarnings( "raw" )
     public Object newProxy( InvocationHandler serviceInvocationHandler )
     {
         if( type.isInterface() )
