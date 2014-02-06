@@ -1,22 +1,22 @@
 /*
- * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008-2011, Rickard Öberg. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed  under the  Apache License,  Version 2.0  (the "License");
+ * you may not use  this file  except in  compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed  under the  License is distributed on an "AS IS" BASIS,
+ * WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+ * implied.
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package org.qi4j.library.rdf.entity;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Graph;
 import org.openrdf.model.Literal;
@@ -25,7 +25,6 @@ import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.GraphImpl;
-import org.openrdf.model.vocabulary.XMLSchema;
 import org.qi4j.api.Qi4j;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.composite.Composite;
@@ -40,6 +39,7 @@ import org.qi4j.api.util.Classes;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.api.value.ValueSerializer;
+import org.qi4j.api.value.ValueSerializer.Options;
 import org.qi4j.library.rdf.Rdfs;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.ManyAssociationState;
@@ -52,24 +52,9 @@ import static org.qi4j.functional.Iterables.first;
 public class EntityStateSerializer
 {
 
-    private Map<String, URI> dataTypes = new HashMap<String, URI>();
     @Service
     @Tagged( ValueSerialization.Formats.JSON )
     private ValueSerializer valueSerializer;
-
-    public EntityStateSerializer()
-    {
-        // TODO A ton more types need to be added here
-        dataTypes.put( String.class.getName(), XMLSchema.STRING );
-        dataTypes.put( Integer.class.getName(), XMLSchema.INT );
-        dataTypes.put( Boolean.class.getName(), XMLSchema.BOOLEAN );
-        dataTypes.put( Byte.class.getName(), XMLSchema.BYTE );
-        dataTypes.put( BigDecimal.class.getName(), XMLSchema.DECIMAL );
-        dataTypes.put( Double.class.getName(), XMLSchema.DOUBLE );
-        dataTypes.put( Long.class.getName(), XMLSchema.LONG );
-        dataTypes.put( Short.class.getName(), XMLSchema.SHORT );
-        dataTypes.put( Date.class.getName(), XMLSchema.DATETIME );
-    }
 
     public URI createEntityURI( ValueFactory valueFactory, EntityReference identity )
     {
@@ -107,12 +92,17 @@ public class EntityStateSerializer
                              entityState.entityDescriptor(),
                              includeNonQueryable );
 
-        serializeAssociations( entityState, graph, entityUri, entityState.entityDescriptor()
-            .state()
-            .associations(), includeNonQueryable );
-        serializeManyAssociations( entityState, graph, entityUri, entityState.entityDescriptor()
-            .state()
-            .manyAssociations(), includeNonQueryable );
+        serializeAssociations( entityState,
+                               graph,
+                               entityUri,
+                               entityState.entityDescriptor().state().associations(),
+                               includeNonQueryable );
+
+        serializeManyAssociations( entityState,
+                                   graph,
+                                   entityUri,
+                                   entityState.entityDescriptor().state().manyAssociations(),
+                                   includeNonQueryable );
     }
 
     private void serializeProperties( final EntityState entityState,
@@ -153,11 +143,12 @@ public class EntityStateSerializer
 
         if( valueType instanceof ValueCompositeType )
         {
-            serializeValueComposite( subject, predicate, (ValueComposite) property, valueType, graph, baseURI, includeNonQueryable );
+            serializeValueComposite( subject, predicate, (ValueComposite) property, valueType,
+                                     graph, baseURI, includeNonQueryable );
         }
         else
         {
-            String stringProperty = valueSerializer.serialize( property, false );
+            String stringProperty = valueSerializer.serialize( new Options().withoutTypeInfo(), property );
             final Literal object = valueFactory.createLiteral( stringProperty );
             graph.add( subject, predicate, object );
         }
@@ -191,9 +182,9 @@ public class EntityStateSerializer
             if( type instanceof ValueCompositeType )
             {
                 URI pred = valueFactory.createURI( baseUri, persistentProperty.qualifiedName().name() );
-                serializeValueComposite( collection, pred, (ValueComposite) propertyValue, type, graph, baseUri + persistentProperty
-                    .qualifiedName()
-                    .name() + "/", includeNonQueryable );
+                serializeValueComposite( collection, pred, (ValueComposite) propertyValue, type, graph,
+                                         baseUri + persistentProperty.qualifiedName().name() + "/",
+                                         includeNonQueryable );
             }
             else
             {

@@ -31,8 +31,18 @@ import org.qi4j.index.sql.support.postgresql.PostgreSQLAppStartup;
 import org.qi4j.library.sql.common.SQLConfiguration;
 import org.qi4j.library.sql.common.SQLUtil;
 
-import static org.qi4j.api.query.QueryExpressions.*;
+import static org.qi4j.api.query.QueryExpressions.eq;
+import static org.qi4j.api.query.QueryExpressions.templateFor;
 
+/**
+ * SQL Support Sample Main Class.
+ * <p><strong>psql postgres</strong></p>
+ * <p>CREATE USER jdbc_test_login WITH PASSWORD 'password';</p>
+ * <p>CREATE DATABASE jdbc_test_db;</p>
+ * <p>GRANT ALL PRIVILEGES ON DATABASE jdbc_test_db TO jdbc_test_login;</p>
+ * <p><strong>psql -d jdbc_test_db</strong></p>
+ * <p>CREATE EXTENSION ltree;</p>
+ */
 public class Main
 {
 

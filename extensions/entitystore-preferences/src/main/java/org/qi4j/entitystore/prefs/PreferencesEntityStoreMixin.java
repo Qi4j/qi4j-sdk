@@ -1,21 +1,27 @@
 /*
- * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008-2011, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2013, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2014, Paul Merlin. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed  under the  Apache License,  Version 2.0  (the "License");
+ * you may not use  this file  except in  compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed  under the  License is distributed on an "AS IS" BASIS,
+ * WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+ * implied.
  *
+ * See the License for the specific language governing permissions and
+ * limitations under the License. 
  */
-
 package org.qi4j.entitystore.prefs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -71,7 +77,11 @@ import static org.qi4j.functional.Iterables.first;
  * Implementation of EntityStore that is backed by the Preferences API.
  *
  * <p>@see Preferences</p>
- * <p>ManyAssociation is stored as string, one identity string per line</p>
+ * <p>
+ * Associations are stored as the identity of the referenced Entity, ManyAssociations are stored as multi-line strings
+ * (one identity per line), and NamedAssociations are stored as multi-line strings (one name on a line, identity on the
+ * next line).
+ * </p>
  * <p>Nested ValuesComposites, Collections and Maps are stored using available ValueSerialization service.</p>
  */
 public class PreferencesEntityStoreMixin
@@ -179,10 +189,12 @@ public class PreferencesEntityStoreMixin
                     {
                         UsecaseBuilder builder = UsecaseBuilder.buildUsecase( "qi4j.entitystore.preferences.visit" );
                         Usecase visitUsecase = builder.withMetaInfo( CacheOptions.NEVER ).newUsecase();
-                        final DefaultEntityStoreUnitOfWork uow = new DefaultEntityStoreUnitOfWork( entityStoreSpi, newUnitOfWorkId(),
-                                                                                                   module, visitUsecase, System
-                            .currentTimeMillis() );
-
+                        final DefaultEntityStoreUnitOfWork uow = new DefaultEntityStoreUnitOfWork(
+                            entityStoreSpi,
+                            newUnitOfWorkId(),
+                            module,
+                            visitUsecase,
+                            System.currentTimeMillis() );
                         try
                         {
                             String[] identities = root.childrenNames();
@@ -222,7 +234,7 @@ public class PreferencesEntityStoreMixin
 
             if( !root.nodeExists( identity.identity() ) )
             {
-                throw new NoSuchEntityException( identity );
+                throw new NoSuchEntityException( identity, UnknownType.class );
             }
 
             Preferences entityPrefs = root.node( identity.identity() );
@@ -236,7 +248,7 @@ public class PreferencesEntityStoreMixin
                 throw new EntityTypeNotFoundException( type );
             }
 
-            Map<QualifiedName, Object> properties = new HashMap<QualifiedName, Object>();
+            Map<QualifiedName, Object> properties = new HashMap<>();
             Preferences propsPrefs = null;
             for( PropertyDescriptor persistentPropertyDescriptor : entityDescriptor.state().properties() )
             {
@@ -259,50 +271,22 @@ public class PreferencesEntityStoreMixin
                     if( mainType.equals( Long.class ) )
                     {
                         properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                        this.getNumber( propsPrefs, persistentPropertyDescriptor, new NumberParser<Long>()
-                                        {
-                                            @Override
-                                            public Long parse( String str )
-                                            {
-                                                return Long.parseLong( str );
-                                            }
-                                        } ) );
+                                        this.getNumber( propsPrefs, persistentPropertyDescriptor, LONG_PARSER ) );
                     }
                     else if( mainType.equals( Integer.class ) )
                     {
                         properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                        this.getNumber( propsPrefs, persistentPropertyDescriptor, new NumberParser<Integer>()
-                                        {
-                                            @Override
-                                            public Integer parse( String str )
-                                            {
-                                                return Integer.parseInt( str );
-                                            }
-                                        } ) );
+                                        this.getNumber( propsPrefs, persistentPropertyDescriptor, INT_PARSER ) );
                     }
                     else if( mainType.equals( Double.class ) )
                     {
                         properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                        this.getNumber( propsPrefs, persistentPropertyDescriptor, new NumberParser<Double>()
-                                        {
-                                            @Override
-                                            public Double parse( String str )
-                                            {
-                                                return Double.parseDouble( str );
-                                            }
-                                        } ) );
+                                        this.getNumber( propsPrefs, persistentPropertyDescriptor, DOUBLE_PARSER ) );
                     }
                     else if( mainType.equals( Float.class ) )
                     {
                         properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                        this.getNumber( propsPrefs, persistentPropertyDescriptor, new NumberParser<Float>()
-                                        {
-                                            @Override
-                                            public Float parse( String str )
-                                            {
-                                                return Float.parseFloat( str );
-                                            }
-                                        } ) );
+                                        this.getNumber( propsPrefs, persistentPropertyDescriptor, FLOAT_PARSER ) );
                     }
                     else
                     {
@@ -327,10 +311,10 @@ public class PreferencesEntityStoreMixin
                                     propsPrefs.getBoolean( persistentPropertyDescriptor.qualifiedName().name(),
                                                            initialValue == null ? false : initialValue ) );
                 }
-                else if( propertyType instanceof ValueCompositeType ||
-                         propertyType instanceof MapType ||
-                         propertyType instanceof CollectionType ||
-                         propertyType instanceof EnumType )
+                else if( propertyType instanceof ValueCompositeType
+                         || propertyType instanceof MapType
+                         || propertyType instanceof CollectionType
+                         || propertyType instanceof EnumType )
                 {
                     String json = propsPrefs.get( persistentPropertyDescriptor.qualifiedName().name(), null );
                     Object value;
@@ -367,7 +351,7 @@ public class PreferencesEntityStoreMixin
             }
 
             // Associations
-            Map<QualifiedName, EntityReference> associations = new HashMap<QualifiedName, EntityReference>();
+            Map<QualifiedName, EntityReference> associations = new HashMap<>();
             Preferences assocs = null;
             for( AssociationDescriptor associationType : entityDescriptor.state().associations() )
             {
@@ -377,13 +361,14 @@ public class PreferencesEntityStoreMixin
                 }
 
                 String associatedEntity = assocs.get( associationType.qualifiedName().name(), null );
-                EntityReference value = associatedEntity == null ? null : EntityReference.parseEntityReference(
-                    associatedEntity );
+                EntityReference value = associatedEntity == null
+                                        ? null
+                                        : EntityReference.parseEntityReference( associatedEntity );
                 associations.put( associationType.qualifiedName(), value );
             }
 
             // ManyAssociations
-            Map<QualifiedName, List<EntityReference>> manyAssociations = new HashMap<QualifiedName, List<EntityReference>>();
+            Map<QualifiedName, List<EntityReference>> manyAssociations = new HashMap<>();
             Preferences manyAssocs = null;
             for( AssociationDescriptor manyAssociationType : entityDescriptor.state().manyAssociations() )
             {
@@ -392,7 +377,7 @@ public class PreferencesEntityStoreMixin
                     manyAssocs = entityPrefs.node( "manyassociations" );
                 }
 
-                List<EntityReference> references = new ArrayList<EntityReference>();
+                List<EntityReference> references = new ArrayList<>();
                 String entityReferences = manyAssocs.get( manyAssociationType.qualifiedName().name(), null );
                 if( entityReferences == null )
                 {
@@ -404,10 +389,46 @@ public class PreferencesEntityStoreMixin
                     String[] refs = entityReferences.split( "\n" );
                     for( String ref : refs )
                     {
-                        EntityReference value = ref == null ? null : EntityReference.parseEntityReference( ref );
+                        EntityReference value = ref == null
+                                                ? null
+                                                : EntityReference.parseEntityReference( ref );
                         references.add( value );
                     }
                     manyAssociations.put( manyAssociationType.qualifiedName(), references );
+                }
+            }
+
+            // NamedAssociations
+            Map<QualifiedName, Map<String, EntityReference>> namedAssociations = new HashMap<>();
+            Preferences namedAssocs = null;
+            for( AssociationDescriptor namedAssociationType : entityDescriptor.state().namedAssociations() )
+            {
+                if( namedAssocs == null )
+                {
+                    namedAssocs = entityPrefs.node( "namedassociations" );
+                }
+
+                Map<String, EntityReference> references = new LinkedHashMap<>();
+                String entityReferences = namedAssocs.get( namedAssociationType.qualifiedName().name(), null );
+                if( entityReferences == null )
+                {
+                    // NamedAssociation not found, default to empty one
+                    namedAssociations.put( namedAssociationType.qualifiedName(), references );
+                }
+                else
+                {
+                    String[] namedRefs = entityReferences.split( "\n" );
+                    if( namedRefs.length % 2 != 0 )
+                    {
+                        throw new EntityStoreException( "Invalid NamedAssociation storage format" );
+                    }
+                    for( int idx = 0; idx < namedRefs.length; idx += 2 )
+                    {
+                        String name = namedRefs[idx];
+                        String ref = namedRefs[idx + 1];
+                        references.put( name, EntityReference.parseEntityReference( ref ) );
+                    }
+                    namedAssociations.put( namedAssociationType.qualifiedName(), references );
                 }
             }
 
@@ -419,14 +440,11 @@ public class PreferencesEntityStoreMixin
                                            entityDescriptor,
                                            properties,
                                            associations,
-                                           manyAssociations
+                                           manyAssociations,
+                                           namedAssociations
             );
         }
-        catch( ValueSerializationException e )
-        {
-            throw new EntityStoreException( e );
-        }
-        catch( BackingStoreException e )
+        catch( ValueSerializationException | BackingStoreException e )
         {
             throw new EntityStoreException( e );
         }
@@ -540,10 +558,10 @@ public class PreferencesEntityStoreMixin
                     {
                         propsPrefs.putBoolean( persistentProperty.qualifiedName().name(), (Boolean) value );
                     }
-                    else if( valueType instanceof ValueCompositeType ||
-                             valueType instanceof MapType ||
-                             valueType instanceof CollectionType ||
-                             valueType instanceof EnumType )
+                    else if( valueType instanceof ValueCompositeType
+                             || valueType instanceof MapType
+                             || valueType instanceof CollectionType
+                             || valueType instanceof EnumType )
                     {
                         String jsonString = valueSerialization.serialize( value );
                         propsPrefs.put( persistentProperty.qualifiedName().name(), jsonString );
@@ -577,11 +595,10 @@ public class PreferencesEntityStoreMixin
             if( !state.manyAssociations().isEmpty() )
             {
                 Preferences manyAssocsPrefs = entityPrefs.node( "manyassociations" );
-                for( Map.Entry<QualifiedName, List<EntityReference>> manyAssociations : state.manyAssociations()
-                    .entrySet() )
+                for( Map.Entry<QualifiedName, List<EntityReference>> manyAssociation : state.manyAssociations().entrySet() )
                 {
                     StringBuilder manyAssocs = new StringBuilder();
-                    for( EntityReference entityReference : manyAssociations.getValue() )
+                    for( EntityReference entityReference : manyAssociation.getValue() )
                     {
                         if( manyAssocs.length() > 0 )
                         {
@@ -591,7 +608,29 @@ public class PreferencesEntityStoreMixin
                     }
                     if( manyAssocs.length() > 0 )
                     {
-                        manyAssocsPrefs.put( manyAssociations.getKey().name(), manyAssocs.toString() );
+                        manyAssocsPrefs.put( manyAssociation.getKey().name(), manyAssocs.toString() );
+                    }
+                }
+            }
+
+            // NamedAssociations
+            if( !state.namedAssociations().isEmpty() )
+            {
+                Preferences namedAssocsPrefs = entityPrefs.node( "namedassociations" );
+                for( Map.Entry<QualifiedName, Map<String, EntityReference>> namedAssociation : state.namedAssociations().entrySet() )
+                {
+                    StringBuilder namedAssocs = new StringBuilder();
+                    for( Map.Entry<String, EntityReference> namedRef : namedAssociation.getValue().entrySet() )
+                    {
+                        if( namedAssocs.length() > 0 )
+                        {
+                            namedAssocs.append( "\n" );
+                        }
+                        namedAssocs.append( namedRef.getKey() ).append( "\n" ).append( namedRef.getValue().identity() );
+                    }
+                    if( namedAssocs.length() > 0 )
+                    {
+                        namedAssocsPrefs.put( namedAssociation.getKey().name(), namedAssocs.toString() );
                     }
                 }
             }
@@ -612,6 +651,42 @@ public class PreferencesEntityStoreMixin
         T parse( String str );
     }
 
+    private static final NumberParser<Long> LONG_PARSER = new NumberParser<Long>()
+    {
+        @Override
+        public Long parse( String str )
+        {
+            return Long.parseLong( str );
+        }
+    };
+
+    private static final NumberParser<Integer> INT_PARSER = new NumberParser<Integer>()
+    {
+        @Override
+        public Integer parse( String str )
+        {
+            return Integer.parseInt( str );
+        }
+    };
+
+    private static final NumberParser<Double> DOUBLE_PARSER = new NumberParser<Double>()
+    {
+        @Override
+        public Double parse( String str )
+        {
+            return Double.parseDouble( str );
+        }
+    };
+
+    private static final NumberParser<Float> FLOAT_PARSER = new NumberParser<Float>()
+    {
+        @Override
+        public Float parse( String str )
+        {
+            return Float.parseFloat( str );
+        }
+    };
+
     private <T> T getNumber( Preferences prefs, PropertyDescriptor pDesc, NumberParser<T> parser )
     {
         Object initialValue = pDesc.initialValue( null );
@@ -623,4 +698,9 @@ public class PreferencesEntityStoreMixin
         }
         return result;
     }
+
+    private static class UnknownType
+    {
+    }
+
 }

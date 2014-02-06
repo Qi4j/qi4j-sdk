@@ -1,6 +1,7 @@
 /*
  * Copyright 2008 Alin Dreghiciu.
- * Copyright 2009 Niclas Hedhman.
+ * Copyright 2009-2012 Niclas Hedhman.
+ * Copyright 2014 Paul Merlin.
  *
  * Licensed  under the  Apache License,  Version 2.0  (the "License");
  * you may not use  this file  except in  compliance with the License.
@@ -19,11 +20,13 @@
 package org.qi4j.test.indexing;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.qi4j.api.query.NotQueryableException;
@@ -32,6 +35,7 @@ import org.qi4j.api.query.QueryBuilder;
 import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.spi.query.EntityFinderException;
 import org.qi4j.spi.query.IndexExporter;
+import org.qi4j.test.indexing.model.Account;
 import org.qi4j.test.indexing.model.City;
 import org.qi4j.test.indexing.model.Domain;
 import org.qi4j.test.indexing.model.Female;
@@ -41,25 +45,33 @@ import org.qi4j.test.indexing.model.Nameable;
 import org.qi4j.test.indexing.model.Person;
 import org.qi4j.test.indexing.model.QueryParam;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsEqual.equalTo;
+import static org.joda.time.DateTimeZone.UTC;
+import static org.joda.time.DateTimeZone.forID;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.qi4j.api.query.QueryExpressions.and;
 import static org.qi4j.api.query.QueryExpressions.contains;
+import static org.qi4j.api.query.QueryExpressions.containsName;
 import static org.qi4j.api.query.QueryExpressions.eq;
 import static org.qi4j.api.query.QueryExpressions.ge;
 import static org.qi4j.api.query.QueryExpressions.gt;
 import static org.qi4j.api.query.QueryExpressions.isNotNull;
 import static org.qi4j.api.query.QueryExpressions.isNull;
+import static org.qi4j.api.query.QueryExpressions.lt;
 import static org.qi4j.api.query.QueryExpressions.matches;
+import static org.qi4j.api.query.QueryExpressions.ne;
 import static org.qi4j.api.query.QueryExpressions.not;
 import static org.qi4j.api.query.QueryExpressions.oneOf;
 import static org.qi4j.api.query.QueryExpressions.or;
 import static org.qi4j.api.query.QueryExpressions.orderBy;
 import static org.qi4j.api.query.QueryExpressions.templateFor;
+import static org.qi4j.test.indexing.NameableAssert.verifyOrderedResults;
+import static org.qi4j.test.indexing.NameableAssert.verifyUnorderedResults;
 
+/**
+ * Abstract satisfiedBy with tests for simple queries against Index/Query engines.
+ */
 public abstract class AbstractQueryTest
     extends AbstractAnyQueryTest
 {
@@ -70,34 +82,6 @@ public abstract class AbstractQueryTest
     {
         IndexExporter indexerExporter = module.findService( IndexExporter.class ).get();
         indexerExporter.exportReadableToStream( System.out );
-    }
-
-    private static void verifyUnorderedResults( final Iterable<? extends Nameable> results, final String... names )
-    {
-        final List<String> expected = new ArrayList<String>( Arrays.asList( names ) );
-
-        for( Nameable entity : results )
-        {
-            String name = entity.name().get();
-            assertTrue( name + " returned but not expected", expected.remove( name ) );
-        }
-
-        for( String notReturned : expected )
-        {
-            fail( notReturned + " was expected but not returned" );
-        }
-    }
-
-    private static void verifyOrderedResults( final Iterable<? extends Nameable> results, final String... names )
-    {
-        final List<String> expected = new ArrayList<String>( Arrays.asList( names ) );
-        final List<String> actual = new ArrayList<String>();
-        for( Nameable result : results )
-        {
-            actual.add( result.name().get() );
-        }
-
-        assertThat( "Result is incorrect", actual, equalTo( expected ) );
     }
 
     @Test
@@ -127,9 +111,9 @@ public abstract class AbstractQueryTest
     {
         QueryBuilder<Nameable> qb = this.module.newQueryBuilder( Nameable.class );
         Query<Nameable> query = unitOfWork.newQuery( qb );
+        System.out.println( "*** script03: " + query );
         verifyUnorderedResults( query, "Joe Doe", "Ann Doe", "Jack Doe", "Penang", "Kuala Lumpur", "Cooking", "Gaming",
                                 "Programming", "Cars" );
-        System.out.println( "*** script03: " + query );
     }
 
     @Test
@@ -145,16 +129,28 @@ public abstract class AbstractQueryTest
     }
 
     @Test
+    public void script04_ne()
+        throws EntityFinderException
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person personTemplate = templateFor( Person.class );
+        City placeOfBirth = personTemplate.placeOfBirth().get();
+        Query<Person> query = unitOfWork.newQuery( qb.where( ne( placeOfBirth.name(), "Kuala Lumpur" ) ) );
+        System.out.println( "*** script04_ne: " + query );
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
     public void script05()
         throws EntityFinderException
     {
         QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
         Person person = templateFor( Person.class );
         Query<Person> query = unitOfWork.newQuery( qb.where( eq( person.mother()
-                                                                     .get()
-                                                                     .placeOfBirth()
-                                                                     .get()
-                                                                     .name(), "Kuala Lumpur" ) )
+            .get()
+            .placeOfBirth()
+            .get()
+            .name(), "Kuala Lumpur" ) )
         );
         System.out.println( "*** script05: " + query );
         verifyUnorderedResults( query, "Joe Doe" );
@@ -172,6 +168,7 @@ public abstract class AbstractQueryTest
     }
 
     @Test
+    @SuppressWarnings( "unchecked" )
     public void script07()
         throws EntityFinderException
     {
@@ -184,6 +181,7 @@ public abstract class AbstractQueryTest
     }
 
     @Test
+    @SuppressWarnings( "unchecked" )
     public void script08()
         throws EntityFinderException
     {
@@ -196,6 +194,7 @@ public abstract class AbstractQueryTest
     }
 
     @Test
+    @SuppressWarnings( "unchecked" )
     public void script09()
         throws EntityFinderException
     {
@@ -238,6 +237,17 @@ public abstract class AbstractQueryTest
         Query<Person> query = unitOfWork.newQuery( qb.where( isNull( person.email() ) ) );
         System.out.println( "*** script12: " + query );
         verifyUnorderedResults( query, "Ann Doe", "Jack Doe" );
+    }
+
+    @Test
+    public void script12_ne()
+        throws EntityFinderException
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where( ne( person.email(), "joe@thedoes.net" ) ) );
+        System.out.println( "*** script12_ne: " + query );
+        verifyUnorderedResults( query );
     }
 
     @Test
@@ -367,7 +377,6 @@ public abstract class AbstractQueryTest
         verifyUnorderedResults( query, "Jack Doe", "Joe Doe" );
     }
 
-    @Ignore( "Skip this one for now. It sporadically fails sometimes." )
     @Test
     public void script23()
         throws EntityFinderException
@@ -422,16 +431,15 @@ public abstract class AbstractQueryTest
     }
 
     @Test
-    @Ignore( "Wait until indexing of complex values is implemented" )
     public void script29()
     {
         QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
         Person person = templateFor( Person.class );
         Query<Person> query = unitOfWork.newQuery( qb.where( eq( person.personalWebsite()
-                                                                     .get()
-                                                                     .protocol()
-                                                                     .get()
-                                                                     .value(), "http" ) )
+            .get()
+            .protocol()
+            .get()
+            .value(), "http" ) )
         );
         System.out.println( "*** script29: " + query );
         verifyUnorderedResults( query, "Jack Doe" );
@@ -439,24 +447,25 @@ public abstract class AbstractQueryTest
 
     @Test
     @Ignore( "Wait till 1.1?" )
+    // Paul: I don't understand this test
+    @SuppressWarnings( "unchecked" )
     public void script30()
     {
         QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
         Person person = templateFor( Person.class );
         QueryParam queryParam = null; // oneOf( person.personalWebsite().get().queryParams() );
-        Query<Person> query = unitOfWork.newQuery( qb.where( and( eq( queryParam.name(), "foo" ), eq( queryParam.value(), "bar" ) ) )
-        );
+        Query<Person> query = unitOfWork.newQuery( qb.where( and( eq( queryParam.name(), "foo" ), eq( queryParam.value(), "bar" ) ) ) );
         System.out.println( "*** script30: " + query );
         verifyUnorderedResults( query, "Jack Doe" );
     }
 
     @Test
-    @Ignore( "Wait till 1.1?" )
+    @Ignore( "Equality on Property<Map<?,?>> not implemented" )
     public void script31()
     {
         QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
         Person person = templateFor( Person.class );
-        Map<String, String> info = new HashMap<String, String>();
+        Map<String, String> info = new HashMap<>( 0 );
         Query<Person> query = unitOfWork.newQuery( qb.where( eq( person.additionalInfo(), info ) ) );
         System.out.println( "*** script31: " + query );
         verifyUnorderedResults( query, "Jack Doe" );
@@ -467,7 +476,6 @@ public abstract class AbstractQueryTest
     {
         QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
         Person person = templateFor( Person.class );
-        Map<String, String> info = new HashMap<String, String>();
         Query<Person> query = unitOfWork.newQuery( qb.where( eq( person.address().get().line1(), "Qi Alley 4j" ) ) );
         System.out.println( "*** script32: " + query );
         verifyUnorderedResults( query, "Joe Doe" );
@@ -492,7 +500,334 @@ public abstract class AbstractQueryTest
         Person person = templateFor( Person.class );
         Female annDoe = unitOfWork.get( Female.class, "anndoe" );
         Query<Person> query = unitOfWork.newQuery( qb.where( eq( person.mother(), annDoe ) ) );
+        System.out.println( "*** script34: " + query );
 
         verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script35()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where( containsName( person.accounts(), "anns" ) ) );
+        System.out.println( "*** script35: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe", "Ann Doe" );
+    }
+
+    @Test
+    public void script36()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Account anns = unitOfWork.get( Account.class, "accountOfAnnDoe" );
+        Query<Person> query = unitOfWork.newQuery( qb.where( contains( person.accounts(), anns ) ) );
+        System.out.println( "*** script36: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe", "Ann Doe" );
+    }
+
+    @Test
+    @Ignore( "Traversing of NamedAssociations is not implemented" )
+    public void script37()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where( eq( person.accounts().get( "anns" ).number(),
+                                                                 "accountOfAnnDoe" ) ) );
+        System.out.println( "*** script37: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe", "Ann Doe" );
+    }
+
+    @Test
+    public void script38()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where( eq( person.title(), Person.Title.DR ) ) );
+        System.out.println( "*** script38: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script39()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where( ne( person.title(), Person.Title.DR ) ) );
+        System.out.println( "*** script39: " + query );
+
+        verifyUnorderedResults( query, "Ann Doe", "Joe Doe" );
+    }
+
+    @Test
+    public void script40_Date()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            eq( person.dateValue(), new DateTime( "2010-03-04T13:24:35", UTC ).toDate() ) ) );
+        System.out.println( "*** script40_Date: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script41_Date()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.dateValue(), new DateTime( "2010-03-04T13:24:35", UTC ).toDate() ) ) );
+        System.out.println( "*** script41_Date: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script42_Date()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.dateValue(), new DateTime( "2010-03-04T14:24:35", forID( "CET" ) ).toDate() ) ) );
+        System.out.println( "*** script42_Date: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script43_Date()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            and( gt( person.dateValue(), new DateTime( "2005-03-04T13:24:35", UTC ).toDate() ),
+                 lt( person.dateValue(), new DateTime( "2015-03-04T13:24:35", UTC ).toDate() ) ) ) );
+        System.out.println( "*** script43_Date: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script40_DateTime()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            eq( person.dateTimeValue(), new DateTime( "2010-03-04T13:24:35", UTC ) ) ) );
+        System.out.println( "*** script40_DateTime: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script41_DateTime()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.dateTimeValue(), new DateTime( "2010-03-04T13:24:35", UTC ) ) ) );
+        System.out.println( "*** script41_DateTime: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script42_DateTime()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.dateTimeValue(), new DateTime( "2010-03-04T14:24:35", forID( "CET" ) ) ) ) );
+        System.out.println( "*** script42_DateTime: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe", "Joe Doe" );
+    }
+
+    @Test
+    public void script43_DateTime()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            and( gt( person.dateTimeValue(), new DateTime( "2005-03-04T13:24:35", UTC ) ),
+                 lt( person.dateTimeValue(), new DateTime( "2015-03-04T13:24:35", UTC ) ) ) ) );
+        System.out.println( "*** script43_DateTime: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script40_LocalDateTime()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            eq( person.localDateTimeValue(), new LocalDateTime( "2010-03-04T13:23:00", UTC ) ) ) );
+        System.out.println( "*** script40_LocalDateTime: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script41_LocalDateTime()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.localDateTimeValue(), new LocalDateTime( "2010-03-04T13:23:00", UTC ) ) ) );
+        System.out.println( "*** script41_LocalDateTime: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script42_LocalDateTime()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.localDateTimeValue(), new LocalDateTime( "2010-03-04T13:23:00", forID( "CET" ) ) ) ) );
+        System.out.println( "*** script42_LocalDateTime: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script43_LocalDateTime()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            and( gt( person.localDateTimeValue(), new LocalDateTime( "2005-03-04T13:24:35", UTC ) ),
+                 lt( person.localDateTimeValue(), new LocalDateTime( "2015-03-04T13:24:35", UTC ) ) ) ) );
+        System.out.println( "*** script43_LocalDateTime: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script40_LocalDate()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            eq( person.localDateValue(), new LocalDate( "2010-03-04", UTC ) ) ) );
+        System.out.println( "*** script40_LocalDate: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script41_LocalDate()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.localDateValue(), new LocalDate( "2010-03-04", UTC ) ) ) );
+        System.out.println( "*** script41_LocalDate: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script42_LocalDate()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.localDateValue(), new LocalDate( "2010-03-04", forID( "CET" ) ) ) ) );
+        System.out.println( "*** script42_LocalDate: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script43_LocalDate()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            and( gt( person.localDateValue(), new LocalDate( "2005-03-04", UTC ) ),
+                 lt( person.localDateValue(), new LocalDate( "2015-03-04", UTC ) ) ) ) );
+        System.out.println( "*** script43_LocalDate: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script50_BigInteger()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            eq( person.bigInteger(), new BigInteger( "23232323232323232323232323" ) ) ) );
+        System.out.println( "*** script50_BigInteger: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script51_BigInteger()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.bigInteger(), new BigInteger( "23232323232323232323232323" ) ) ) );
+        System.out.println( "*** script51_BigInteger: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script52_BigInteger()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ge( person.bigInteger(), new BigInteger( "23232323232323232323232323" ) ) ) );
+        System.out.println( "*** script52_BigInteger: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe", "Joe Doe" );
+    }
+
+    @Test
+    public void script50_BigDecimal()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            eq( person.bigDecimal(), new BigDecimal( "2342.76931348623157e+307" ) ) ) );
+        System.out.println( "*** script50_BigDecimal: " + query );
+
+        verifyUnorderedResults( query, "Joe Doe" );
+    }
+
+    @Test
+    public void script51_BigDecimal()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ne( person.bigDecimal(), new BigDecimal( "2342.76931348623157e+307" ) ) ) );
+        System.out.println( "*** script51_BigDecimal: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe" );
+    }
+
+    @Test
+    public void script52_BigDecimal()
+    {
+        QueryBuilder<Person> qb = this.module.newQueryBuilder( Person.class );
+        Person person = templateFor( Person.class );
+        Query<Person> query = unitOfWork.newQuery( qb.where(
+            ge( person.bigDecimal(), new BigDecimal( "2342.76931348623157e+307" ) ) ) );
+        System.out.println( "*** script52_BigDecimal: " + query );
+
+        verifyUnorderedResults( query, "Jack Doe", "Joe Doe" );
     }
 }

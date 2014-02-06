@@ -11,9 +11,9 @@
  * limitations under the License.
  *
  */
-
 package org.qi4j.migration;
 
+import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,13 +41,22 @@ public interface Migrator
     boolean renameAssociation( JSONObject state, String from, String to )
         throws JSONException;
 
-    boolean addManyAssociation( JSONObject state, String name, String... defaultReference )
+    boolean addManyAssociation( JSONObject state, String name, String... defaultReferences )
         throws JSONException;
 
     boolean removeManyAssociation( JSONObject state, String name )
         throws JSONException;
 
     boolean renameManyAssociation( JSONObject state, String from, String to )
+        throws JSONException;
+
+    boolean addNamedAssociation( JSONObject state, String name, Map<String, String> defaultReferences )
+        throws JSONException;
+
+    boolean removeNamedAssociation( JSONObject state, String name )
+        throws JSONException;
+
+    boolean renameNamedAssociation( JSONObject state, String from, String to )
         throws JSONException;
 
     void changeEntityType( JSONObject state, String newEntityType )

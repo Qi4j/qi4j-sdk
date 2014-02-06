@@ -18,7 +18,10 @@
  */
 package org.qi4j.index.rdf;
 
-import org.junit.After;
+import java.io.File;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.bootstrap.AssemblyException;
@@ -29,13 +32,19 @@ import org.qi4j.library.rdf.entity.EntityStateSerializer;
 import org.qi4j.library.rdf.entity.EntityTypeSerializer;
 import org.qi4j.library.rdf.repository.NativeConfiguration;
 import org.qi4j.library.rdf.repository.NativeRepositoryService;
+import org.qi4j.spi.query.EntityFinderException;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.indexing.AbstractQueryTest;
+import org.qi4j.test.util.DelTreeAfter;
 import org.qi4j.valueserialization.orgjson.OrgJsonValueSerializationService;
 
-//@Ignore("Getting failures when running under Gradle and new OpenRDF version." )
-public class RdfQueryTest extends AbstractQueryTest
+public class RdfQueryTest
+    extends AbstractQueryTest
 {
+
+    private static final File DATA_DIR = new File( "build/tmp/rdf-query-test" );
+    @Rule
+    public final DelTreeAfter delTreeAfter = new DelTreeAfter( DATA_DIR );
 
     @Override
     public void assemble( ModuleAssembly module )
@@ -50,42 +59,41 @@ public class RdfQueryTest extends AbstractQueryTest
 
         ModuleAssembly config = module.layer().module( "Config" );
         config.entities( NativeConfiguration.class ).visibleIn( Visibility.layer );
+        config.forMixin( NativeConfiguration.class ).declareDefaults().dataDirectory().set( DATA_DIR.getAbsolutePath() );
         new EntityTestAssembler().assemble( config );
     }
 
+    @Test
+    @Ignore( "oneOf() Query Expression not supported by RDF Indexing" )
     @Override
-    @After
-    public void tearDown()
-        throws Exception
+    public void script23()
+        throws EntityFinderException
     {
-        java.io.File data = null;
-        if( unitOfWork != null )
-        {
-            NativeConfiguration conf = unitOfWork.get( NativeConfiguration.class, "NativeRepositoryService" );
-            data = new java.io.File( conf.dataDirectory().get() );
-            unitOfWork.discard();
-        }
-        if( data != null )
-        {
-            remove( data );
-        }
-        super.tearDown();
+        super.script23();
     }
 
-    private void remove( java.io.File data )
+    @Test
+    @Ignore( "Deep queries in complex values are not supported by RDF Indexing" )
+    @Override
+    public void script29()
     {
-        if( data.isDirectory() )
-        {
-            for( java.io.File file : data.listFiles() )
-            {
-                remove( file );
-            }
-
-            data.delete();
-        }
-        else
-        {
-            data.delete();
-        }
+        super.script29();
     }
+
+    @Test
+    @Ignore( "NamedAssociation are not supported by RDF Indexing" )
+    @Override
+    public void script35()
+    {
+        super.script35();
+    }
+
+    @Test
+    @Ignore( "NamedAssociation are not supported by RDF Indexing" )
+    @Override
+    public void script36()
+    {
+        super.script36();
+    }
+
 }

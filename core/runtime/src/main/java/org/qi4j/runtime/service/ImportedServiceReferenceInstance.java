@@ -1,21 +1,25 @@
 /*
- * Copyright (c) 2008, Rickard Öberg. All Rights Reserved.
- * Copyright (c) 2012, Paul Merlin.
+ * Copyright (c) 2008-2011, Rickard Öberg. All Rights Reserved.
+ * Copyright (c) 2008-2013, Niclas Hedhman. All Rights Reserved.
+ * Copyright (c) 2012-2014, Paul Merlin. All Rights Reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed  under the  Apache License,  Version 2.0  (the "License");
+ * you may not use  this file  except in  compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * distributed  under the  License is distributed on an "AS IS" BASIS,
+ * WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+ * implied.
+ *
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
 package org.qi4j.runtime.service;
 
 import org.qi4j.api.activation.Activation;
-import org.qi4j.api.activation.ActivationEvent;
 import org.qi4j.api.activation.ActivationEventListener;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.PassivationException;
@@ -24,7 +28,6 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.service.ServiceUnavailableException;
 import org.qi4j.api.structure.Module;
 import org.qi4j.runtime.activation.ActivationDelegate;
-import org.qi4j.runtime.activation.ActivationEventListenerSupport;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -33,6 +36,8 @@ import org.slf4j.LoggerFactory;
  * Whenever the service is requested it is returned directly to the client. That means that
  * to handle service passivation and unavailability correctly, any proxying must be done in the
  * service importer.
+ *
+ * @param <T> Service Type
  */
 public final class ImportedServiceReferenceInstance<T>
     implements ServiceReference<T>, Activation
@@ -42,7 +47,6 @@ public final class ImportedServiceReferenceInstance<T>
     private final Module module;
     private final ImportedServiceModel serviceModel;
     private final ActivationDelegate activation = new ActivationDelegate( this );
-    private final ActivationEventListenerSupport activationEventSupport = new ActivationEventListenerSupport();
     private boolean active = false;
 
     public ImportedServiceReferenceInstance( ImportedServiceModel serviceModel, Module module )
@@ -98,17 +102,14 @@ public final class ImportedServiceReferenceInstance<T>
         {
             try
             {
-                activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.PASSIVATING ) );
                 activation.passivate( new Runnable()
                 {
-
                     @Override
                     public void run()
                     {
                         active = false;
                     }
                 } );
-                activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.PASSIVATED ) );
             }
             finally
             {
@@ -155,22 +156,19 @@ public final class ImportedServiceReferenceInstance<T>
             {
                 if( serviceInstance == null )
                 {
-                    activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.ACTIVATING ) );
                     serviceInstance = serviceModel.<T>importInstance( module );
                     instance = serviceInstance.instance();
 
                     try
                     {
-                        activation.activate( serviceModel.newActivatorsInstance(), serviceInstance, new Runnable()
+                        activation.activate( serviceModel.newActivatorsInstance( module ), serviceInstance, new Runnable()
                         {
-
                             @Override
                             public void run()
                             {
                                 active = true;
                             }
                         } );
-                        activationEventSupport.fireEvent( new ActivationEvent( this, ActivationEvent.EventType.ACTIVATED ) );
                     }
                     catch( Exception e )
                     {
@@ -193,13 +191,13 @@ public final class ImportedServiceReferenceInstance<T>
     @Override
     public void registerActivationEventListener( ActivationEventListener listener )
     {
-        activationEventSupport.registerActivationEventListener( listener );
+        activation.registerActivationEventListener( listener );
     }
 
     @Override
     public void deregisterActivationEventListener( ActivationEventListener listener )
     {
-        activationEventSupport.deregisterActivationEventListener( listener );
+        activation.deregisterActivationEventListener( listener );
     }
 
     @Override

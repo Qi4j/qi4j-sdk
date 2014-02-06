@@ -19,6 +19,7 @@ package org.qi4j.index.elasticsearch;
 
 import java.io.File;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
@@ -39,24 +40,32 @@ import org.qi4j.library.fileconfig.FileConfigurationOverride;
 import org.qi4j.library.fileconfig.FileConfigurationService;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
+import org.qi4j.test.util.DelTreeAfter;
 
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
-import static org.qi4j.api.query.QueryExpressions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.qi4j.api.query.QueryExpressions.eq;
+import static org.qi4j.api.query.QueryExpressions.ne;
+import static org.qi4j.api.query.QueryExpressions.not;
+import static org.qi4j.api.query.QueryExpressions.templateFor;
+import static org.qi4j.test.util.Assume.assumeNoIbmJdk;
 
 public class ElasticSearchTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
+
+    private static final File DATA_DIR = new File( "build/tmp/es-test" );
+    @Rule
+    public final DelTreeAfter delTreeAfter = new DelTreeAfter( DATA_DIR );
 
     @BeforeClass
     public static void beforeClass_IBMJDK()
     {
-        // Ignore this test on IBM JDK
-        assumeTrue( !( System.getProperty( "java.vendor" ).contains( "IBM" ) ) );
+        assumeNoIbmJdk();
     }
 
     public interface Post
-            extends Identity
+        extends Identity
     {
 
         Property<String> title();
@@ -75,7 +84,7 @@ public class ElasticSearchTest
     }
 
     public interface Page
-            extends Identity
+        extends Identity
     {
 
         Property<String> title();
@@ -98,7 +107,7 @@ public class ElasticSearchTest
     }
 
     public interface Author
-            extends Identity
+        extends Identity
     {
 
         Property<String> nickname();
@@ -106,7 +115,7 @@ public class ElasticSearchTest
     }
 
     public interface Comment
-            extends Identity
+        extends Identity
     {
 
         Property<String> content();
@@ -115,7 +124,7 @@ public class ElasticSearchTest
 
     @Override
     public void assemble( ModuleAssembly module )
-            throws AssemblyException
+        throws AssemblyException
     {
         // Config module
         ModuleAssembly config = module.layer().module( "config" );
@@ -125,15 +134,20 @@ public class ElasticSearchTest
         new EntityTestAssembler().assemble( module );
 
         // Index/Query
-        new ESFilesystemIndexQueryAssembler().withConfigModule( config ).withConfigVisibility( Visibility.layer ).assemble( module );
+        new ESFilesystemIndexQueryAssembler().
+            withConfigModule( config ).
+            withConfigVisibility( Visibility.layer ).
+            assemble( module );
         ElasticSearchConfiguration esConfig = config.forMixin( ElasticSearchConfiguration.class ).declareDefaults();
         esConfig.indexNonAggregatedAssociations().set( Boolean.TRUE );
 
         // FileConfig
-        FileConfigurationOverride override = new FileConfigurationOverride().withData( new File( "build/qi4j-data" ) ).
-                withLog( new File( "build/qi4j-logs" ) ).withTemporary( new File( "build/qi4j-temp" ) );
+        FileConfigurationOverride override = new FileConfigurationOverride().
+            withData( new File( DATA_DIR, "qi4j-data" ) ).
+            withLog( new File( DATA_DIR, "qi4j-logs" ) ).
+            withTemporary( new File( DATA_DIR, "qi4j-temp" ) );
         module.services( FileConfigurationService.class ).
-                setMetaInfo( override );
+            setMetaInfo( override );
 
         // Entities & Values
         module.entities( Post.class, Page.class, Author.class, Comment.class );
@@ -142,7 +156,7 @@ public class ElasticSearchTest
 
     @Test
     public void test()
-            throws UnitOfWorkCompletionException
+        throws UnitOfWorkCompletionException
     {
         String title = "Foo Bar Bazar!";
 

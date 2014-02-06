@@ -1,7 +1,7 @@
 /*
- * Copyright 2007, Niclas Hedhman. All Rights Reserved.
- * Copyright 2009, Rickard Öberg. All Rights Reserved.
- * Copyright 2012, Paul Merlin. All Rights Reserved.
+ * Copyright 2007-2011, Niclas Hedhman. All Rights Reserved.
+ * Copyright 2009-2013, Rickard Öberg. All Rights Reserved.
+ * Copyright 2012-2014, Paul Merlin. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ import org.qi4j.api.structure.Module;
 import org.qi4j.api.unitofwork.EntityTypeNotFoundException;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.api.usecase.UsecaseBuilder;
-import org.qi4j.api.util.Classes;
 import org.qi4j.api.value.ValueSerialization;
 import org.qi4j.io.Input;
 import org.qi4j.io.Output;
@@ -66,7 +65,7 @@ import org.qi4j.spi.entitystore.StateCommitter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.qi4j.functional.Iterables.*;
+import static org.qi4j.functional.Iterables.first;
 
 /**
  * Implementation of EntityStore that works with an implementation of MapEntityStore.
@@ -119,14 +118,14 @@ public class JSONMapEntityStoreMixin
     {
         logger = LoggerFactory.getLogger( descriptor.identity() );
 
-        uuid = UUID.randomUUID().toString() + "-";
+        uuid = descriptor.identity() + "-" + UUID.randomUUID().toString();
         if( caching != null )
         {
             cache = caching.fetchCache( uuid, CacheState.class );
         }
         else
         {
-            cache = new NullCache<CacheState>();
+            cache = new NullCache<>();
         }
     }
 
@@ -137,6 +136,7 @@ public class JSONMapEntityStoreMixin
         if( caching != null )
         {
             caching.returnCache( cache );
+            cache = null;
         }
     }
 
@@ -159,15 +159,15 @@ public class JSONMapEntityStoreMixin
         try
         {
             JSONObject state = new JSONObject();
-            state.put( JSONEntityState.JSON_KEY_IDENTITY, identity.identity() );
-            state.put( JSONEntityState.JSON_KEY_APPLICATION_VERSION, application.version() );
-            state.put( JSONEntityState.JSON_KEY_TYPE, first( entityDescriptor.types() ).getName() );
-            state.put( "types", toList( map( Classes.toClassName(), entityDescriptor.mixinTypes() ) ) );
-            state.put( JSONEntityState.JSON_KEY_VERSION, unitOfWork.identity() );
-            state.put( JSONEntityState.JSON_KEY_MODIFIED, unitOfWork.currentTime() );
-            state.put( JSONEntityState.JSON_KEY_PROPERTIES, new JSONObject() );
-            state.put( JSONEntityState.JSON_KEY_ASSOCIATIONS, new JSONObject() );
-            state.put( JSONEntityState.JSON_KEY_MANYASSOCIATIONS, new JSONObject() );
+            state.put( JSONKeys.IDENTITY, identity.identity() );
+            state.put( JSONKeys.APPLICATION_VERSION, application.version() );
+            state.put( JSONKeys.TYPE, first( entityDescriptor.types() ).getName() );
+            state.put( JSONKeys.VERSION, unitOfWork.identity() );
+            state.put( JSONKeys.MODIFIED, unitOfWork.currentTime() );
+            state.put( JSONKeys.PROPERTIES, new JSONObject() );
+            state.put( JSONKeys.ASSOCIATIONS, new JSONObject() );
+            state.put( JSONKeys.MANY_ASSOCIATIONS, new JSONObject() );
+            state.put( JSONKeys.NAMED_ASSOCIATIONS, new JSONObject() );
             return new JSONEntityState( (DefaultEntityStoreUnitOfWork) unitOfWork, valueSerialization,
                                         identity, entityDescriptor, state );
         }
@@ -225,10 +225,10 @@ public class JSONMapEntityStoreMixin
                                 JSONEntityState state = (JSONEntityState) entityState;
                                 if( state.status().equals( EntityStatus.NEW ) )
                                 {
-                                    Writer writer = changer.newEntity( state.identity(),
-                                                                       state.entityDescriptor() );
-                                    writeEntityState( state, writer, unitOfWork.identity(), unitOfWork.currentTime() );
-                                    writer.close();
+                                    try( Writer writer = changer.newEntity( state.identity(), state.entityDescriptor() ) )
+                                    {
+                                        writeEntityState( state, writer, unitOfWork.identity(), unitOfWork.currentTime() );
+                                    }
                                     if( options.cacheOnNew() )
                                     {
                                         cache.put( state.identity().identity(), new CacheState( state.state() ) );
@@ -236,10 +236,10 @@ public class JSONMapEntityStoreMixin
                                 }
                                 else if( state.status().equals( EntityStatus.UPDATED ) )
                                 {
-                                    Writer writer = changer.updateEntity( state.identity(),
-                                                                          state.entityDescriptor() );
-                                    writeEntityState( state, writer, unitOfWork.identity(), unitOfWork.currentTime() );
-                                    writer.close();
+                                    try( Writer writer = changer.updateEntity( state.identity(), state.entityDescriptor() ) )
+                                    {
+                                        writeEntityState( state, writer, unitOfWork.identity(), unitOfWork.currentTime() );
+                                    }
                                     if( options.cacheOnWrite() )
                                     {
                                         cache.put( state.identity().identity(), new CacheState( state.state() ) );
@@ -287,11 +287,14 @@ public class JSONMapEntityStoreMixin
                             .withMetaInfo( CacheOptions.NEVER )
                             .newUsecase();
 
-                        final DefaultEntityStoreUnitOfWork uow =
-                            new DefaultEntityStoreUnitOfWork( entityStoreSpi, newUnitOfWorkId(), module, usecase, System
-                                .currentTimeMillis() );
+                        final DefaultEntityStoreUnitOfWork uow = new DefaultEntityStoreUnitOfWork(
+                            entityStoreSpi,
+                            newUnitOfWorkId(),
+                            module,
+                            usecase,
+                            System.currentTimeMillis() );
 
-                        final List<EntityState> migrated = new ArrayList<EntityState>();
+                        final List<EntityState> migrated = new ArrayList<>();
 
                         try
                         {
@@ -353,10 +356,10 @@ public class JSONMapEntityStoreMixin
                     for( EntityState migratedEntity : migratedEntities )
                     {
                         JSONEntityState state = (JSONEntityState) migratedEntity;
-                        Writer writer = changer.updateEntity( state.identity(),
-                                                              state.entityDescriptor() );
-                        writeEntityState( state, writer, state.version(), state.lastModified() );
-                        writer.close();
+                        try( Writer writer = changer.updateEntity( state.identity(), state.entityDescriptor() ) )
+                        {
+                            writeEntityState( state, writer, state.version(), state.lastModified() );
+                        }
                     }
                 }
             } );
@@ -379,11 +382,11 @@ public class JSONMapEntityStoreMixin
         try
         {
             JSONObject jsonState = state.state();
-            jsonState.put( "version", identity );
-            jsonState.put( "modified", lastModified );
+            jsonState.put( JSONKeys.VERSION, identity );
+            jsonState.put( JSONKeys.MODIFIED, lastModified );
             writer.append( jsonState.toString() );
         }
-        catch( Exception e )
+        catch( JSONException | IOException e )
         {
             throw new EntityStoreException( "Could not store EntityState", e );
         }
@@ -398,13 +401,18 @@ public class JSONMapEntityStoreMixin
             JSONObject jsonObject = new JSONObject( new JSONTokener( entityState ) );
             EntityStatus status = EntityStatus.LOADED;
 
-            String version = jsonObject.getString( "version" );
-            long modified = jsonObject.getLong( "modified" );
-            String identity = jsonObject.getString( "identity" );
+            String version = jsonObject.getString( JSONKeys.VERSION );
+            long modified = jsonObject.getLong( JSONKeys.MODIFIED );
+            String identity = jsonObject.getString( JSONKeys.IDENTITY );
+
+            // Check if NamedAssociation is supported
+            if( !jsonObject.has( JSONKeys.NAMED_ASSOCIATIONS ) )
+            {
+                jsonObject.put( JSONKeys.NAMED_ASSOCIATIONS, new JSONObject() );
+            }
 
             // Check if version is correct
-            String currentAppVersion = jsonObject.optString( MapEntityStore.JSONKeys.application_version.name(),
-                                                             "0.0" );
+            String currentAppVersion = jsonObject.optString( JSONKeys.APPLICATION_VERSION, "0.0" );
             if( !currentAppVersion.equals( application.version() ) )
             {
                 if( migration != null )
@@ -414,18 +422,18 @@ public class JSONMapEntityStoreMixin
                 else
                 {
                     // Do nothing - set version to be correct
-                    jsonObject.put( MapEntityStore.JSONKeys.application_version.name(), application.version() );
+                    jsonObject.put( JSONKeys.APPLICATION_VERSION, application.version() );
                 }
 
-                LoggerFactory.getLogger( getClass() )
-                    .debug(
-                        "Updated version nr on " + identity + " from " + currentAppVersion + " to " + application.version() );
+                LoggerFactory.getLogger( getClass() ).debug( "Updated version nr on " + identity
+                                                             + " from " + currentAppVersion
+                                                             + " to " + application.version() );
 
                 // State changed
                 status = EntityStatus.UPDATED;
             }
 
-            String type = jsonObject.getString( "type" );
+            String type = jsonObject.getString( JSONKeys.TYPE );
 
             EntityDescriptor entityDescriptor = module.entityDescriptor( type );
             if( entityDescriptor == null )
@@ -453,18 +461,14 @@ public class JSONMapEntityStoreMixin
     public JSONObject jsonStateOf( String id )
         throws IOException
     {
-        Reader reader = mapEntityStore.get( EntityReference.parseEntityReference( id ) );
-        JSONObject jsonObject;
-        try
+        try( Reader reader = mapEntityStore.get( EntityReference.parseEntityReference( id ) ) )
         {
-            jsonObject = new JSONObject( new JSONTokener( reader ) );
+            return new JSONObject( new JSONTokener( reader ) );
         }
         catch( JSONException e )
         {
             throw new IOException( e );
         }
-        reader.close();
-        return jsonObject;
     }
 
     private EntityState fetchCachedState( EntityReference identity, DefaultEntityStoreUnitOfWork unitOfWork )
@@ -475,7 +479,7 @@ public class JSONMapEntityStoreMixin
             JSONObject data = cacheState.json;
             try
             {
-                String type = data.getString( "type" );
+                String type = data.getString( JSONKeys.TYPE );
                 EntityDescriptor entityDescriptor = unitOfWork.module().entityDescriptor( type );
                 return new JSONEntityState( unitOfWork, valueSerialization, identity, entityDescriptor, data );
             }
@@ -490,7 +494,7 @@ public class JSONMapEntityStoreMixin
 
     private boolean doCacheOnRead( DefaultEntityStoreUnitOfWork unitOfWork )
     {
-        CacheOptions cacheOptions = ( unitOfWork ).usecase().metaInfo( CacheOptions.class );
+        CacheOptions cacheOptions = unitOfWork.usecase().metaInfo( CacheOptions.class );
         return cacheOptions == null || cacheOptions.cacheOnRead();
     }
 
@@ -499,11 +503,11 @@ public class JSONMapEntityStoreMixin
     {
         public JSONObject json;
 
-        public CacheState()
+        private CacheState()
         {
         }
 
-        public CacheState( JSONObject state )
+        private CacheState( JSONObject state )
         {
             json = state;
         }
@@ -529,4 +533,5 @@ public class JSONMapEntityStoreMixin
             }
         }
     }
+
 }

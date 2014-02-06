@@ -8,6 +8,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
@@ -30,7 +31,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import static org.qi4j.library.rest.client.api.HandlerCommand.*;
+import static org.qi4j.library.rest.client.api.HandlerCommand.refresh;
+import static org.qi4j.test.util.Assume.assumeConnectivity;
 
 /**
  * Reads Qi4j Github commits on develop ATOM feed and prints out all title and detail url for each entry.
@@ -40,6 +42,12 @@ import static org.qi4j.library.rest.client.api.HandlerCommand.*;
 public class RssReaderTest
     extends AbstractQi4jTest
 {
+
+    @BeforeClass
+    public static void beforeRssReaderTest()
+    {
+        assumeConnectivity( "github.com", 443 );
+    }
 
     private ContextResourceClient crc;
 
@@ -110,7 +118,7 @@ public class RssReaderTest
                     System.out.println( "== " + xPath.evaluate( "feed/title", result ) + " ==" );
 
                     final NodeList nodes = (NodeList) xPath.evaluate( "feed/entry", result, XPathConstants.NODESET );
-                    List<Node> items = new ArrayList<Node>();
+                    List<Node> items = new ArrayList<>();
                     for( int i = 0; i < nodes.getLength(); i++ )
                     {
                         items.add( nodes.item( i ) );
