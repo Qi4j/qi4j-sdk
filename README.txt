@@ -2,9 +2,14 @@ THIS REPOSITORY IS NO LONGER ACTIVE.
 
 Please see http://zest.apache.org and/or http://github.com/Apache/zest-qi4j.
 
+Apache Zest was created in March 2015, and the Qi4j project is the primary 
+subproject within Zest. You will find all the existing Qi4j stuff in there,
+including old documentation, source code history and so forth.
+
+Qi4j is Dead, Long live Apache Zest Qi4j
 
 
-Welcome to the world of Qi4j
+# Welcome to the world of Qi4j
    - Composite Oriented Programming on the Java platform.
 
 
