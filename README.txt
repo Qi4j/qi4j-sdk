@@ -1,3 +1,8 @@
+THIS REPOSITORY IS NO LONGER ACTIVE.
+
+Please see http://zest.apache.org and/or http://github.com/Apache/zest-sandbox.
+
+
 
 Welcome to the world of Qi4j
    - Composite Oriented Programming on the Java platform.
