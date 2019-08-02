@@ -21,6 +21,7 @@ package org.apache.polygene.entitystore.zookeeper;
 
 import com.github.junit5docker.Docker;
 import com.github.junit5docker.Port;
+import java.lang.reflect.UndeclaredThrowableException;
 import org.apache.polygene.api.common.Visibility;
 import org.apache.polygene.bootstrap.ModuleAssembly;
 import org.apache.polygene.entitystore.zookeeper.assembly.ZookeeperEntityStoreAssembler;
@@ -29,6 +30,7 @@ import org.apache.polygene.test.entity.model.EntityStoreTestSuite;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static java.lang.Thread.sleep;
 import static java.util.Collections.singletonList;
 import static org.apache.polygene.entitystore.zookeeper.ZookeeperEntityStoreTest.TEST_ZNODE_NAME;
 
@@ -42,6 +44,14 @@ public class ZookeeperEntityStoreTestSuite
     @Override
     protected void defineStorageModule( ModuleAssembly module )
     {
+        try
+        {
+            sleep(1000);
+        }
+        catch( InterruptedException e )
+        {
+            throw new UndeclaredThrowableException( e );
+        }
         module.defaultServices();
         new ZookeeperEntityStoreAssembler()
             .withConfig( configModule, Visibility.application )

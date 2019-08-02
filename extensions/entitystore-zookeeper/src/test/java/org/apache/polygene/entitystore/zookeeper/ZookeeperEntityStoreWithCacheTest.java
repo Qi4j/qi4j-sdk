@@ -31,6 +31,7 @@ import org.apache.polygene.test.cache.AbstractEntityStoreWithCacheTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import static java.lang.Thread.sleep;
 import static java.util.Collections.singletonList;
 import static org.apache.polygene.entitystore.zookeeper.ZookeeperEntityStoreTest.TEST_ZNODE_NAME;
 
@@ -46,7 +47,7 @@ public class ZookeeperEntityStoreWithCacheTest
         throws Exception
     {
         super.assemble( module );
-
+        sleep(1000);
         ModuleAssembly config = module.layer().module( "config" );
 
         ZookeeperEntityStoreAssembler zkAssembler = new ZookeeperEntityStoreAssembler();

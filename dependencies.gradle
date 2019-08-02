@@ -66,7 +66,7 @@ def jdbmVersion = '2.4'
 def jedisVersion = '2.9.0'
 def jettyVersion = '9.2.17.v20160517' // 9.3.x Tests fail!
 def johnzonVersion = '1.1.1'
-def jooqVersion = '3.10.6'
+def jooqVersion = '3.11.11'
 def kotlinVersion = '1.2.31'
 def leveldbVersion = '0.9'
 def leveldbJniVersion = '1.8'
@@ -281,12 +281,12 @@ dependencies.buildToolsVersions << [
 
 // Docker Images
 dependencies.dockerImagesVersions << [
-        cassandra: 'cassandra:3.10',
+        cassandra: 'cassandra:3.11',
         memcached: 'memcached:1.4.39-alpine',
         mariadb  : 'mariadb:10.1.21',
         mongo    : 'mongo:3.5.10',
-        mysql    : 'mysql:8.0.11',
-        postgres : 'postgres:9.6.3-alpine',
+        mysql    : 'mysql:8',
+        postgres : 'postgres:9-alpine',
         redis    : 'redis:4.0.0-alpine',
         riak     : 'basho/riak-kv:ubuntu-2.2.3',
         s3server : 'scality/s3server:mem-bb2a38c0',
