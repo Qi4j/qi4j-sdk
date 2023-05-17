@@ -20,11 +20,11 @@
 
 
 /**
- * Apache Polygene Documentation WebSite Progressive Enhancement.
+ * Qi4j Documentation WebSite Progressive Enhancement.
  */
 $( document ).ready( function($){
 
-    var atHome = window.location.hostname == "polygene.apache.org"
+    var atHome = window.location.hostname == "qi4j.github.com"
 
     /**
      * Glossary.
@@ -95,7 +95,7 @@ $( document ).ready( function($){
                 }
                 else
                 {
-                    return "https://polygene.apache.org/java/" + versions[ displayName ];
+                    return "https://qi4j.github.com/" + versions[ displayName ];
                 }
             }
             $( "div.logo select" ).change( function()
@@ -144,7 +144,7 @@ $( document ).ready( function($){
             case "Overview":
                 $dt.attr( "style", "margin-bottom: 24px" );
             // Tutorials
-            case "Polygene\u2122 in 30 minutes":
+            case "Qi4j\u2122 in 30 minutes":
             case "Leverage Properties":
             case "Use @Invocation":
                 $dt.attr( "style", "margin-bottom: 24px" );

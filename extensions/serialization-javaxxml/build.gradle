@@ -16,18 +16,18 @@
  *  limitations under the License.
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ javax.xml Serialization Extension"
+description = "Qi4j javax.xml Serialization Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - Serialization - javax.xml" } }
+jar { manifest { name = "Qi4j Extension - Serialization - javax.xml" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.xmlunit
 
   testRuntimeOnly libraries.logback

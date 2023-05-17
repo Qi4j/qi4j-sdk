@@ -18,23 +18,23 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Cassandra EntityStore Extension"
+description = "Qi4j Cassandra EntityStore Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - Cassandra" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - Cassandra" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
   api libraries.cassandra_client
-  api polygene.library( 'constraints' )
+  api qi4j.library( 'constraints' )
 
-  implementation polygene.library( 'locking' )
+  implementation qi4j.library( 'locking' )
   implementation libraries.jackson_mapper
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.docker_junit
 
   testRuntimeOnly libraries.logback

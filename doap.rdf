@@ -1,61 +1,28 @@
 <?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl"?>
-<!--
-  Licensed to the Apache Software Foundation (ASF) under one or more
-  contributor license agreements.  See the NOTICE file distributed with
-  this work for additional information regarding copyright ownership.
-  The ASF licenses this file to You under the Apache License, Version 2.0
-  (the "License"); you may not use this file except in compliance with
-  the License.  You may obtain a copy of the License at
-  
-  http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
--->
 <rdf:RDF xml:lang="en"
          xmlns="http://usefulinc.com/ns/doap#" 
          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
-         xmlns:asfext="http://projects.apache.org/ns/asfext#"
          xmlns:foaf="http://xmlns.com/foaf/0.1/">
-<!--
-  =======================================================================
-
-   Copyright (c) 2008 The Apache Software Foundation.  
-   All rights reserved.
-
-  =======================================================================
--->
-  <Project rdf:about="http://polygene.apache.org/">
+  <Project rdf:about="http://github.com/Qi4j/qi4j-sdk/">
     <created>2008-12-17</created>
     <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
-    <name>Apache Polygene</name>
-    <homepage rdf:resource="https://polygene.apache.org/" />
-    <asfext:pmc rdf:resource="https://polygene.apache.org" />
-    <shortdesc>Apache Polygene is a community based effort exploring Composite Oriented Programming for domain centric application development.</shortdesc>
-    <description>Apache Polygene is a community based effort exploring Composite Oriented Programming for domain centric application development. This includes evolved concepts from Aspect Oriented Programming, Dependency Injection and Domain Driven Design. Composite Oriented Programming allows developers to work with 'fragments', smaller than classes, and 'compose' fragments into larger 'composites' which acts like the regular objects. Polygene also tackles the enforcement of application composition, i.e. composites are declared in modules, modules are contained in layers and access between layers are controlled/enforced. Apache Polygene™ (Java Edition), first Apache Polygene sub-project, is an implementation of Composite Oriented Programming, using the standard Java platform, without the use of any pre-processors or new language elements. Everything you know from Java still applies and you can leverage both your experience and toolkits to become more productive with Composite Oriented Programming today.</description>
-    <bug-database rdf:resource="https://issues.apache.org/jira/browse/POLYGENE" />
-    <mailing-list rdf:resource="https://www.apache.org/foundation/mailinglists.html" />
-    <download-page rdf:resource="https://polygene.apache.org/download.html" />
+    <name>Qi4j</name>
+    <homepage rdf:resource="http://github.com/Qi4j/qi4j-sdk/" />
+    <shortdesc>Qi4j is a community based effort exploring Composite Oriented Programming for domain centric application development.</shortdesc>
+    <description>Qi4j is a community based effort exploring Composite Oriented Programming for domain centric application development. This includes evolved concepts from Aspect Oriented Programming, Dependency Injection and Domain Driven Design. Composite Oriented Programming allows developers to work with 'fragments', smaller than classes, and 'compose' fragments into larger 'composites' which acts like the regular objects. Qi4j also tackles the enforcement of application composition, i.e. composites are declared in modules, modules are contained in layers and access between layers are controlled/enforced. Qi4j (Java Edition), first Qi4j sub-project, is an implementation of Composite Oriented Programming, using the standard Java platform, without the use of any pre-processors or new language elements. Everything you know from Java still applies and you can leverage both your experience and toolkits to become more productive with Composite Oriented Programming today.</description>
+    <bug-database rdf:resource="https://github.com/Qi4j/qi4j-sdk/issues" />
+    <mailing-list rdf:resource="https://groups.google.com/g/qi4j-dev" />
+    <download-page rdf:resource="https://github.com/Qi4j/qi4j-sdk/" />
     <programming-language>Java</programming-language>
     <programming-language>C#</programming-language>
     <programming-language>Scala</programming-language>
     <programming-language>Groovy</programming-language>
     <programming-language>JavaScript</programming-language>
-    <category rdf:resource="http://projects.apache.org/category/library" />
-    <repository>
-      <SVNRepository>
-        <location rdf:resource="http://svn.apache.org/repos/asf/polygene/"/>
-        <browse rdf:resource="http://svn.apache.org/viewcvs.cgi/polygene/"/>
-      </SVNRepository>
-    </repository>
     <repository>
       <GitRepository>
-        <location rdf:resource="https://git-wip-us.apache.org/repos/asf/polygene-java.git"/>
-        <browse rdf:resource="https://github.com/apache/polygene-java"/>
+        <location rdf:resource="https://github.com/Qi4j/qi4j-sdk"/>
+        <browse rdf:resource="https://github.com/Qi4j/qi4j-sdk"/>
       </GitRepository>
     </repository>
     <maintainer>

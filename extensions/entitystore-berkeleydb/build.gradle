@@ -18,24 +18,24 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Berkeley DB (Java Edition) EntityStore Extension"
+description = "Qi4j Berkeley DB (Java Edition) EntityStore Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - BDB/JE" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - BDB/JE" } }
 
 dependencies {
-    api polygene.core.bootstrap
+    api qi4j.core.bootstrap
     api libraries.bdb_je
-    api polygene.library( 'constraints' )
-    api polygene.library( 'fileconfig' )
+    api qi4j.library( 'constraints' )
+    api qi4j.library( 'fileconfig' )
 
-    implementation polygene.library( 'locking' )
+    implementation qi4j.library( 'locking' )
     implementation libraries.jackson_mapper
 
-    runtimeOnly polygene.core.runtime
+    runtimeOnly qi4j.core.runtime
 
-    testImplementation polygene.core.testsupport
+    testImplementation qi4j.core.testsupport
 
     testRuntimeOnly libraries.logback
 }

@@ -24,11 +24,11 @@
 
 == JavaDocs ==
 
-In this section you will find links to JavaDocs corresponding to this Apache Polygene™ (Java Edition) version ({revnumber}), to some alias versions, and finally, to previous releases.
+In this section you will find links to JavaDocs corresponding to this Qi4j (Java Edition) version ({revnumber}), to some alias versions, and finally, to previous releases.
 
-=== Apache Polygene™ (Java Edition) {revnumber} ===
+=== Qi4j (Java Edition) {revnumber} ===
 
-// JavaDocs for Apache Polygene™ (Java Edition) {revnumber}:
+// JavaDocs for Qi4j (Java Edition) {revnumber}:
 
 * link:javadocs/index.html[Release {revnumber}]
 
@@ -37,8 +37,8 @@ In this section you will find links to JavaDocs corresponding to this Apache Pol
 
 Links to _"alias versions"_ JavaDocs:
 
-* https://polygene.apache.org/java/latest/javadocs/[Latest Release (`master` branch)]
-* https://polygene.apache.org/java/develop/javadocs/[Development (`develop` branch)]
+* https://qi4j.github.com/latest/javadocs/[Latest Release (`master` branch)]
+* https://qi4j.github.com/develop/javadocs/[Development (`develop` branch)]
 
 
 === Previous Releases ===

@@ -18,18 +18,18 @@
  *
  */
 
-apply plugin: 'polygene-sample'
+apply plugin: 'qi4j-sample'
 
-description = "Sample of how DCI (Data, Context & Interaction) pattern is implemented with Apache Polygene™."
+description = "Sample of how DCI (Data, Context & Interaction) pattern is implemented with Qi4j."
 
-jar { manifest { name = "Apache Polygene™ Sample - DCI" } }
+jar { manifest { name = "Qi4j Sample - DCI" } }
 
 dependencies {
-  implementation polygene.core.bootstrap
-  implementation polygene.core.runtime  /* TODO: Get rid of this dependency */
-  implementation polygene.library( 'constraints' )
+  implementation qi4j.core.bootstrap
+  implementation qi4j.core.runtime  /* TODO: Get rid of this dependency */
+  implementation qi4j.library( 'constraints' )
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.easymock
 
   testRuntimeOnly libraries.logback

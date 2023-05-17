@@ -18,14 +18,14 @@
  *
  */
 
-apply plugin: 'polygene-core'
+apply plugin: 'qi4j-core'
 
-jar { manifest { name = "Apache Polygene™ Core API" } }
+jar { manifest { name = "Qi4j Core API" } }
 
 dependencies {
-  testImplementation polygene.core.testsupport
-  testImplementation polygene.extension( 'serialization-javaxjson' )
-  testImplementation polygene.library( 'constraints' )
+  testImplementation qi4j.core.testsupport
+  testImplementation qi4j.extension( 'serialization-javaxjson' )
+  testImplementation qi4j.library( 'constraints' )
 
-  testRuntimeOnly polygene.core.runtime
+  testRuntimeOnly qi4j.core.runtime
 }

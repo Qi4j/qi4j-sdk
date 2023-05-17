@@ -29,8 +29,8 @@ Constraints. In this tutorial we will only use Mixins. When a TransientComposite
 framework will inspect the interface to determine what the TransientComposite instance should look like in terms of 
 used Fragments.
 
-In Polygene™ all method parameters are considered mandatory unless marked as @Optional. Therefore you can remove the null
-checks in the Mixin. If a null value is passed in an exception will be thrown by Polygene™.
+In Qi4j all method parameters are considered mandatory unless marked as @Optional. Therefore you can remove the null
+checks in the Mixin. If a null value is passed in an exception will be thrown by Qi4j.
 
 Steps for this tutorial:
 
@@ -48,14 +48,14 @@ These ones remain unchanged:
 *HelloWorldComposite.java*
 [snippet,java]
 ----
-source=tutorials/composites/src/main/java/org/apache/polygene/tutorials/composites/tutorial3/HelloWorldComposite.java
+source=tutorials/composites/src/main/java/org/qi4j/tutorials/composites/tutorial3/HelloWorldComposite.java
 tag=solution
 ----
 
 *HelloWorldMixin.java*
 [snippet,java]
 ----
-source=tutorials/composites/src/main/java/org/apache/polygene/tutorials/composites/tutorial2/HelloWorldMixin.java
+source=tutorials/composites/src/main/java/org/qi4j/tutorials/composites/tutorial2/HelloWorldMixin.java
 tag=solution
 ----
 

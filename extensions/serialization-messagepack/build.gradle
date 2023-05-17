@@ -16,21 +16,21 @@
  *  limitations under the License.
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ MessagePack Serialization Extension"
+description = "Qi4j MessagePack Serialization Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - Serialization - MessagePack" } }
+jar { manifest { name = "Qi4j Extension - Serialization - MessagePack" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
   api libraries.msgpack
 
   implementation libraries.commons_lang
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

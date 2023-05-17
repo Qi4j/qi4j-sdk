@@ -54,7 +54,7 @@ track service levels and see exception messages, and trip/enable circuit
 breakers.
 
 Fourth, if an external system is unavailable due to a circuitbreaker
-tripping it should be possible to expose this to other Polygene™ services.
+tripping it should be possible to expose this to other Qi4j services.
 There is a standard implementation of the Availability interface that
 delegates to a circuit breaker and the Enabled configuration flag, which
 is what we'd suspect will be used in most cases where external systems
@@ -64,13 +64,13 @@ include::../../build/docs/buildinfo/artifact.txt[]
 
 == Direct usage ==
 
-The CircuitBreaker can be used directly, even without using anything else from the Polygene™ SDK.
+The CircuitBreaker can be used directly, even without using anything else from the Qi4j SDK.
 
 Here is a code snippet that demonstrate how to create a CircuitBreaker and how it behave:
 
 [snippet,java]
 ----
-source=libraries/circuitbreaker/src/test/java/org/apache/polygene/library/circuitbreaker/CircuitBreakerTest.java
+source=libraries/circuitbreaker/src/test/java/org/qi4j/library/circuitbreaker/CircuitBreakerTest.java
 tag=direct
 ----
 
@@ -88,7 +88,7 @@ Here is how to declare such a Service:
 
 [snippet,java]
 ----
-source=libraries/circuitbreaker/src/test/java/org/apache/polygene/library/circuitbreaker/BreaksCircuitOnThrowableTest.java
+source=libraries/circuitbreaker/src/test/java/org/qi4j/library/circuitbreaker/BreaksCircuitOnThrowableTest.java
 tag=service
 ----
 
@@ -106,7 +106,7 @@ Here is how it goes:
 
 [snippet,java]
 ----
-source=libraries/circuitbreaker/src/test/java/org/apache/polygene/library/circuitbreaker/jmx/CircuitBreakerManagementSample.java
+source=libraries/circuitbreaker/src/test/java/org/qi4j/library/circuitbreaker/jmx/CircuitBreakerManagementSample.java
 tag=jmx
 ----
 

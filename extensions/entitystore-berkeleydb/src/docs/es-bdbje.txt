@@ -39,7 +39,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-leveldb/src/test/java/org/apache/polygene/entitystore/bdbje/BdbJeEntityStoreTest.java
+source=extensions/entitystore-leveldb/src/test/java/org/qi4j/entitystore/bdbje/BdbJeEntityStoreTest.java
 tag=assembly
 ----
 
@@ -49,7 +49,7 @@ Here are the configuration properties for the Berkeley DB (Java Edition) EntityS
 
 [snippet,java]
 ----
-source=extensions/entitystore-leveldb/src/main/java/org/apache/polygene/entitystore/bdbje/BdbJeEntityStoreConfiguration.java
+source=extensions/entitystore-leveldb/src/main/java/org/qi4j/entitystore/bdbje/BdbJeEntityStoreConfiguration.java
 tag=config
 ----
 

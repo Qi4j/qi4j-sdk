@@ -17,26 +17,26 @@
  *
  *
  */
-import org.apache.polygene.gradle.TaskGroups
+import org.qi4j.gradle.TaskGroups
 
-apply plugin: 'polygene-sample'
+apply plugin: 'qi4j-sample'
 
 description = "Sample of how to build a web forum"
 
-jar { manifest { name = "Apache Polygene™ Sample - Forum" } }
+jar { manifest { name = "Qi4j Sample - Forum" } }
 
 dependencies {
-  implementation polygene.core.bootstrap
-  implementation polygene.library( 'rest-server' )
-  implementation polygene.library( 'fileconfig' )
-  implementation polygene.extension( 'entitystore-memory' )
-  implementation polygene.extension( 'entitystore-file' )
-  implementation polygene.extension( 'indexing-rdf' )
+  implementation qi4j.core.bootstrap
+  implementation qi4j.library( 'rest-server' )
+  implementation qi4j.library( 'fileconfig' )
+  implementation qi4j.extension( 'entitystore-memory' )
+  implementation qi4j.extension( 'entitystore-file' )
+  implementation qi4j.extension( 'indexing-rdf' )
   implementation libraries.servlet_api
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }
@@ -44,6 +44,6 @@ dependencies {
 task( runForumSample, dependsOn: 'testClasses', type: JavaExec ) {
   group = TaskGroups.SAMPLES
   description = "Runs $project.name sample."
-  main = 'org.apache.polygene.sample.forum.web.Main'
+  main = 'org.qi4j.sample.forum.web.Main'
   classpath = sourceSets.test.runtimeClasspath
 }

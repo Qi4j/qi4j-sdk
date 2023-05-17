@@ -1,0 +1,71 @@
+<%#
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+-%>
+package <%= qi4j.packageName %>.model.security;
+
+import java.util.Collections;
+import java.util.List;
+import concern.api.org.qi4j.Concerns;
+import identity.api.org.qi4j.Identity;
+import identity.api.org.qi4j.StringIdentity;
+import scope.injection.api.org.qi4j.Structure;
+import mixin.api.org.qi4j.Mixins;
+import unitofwork.api.org.qi4j.UnitOfWorkFactory;
+import concern.unitofwork.api.org.qi4j.UnitOfWorkConcern;
+import concern.unitofwork.api.org.qi4j.UnitOfWorkPropagation;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+
+@Concerns( UnitOfWorkConcern.class )
+@Mixins( { SecurityRepository.ShiroBackedSecurityRepositoryMixin.class } )
+public interface SecurityRepository
+{
+    @UnitOfWorkPropagation
+    boolean verifyPassword( String user, String password );
+
+    @UnitOfWorkPropagation
+    List<String> findRoleNamesOfUser( String name );
+
+
+    class ShiroBackedSecurityRepositoryMixin
+        implements SecurityRepository
+    {
+        @Structure
+        private UnitOfWorkFactory uowf;
+
+        @Override
+        @UnitOfWorkPropagation
+        public boolean verifyPassword( String userName, String password )
+        {
+            Subject currentUser = SecurityUtils.getSubject();
+            return currentUser.isAuthenticated();
+        }
+
+        @UnitOfWorkPropagation
+        public List<String> findRoleNamesOfUser( String name )
+        {
+            if( "admin".equals( name ) )
+            {
+                return Collections.singletonList("admin");
+            }
+            return Collections.singletonList("user");
+        }
+    }
+}

@@ -20,7 +20,7 @@
 [[core-api-dependency-injection,Dependency Injection]]
 = Dependency Injection =
 
-Polygene has a rather sophisticated dependency injection system, which is based around the <<core-api-modules>>
+Qi4j has a rather sophisticated dependency injection system, which is based around the <<core-api-modules>>
 and <<core-api-visibility>> concepts. The dependency injection system also need help to keep the injection scopes
 separated. The following injection scopes exists, some more common than others;
 
@@ -94,8 +94,8 @@ The possible types are;
     * ObjectFactory
     * QueryBuilderFactory
     * ServiceFinder
-    * PolygeneAPI
-    * PolygeneSPI
+    * Qi4jAPI
+    * Qi4jSPI
 
 [[core-api-service,@Service]]
 == @Service ==
@@ -128,7 +128,7 @@ arbitrary types to these meta types. Only type matching will occur, so for insta
 this way.
 
 If a ++@Uses++ declaration can not be satisfied from the injected objects via ++uses()++ builder method, then
-if the ++@Uses++ injection is not ++@Optional++ the Polygene runtime will attempt to (in this order)
+if the ++@Uses++ injection is not ++@Optional++ the Qi4j runtime will attempt to (in this order)
 
     * Instantiate a visible <<def-transientcomposite>>
     * Instantiate a visible <<def-object>>

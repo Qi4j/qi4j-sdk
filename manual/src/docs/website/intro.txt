@@ -28,7 +28,7 @@ include::../../../../tutorials/introduction/src/docs/highlights.txt[]
 
 :leveloffset: 2
 
-include::../../../../tools/src/docs/yeoman_polygene.txt[]
+include::../../../../tools/src/docs/yeoman_qi4j.txt[]
 
 :leveloffset: 2
 
@@ -40,7 +40,7 @@ include::../../../../tutorials/introduction/src/docs/what-is-composite-oriented-
 
 :leveloffset: 2
 
-// include::../../../../tutorials/introduction/src/docs/polygene-cop.txt[]
+// include::../../../../tutorials/introduction/src/docs/qi4j-cop.txt[]
 //
 // :leveloffset: 2
 

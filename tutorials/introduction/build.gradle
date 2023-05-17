@@ -18,18 +18,18 @@
  *
  */
 
-apply plugin: 'polygene-tutorial'
+apply plugin: 'qi4j-tutorial'
 
-description = "An Introduction to Apache Polygene™ in its simplest form."
+description = "An Introduction to Qi4j in its simplest form."
 
-jar { manifest { name = "Apache Polygene™ Tutorial - Introduction" } }
+jar { manifest { name = "Qi4j Tutorial - Introduction" } }
 
 dependencies {
-  implementation polygene.core.bootstrap
+  implementation qi4j.core.bootstrap
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

@@ -18,24 +18,24 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ LevelDB EntityStore Extension"
+description = "Qi4j LevelDB EntityStore Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - LevelDB" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - LevelDB" } }
 
 dependencies {
-  api polygene.core.bootstrap
-  api polygene.library( 'fileconfig' )
+  api qi4j.core.bootstrap
+  api qi4j.library( 'fileconfig' )
 
-  implementation polygene.library( 'locking' )
+  implementation qi4j.library( 'locking' )
   implementation libraries.leveldb_api
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
   runtimeOnly libraries.leveldb_java
   runtimeOnly libraries.leveldb_jni_all
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

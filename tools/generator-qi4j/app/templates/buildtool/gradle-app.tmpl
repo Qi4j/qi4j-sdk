@@ -1,0 +1,115 @@
+<%#
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+-%>
+apply plugin: 'application'
+
+mainClassName="<%= qi4j.packageName %>.app.<%= qi4j.name %>Launcher"
+
+startScripts {
+  applicationName = "<%= qi4j.name %>"
+  optsEnvironmentVar = "<%= qi4j.name.toUpperCase() %>_OPTS"
+
+  // GC Tuning strategies, see https://docs.oracle.com/javase/8/docs/technotes/guides/vm/gctuning/
+  // Strict memory bound
+  // defaultJvmOpts << "-Xmx512M -Xms512M"
+
+  // Goal oriented, "throughput" and "max pause"
+  // defaultJvmOpts << "-XX:MaxGCPauseMillis=300 -XX:GCTimeRatio=19"
+
+  // Garbage Collector
+  // OneOf; -XX:+UseG1GC, -XX:+UseConcMarkSweepGC, -XX:-UseParallelOldGC, -XX:+UseSerialGC
+  defaultJvmOpts << "-XX:+UseG1GC"
+
+  // Custom start scripts
+  unixStartScriptGenerator.template = resources.text.fromFile('src/scripts/customUnixStartScript.txt')
+  windowsStartScriptGenerator.template = resources.text.fromFile('src/scripts/customWindowsStartScript.txt')
+}
+
+dependencies {
+  implementation project( ":bootstrap" )
+  implementation project( ":model" )
+<%
+if( qi4j.applicationtype === 'Rest API' ) {
+%>  implementation project( ":rest" )
+  implementation "org.qi4j.libraries:org.qi4j.library.restlet:$qi4jVersion"
+  runtimeOnly "org.restlet.jee:org.restlet.ext.servlet:$restletVersion"
+<%
+}
+
+if( hasFeature( 'security' ) ) {
+%>  implementation "org.qi4j.libraries:org.qi4j.library.shiro-web:$qi4jVersion"
+<%
+}
+%>  implementation "org.qi4j.core:org.qi4j.core.spi:$qi4jVersion"
+  implementation "org.qi4j.core:org.qi4j.core.bootstrap:$qi4jVersion"
+  implementation "org.qi4j.extensions:org.qi4j.extension.entitystore-<%= qi4j.entitystoremodule.toLowerCase() %>:$qi4jVersion"
+  implementation "org.qi4j.extensions:org.qi4j.extension.indexing-<%= qi4j.indexing.toLowerCase() %>:$qi4jVersion"
+  implementation "org.qi4j.extensions:org.qi4j.extension.serialization-javaxjson:$qi4jVersion"
+<%
+if( qi4j.caching !== "None" ) {
+%>  implementation "org.qi4j.extensions:org.qi4j.extension.cache-<%= qi4j.caching.toLowerCase() %>:$qi4jVersion"
+<%
+}
+if( qi4j.metrics !== "None" ) {
+%>  implementation "org.qi4j.extensions:org.qi4j.extension.metrics-<%= qi4j.metrics.toLowerCase() %>:$qi4jVersion"
+<%
+}
+if( hasFeature( 'envisage' ) ) {
+%>  implementation "org.qi4j.tools:org.qi4j.tool.envisage:$qi4jVersion"
+<%
+}
+if( qi4j.entitystore == 'LevelDB'  ) {
+%>  runtimeOnly "org.fusesource.leveldbjni:leveldbjni-all:$levelDbVersion"
+<%
+}
+if( qi4j.entitystore == 'DerbySQL'  ) {
+%>  runtimeOnly "org.apache.derby:derby:$derbyVersion"
+<%
+}
+if( qi4j.entitystore == 'H2SQL'  ) {
+%>  runtimeOnly "com.h2database:h2:$h2Version"
+<%
+}
+if( qi4j.entitystore == 'MySQL'  ) {
+%>  runtimeOnly "mysql:mysql-connector-java:$mysqlVersion"
+<%
+}
+if( qi4j.entitystore == 'PostgreSQL' || qi4j.indexing == 'SQL' ) {
+%>  runtimeOnly "org.postgresql:postgresql:$postgresVersion"
+<%
+}
+if( qi4j.entitystore == 'SQLite'  ) {
+%>  runtimeOnly "org.xerial:sqlite-jdbc:$sqliteVersion"
+<%
+}
+%>  runtimeOnly "org.qi4j.core:org.qi4j.core.runtime:$qi4jVersion"
+  runtimeOnly "org.apache.johnzon:johnzon-core:$johnzonVersion"
+  runtimeOnly "org.apache.johnzon:johnzon-mapper:$johnzonVersion"
+  runtimeOnly "org.apache.geronimo.specs:geronimo-json_1.1_spec:1.0"
+  runtimeOnly "ch.qos.logback:logback-classic:$logbackVersion"
+  runtimeOnly "ch.qos.logback:logback-core:$logbackVersion"
+
+  testImplementation "org.qi4j.tools:org.qi4j.tool.model-detail:$qi4jVersion"
+  testImplementation "org.qi4j.core:org.qi4j.core.testsupport:$qi4jVersion"
+  testImplementation "com.github.tdomzal:junit-docker-rule:0.3"
+}
+
+tasks.withType(Tar){
+  compression = Compression.GZIP
+}

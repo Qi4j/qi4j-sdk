@@ -25,15 +25,15 @@
 
 <!-- favicon -->
 
-<link rel="shortcut icon" href="http://polygene.apache.org/favicon.ico" type="image/vnd.microsoft.icon" />
-<link rel="icon" href="http://polygene.apache.org/favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="http://qi4j.github.com/favicon.ico" type="image/vnd.microsoft.icon" />
+<link rel="icon" href="http://qi4j.github.com/favicon.ico" type="image/x-icon" />
 
 <!-- style -->
 
 <link href="css/shCore.css" rel="stylesheet" type="text/css" />
 <link href="css/shCoreEclipse.css" rel="stylesheet" type="text/css" />
 <link href="css/shThemeEclipse.css" rel="stylesheet" type="text/css" />
-<link href="css/polygene.css" rel="stylesheet" type="text/css" />
+<link href="css/qi4j.css" rel="stylesheet" type="text/css" />
 
 <!-- Syntax Highlighter -->
 
@@ -68,7 +68,7 @@
 
 <script type="text/javascript" src="js/tablestyler.js"></script>
 
-<!-- Apache Polygene WebSite Progressive Enhancement -->
+<!-- Qi4j WebSite Progressive Enhancement -->
 
 <link href="css/progressive-enhancement.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="js/jquery.scrollTo-1.4.2.js"></script>

@@ -23,7 +23,7 @@ buildscript {
   dependencies { classpath "gradle.plugin.org.akhikhl.gretty:gretty:2.0.0" }
 }
 
-apply plugin: 'polygene-sample'
+apply plugin: 'qi4j-sample'
 apply plugin: 'war'
 
 // TODO: PAUL!! This Plugin seems stale, and there are a dozen forks. How do we proceed?
@@ -36,12 +36,12 @@ description = "Sample of implementation of a Car Rental application."
 // And then go to:
 //      http://localhost:8080/rental/rental/main
 
-jar { manifest { name = "Apache Polygene™ Sample - Car Rental" } }
+jar { manifest { name = "Qi4j Sample - Car Rental" } }
 
 dependencies {
-  implementation polygene.core.bootstrap
+  implementation qi4j.core.bootstrap
 
   providedCompile libraries.servlet_api
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 }

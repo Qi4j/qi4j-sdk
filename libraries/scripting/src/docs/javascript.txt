@@ -22,21 +22,21 @@
 
 In Javascript, we map directly to JS functions with the same name.
 
-For the following Polygene composite type,
+For the following Qi4j composite type,
 
 [snippet,java]
 ----
-source=libraries/scripting/src/test/java/org/apache/polygene/library/scripting/HelloSpeaker.java
+source=libraries/scripting/src/test/java/org/qi4j/library/scripting/HelloSpeaker.java
 tag=speaker
 ----
 
 
-we need a implementation in a resource file (visible on classpath) named +org/apache/polygene/library/scripting/HelloSpeaker.js+
+we need a implementation in a resource file (visible on classpath) named +org/qi4j/library/scripting/HelloSpeaker.js+
 that looks like this;
 
 [snippet,javascript]
 ----
-source=libraries/scripting/src/test/resources/org/apache/polygene/library/scripting/HelloSpeaker.js
+source=libraries/scripting/src/test/resources/org/qi4j/library/scripting/HelloSpeaker.js
 tag=script
 ----
 

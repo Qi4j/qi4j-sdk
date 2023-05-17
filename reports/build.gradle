@@ -16,4 +16,4 @@
  *  limitations under the License.
  */
 
-apply plugin: 'polygene-reports'
+apply plugin: 'qi4j-reports'

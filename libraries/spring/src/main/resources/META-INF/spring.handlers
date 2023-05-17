@@ -18,4 +18,4 @@
 #
 #
 
-http\://polygene.apache.org/schema/polygene/spring=org.apache.polygene.library.spring.bootstrap.internal.PolygeneNamespaceHandler
+http\://qi4j.org/schema/qi4j/spring=internal.bootstrap.spring.library.org.qi4j.Qi4jNamespaceHandler

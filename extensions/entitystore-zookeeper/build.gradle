@@ -18,23 +18,23 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Zookeeper EntityStore Extension. NOTE: Meant for configuration and other very light loads."
+description = "Qi4j Zookeeper EntityStore Extension. NOTE: Meant for configuration and other very light loads."
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - Zookeeper" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - Zookeeper" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
-  implementation polygene.library( 'locking' )
-  implementation polygene.library( 'constraints' )
-  implementation polygene.library( 'execution' )
+  implementation qi4j.library( 'locking' )
+  implementation qi4j.library( 'constraints' )
+  implementation qi4j.library( 'execution' )
   implementation libraries.zookeeper
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.awaitility
   testImplementation libraries.docker_junit
 

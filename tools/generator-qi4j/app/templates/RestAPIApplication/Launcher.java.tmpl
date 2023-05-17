@@ -1,0 +1,92 @@
+<%#
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+-%>
+package <%= qi4j.packageName %>.app;
+
+import <%= qi4j.packageName %>.bootstrap.<%= qi4j.name %>ApplicationAssembler;
+import <%= qi4j.packageName %>.bootstrap.connectivity.ConnectivityLayer;
+import <%= qi4j.packageName %>.bootstrap.connectivity.RestApiModule;
+
+import java.util.function.Consumer;
+
+import structure.api.org.qi4j.Application;
+import bootstrap.org.qi4j.ApplicationAssembly;
+import bootstrap.org.qi4j.AssemblyException;
+import layered.bootstrap.org.qi4j.LayeredApplicationAssembler;
+import org.qi4j.library.restlet.Qi4jRestApplicationLauncher;
+<% if( hasFeature( 'envisage' ) ) {
+%>import descriptor.model.tools.org.qi4j.ApplicationDetailDescriptor;
+<% } %>
+
+public class <%= qi4j.name %>Launcher extends Qi4jRestApplicationLauncher
+{
+    private static final String name = "<%= qi4j.name %>";
+    private static final String version = "0.1";
+    private Application.Mode mode;
+    private Consumer<ApplicationAssembly> customize;
+<% if( hasFeature( 'envisage' ) ) {
+%>    private ApplicationDetailDescriptor detailedModel;
+<% } %>
+
+    public static void main( String[] args )
+        throws Exception
+    {
+        <%= qi4j.name %>Launcher app = new <%= qi4j.name %>Launcher(getApplicationMode(), none -> {} );
+        app.installShutdownHook();
+        app.initialize();
+    }
+
+    public <%= qi4j.name %>Launcher(Application.Mode mode, Consumer<ApplicationAssembly> customize)
+    {
+        this.mode = mode;
+        this.customize = customize;
+    }
+
+    protected LayeredApplicationAssembler createApplicationAssembler()
+        throws AssemblyException
+    {
+        return new <%= qi4j.name %>ApplicationAssembler( name, version, mode, customize );
+    }
+
+    @Override
+    public void shutdown()
+    {
+        super.shutdown();
+    }
+
+    protected String entryLayer()
+    {
+        return ConnectivityLayer.NAME;
+    }
+
+    protected String entryModule()
+    {
+        return RestApiModule.NAME;
+    }
+
+    private static Application.Mode getApplicationMode()
+    {
+        String mode = System.getenv( "APP_MODE" );
+        if( mode == null )
+        {
+            return Application.Mode.development;
+        }
+        return Application.Mode.valueOf( mode );
+    }
+}

@@ -17,22 +17,22 @@
  *
  *
  */
-import org.apache.polygene.gradle.TaskGroups
+import org.qi4j.gradle.TaskGroups
 
-apply plugin: 'polygene-library'
+apply plugin: 'qi4j-library'
 
-description = "Apache Polygene™ JMX Library provides Java Management Extension (JMX) integration for Apache Polygene™ applications."
+description = "Qi4j JMX Library provides Java Management Extension (JMX) integration for Qi4j applications."
 
-jar { manifest { name = "Apache Polygene™ Library - JMX" } }
+jar { manifest { name = "Qi4j Library - JMX" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
   implementation libraries.slf4j_api
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }
@@ -40,6 +40,6 @@ dependencies {
 task( runJmxSample, dependsOn: 'testClasses', type: JavaExec ) {
   group = TaskGroups.SAMPLES
   description = "Runs $project.name sample."
-  main = 'org.apache.polygene.library.jmx.JMXTest'
+  main = 'org.qi4j.library.jmx.JMXTest'
   classpath = sourceSets.test.runtimeClasspath
 }

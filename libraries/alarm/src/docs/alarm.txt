@@ -37,7 +37,7 @@ consequences are to other systems when one fails. The _Alarm Point_ concepts bec
 world of today, where _Alarm Points_ allows for fine-grained notification and view into the health of one or more
 systems.
 
-In Polygene, we are building upon this powerful abstraction, from decades of field experience.
+In Qi4j, we are building upon this powerful abstraction, from decades of field experience.
 
 include::../../build/docs/buildinfo/artifact.txt[]
 
@@ -76,12 +76,12 @@ provide an _Identity_ of the Alarm, which must survive restarts. The code could 
 
 [snippet,java]
 --------------
-source=libraries/alarm/src/test/java/org/apache/polygene/library/alarm/AlarmProxyTest.java
+source=libraries/alarm/src/test/java/org/qi4j/library/alarm/AlarmProxyTest.java
 tag=documentation
 --------------
 
 == Alarm Models ==
-The Polygene™ Alarm library comes with 3 _Alarm Models_ which should be sufficient for most uses. These are based on decades
+The Qi4j Alarm library comes with 3 _Alarm Models_ which should be sufficient for most uses. These are based on decades
 of experience from the industrial automation industry and user feedback.
 
 == Simple Alarm Model ==

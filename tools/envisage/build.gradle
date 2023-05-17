@@ -17,26 +17,26 @@
  *
  *
  */
-import org.apache.polygene.gradle.TaskGroups
+import org.qi4j.gradle.TaskGroups
 
-apply plugin: 'polygene-tool'
+apply plugin: 'qi4j-tool'
 
-description = "Visualizer of a Apache Polygene™ Application Structure."
+description = "Visualizer of a Qi4j Application Structure."
 
-jar { manifest { name = "Apache Polygene™ Envisage" } }
+jar { manifest { name = "Qi4j Envisage" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
-  implementation polygene.tool( 'model-detail' )
+  implementation qi4j.tool( 'model-detail' )
   implementation libraries.jgoodies_looks
   implementation libraries.pdfbox
   implementation libraries.prefuse
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
-  testImplementation polygene.extension( 'indexing-rdf' )
+  testImplementation qi4j.core.testsupport
+  testImplementation qi4j.extension( 'indexing-rdf' )
 
   testRuntimeOnly libraries.logback
 }
@@ -44,13 +44,13 @@ dependencies {
 task( runEnvisageSample, dependsOn: 'testClasses', type: JavaExec ) {
   group = TaskGroups.SAMPLES
   description = "Runs $project.name sample."
-  main = 'org.apache.polygene.envisage.sample.EnvisageSample'
+  main = 'org.qi4j.envisage.sample.EnvisageSample'
   classpath = sourceSets.test.runtimeClasspath
 }
 
 task( runEnvisageSchoolSample, dependsOn: 'testClasses', type: JavaExec ) {
   group = TaskGroups.SAMPLES
   description = "Runs $project.name School sample."
-  main = 'org.apache.polygene.envisage.school.EnvisageSchoolSample'
+  main = 'org.qi4j.envisage.school.EnvisageSchoolSample'
   classpath = sourceSets.test.runtimeClasspath
 }

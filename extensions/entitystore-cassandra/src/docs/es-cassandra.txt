@@ -36,7 +36,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-cassandra/src/test/java/org/apache/polygene/entitystore/cassandra/CassandraMapEntityStoreTest.java
+source=extensions/entitystore-cassandra/src/test/java/org/qi4j/entitystore/cassandra/CassandraMapEntityStoreTest.java
 tag=assembly
 ----
 
@@ -47,7 +47,7 @@ DefaultBuilder mixin, on the CassandraCluster composite, it is possible to provi
 
 [snippet,java]
 ----
-source=extensions/entitystore-cassandra/src/test/java/org/apache/polygene/entitystore/cassandra/DocSupport.java
+source=extensions/entitystore-cassandra/src/test/java/org/qi4j/entitystore/cassandra/DocSupport.java
 tag=assembly
 ----
 
@@ -55,7 +55,7 @@ And we then have a choice to override any of the provided extension points in De
 
 [snippet,java]
 ----
-source=extensions/entitystore-cassandra/src/test/java/org/apache/polygene/entitystore/cassandra/DocSupport.java
+source=extensions/entitystore-cassandra/src/test/java/org/qi4j/entitystore/cassandra/DocSupport.java
 tag=builder
 ----
 
@@ -67,21 +67,21 @@ Here are the configuration properties for the Cassandra EntityStore:
 
 [snippet,java]
 ----
-source=extensions/entitystore-cassandra/src/main/java/org/apache/polygene/entitystore/cassandra/CassandraEntityStoreConfiguration.java
+source=extensions/entitystore-cassandra/src/main/java/org/qi4j/entitystore/cassandra/CassandraEntityStoreConfiguration.java
 tag=config
 ----
 
 == Cassandra Authentication ==
 It is possible to configure Cassandra with many types of authentication. User/password is provided in this library's
 configuration, and for more advanced setups, you need to provide an implementation of com.datastax.driver.core.AuthProvider
-as a Polygene service (and visible to the ClusterBuilder as usual).
+as a Qi4j service (and visible to the ClusterBuilder as usual).
 
 == Cassandra Keyspace ==
 The Cassandra EntityStore can either use an existing Cassandra Keyspace, which is the default, OR create its own
 keyspace.
 
 The CassandraEntityStoreConfiguration#keyspaceName() defines the name of the keyspace to use, or to be created. If not
-defined, then the default name is "polygene".
+defined, then the default name is "qi4j".
 
 The CassandraEntityStoreConfiguration#createIfMissing() defines if new missing resources should be created or an
 Exception should be thrown if missing.
@@ -94,9 +94,9 @@ factor, defaults to 3, and the command to create the keyspace is;
     CREATE KEYSPACE &lt;keyspaceName&gt; WITH replication = {'class':'SimpleStrategy', 'replication_factor' : &lt;replicationFactor&gt; };
 -----------------
 
-== Polygene's Cassandra Table ==
+== Qi4j's Cassandra Table ==
 
-Polygene will store all entities in a single Cassandra TABLE
+Qi4j will store all entities in a single Cassandra TABLE
 
 [source]
 -----------------

@@ -20,9 +20,9 @@
 
 <!DOCTYPE idea-plugin PUBLIC "Plugin/DTD" "http://plugins.intellij.net/plugin.dtd">
 <idea-plugin>
-  <id>org.apache.polygene</id>
+  <id>org.qi4j</id>
   <name>qidea</name>
-  <description>Apache Polygene™ idea plugin</description>
+  <description>Qi4j idea plugin</description>
   <version>0.1</version>
   <vendor>codedragons</vendor>
   <idea-version since-build="8000"/>
@@ -31,21 +31,21 @@
 
   <application-components>
     <component>
-      <implementation-class>org.apache.polygene.ide.plugin.idea.PolygeneApplicationComponent</implementation-class>
+      <implementation-class>org.qi4j.ide.plugin.idea.Qi4jApplicationComponent</implementation-class>
     </component>
   </application-components>
 
   <actions>
     <action id="CreateConcernFromMixinTypeOrCompositeAction"
-            class="org.apache.polygene.ide.plugin.idea.concerns.actions.create.CreateConcernFromMixinTypeOrCompositeAction"
-            text="New Concern" description="Create new Polygene™ concern">
+            class="org.qi4j.ide.plugin.idea.concerns.actions.create.CreateConcernFromMixinTypeOrCompositeAction"
+            text="New Concern" description="Create new Qi4j concern">
       <add-to-group group-id="CodeMenu" anchor="last"/>
     </action>
 
-    <group id="Polygene" class="org.apache.polygene.ide.plugin.idea.common.actions.PolygeneCreateActionGroup" text="Polygene™">
-      <action id="Polygene.NewConcernOf"
-              class="org.apache.polygene.ide.plugin.idea.concerns.actions.create.inPackage.CreateConcernOfInPackageAction"
-              text="New Concern" description="Create new Polygene concern">
+    <group id="Qi4j" class="org.qi4j.ide.plugin.idea.common.actions.Qi4jCreateActionGroup" text="Qi4j">
+      <action id="Qi4j.NewConcernOf"
+              class="org.qi4j.ide.plugin.idea.concerns.actions.create.inPackage.CreateConcernOfInPackageAction"
+              text="New Concern" description="Create new Qi4j concern">
       </action>
       <add-to-group group-id="NewGroup" anchor="last"/>
     </group>

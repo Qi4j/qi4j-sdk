@@ -18,23 +18,23 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ SQL Indexing Extension"
+description = "Qi4j SQL Indexing Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - Indexing - SQL" } }
+jar { manifest { name = "Qi4j Extension - Indexing - SQL" } }
 
 dependencies {
-  api polygene.core.bootstrap
-  api polygene.library( 'sql' )
+  api qi4j.core.bootstrap
+  api qi4j.library( 'sql' )
 
-  implementation polygene.library( 'sql-generator' )
-  implementation polygene.extension( 'reindexer' )
+  implementation qi4j.library( 'sql-generator' )
+  implementation qi4j.extension( 'reindexer' )
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
-  testImplementation polygene.library( 'sql-dbcp' )
+  testImplementation qi4j.core.testsupport
+  testImplementation qi4j.library( 'sql-dbcp' )
   testImplementation libraries.docker_junit
 
   testRuntimeOnly libraries.logback

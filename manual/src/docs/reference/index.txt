@@ -18,11 +18,11 @@
 ///////////////////////////////////////////////////////////////
 
 [[reference-documentation,Reference Manual]]
-= Apache Polygene™ v{revnumber} Reference Manual =
+= Qi4j v{revnumber} Reference Manual =
 
-:polygene-version: {revnumber}
-:polygene-buildnumber: {revnumber}
-:polygene-git-tag: {gitversion}
+:qi4j-version: {revnumber}
+:qi4j-buildnumber: {revnumber}
+:qi4j-git-tag: {gitversion}
 
 
 :leveloffset: 2

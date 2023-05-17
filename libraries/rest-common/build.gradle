@@ -18,16 +18,16 @@
  *
  */
 
-apply plugin: 'polygene-library'
+apply plugin: 'qi4j-library'
 
-description = "Apache Polygene™ REST Library provides various Restlet resources that can be used to expose Apache Polygene™ entities and indexes. Mostly for debugging."
+description = "Qi4j REST Library provides various Restlet resources that can be used to expose Qi4j entities and indexes. Mostly for debugging."
 
-jar { manifest { name = "Apache Polygene™ Library - REST" } }
+jar { manifest { name = "Qi4j Library - REST" } }
 
 dependencies {
   compileOnly libraries.servlet_api
 
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
   implementation libraries.restlet
   implementation libraries.velocity

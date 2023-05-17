@@ -62,7 +62,7 @@
         Copyright © 2015 The Apache Software Foundation, Licensed under the <a href="http://www.apache.org/licenses/" target="_blank">Apache License, Version 2.0</a>.
         <br/>
         <small>
-            Apache Polygene, Polygene, Apache, the Apache feather logo, and the Apache Polygene project logo are trademarks of The Apache Software Foundation.<br/>
+            Qi4j, Qi4j, Apache, the Apache feather logo, and the Qi4j project logo are trademarks of The Apache Software Foundation.<br/>
             All other marks mentioned may be trademarks or registered trademarks of their respective owners.
         </small>
       </p>

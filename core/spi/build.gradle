@@ -18,18 +18,18 @@
  *
  */
 
-apply plugin: 'polygene-core'
+apply plugin: 'qi4j-core'
 
-jar { manifest { name = "Apache Polygene™ Core SPI" } }
+jar { manifest { name = "Qi4j Core SPI" } }
 
 dependencies {
-  api polygene.core.api
+  api qi4j.core.api
   api libraries.javax_json
 
   runtimeOnly libraries.johnzon
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
-  testRuntimeOnly polygene.core.runtime
+  testRuntimeOnly qi4j.core.runtime
   testRuntimeOnly libraries.logback
 }

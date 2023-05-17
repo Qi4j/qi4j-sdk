@@ -18,20 +18,20 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Migration Extension"
+description = "Qi4j Migration Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - Migration" }}
+jar { manifest { name = "Qi4j Extension - Migration" }}
 
 dependencies {
-  api polygene.core.spi
+  api qi4j.core.spi
 
   implementation libraries.slf4j_api
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

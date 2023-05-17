@@ -25,13 +25,13 @@ source=core/runtime/dev-status.xml
 --------------
 
 First of all, your code should never, ever, have a dependency on Core Runtime. If you think you need this, you should
-probably contact users@polygene.apache.org mailing list and see if your usecase can either be solved in a existing way or
+probably contact qi4j-dev@googlegroups.com mailing list and see if your usecase can either be solved in a existing way or
 perhaps that a new Core SPI Extension is needed.
 
 include::../../build/docs/buildinfo/artifact.txt[]
 
 Let's repeat that; *Never, never, ever depend on Core Runtime*. Make sure that the compile dependency does NOT include
-the `org.apache.polygene.core.runtime` jar.
+the `org.qi4j.core.runtime` jar.
 
 == Custom AssemblyHelper ==
 BUT, there are super-rare cases, where a custom AssemblyHelper might be needed. One known use-case is to introduce
@@ -41,13 +41,13 @@ as Dalvik.
 To do this, add the +AssemblyHelper+ implementation instance as +metaInfo+ to the +ApplicationAssembly+
 
 We think this is so rare, that the +AssemblyHelper+ class will remain in the +core/runtime+ module and has not
-been promoted to the +core/bootstrap+ module. If you plan to use this feature, please contact the Polygene development
-team at +dev@polygene.apache.org+ to ensure we can make this a better supported, backed by real usecases.
+been promoted to the +core/bootstrap+ module. If you plan to use this feature, please contact the Qi4j development
+team at +qi4j-dev@googlegroups.com+ to ensure we can make this a better supported, backed by real usecases.
 
 Fictitious example of using a hypothetical Dalvik capable classloader;
 
 [snippet,java]
 --------------
-source=core/runtime/src/test/java/org/apache/polygene/runtime/bootstrap/docs/DocumentationSupport.java
+source=core/runtime/src/test/java/org/qi4j/runtime/bootstrap/docs/DocumentationSupport.java
 tag=customAssemblyHelper
 --------------

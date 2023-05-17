@@ -52,7 +52,7 @@ Here are the available configuration properties:
 
 [snippet,java]
 ----
-source=extensions/entitystore-sqlkv/src/main/java/org/apache/polygene/entitystore/sql/SQLMapEntityStoreConfiguration.java
+source=extensions/entitystore-sqlkv/src/main/java/org/qi4j/entitystore/sql/SQLMapEntityStoreConfiguration.java
 tag=config
 ----
 
@@ -68,7 +68,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-sqlkv/src/test/java/org/apache/polygene/entitystore/sql/PostgreSQLEntityStoreTest.java
+source=extensions/entitystore-sqlkv/src/test/java/org/qi4j/entitystore/sql/PostgreSQLEntityStoreTest.java
 tag=assembly
 ----
 
@@ -88,7 +88,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-sqlkv/src/test/java/org/apache/polygene/entitystore/sql/MySQLEntityStoreTest.java
+source=extensions/entitystore-sqlkv/src/test/java/org/qi4j/entitystore/sql/MySQLEntityStoreTest.java
 tag=assembly
 ----
 
@@ -111,7 +111,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-sqlkv/src/test/java/org/apache/polygene/entitystore/sql/SQLiteEntityStoreTest.java
+source=extensions/entitystore-sqlkv/src/test/java/org/qi4j/entitystore/sql/SQLiteEntityStoreTest.java
 tag=assembly
 ----
 
@@ -131,7 +131,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-sqlkv/src/test/java/org/apache/polygene/entitystore/sql/H2SQLEntityStoreTest.java
+source=extensions/entitystore-sqlkv/src/test/java/org/qi4j/entitystore/sql/H2SQLEntityStoreTest.java
 tag=assembly
 ----
 
@@ -152,7 +152,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-sqlkv/src/test/java/org/apache/polygene/entitystore/sql/DerbySQLEntityStoreTest.java
+source=extensions/entitystore-sqlkv/src/test/java/org/qi4j/entitystore/sql/DerbySQLEntityStoreTest.java
 tag=assembly
 ----
 

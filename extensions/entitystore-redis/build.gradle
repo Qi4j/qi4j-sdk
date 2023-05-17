@@ -18,21 +18,21 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Redis EntityStore Extension"
+description = "Qi4j Redis EntityStore Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - Redis" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - Redis" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
-  implementation polygene.library( 'locking' )
+  implementation qi4j.library( 'locking' )
   implementation libraries.jedis
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.docker_junit
 
   testRuntimeOnly libraries.logback

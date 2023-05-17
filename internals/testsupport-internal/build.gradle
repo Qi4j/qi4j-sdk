@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-apply plugin: 'polygene-internal'
-apply plugin: 'polygene-internal-docker'
+apply plugin: 'qi4j-internal'
+apply plugin: 'qi4j-internal-docker'
 
-description = "Apache Polygene™ Internal Test Support"
+description = "Qi4j Internal Test Support"

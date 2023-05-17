@@ -18,22 +18,22 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Riak EntityStore Extension"
+description = "Qi4j Riak EntityStore Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - Riak" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - Riak" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
-  implementation polygene.library( 'locking' )
-  implementation polygene.library( 'constraints' )
+  implementation qi4j.library( 'locking' )
+  implementation qi4j.library( 'constraints' )
   implementation libraries.riak
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.awaitility
   testImplementation libraries.docker_junit
 

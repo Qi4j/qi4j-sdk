@@ -18,20 +18,20 @@
  *
  */
 
-apply plugin: 'polygene-library'
+apply plugin: 'qi4j-library'
 
-description = "Apache Polygene™ Constraint Library provides common set of constraints."
+description = "Qi4j Constraint Library provides common set of constraints."
 
-jar { manifest { name = "Apache Polygene™ Library - Constraints"}}
+jar { manifest { name = "Qi4j Library - Constraints"}}
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
   api libraries.commons_validator
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

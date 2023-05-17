@@ -15,30 +15,30 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-import org.apache.polygene.gradle.structure.tests.PerformanceTestsPlugin
+import org.qi4j.gradle.structure.tests.PerformanceTestsPlugin
 
-apply plugin: 'polygene-test'
+apply plugin: 'qi4j-test'
 
-description = "Apache Polygene™ Performance Test Suite."
+description = "Qi4j Performance Test Suite."
 
-jar { manifest { name = "Apache Polygene™ Tests - Performance" } }
+jar { manifest { name = "Qi4j Tests - Performance" } }
 
 apply plugin: PerformanceTestsPlugin
 
 dependencies {
-  implementation polygene.core.bootstrap
+  implementation qi4j.core.bootstrap
   implementation libraries.junit
   implementation libraries.slf4j_api
 
-  perfImplementation polygene.core.testsupport
-  perfImplementation polygene.library( 'sql-dbcp' )
-  perfImplementation polygene.extension( 'entitystore-memory' )
-  perfImplementation polygene.extension( 'entitystore-jdbm' )
-  perfImplementation polygene.extension( 'entitystore-sqlkv' )
-  perfImplementation polygene.extension( 'cache-ehcache' )
-  perfImplementation polygene.extension( 'indexing-rdf' )
+  perfImplementation qi4j.core.testsupport
+  perfImplementation qi4j.library( 'sql-dbcp' )
+  perfImplementation qi4j.extension( 'entitystore-memory' )
+  perfImplementation qi4j.extension( 'entitystore-jdbm' )
+  perfImplementation qi4j.extension( 'entitystore-sqlkv' )
+  perfImplementation qi4j.extension( 'cache-ehcache' )
+  perfImplementation qi4j.extension( 'indexing-rdf' )
   perfImplementation libraries.derby
 
-  perfRuntimeOnly polygene.core.runtime
+  perfRuntimeOnly qi4j.core.runtime
   perfRuntimeOnly libraries.logback
 }

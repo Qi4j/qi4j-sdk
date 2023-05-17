@@ -25,7 +25,7 @@
 source=libraries/jmx/dev-status.xml
 --------------
 
-The JMX library provides a service that exposes a Polygene™ application in
+The JMX library provides a service that exposes a Qi4j application in
 http://www.oracle.com/technetwork/articles/java/docs-jsp-135989.html[JMX]
 automatically, giving you an opportunity to inspect the application much as
 you would with the <<tools-envisage>> tool.
@@ -41,18 +41,18 @@ image:library-jmx.png[width="800px"]
 
 == Assembly ==
 
-JMX Support for Polygene™ applications:
+JMX Support for Qi4j applications:
 
 [snippet,java]
 ----
-source=libraries/jmx/src/test/java/org/apache/polygene/library/jmx/JMXTest.java
+source=libraries/jmx/src/test/java/org/qi4j/library/jmx/JMXTest.java
 tag=assembly
 ----
 
-Managing the MX Beans Server from your Polygene™ application using the `JMXConnectorService`:
+Managing the MX Beans Server from your Qi4j application using the `JMXConnectorService`:
 
 [snippet,java]
 ----
-source=libraries/jmx/src/test/java/org/apache/polygene/library/jmx/JMXTest.java
+source=libraries/jmx/src/test/java/org/qi4j/library/jmx/JMXTest.java
 tag=connector
 ----

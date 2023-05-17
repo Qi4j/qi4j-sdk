@@ -18,18 +18,18 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Preferences EntityStore Extension"
+description = "Qi4j Preferences EntityStore Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - Preferences" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - Preferences" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

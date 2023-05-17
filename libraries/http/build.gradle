@@ -18,25 +18,25 @@
  *
  */
 
-apply plugin: 'polygene-library'
+apply plugin: 'qi4j-library'
 
-description = "Apache Polygene™ Http Library provides embedded Jetty for Apache Polygene™ application use."
+description = "Qi4j Http Library provides embedded Jetty for Qi4j application use."
 
-jar { manifest { name = "Apache Polygene™ Library - Http" } }
+jar { manifest { name = "Qi4j Library - Http" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
   api libraries.servlet_api
 
-  implementation polygene.library( 'jmx' )
-  implementation polygene.library( 'constraints' )
+  implementation qi4j.library( 'jmx' )
+  implementation qi4j.library( 'constraints' )
   implementation libraries.bouncy_castle
   implementation libraries.jetty_webapp
   implementation libraries.jetty_jmx
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.http_client
   testImplementation libraries.junit
 
@@ -70,7 +70,7 @@ if( JavaVersion.current() < JavaVersion.VERSION_1_9 )
     // TODO Test JVM won't start when offline
     try
     {
-      new URL( 'https://polygene.apache.org/' ).text
+      new URL( 'https://qi4j.org/' ).text
       enabled = true
     }
     catch( Exception ex )

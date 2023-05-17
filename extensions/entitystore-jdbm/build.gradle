@@ -18,22 +18,22 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ JDBM EntityStore Extension"
+description = "Qi4j JDBM EntityStore Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - JDBM" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - JDBM" } }
 
 dependencies {
-  api polygene.core.bootstrap
-  api polygene.library( 'fileconfig' )
+  api qi4j.core.bootstrap
+  api qi4j.library( 'fileconfig' )
 
-  implementation polygene.library( 'locking' )
+  implementation qi4j.library( 'locking' )
   implementation libraries.jdbm
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

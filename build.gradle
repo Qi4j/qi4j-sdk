@@ -16,6 +16,6 @@
  *  limitations under the License.
  */
 
-apply plugin: 'polygene-dependencies-declaration'
+apply plugin: 'qi4j-dependencies-declaration'
 apply from: 'dependencies.gradle'
-apply plugin: 'polygene-root'
+apply plugin: 'qi4j-root'

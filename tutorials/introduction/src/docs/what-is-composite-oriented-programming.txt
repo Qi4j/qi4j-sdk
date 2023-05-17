@@ -24,7 +24,7 @@ We found this very well written blog entry on the Internet, which very well desc
 Programming really is.
 
 The article uses C# and a "show by example" approach to explaining COP, and this shows clearly that COP is not
-Java specific, and although the founders of Qi4j (now Apache Polygene™) were (to our knowledge) the first to introduce
+Java specific, and although the founders of Qi4j (now Qi4j) were (to our knowledge) the first to introduce
 the name, it applies across languages and potentially deserves one or more languages on its own.
 
 The article is re-published here, as allowed by the
@@ -34,9 +34,6 @@ http://www.opensource.org/licenses/MS-PL[Microsoft Public License]. The content 
 is NOT under the usual http://www.opensource.org/licenses/Apache-2.0[Apache License].
 
 We would like to thank Fredrik Kalseth for his explicit approval as well.
-
-The article below was published during the time when Polygene™ was known as Qi4j, and whenever "Qi4j" is mentioned
-below it should be read as "Polygene".
 
 Since then, this article went offline but can be found on the
 https://web.archive.org/web/20130414005509/http://iridescence.no/post/composite-oriented-programming.aspx[Internet Archive].

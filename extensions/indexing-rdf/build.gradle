@@ -18,23 +18,23 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ RDF Index/Query Extension"
+description = "Qi4j RDF Index/Query Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - Index/Query - RDF" } }
+jar { manifest { name = "Qi4j Extension - Index/Query - RDF" } }
 
 dependencies {
-  api polygene.core.bootstrap
-  api polygene.library( 'rdf' )
+  api qi4j.core.bootstrap
+  api qi4j.library( 'rdf' )
 
   implementation libraries.commons_lang
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
-  testImplementation polygene.extension( 'entitystore-preferences' )
-  testImplementation polygene.extension( 'entitystore-jdbm' )
+  testImplementation qi4j.core.testsupport
+  testImplementation qi4j.extension( 'entitystore-preferences' )
+  testImplementation qi4j.extension( 'entitystore-jdbm' )
 
   testRuntimeOnly libraries.logback
 }

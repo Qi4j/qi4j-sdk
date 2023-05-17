@@ -17,23 +17,23 @@
  *
  *
  */
-import org.apache.polygene.gradle.TaskGroups
+import org.qi4j.gradle.TaskGroups
 
-apply plugin: 'polygene-library'
+apply plugin: 'qi4j-library'
 
-description = "Apache Polygene™ Circuit Breaker Library provides a framework for connecting external resources, so that they can be disabled during re-play of events."
+description = "Qi4j Circuit Breaker Library provides a framework for connecting external resources, so that they can be disabled during re-play of events."
 
-jar { manifest { name = "Apache Polygene™ Library - Circuit Breaker" } }
+jar { manifest { name = "Qi4j Library - Circuit Breaker" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
-  implementation polygene.library( 'jmx' )
+  implementation qi4j.library( 'jmx' )
   implementation libraries.slf4j_api
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.awaitility
 
   testRuntimeOnly libraries.logback
@@ -42,6 +42,6 @@ dependencies {
 task( runCircuitBreakerSample, dependsOn: 'testClasses', type: JavaExec ) {
   group = TaskGroups.SAMPLES
   description = "Runs $project.name sample."
-  main = 'org.apache.polygene.library.circuitbreaker.jmx.CircuitBreakerManagementSample'
+  main = 'org.qi4j.library.circuitbreaker.jmx.CircuitBreakerManagementSample'
   classpath = sourceSets.test.runtimeClasspath
 }

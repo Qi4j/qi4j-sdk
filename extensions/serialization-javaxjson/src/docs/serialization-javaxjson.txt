@@ -41,9 +41,9 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/serialization-javaxjson/src/test/java/org/apache/polygene/serialization/javaxjson/JavaxJsonValueCompositeSerializationTest.java
+source=extensions/serialization-javaxjson/src/test/java/org/qi4j/serialization/javaxjson/JavaxJsonValueCompositeSerializationTest.java
 tag=assembly
 ----
 
-Note that this assembler is optional as Polygene assemble this service by default if no Serialization service is declared.
+Note that this assembler is optional as Qi4j assemble this service by default if no Serialization service is declared.
 

@@ -47,7 +47,7 @@ following methods
 
 [snippet,java]
 ----
-source=libraries/execution/src/main/java/org/apache/polygene/library/execution/assembly/ExecutionServiceAssembler.java
+source=libraries/execution/src/main/java/org/qi4j/library/execution/assembly/ExecutionServiceAssembler.java
 tag=configuration
 ----
 
@@ -63,6 +63,6 @@ following methods
 
 [snippet,java]
 ----
-source=libraries/execution/src/main/java/org/apache/polygene/library/execution/assembly/ScheduledExecutionService.java
+source=libraries/execution/src/main/java/org/qi4j/library/execution/assembly/ScheduledExecutionService.java
 tag=configuration
 ----

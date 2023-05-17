@@ -18,18 +18,18 @@
  *
  */
 
-apply plugin: 'polygene-tutorial'
+apply plugin: 'qi4j-tutorial'
 
-description = "Tutorial on how to convert existing application into a Apache Polygene™ one, step-by-step."
+description = "Tutorial on how to convert existing application into a Qi4j one, step-by-step."
 
-jar { manifest { name = "Apache Polygene™ Tutorial - Cargo" } }
+jar { manifest { name = "Qi4j Tutorial - Cargo" } }
 
 dependencies {
-  implementation polygene.core.bootstrap
+  implementation qi4j.core.bootstrap
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.easymock
 
   testRuntimeOnly libraries.logback

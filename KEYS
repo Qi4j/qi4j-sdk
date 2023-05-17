@@ -1,4 +1,4 @@
-This file contains the GPG keys of Apache Polygene developers.
+This file contains the GPG keys of Qi4j developers.
 
 Users:    gpg --import KEYS
 
@@ -24,9 +24,9 @@ Developers:
 ********************************* PLEASE NOTE **********************************
 
   Releases will be signed using one of the keys present in this file. This file
-  will be available with the distributed Apache Polygene releases at:
+  will be available with the distributed Qi4j releases at:
 
-      https://dist.apache.org/repos/dist/release/polygene/KEYS
+      https://github.com/Qi4j/qi4j-sdk/issues/KEYS
 
 ********************************************************************************
 

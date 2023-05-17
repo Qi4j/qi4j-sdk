@@ -18,19 +18,19 @@
  *
  */
 
-apply plugin: 'polygene-tutorial'
+apply plugin: 'qi4j-tutorial'
 
-description = "Basic tutorial on how to covert a simple 'Hello World' application to Apache Polygene™, using more and more features for each step."
+description = "Basic tutorial on how to covert a simple 'Hello World' application to Qi4j, using more and more features for each step."
 
-jar { manifest { name = "Apache Polygene™ Tutorial - Composites" } }
+jar { manifest { name = "Qi4j Tutorial - Composites" } }
 
 dependencies {
-  implementation polygene.core.bootstrap
-  implementation polygene.library( 'constraints' )
+  implementation qi4j.core.bootstrap
+  implementation qi4j.library( 'constraints' )
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

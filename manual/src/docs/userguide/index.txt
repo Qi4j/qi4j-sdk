@@ -17,11 +17,11 @@
  * under the License.
 ///////////////////////////////////////////////////////////////
 
-= Polygene™ v{revnumber} User Guide =
+= Qi4j v{revnumber} User Guide =
 
-:polygene-version: {revnumber}
-:polygene-buildnumber: {revnumber}
-:polygene-git-tag: {gitversion}
+:qi4j-version: {revnumber}
+:qi4j-buildnumber: {revnumber}
+:qi4j-git-tag: {gitversion}
 
 
 :leveloffset: {level2}

@@ -30,6 +30,6 @@
         <appender-ref ref="stdout" />
     </root>
 
-    <logger name="org.apache.polygene.spi" level="debug"/>
+    <logger name="org.qi4j.spi" level="debug"/>
 
 </configuration>

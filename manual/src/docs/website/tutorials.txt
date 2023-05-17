@@ -25,15 +25,15 @@
 == Overview ==
 
 TIP: Theses tutorials are based on actual code found in the `tutorials/` directory of the
-https://polygene.apache.org/download.html[Polygene™ SDK sources]. You should start your favorite editor and find the code related to
+https://qi4j.github.com/download.html[Qi4j SDK sources]. You should start your favorite editor and find the code related to
 this tutorial, run it and play with it.
 
-In this section you will find a comprehensive set of tutorials about Composite Oriented Programming using Polygene™.
+In this section you will find a comprehensive set of tutorials about Composite Oriented Programming using Qi4j.
 
-[[tutorials-intro,Polygene™ in 42 minutes]]
-=== Polygene™ in 42 minutes ===
+[[tutorials-intro,Qi4j in 42 minutes]]
+=== Qi4j in 42 minutes ===
 
-This quite long introduction to Polygene™ will start by brushing up an overview of the problems Polygene™ solve, teach you what
+This quite long introduction to Qi4j will start by brushing up an overview of the problems Qi4j solve, teach you what
 Composite Oriented Programming is and guide you through the process of writing a complete Application around an adapted
 Hello World example.
 
@@ -42,13 +42,13 @@ Hello World example.
 - <<thirty-minutes-intro>>
 // - <<two-hours-intro>>
 
-=== Getting real with Polygene™ ===
+=== Getting real with Qi4j ===
 
-Throughout this set of tutorials it will be shown how to depend on Polygene™ in your build, how to assemble a complete
+Throughout this set of tutorials it will be shown how to depend on Qi4j in your build, how to assemble a complete
 application, how to create and work with Composites and Services, how to use contextual fragments and leverage
 properties.
 
-- <<howto-depend-on-polygene>>
+- <<howto-depend-on-qi4j>>
 - <<howto-assemble-application>>
 - <<tut-composites>>
 - <<tut-services>>
@@ -66,10 +66,10 @@ typical application.
 - <<howto-create-entity>>
 - <<howto-configure-service>>
 
-=== Polygene™ Development ===
+=== Qi4j Development ===
 
-This last set of tutorials you'll learn how to build the Polygene™ SDK from sources including this very documentation website
-, the Polygene™ manual, binaries and sources distributions.
+This last set of tutorials you'll learn how to build the Qi4j SDK from sources including this very documentation website
+, the Qi4j manual, binaries and sources distributions.
 
 - <<build-system>>
 - <<community-docs>>
@@ -94,7 +94,7 @@ include::../../../../tutorials/introduction/thirtyminutes/src/docs/thirty-minute
 
 :leveloffset: 2
 
-include::../tutorials/howto-depend-on-polygene.txt[]
+include::../tutorials/howto-depend-on-qi4j.txt[]
 
 :leveloffset: 2
 
@@ -150,6 +150,3 @@ include::../tutorials/howto-writing-docs.txt[]
 
 :leveloffset: 2
 
-include::../tutorials/howto-releasing-apache.txt[]
-
-:leveloffset: 2

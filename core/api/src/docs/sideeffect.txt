@@ -39,7 +39,7 @@ SideEffects are applied to composite types in several ways;
 As mentioned above, side effects that implements the _Mixin Type_ are called *Typed SideEffects*.
 
 A Typed SideEffect doesn't have to implement all the methods in the Mixin Type. By making the class abstract and only
-implementing the methods of interest, Polygene™ runtime will subclass the side effect (otherwise not valid for the
+implementing the methods of interest, Qi4j runtime will subclass the side effect (otherwise not valid for the
 JVM/compiler), but the generated methods will never be invoked.
 
 == Generic SideEffect ==
@@ -65,6 +65,6 @@ The invocation order of SideEffects is UNDEFINED, and one MUST NOT rely on SideE
 They MAY be concurrent and outside the thread that executed the method, so the SideEffect can also not depend on
 the UnitOfWork that may be observed as present.
 
-To be clear; the method call to the SideEffect is NOT its own Polygene-controlled invocation stack, and any annotations
+To be clear; the method call to the SideEffect is NOT its own Qi4j-controlled invocation stack, and any annotations
 on the SideEffect methods will be ignored (or it is a bug). That means that IF the SideEffect needs a UnitOfWork it
 either needs to manage one explicitly or call out to a service that has the @UnitOfWorkPropagation annotation.

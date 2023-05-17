@@ -16,15 +16,15 @@
  *  limitations under the License.
  */
 
-apply plugin: 'polygene-manual'
+apply plugin: 'qi4j-manual'
 
-description = "Apache Polygene™ Manuals and Website."
+description = "Qi4j Manuals and Website."
 
 dependencies {
-  implementation polygene.core.bootstrap
-  implementation polygene.library( 'constraints' )
-  implementation polygene.library( 'logging' )
+  implementation qi4j.core.bootstrap
+  implementation qi4j.library( 'constraints' )
+  implementation qi4j.library( 'logging' )
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
   runtimeOnly libraries.logback
 }

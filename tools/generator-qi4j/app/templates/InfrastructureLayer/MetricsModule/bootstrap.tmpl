@@ -1,0 +1,61 @@
+<%#
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+-%>
+package <%= qi4j.packageName %>.bootstrap.infrastructure;
+
+import common.api.org.qi4j.Visibility;
+import bootstrap.org.qi4j.AssemblyException;
+import bootstrap.org.qi4j.LayerAssembly;
+import bootstrap.org.qi4j.ModuleAssembly;
+import layered.bootstrap.org.qi4j.ModuleAssembler;
+<%
+if (qi4j.metrics === "None") {
+%>import defaults.bootstrap.org.qi4j.DefaultMetricsProviderAssembler;
+import metrics.api.org.qi4j.MetricsProvider;
+<%
+} else {
+%>import org.qi4j.metrics.<%- qi4j.metrics.toLowerCase() %>.assembly.<%- qi4j.metrics %>MetricsAssembler;
+<%
+}
+%>
+public class <%- qi4j.metrics %>MetricsModule
+    implements ModuleAssembler
+{
+    public static final String NAME = "<%- qi4j.metrics %> Metrics Module";
+
+    @Override
+    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+        throws AssemblyException
+    {
+<%
+if (qi4j.metrics === "None") {
+%>        new DefaultMetricsProviderAssembler().assemble( module );
+        module.services( MetricsProvider.class ).visibleIn( Visibility.application );
+<%
+} else {
+%>        new <%- qi4j.metrics %>MetricsAssembler()
+            .visibleIn( Visibility.application )
+            .assemble( module );
+<%
+}
+%>
+        return module;
+    }
+}
+

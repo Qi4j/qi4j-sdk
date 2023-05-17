@@ -18,22 +18,22 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Ehcache Cache Extension"
+description = "Qi4j Ehcache Cache Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension: EhCache" } }
+jar { manifest { name = "Qi4j Extension: EhCache" } }
 
 dependencies {
-  api polygene.core.bootstrap
-  api polygene.library( 'fileconfig' )
+  api qi4j.core.bootstrap
+  api qi4j.library( 'fileconfig' )
 
-  implementation polygene.library( 'constraints' )
+  implementation qi4j.library( 'constraints' )
   implementation libraries.ehcache
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

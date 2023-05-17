@@ -38,6 +38,6 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/serialization-messagepack/src/test/java/org/apache/polygene/serialization/messagepack/MessagePackValueCompositeSerializationTest.java
+source=extensions/serialization-messagepack/src/test/java/org/qi4j/serialization/messagepack/MessagePackValueCompositeSerializationTest.java
 tag=assembly
 ----

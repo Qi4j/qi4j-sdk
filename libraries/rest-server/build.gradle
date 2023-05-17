@@ -18,25 +18,25 @@
  *
  */
 
-apply plugin: 'polygene-library'
+apply plugin: 'qi4j-library'
 
-description = "Apache Polygene™ REST Server Library provides a server component for building REST API's based on usecases"
+description = "Qi4j REST Server Library provides a server component for building REST API's based on usecases"
 
-jar { manifest { name = "Apache Polygene™ Library - REST server" } }
+jar { manifest { name = "Qi4j Library - REST server" } }
 
 dependencies {
   compileOnly libraries.servlet_api
 
-  api polygene.library( 'rest-common' )
+  api qi4j.library( 'rest-common' )
   api libraries.restlet
 
   implementation libraries.slf4j_api
   implementation libraries.velocity
   implementation libraries.freemarker
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

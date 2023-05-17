@@ -22,7 +22,7 @@
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[POLYGENE] @%-20thread %-5level %logger{36} - %msg%n</pattern>
+            <pattern>[QI4J] @%-20thread %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -30,7 +30,7 @@
         <appender-ref ref="stdout" />
     </root>
 
-    <logger name="org.apache.polygene.library.http" level="trace"/>
+    <logger name="org.qi4j.library.http" level="trace"/>
     <logger name="org.eclipse.jetty" level="info"/>
     <logger name="org.jetty" level="info"/>
     

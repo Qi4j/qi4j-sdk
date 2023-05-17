@@ -24,7 +24,7 @@
 source=libraries/logging/dev-status.xml
 --------------
 
-First of all, Polygene™ is taking a fresh look at all things that we take for granted. Logging is one such thing.
+First of all, Qi4j is taking a fresh look at all things that we take for granted. Logging is one such thing.
 
 It should (but is not) obvious that Logging are used for three very distinct purposes, and in our opinion the concepts
 are not related and should not be abstracted in the same fashion, as has been the norm in Log4j, JDK logging, Commons
@@ -61,7 +61,7 @@ To produce debugging output in your code you just need to add the field
 
 [snippet,java]
 -----------
-source=libraries/logging/src/test/java/org/apache/polygene/library/logging/docsupport/LoggingDocs.java
+source=libraries/logging/src/test/java/org/qi4j/library/logging/docsupport/LoggingDocs.java
 tag=logging1
 -----------
 
@@ -69,7 +69,7 @@ and then check for null at each usage
 
 [snippet,java]
 -----------
-source=libraries/logging/src/test/java/org/apache/polygene/library/logging/docsupport/LoggingDocs.java
+source=libraries/logging/src/test/java/org/qi4j/library/logging/docsupport/LoggingDocs.java
 tag=logging2
 -----------
 
@@ -83,7 +83,7 @@ visible.
 == Tracing ==
 
 Tracing is the process of tracking all the methods that has been called. There are two levels of tracing available in
-Polygene. Either Trace All or trace where a annotation has been given.
+Qi4j. Either Trace All or trace where a annotation has been given.
 
 If the TraceAllConcern is added to a composite, and there is a TraceService visible, then all method calls into that
 composite is traced.
@@ -93,7 +93,7 @@ interface or the mixin implementation. You will also need to add the TraceConcer
 
 [snippet,java]
 -----------
-source=libraries/logging/src/test/java/org/apache/polygene/library/logging/docsupport/LoggingDocs.java
+source=libraries/logging/src/test/java/org/qi4j/library/logging/docsupport/LoggingDocs.java
 tag=logging3
 -----------
 
@@ -110,6 +110,6 @@ sideeffects and mixins to composites during the bootstrap phase instead of hard-
 
 [snippet,java]
 -----------
-source=libraries/logging/src/test/java/org/apache/polygene/library/logging/docsupport/LoggingDocs.java
+source=libraries/logging/src/test/java/org/qi4j/library/logging/docsupport/LoggingDocs.java
 tag=logging4
 -----------

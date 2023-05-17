@@ -24,13 +24,13 @@
 
 == Overview ==
 
-The Polygene™ SDK comes with useful development tools:
+The Qi4j SDK comes with useful development tools:
  a `yeoman` project generator,
  a detailed application model and its visualization gui.
 
 :leveloffset: 2
 
-include::../../../../tools/generator-polygene/src/docs/yeoman_polygene.txt[]
+include::../../../../tools/generator-qi4j/src/docs/yeoman_qi4j.txt[]
 
 :leveloffset: 2
 

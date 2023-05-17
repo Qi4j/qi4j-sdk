@@ -18,20 +18,20 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-jar { manifest { description = "Apache Polygene™ Reindexer Extension" } }
+jar { manifest { description = "Qi4j Reindexer Extension" } }
 
 dependencies {
-  api polygene.core.spi
+  api qi4j.core.spi
 
   implementation libraries.slf4j_api
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
-  testImplementation polygene.extension( 'entitystore-jdbm' )
-  testImplementation polygene.extension( 'indexing-rdf' )
+  testImplementation qi4j.core.testsupport
+  testImplementation qi4j.extension( 'entitystore-jdbm' )
+  testImplementation qi4j.extension( 'indexing-rdf' )
 
   testRuntimeOnly libraries.logback
 }

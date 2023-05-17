@@ -39,7 +39,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-sql/src/test/java/org/apache/polygene/entitystore/sql/SqlEntityStoreTest.java
+source=extensions/entitystore-sql/src/test/java/org/qi4j/entitystore/sql/SqlEntityStoreTest.java
 tag=assembly
 ----
 
@@ -49,7 +49,7 @@ Here are the available configuration properties:
 
 [snippet,java]
 ----
-source=extensions/entitystore-sql/src/main/java/org/apache/polygene/entitystore/sql/SqlEntityStoreConfiguration.java
+source=extensions/entitystore-sql/src/main/java/org/qi4j/entitystore/sql/SqlEntityStoreConfiguration.java
 tag=config
 ----
 
@@ -57,7 +57,7 @@ All authentication related properties are optional.
 By default no authentication is used.
 As soon as you provide a `username`, authentication is set up.
 It is also strongly recommended that a connection pool is setup. <<library-sql-dbcp>> and <<library-bonecp>> are
-available in Polygene, but you can create your own.
+available in Qi4j, but you can create your own.
 
 == Table Layout ==
 The SQL Entity Store will create, if createIfMissing() is true, or expect that the following tables exist.
@@ -126,7 +126,7 @@ For instance, the following types will end up creating 4 Mixin tables, plus the 
 
 [snippet,java]
 ----
-source=extensions/entitystore-sql/src/test/java/org/apache/polygene/entitystore/sql/DocSupport.java
+source=extensions/entitystore-sql/src/test/java/org/qi4j/entitystore/sql/DocSupport.java
 tag=types
 ----
 

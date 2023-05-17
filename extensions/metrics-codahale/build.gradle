@@ -18,20 +18,20 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ Codahale Metrics Extension"
+description = "Qi4j Codahale Metrics Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - Metrics - Codahale" } }
+jar { manifest { name = "Qi4j Extension - Metrics - Codahale" } }
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
   api libraries.codahale_metrics
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
-  testImplementation polygene.library( 'jmx' )
+  testImplementation qi4j.core.testsupport
+  testImplementation qi4j.library( 'jmx' )
 
   testRuntimeOnly libraries.logback
 }

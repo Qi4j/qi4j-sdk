@@ -63,7 +63,7 @@ Let's see how it works in practice.
 
 [snippet,java]
 ----
-source=core/api/src/test/java/org/apache/polygene/api/value/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/value/DocumentationSupport.java
 tag=default
 ----
 
@@ -88,7 +88,7 @@ Let's see how to use the Serialization Services.
 
 [snippet,java]
 ----
-source=core/api/src/test/java/org/apache/polygene/api/value/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/value/DocumentationSupport.java
 tag=service
 ----
 

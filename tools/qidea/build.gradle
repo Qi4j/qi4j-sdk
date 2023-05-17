@@ -18,18 +18,18 @@
  *
  */
 
-apply plugin: 'polygene-tool'
+apply plugin: 'qi4j-tool'
 
-description = "IntelliJ IDEA Plugin for Apache Polygene™ development."
+description = "IntelliJ IDEA Plugin for Qi4j development."
 
-jar { manifest { name = "Apache Polygene™ IDEA plugin" }}
+jar { manifest { name = "Qi4j IDEA plugin" }}
 
 dependencies {
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

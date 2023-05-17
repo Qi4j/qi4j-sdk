@@ -20,7 +20,7 @@
     <value>
         <identity>configtest</identity>
         <host>
-            <value _type="org.apache.polygene.test.entity.AbstractConfigurationDeserializationTest$Host">
+            <value _type="org.qi4j.test.entity.AbstractConfigurationDeserializationTest$Host">
                 <ip>12.23.34.45</ip>
                 <port>1234</port>
             </value>

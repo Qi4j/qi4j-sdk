@@ -13,7 +13,7 @@
 
 [[core-api-metrics, Metrics API]]
 = Metrics API =
-The Polygene™ platform defines an advanced Metrics SPI to capture runtime metrics of Polygene's internals as well be used by
+The Qi4j platform defines an advanced Metrics SPI to capture runtime metrics of Qi4j's internals as well be used by
 application code (via this API) to provide production metrics for operations personnel, ensuring healthy state of
 the applications.
 
@@ -23,12 +23,12 @@ There are quite a lot of different Metrics components available, which are insta
 factory for each component type, to allow for additional components to be created in the future without breaking
 compatibility in the existing implementations.
 
-The MetricsProvider is a standard Polygene™ Service and simply acquired via the @Service annotation on a field or
+The MetricsProvider is a standard Qi4j Service and simply acquired via the @Service annotation on a field or
 constructor argument.
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/metrics/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/metrics/DocumentationSupport.java
 tag=common
 --------------
 
@@ -46,7 +46,7 @@ To create a Gauge, you do something like;
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/metrics/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/metrics/DocumentationSupport.java
 tag=gauge
 --------------
 
@@ -58,7 +58,7 @@ many visualization platforms. such as Kibana, Graphite and Grafana, are made to 
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/metrics/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/metrics/DocumentationSupport.java
 tag=counter
 --------------
 
@@ -68,7 +68,7 @@ http://www.johndcook.com/standard_deviation.html["Accurately computing running v
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/metrics/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/metrics/DocumentationSupport.java
 tag=histogram
 --------------
 
@@ -82,7 +82,7 @@ http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average["Exponent
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/metrics/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/metrics/DocumentationSupport.java
 tag=meter
 --------------
 
@@ -92,7 +92,7 @@ critical sections, or even HTTP requests duration and similar.
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/metrics/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/metrics/DocumentationSupport.java
 tag=timer
 --------------
 
@@ -102,13 +102,13 @@ regularly to report its status, which is then forwarded to the monitoring system
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/metrics/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/metrics/DocumentationSupport.java
 tag=healthcheck
 --------------
 
 
 = Timing Capture =
-A lot of metrics are around the time it takes to execute something and Polygene supports this at its core.
+A lot of metrics are around the time it takes to execute something and Qi4j supports this at its core.
 
 == Usage ==
 There are currently the following possibilities available;
@@ -135,7 +135,7 @@ Example;
 
 [snippet,java]
 ----
-source=core/api/src/test/java/org/apache/polygene/api/metrics/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/metrics/DocumentationSupport.java
 tag=capture
 ----
 
@@ -145,7 +145,7 @@ Any of the method declarations should work. From the testcases we have the follo
 
 [snippet,java]
 ----
-source=core/testsupport/src/main/java/org/apache/polygene/test/metrics/AbstractTimingCaptureTest.java
+source=core/testsupport/src/main/java/org/qi4j/test/metrics/AbstractTimingCaptureTest.java
 tag=complex-capture
 ----
 

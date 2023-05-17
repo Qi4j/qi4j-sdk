@@ -26,7 +26,7 @@ source=extensions/entitystore-sqlkv/dev-status.xml
 --------------
 
 EntityStore service backed by a Zookeeper cluster. All entities are stored under a configurable ZNode, by default
-/polygene/store.
+/qi4j/store.
 
 Note that Zookeeper is not intended for heavy loads, and this implementation is primarily for Configurations and
 reference data that is primarily read-only in nature.
@@ -39,7 +39,7 @@ Here are the available configuration properties:
 
 [snippet,java]
 ----
-source=extensions/entitystore-zookeeper/src/main/java/org/apache/polygene/entitystore/zookeeper/ZookeeperEntityStoreConfiguration.java
+source=extensions/entitystore-zookeeper/src/main/java/org/qi4j/entitystore/zookeeper/ZookeeperEntityStoreConfiguration.java
 tag=config
 ----
 
@@ -47,7 +47,7 @@ Assembly is done using the provided Assembler:
 
 [snippet,java]
 ----
-source=extensions/entitystore-zookeeper/src/test/java/org/apache/polygene/entitystore/zookeeper/ZookeeperEntityStoreTest.java
+source=extensions/entitystore-zookeeper/src/test/java/org/qi4j/entitystore/zookeeper/ZookeeperEntityStoreTest.java
 tag=assembly
 ----
 

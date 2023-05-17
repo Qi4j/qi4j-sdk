@@ -17,7 +17,7 @@
  */
 
 task install( type: Wrapper ) {
-  description = 'Installs the Gradle Wrapper in Apache Polygene™ source distribution.'
+  description = 'Installs the Gradle Wrapper in Qi4j source distribution.'
   gradleVersion = '%REQUIRED_GRADLE_VERSION%'
   def targetRoot = project.rootDir.parentFile.parentFile
   jarFile = new File(targetRoot, 'gradle/wrapper/gradle-wrapper.jar')

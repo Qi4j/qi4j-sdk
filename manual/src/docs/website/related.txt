@@ -20,9 +20,9 @@
 [[related,Related publications and projects]]
 = Related publications & projects =
 
-Polygene™ addresses a wide range of concepts, the related publications and projects you'll find in this section span accross
+Qi4j addresses a wide range of concepts, the related publications and projects you'll find in this section span accross
 all theses concepts. Please note that this is not an exhaustive list but only some pointers to help you understand which
-principles Polygene™ is based on.
+principles Qi4j is based on.
 
 
 == Publications ==

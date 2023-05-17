@@ -17,23 +17,23 @@
  *
  *
  */
-import org.apache.polygene.gradle.TaskGroups
+import org.qi4j.gradle.TaskGroups
 
-apply plugin: 'polygene-sample'
+apply plugin: 'qi4j-sample'
 
 description = "Sample of how to use the Swing bindings."
 
-jar { manifest { name = "Apache Polygene™ Sample - Swing Bindings" } }
+jar { manifest { name = "Qi4j Sample - Swing Bindings" } }
 
 dependencies {
-  implementation polygene.core.bootstrap
+  implementation qi4j.core.bootstrap
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 }
 
 task( runSwingSample, dependsOn: 'classes', type: JavaExec ) {
   group = TaskGroups.SAMPLES
   description = "Runs $project.name sample."
-  main = 'org.apache.polygene.sample.swing.binding.example.Main'
+  main = 'org.qi4j.sample.swing.binding.example.Main'
   classpath = sourceSets.main.runtimeClasspath
 }

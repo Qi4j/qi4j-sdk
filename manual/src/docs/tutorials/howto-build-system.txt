@@ -18,26 +18,26 @@
 ///////////////////////////////////////////////////////////////
 
 [[build-system,Build System]]
-= Polygene™ Build System =
+= Qi4j Build System =
 
-This tutorial is intended for developers who want to build the Polygene™ SDK themselves.
-It describe the Polygene™ SDK Build System from compilation to publication of artifacts for consumption by other
+This tutorial is intended for developers who want to build the Qi4j SDK themselves.
+It describe the Qi4j SDK Build System from compilation to publication of artifacts for consumption by other
 applications.
 
-If instead you want to setup your project build system to depend on modules of the Polygene™ SDK see the
-<<howto-depend-on-polygene,dedicated tutorial>>.
+If instead you want to setup your project build system to depend on modules of the Qi4j SDK see the
+<<howto-depend-on-qi4j,dedicated tutorial>>.
 
 
 == Gradle ==
 
 NOTE: All major Java IDEs have great Gradle support.
-Visit the https://www.gradle.org/resources[Gradle] website to learn how to import the Polygene™ SDK build into your
+Visit the https://www.gradle.org/resources[Gradle] website to learn how to import the Qi4j SDK build into your
 favorite IDE.
 
-Polygene™ community migrated away from Maven after several years of frustration, especially around release management,
+Qi4j community migrated away from Maven after several years of frustration, especially around release management,
 versioning and cross-module dependency resolution issues, in Feb 2011.
 The tool of choice is now Gradle, and it doesn't require any installation, there are +gradlew+ and +gradlew.bat+ in
-the root folder of the Polygene™ SDK that will bootstrap Gradle if not done so already.
+the root folder of the Qi4j SDK that will bootstrap Gradle if not done so already.
 
 If you are new to Gradle, you should keep the https://gradle.org/docs[documentation] at hands.
 
@@ -47,14 +47,14 @@ https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_prop
 
 == The Wrapper ==
 
-`gradlew` and `gradlew.bat` scripts that can be found at the root of the Polygene sources is *The Wrapper*.
+`gradlew` and `gradlew.bat` scripts that can be found at the root of the Qi4j sources is *The Wrapper*.
 Any build invocation starts from this script.
 It will download the Gradle distribution version required by the build.
 See the https://docs.gradle.org/current/userguide/gradle_wrapper.html[Gradle Wrapper] documentation for more details.
 
 == Main tasks ==
 
-The Polygene™ SDK project has tasks that work with the whole SDK.
+The Qi4j SDK project has tasks that work with the whole SDK.
 
 `./gradlew downloadDependencies`::
 --
@@ -124,7 +124,7 @@ If you want to narrow your exploration to submodules use the following:
 ----
 
 These examples will respectively output all gradle tasks available in the +:tests:performance+ module where you should find
-the +performanceTest+ task that runs the Polygene™ performance test suite and the +:release+ module tasks.
+the +performanceTest+ task that runs the Qi4j performance test suite and the +:release+ module tasks.
 
 +tasks+ itself is a task, in the same way we can target module(s) with tasks, e.g.:
 
@@ -154,7 +154,7 @@ It will also try hard to do less and not get in your way.
 
 == Tests ==
 
-NOTE: See the https://builds.apache.org/view/P/view/Polygene/[Polygene™ Continuous Integration] for current tests results
+NOTE: See the https://builds.apache.org/view/P/view/Polygene/[Qi4j Continuous Integration] for current tests results
 
 Unit and integration tests are located near the code under test.
 You'll find theses tests across the whole SDK.
@@ -192,7 +192,7 @@ If you want to forcibly skip all Docker related work, set the `skipDocker` Gradl
 
 === Performance tests ===
 
-Performance tests provide performance measurements for typical Polygene™ use cases.
+Performance tests provide performance measurements for typical Qi4j use cases.
 They are not part of the default build and are located in the `tests/performance` directory of the SDK.
 
 They can be run with the following Gradle command:
@@ -224,8 +224,8 @@ You'll need Asciidoc and docbook-xsl installed.
 
 IMPORTANT: Remember that if a +version+ property is not defined, the build system will refuse to make a release and upload.
 
-The Polygene™ SDK build system is setup for an easy release process.
-This is very useful to the Polygene™ Core Team but can also be useful to third parties that want to cut a in-house release.
+The Qi4j SDK build system is setup for an easy release process.
+This is very useful to the Qi4j Core Team but can also be useful to third parties that want to cut a in-house release.
 In this regard, we try to make every aspect of the release process usable for such cases.
 
 The following sections describe various aspects of the release process.
@@ -234,12 +234,12 @@ By default you need to have a proper PGP setup, see below.
 
 === Release Criteria ===
 
-The Polygene™ SDK modules are of varying maturity level and we try to maintain a STATUS (+dev-status.xml+) file indicating
+The Qi4j SDK modules are of varying maturity level and we try to maintain a STATUS (+dev-status.xml+) file indicating
 how good the codebase, documentation and unit tests are for each of the modules. This is highly subjective and
 potentially different individuals will judge this differently, but at least it gives a ballpark idea of the situation
 for our users.
 
-The Polygene™ SDK build system use the values from the +dev-status.xml+ files to filter out non-releasable modules out for
+The Qi4j SDK build system use the values from the +dev-status.xml+ files to filter out non-releasable modules out for
 the +javadocs+ and +uploadArchives+ root project tasks.
 Moreover, the +release+ task ensure that no releasable module depends on module(s) that don't fit the release criteria
 and throw a detailed exception if need be.

@@ -25,25 +25,25 @@
 source=libraries/osgi/dev-status.xml
 --------------
 
-OSGi Library allows you to import OSGi services as Polygene™ Services and to export Polygene™ Services as OSGi Services both
-leveraging the Polygene™ Availability and OSGi FallbackStrategy mechanisms.
+OSGi Library allows you to import OSGi services as Qi4j Services and to export Qi4j Services as OSGi Services both
+leveraging the Qi4j Availability and OSGi FallbackStrategy mechanisms.
 
 include::../../build/docs/buildinfo/artifact.txt[]
 
-== Export Polygene™ services to an OSGi Bundle ==
+== Export Qi4j services to an OSGi Bundle ==
 
 [snippet,java]
 ----
-source=libraries/osgi/src/test/java/org/apache/polygene/library/osgi/DocumentationSupport.java
+source=libraries/osgi/src/test/java/org/qi4j/library/osgi/DocumentationSupport.java
 tag=export
 ----
 
 
-== Import OSGi services in a Polygene™ Module ==
+== Import OSGi services in a Qi4j Module ==
 
 [snippet,java]
 ----
-source=libraries/osgi/src/test/java/org/apache/polygene/library/osgi/DocumentationSupport.java
+source=libraries/osgi/src/test/java/org/qi4j/library/osgi/DocumentationSupport.java
 tag=import
 ----
 

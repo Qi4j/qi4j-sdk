@@ -1,0 +1,41 @@
+<%
+if( qi4j.entitystore == 'PostgreSQL' || qi4j.indexing == 'SQL' ) {
+%>
+Start Postgres in Docker
+=========================
+    docker run -p 5432:5432 --name qi4j-postgres -d postgres
+
+Connect to Postgres via Docker
+==============================
+    docker run -it --rm --link qi4j-postgres:postgres postgres psql -h postgres -U postgres
+
+Setting up Postgresql database
+==============================
+In the psql command shell, execute the following commands (must have elevated
+permissions, such as user 'postgres'
+
+    CREATE USER qi4j WITH PASSWORD 'ThisIsGreat!';
+    CREATE DATABASE <%= qi4j.name.toLowerCase() %>;
+    GRANT ALL ON DATABASE <%= qi4j.name.toLowerCase() %> TO qi4j;
+    \connect <%= qi4j.name.toLowerCase() %>
+    CREATE EXTENSION ltree;
+    \q
+<%
+}
+%>
+<%
+if( qi4j.entitystore == 'Cassandra' ) {
+%>
+Start Cassandra in Docker
+=========================
+    docker run -d -p 7000:7000 -p 7001:7001 -p 7199:7199 -p 9042:9042 -p 9160:9160 --name qi4j-cassandra cassandra
+    docker logs -f qi4j-cassandra
+
+and wait for the following log message to appear.
+
+    Starting listening for CQL clients on /0.0.0.0:9042 (unencrypted)...
+
+after that you can Ctrl-C back to command line.
+<%
+}
+%>

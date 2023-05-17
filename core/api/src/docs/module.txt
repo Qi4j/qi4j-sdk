@@ -20,6 +20,6 @@ belongs to a single Layer, but many Modules can exist in the same Layer. Composi
     * Composites from Modules in the same Layer, with Visibility set to Visibility.layer
     * Composites from Modules in Layers below, with Visibility set to Visibility.application
 
-Modules contains a lot of the Polygene™ infrastructure, which are the enforcers of these wise modularization principles.
+Modules contains a lot of the Qi4j infrastructure, which are the enforcers of these wise modularization principles.
 
 It is not possible to modify the Modules, their resolution nor binding in any way after the application starts.

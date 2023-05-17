@@ -18,19 +18,19 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - File system" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - File system" } }
 
 dependencies {
-  api polygene.core.bootstrap
-  api polygene.library( 'fileconfig' )
+  api qi4j.core.bootstrap
+  api qi4j.library( 'fileconfig' )
 
-  implementation polygene.library( 'locking' )
-  implementation polygene.library( 'constraints' )
+  implementation qi4j.library( 'locking' )
+  implementation qi4j.library( 'constraints' )
 
-  runtimeOnly polygene.core.runtime
-  testImplementation polygene.core.testsupport
+  runtimeOnly qi4j.core.runtime
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

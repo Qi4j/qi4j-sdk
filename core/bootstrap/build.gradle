@@ -18,14 +18,14 @@
  *
  */
 
-apply plugin: 'polygene-core'
+apply plugin: 'qi4j-core'
 
-jar { manifest { name = "Apache Polygene™ Core Bootstrap" } }
+jar { manifest { name = "Qi4j Core Bootstrap" } }
 
 dependencies {
-  api polygene.core.spi
+  api qi4j.core.spi
 
-  testRuntimeOnly polygene.core.runtime
+  testRuntimeOnly qi4j.core.runtime
 
   testRuntime libraries.kotlin
 }

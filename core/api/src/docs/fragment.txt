@@ -22,7 +22,7 @@ about its internal structure.
 The Composite is composed by declaring the parts it forms in the Composite Type interface declaration. Technically
 speaking, Composite Type is the only Fragment that is required to exist. The other Fragments are optional.
 
-There are 4 types of Fragments in Polygene;
+There are 4 types of Fragments in Qi4j;
 
     * <<core-api-mixin>> - The state carrying part of a Composite.
     * <<core-api-constraint>> - Rules for in and out arguments, typically used for validation.

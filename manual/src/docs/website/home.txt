@@ -19,33 +19,33 @@
 
 :leveloffset: 1
 
-[[home,Polygene™ Home Page]]
-= Polygene™ =
+[[home,Qi4j Home Page]]
+= Qi4j =
 
 [IMPORTANT]
 .{revnumber}
 ====
-This is the documentation for *Polygene™ {revnumber}*. Use the version switcher on the left to browse other
+This is the documentation for *Qi4j {revnumber}*. Use the version switcher on the left to browse other
 versions documentation.
 ====
 
-== What is Apache Polygene™ ? ==
-The short answer is that Apache Polygene™ is a framework for domain centric application development, including evolved
+== What is Qi4j ? ==
+The short answer is that Qi4j is a framework for domain centric application development, including evolved
 concepts from http://en.wikipedia.org/wiki/Aspect-oriented_programming[AOP],
 http://en.wikipedia.org/wiki/Dependency_injection[DI] and http://en.wikipedia.org/wiki/Domain-driven_design[DDD].
 
-Polygene™ is an implementation of Composite Oriented Programming, using the standard Java platform, without the use of
+Qi4j is an implementation of Composite Oriented Programming, using the standard Java platform, without the use of
 any pre-processors or new language elements. Everything you know from Java still applies and you can leverage both
 your experience and toolkits to become more productive with Composite Oriented Programming today.
 
-Moreover, Polygene™ enables Composite Oriented Programming on the Java platform, including both Java and Scala as primary
+Moreover, Qi4j enables Composite Oriented Programming on the Java platform, including both Java and Scala as primary
 languages as well as many of the plethora of languages running on the JVM as bridged languages.
 
 We strongly recommend the <<intro, introduction>> section.
 
 == Brief History ==
-Apache Polygene™ started its life in 2007 as Qi4j™, initially at OPS4J's infrastructure and later on GitHub.
-In March 2015, Apache Polygene™ was created with the Qi4j™ codebase as the base, existing Apache Members as the
+Qi4j started its life in 2007 as Qi4j™, initially at OPS4J's infrastructure and later on GitHub.
+In March 2015, Qi4j was created with the Qi4j™ codebase as the base, existing Apache Members as the
 bootstrap Project Management Committee (PMC).
 
 image:intro-qi.png["Qi",align="center"]

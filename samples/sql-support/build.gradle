@@ -17,23 +17,23 @@
  *
  *
  */
-import org.apache.polygene.gradle.TaskGroups
+import org.qi4j.gradle.TaskGroups
 
-apply plugin: 'polygene-sample'
+apply plugin: 'qi4j-sample'
 
 description = "SQL Support Sample."
 
-jar { manifest { name = "Apache Polygene™ Sample - SQL Support" } }
+jar { manifest { name = "Qi4j Sample - SQL Support" } }
 
 dependencies {
 
-  implementation polygene.core.bootstrap
-  implementation polygene.library( 'sql-dbcp' )
-  implementation polygene.extension( 'entitystore-preferences' )
-  implementation polygene.extension( 'entitystore-sqlkv' )
-  implementation polygene.extension( 'indexing-sql' )
+  implementation qi4j.core.bootstrap
+  implementation qi4j.library( 'sql-dbcp' )
+  implementation qi4j.extension( 'entitystore-preferences' )
+  implementation qi4j.extension( 'entitystore-sqlkv' )
+  implementation qi4j.extension( 'indexing-sql' )
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
   runtimeOnly libraries.postgres
   runtimeOnly libraries.logback
 }
@@ -41,6 +41,6 @@ dependencies {
 task( runSqlSupportSample, dependsOn: 'classes', type: JavaExec ) {
   group = TaskGroups.SAMPLES
   description = "Runs $project.name sample."
-  main = 'org.apache.polygene.sample.sqlsupport.Main'
+  main = 'org.qi4j.sample.sqlsupport.Main'
   classpath = sourceSets.main.runtimeClasspath
 }

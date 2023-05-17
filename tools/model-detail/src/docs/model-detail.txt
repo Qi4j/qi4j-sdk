@@ -32,12 +32,12 @@ On application bootstrap:
 
 [snippet,java]
 ----
-source=tools/model-detail/src/test/java/org/apache/polygene/tools/model/DocumentationSupport.java
+source=tools/model-detail/src/test/java/org/qi4j/tools/model/DocumentationSupport.java
 tag=usage
 ----
 
     . Given an application assembler,
-    . and a Polygene runtime,
+    . and a Qi4j runtime,
     . create the `ApplicationModel`.
     . Use the `createApplicationDetailDescriptor()` static method to create a detailed application model object.
     . Use its `toJson()` method to get a detailed report of the application model.

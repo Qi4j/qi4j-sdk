@@ -18,21 +18,21 @@
  *
  */
 
-apply plugin: 'polygene-extension'
+apply plugin: 'qi4j-extension'
 
-description = "Apache Polygene™ SQL Key/Value EntityStore Extension"
+description = "Qi4j SQL Key/Value EntityStore Extension"
 
-jar { manifest { name = "Apache Polygene™ Extension - EntityStore - SQL Key/Value" } }
+jar { manifest { name = "Qi4j Extension - EntityStore - SQL Key/Value" } }
 
 dependencies {
-  api polygene.core.bootstrap
-  api polygene.library( 'sql' )
+  api qi4j.core.bootstrap
+  api qi4j.library( 'sql' )
   api libraries.jooq
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
-  testImplementation polygene.library( 'sql-dbcp' )
+  testImplementation qi4j.core.testsupport
+  testImplementation qi4j.library( 'sql-dbcp' )
   testImplementation libraries.docker_junit
 
   testRuntimeOnly libraries.logback

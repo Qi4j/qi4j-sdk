@@ -18,22 +18,22 @@
  *
  */
 
-apply plugin: 'polygene-library'
+apply plugin: 'qi4j-library'
 
-description = "Apache Polygene™ Servlet Library provides integration of Apache Polygene™ into web applications."
+description = "Qi4j Servlet Library provides integration of Qi4j into web applications."
 
-jar { manifest { name = "Apache Polygene™ Library - Servlet" } }
+jar { manifest { name = "Qi4j Library - Servlet" } }
 
 dependencies {
   compileOnly libraries.servlet_api
 
-  api polygene.core.bootstrap
+  api qi4j.core.bootstrap
 
   implementation libraries.slf4j_api
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
   testImplementation libraries.jetty_webapp
   testImplementation libraries.http_client
 

@@ -16,4 +16,4 @@
  *  limitations under the License.
  */
 
-apply plugin: 'polygene-release'
+apply plugin: 'qi4j-release'

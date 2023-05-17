@@ -1,0 +1,392 @@
+<%#
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+-%>
+package <%= qi4j.packageName %>.app;
+
+import <%= qi4j.packageName %>.bootstrap.<%= qi4j.name %>ApplicationAssembler;
+
+import <%= qi4j.packageName %>.bootstrap.config.ConfigModule;
+import <%= qi4j.packageName %>.bootstrap.config.ConfigurationLayer;
+import javax.json.Json;
+import javax.json.JsonWriter;
+
+import structure.api.org.qi4j.Application;
+import structure.api.org.qi4j.ApplicationDescriptor;
+import bootstrap.org.qi4j.ApplicationAssembly;
+import bootstrap.org.qi4j.AssemblyException;
+import bootstrap.org.qi4j.ModuleAssembly;
+import layered.bootstrap.org.qi4j.LayeredApplicationAssembler;
+import descriptor.model.tools.org.qi4j.ApplicationDetailDescriptor;
+import descriptor.model.tools.org.qi4j.ApplicationDetailDescriptorBuilder;
+<%
+qi4j.ignoredTest = ['MySQL', 'PostgreSQL'].indexOf(qi4j.entitystore) != -1 || ['SQL'].indexOf(qi4j.indexing) != -1;
+qi4j.needsDocker = ['Cassandra', 'Redis', 'Riak', 'MongoDB'].indexOf(qi4j.entitystore) != -1 || ['Memcache'].indexOf(qi4j.caching) != -1;
+qi4j.needsDelayChecker = false;
+
+if( qi4j.entitystore !== 'Memory' && qi4j.entitystore !== 'Preferences' ) {
+    if( qi4j.entitystore.indexOf('SQL') < 0 ) {
+%>import org.qi4j.entitystore.<%= qi4j.entitystore.toLowerCase() %>.<%= qi4j.entitystore %>EntityStoreConfiguration;
+<% } else {
+%>import sql.entitystore.org.qi4j.SqlEntityStoreConfiguration;
+<%
+    }
+}
+if( qi4j.caching === 'Memcache' ) {
+%>import memcache.cache.org.qi4j.MemcacheConfiguration;
+<%
+}
+if( qi4j.needsDocker ) {
+%>
+import com.spotify.docker.client.DefaultDockerClient;
+import pl.domzal.junit.docker.rule.DockerRule;
+import pl.domzal.junit.docker.rule.DockerRuleBuilder;
+import pl.domzal.junit.docker.rule.WaitFor;
+import pl.domzal.junit.docker.rule.wait.StartCondition;
+import pl.domzal.junit.docker.rule.wait.StartConditionCheck;
+
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+import org.junit.Assume;
+import org.junit.ClassRule;
+<%
+}
+%>
+import org.junit.jupiter.api.Test;
+
+<%
+if( qi4j.ignoredTest ) {
+%>
+// This combination of EntityStore and Index/Query extensions requires some manual setup
+// This the respective extensions documentation for details
+@org.junit.Ignore
+<%
+}
+%>
+public class BootstrapTest
+{
+    @Test
+    public void applicationBootstrapSucceeds()
+        throws Exception
+    {
+        <%= qi4j.name %>Launcher launcher = new <%= qi4j.name %>Launcher(Application.Mode.development, this::setupTest);
+        launcher.initialize();
+        System.out.println("Application Launched...");
+        // Thread.sleep( 3600000L );
+        launcher.shutdown();
+    }
+
+    private void setupTest( ApplicationAssembly assembly )
+    {
+        entityStoreSetup( assembly );
+<%
+if( qi4j.caching === 'Memcache' ) {
+%>        cacheSetup( assembly );
+<%
+}
+if( qi4j.indexing === 'SQL' ) {
+%>        indexingSetup( assembly );
+<%
+}
+%>    }
+<%
+if(  qi4j.entitystore === 'Cassandra' ) {
+%>
+    private void entityStoreSetup( ApplicationAssembly assembly )
+    {
+        ModuleAssembly config = assembly.layer( ConfigurationLayer.NAME ).module( ConfigModule.NAME );
+        CassandraEntityStoreConfiguration defaults = config.forMixin( CassandraEntityStoreConfiguration.class ).declareDefaults();
+        String host = ES_DOCKER.getDockerHost();
+        int port = Integer.valueOf( ES_DOCKER.getExposedContainerPort( "9042/tcp" ) );
+        System.out.println("Cassandra: " + host + ":" + port);
+        defaults.hostnames().set( host + ':' + port );
+        defaults.createIfMissing().set( true );
+    }
+
+    @ClassRule
+    public static final OptionalDockerRule ES_DOCKER = new OptionalDockerRule( DockerRule.builder()
+                                                         .imageName( "cassandra:3.10"  )
+                                                         .publishAllPorts( true )
+                                                         .waitForTimeout( 120 )
+                                                         .waitFor( WaitFor.logMessageSequence( "Starting listening for CQL clients" ) ) );
+<% }
+if(  qi4j.entitystore === 'BerkeleyDB' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'DerbySQL' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'File' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'Geode' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'H2SQL' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'Hazelcast' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'JClouds' ) {
+%>
+    private void entityStoreSetup( ApplicationAssembly assembly )
+    {
+        // Assembly use a transient JClouds provider
+    }
+<% }
+if(  qi4j.entitystore === 'Jdbm' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'LevelDB' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'Memory' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'MongoDB' ) {
+%>
+    private void entityStoreSetup( ApplicationAssembly assembly )
+    {
+        ModuleAssembly config = assembly.layer( ConfigurationLayer.NAME ).module( ConfigModule.NAME );
+        MongoDBEntityStoreConfiguration mongoConfig = config.forMixin( MongoDBEntityStoreConfiguration.class ).declareDefaults();
+        mongoConfig.hostname().set( ES_DOCKER.getDockerHost() );
+        mongoConfig.port().set( Integer.valueOf( ES_DOCKER.getExposedContainerPort( "27017/tcp" ) ) );
+    }
+
+    @ClassRule
+    public static final OptionalDockerRule ES_DOCKER = new OptionalDockerRule( DockerRule.builder()
+                                                            .imageName( "mongo:3.5.8" )
+                                                            .expose( "27017" )
+                                                            .waitForTimeout( 120 )
+                                                            .waitFor( WaitFor.tcpPort(27017) ) );
+<% }
+if(  qi4j.entitystore === 'MySQL' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+        // See the @Ignore annotation above
+        throw new UnsupportedOperationException();
+    }
+<% }
+if(  qi4j.entitystore === 'PostgreSQL' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+        // See the @Ignore annotation above
+        throw new UnsupportedOperationException();
+    }
+<% }
+if(  qi4j.entitystore === 'Preferences' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if(  qi4j.entitystore === 'Redis' ) {
+%>
+    private void entityStoreSetup( ApplicationAssembly assembly )
+    {
+        ModuleAssembly config = assembly.layer( ConfigurationLayer.NAME ).module( ConfigModule.NAME );
+
+        RedisEntityStoreConfiguration redisConfig = config.forMixin( RedisEntityStoreConfiguration.class )
+                                                          .declareDefaults();
+        redisConfig.host().set( ES_DOCKER.getDockerHost() );
+        redisConfig.port().set( Integer.valueOf( ES_DOCKER.getExposedContainerPort( "6379/tcp" ) ) );
+    }
+
+    @ClassRule
+    public static final OptionalDockerRule ES_DOCKER = new OptionalDockerRule( DockerRule.builder()
+                                                         .imageName( "redis:3.2.8-alpine"  )
+                                                         .expose( "6379" )
+                                                         .waitForTimeout( 120 )
+                                                         .waitFor( WaitFor.tcpPort( 6379 ) ) );
+<% }
+if(  qi4j.entitystore === 'Riak' ) {
+    qi4j.needsDelayChecker = true;
+%>
+    private void entityStoreSetup( ApplicationAssembly assembly )
+    {
+        ModuleAssembly config = assembly.layer( ConfigurationLayer.NAME ).module( ConfigModule.NAME );
+
+        RiakEntityStoreConfiguration riakConfig = config.forMixin( RiakEntityStoreConfiguration.class ).declareDefaults();
+        String host = ES_DOCKER.getDockerHost();
+        String port = ES_DOCKER.getExposedContainerPort( "8087/tcp" );
+        riakConfig.hosts().set( java.util.Collections.singletonList( host + ':' + port ) );
+    }
+
+    @ClassRule
+    public static final OptionalDockerRule ES_DOCKER = new OptionalDockerRule( DockerRule.builder()
+                                                         .imageName( "basho/riak-kv:ubuntu-2.2.3"  )
+                                                         .expose( "8087" )
+                                                         .waitForTimeout( 120 )
+                                                         .waitFor( WaitFor.logMessageSequence( "riak_auth_mods started on node" ) )
+                                                         .waitFor( new DelayChecker( 3000L ) ) );
+<% }
+if(  qi4j.entitystore === 'SQLite' ) {
+%>
+    private void entityStoreSetup(ApplicationAssembly assembly )
+    {
+    }
+<% }
+if( qi4j.caching === 'Memcache' ) {
+%>
+
+    private void cacheSetup( ApplicationAssembly assembly )
+    {
+        ModuleAssembly config = assembly.layer( ConfigurationLayer.NAME ).module( ConfigModule.NAME );
+
+        MemcacheConfiguration memcacheConfig = config.forMixin( MemcacheConfiguration.class ).declareDefaults();
+        memcacheConfig.addresses().set( CACHE_DOCKER.getDockerHost() + ":" + CACHE_DOCKER.getExposedContainerPort( "11211/tcp" ) );
+    }
+
+    @ClassRule
+    public static final OptionalDockerRule CACHE_DOCKER = new OptionalDockerRule( DockerRule.builder()
+                                                              .imageName( "memcached:1.4.36-alpine"  )
+                                                              .expose( "11211" )
+                                                              .waitForTimeout( 120 )
+                                                              .waitFor( WaitFor.tcpPort( 11211 ) ) );
+
+<%
+}
+if( qi4j.indexing === 'SQL' ) {
+%>
+    private void indexingSetup( ApplicationAssembly assembly )
+    {
+        // See the @Ignore annotation above
+        throw new UnsupportedOperationException();
+    }
+<%
+}
+%>
+
+<%
+if( qi4j.needsDocker ) {
+%>
+    /**
+     * This JUnit Rule will skip tests if no Docker service is available.
+     */
+    public static class OptionalDockerRule implements TestRule
+    {
+        private final DockerRuleBuilder dockerRuleBuilder;
+        private DockerRule dockerRule;
+
+        private OptionalDockerRule( DockerRuleBuilder dockerRuleBuilder )
+        {
+            this.dockerRuleBuilder = dockerRuleBuilder;
+        }
+
+        @Override
+        public Statement apply( Statement base, Description description )
+        {
+            try
+            {
+                DefaultDockerClient.fromEnv().build().listImages();
+            }
+            catch( Throwable ex )
+            {
+                Assume.assumeNoException( ex );
+            }
+
+            dockerRule = dockerRuleBuilder.build();
+            return dockerRule.apply( base, description );
+        }
+
+        public String getDockerHost()
+        {
+            return dockerRule.getDockerHost();
+        }
+
+        public String getExposedContainerPort( String containerPort )
+        {
+            return dockerRule.getExposedContainerPort( containerPort );
+        }
+    }
+<%
+}
+%>
+
+<%
+if( qi4j.needsDelayChecker ) {
+%>
+    private static class DelayChecker
+        implements StartCondition
+    {
+        private final long millis;
+        private final long doneAt;
+
+        DelayChecker( long millis )
+        {
+            this.millis = millis;
+            this.doneAt = System.currentTimeMillis() + millis;
+        }
+
+        @Override
+        public StartConditionCheck build( DockerRule currentRule )
+        {
+            return new StartConditionCheck()
+            {
+                @Override
+                public boolean check()
+                {
+                    return System.currentTimeMillis() > doneAt;
+                }
+
+                @Override
+                public String describe()
+                {
+                    return String.format( "delay check %d ms", millis );
+                }
+
+                @Override
+                public void after()
+                {
+                }
+            };
+        }
+    }
+<% }
+%>}

@@ -18,19 +18,19 @@
  *
  */
 
-apply plugin: 'polygene-test'
+apply plugin: 'qi4j-test'
 
-description = "Apache Polygene™ Regression Tests are added by community members who find bugs and typically reported via Jira issues. These tests are not run as part of the normal build, but is accessible from './gradlew regression' to allow builds to still work."
+description = "Qi4j Regression Tests are added by community members who find bugs and typically reported via Jira issues. These tests are not run as part of the normal build, but is accessible from './gradlew regression' to allow builds to still work."
 
-jar { manifest { name = "Apache Polygene™ Tests - Regression" } }
+jar { manifest { name = "Qi4j Tests - Regression" } }
 
 dependencies {
-  implementation polygene.core.testsupport
-  implementation polygene.library( 'logging' )
-  implementation polygene.extension( 'entitystore-jdbm' )
+  implementation qi4j.core.testsupport
+  implementation qi4j.library( 'logging' )
+  implementation qi4j.extension( 'entitystore-jdbm' )
   implementation libraries.slf4j_api
   implementation libraries.junit
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
   runtimeOnly libraries.logback
 }

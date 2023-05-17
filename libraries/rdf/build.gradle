@@ -18,22 +18,22 @@
  *
  */
 
-apply plugin: 'polygene-library'
+apply plugin: 'qi4j-library'
 
-description = "Apache Polygene™ RDF Library provides commonalities of various RDF based services in Apache Polygene™, such as RDF Indexing."
+description = "Qi4j RDF Library provides commonalities of various RDF based services in Qi4j, such as RDF Indexing."
 
-jar { manifest { name = "Apache Polygene™ Library - RDF" } }
+jar { manifest { name = "Qi4j Library - RDF" } }
 
 dependencies {
-  api polygene.core.spi
+  api qi4j.core.spi
   api libraries.sesame
 
-  implementation polygene.library( 'constraints' )
-  implementation polygene.library( 'fileconfig' )
+  implementation qi4j.library( 'constraints' )
+  implementation qi4j.library( 'fileconfig' )
 
-  runtimeOnly polygene.core.runtime
+  runtimeOnly qi4j.core.runtime
 
-  testImplementation polygene.core.testsupport
+  testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback
 }

@@ -11,18 +11,18 @@
           "name":"http",
           "services":[
             {
-              "type":"org.apache.polygene.tools.model.DocumentationSupport$HttpService",
+              "type":"org.qi4j.tools.model.DocumentationSupport$HttpService",
               "visibility":"module",
               "types":[
-                "org.apache.polygene.tools.model.DocumentationSupport$HttpService",
-                "org.apache.polygene.api.service.ServiceComposite"
+                "org.qi4j.tools.model.DocumentationSupport$HttpService",
+                "org.qi4j.api.service.ServiceComposite"
               ],
               "mixins":[
                 {
-                  "mixin":"org.apache.polygene.api.identity.HasIdentity$HasIdentityMixin",
+                  "mixin":"org.qi4j.api.identity.HasIdentity$HasIdentityMixin",
                   "constructors":[
                     {
-                      "name":"org.apache.polygene.api.identity.HasIdentity_HasIdentityMixin_Stub"
+                      "name":"org.qi4j.api.identity.HasIdentity_HasIdentityMixin_Stub"
                     }
                   ],
                   "injection":{
@@ -32,18 +32,18 @@
               ]
             },
             {
-              "type":"org.apache.polygene.api.unitofwork.UnitOfWorkFactory",
+              "type":"org.qi4j.api.unitofwork.UnitOfWorkFactory",
               "visibility":"module",
               "types":[
-                "org.apache.polygene.api.unitofwork.UnitOfWorkFactory",
-                "org.apache.polygene.api.service.ServiceComposite"
+                "org.qi4j.api.unitofwork.UnitOfWorkFactory",
+                "org.qi4j.api.service.ServiceComposite"
               ],
               "mixins":[
                 {
-                  "mixin":"org.apache.polygene.runtime.unitofwork.UnitOfWorkFactoryMixin",
+                  "mixin":"org.qi4j.runtime.unitofwork.UnitOfWorkFactoryMixin",
                   "constructors":[
                     {
-                      "name":"org.apache.polygene.runtime.unitofwork.UnitOfWorkFactoryMixin_Stub"
+                      "name":"org.qi4j.runtime.unitofwork.UnitOfWorkFactoryMixin_Stub"
                     }
                   ],
                   "injection":{
@@ -51,10 +51,10 @@
                   }
                 },
                 {
-                  "mixin":"org.apache.polygene.api.identity.HasIdentity$HasIdentityMixin",
+                  "mixin":"org.qi4j.api.identity.HasIdentity$HasIdentityMixin",
                   "constructors":[
                     {
-                      "name":"org.apache.polygene.api.identity.HasIdentity_HasIdentityMixin_Stub"
+                      "name":"org.qi4j.api.identity.HasIdentity_HasIdentityMixin_Stub"
                     }
                   ],
                   "injection":{
@@ -81,18 +81,18 @@
           "name":"domain",
           "services":[
             {
-              "type":"org.apache.polygene.api.unitofwork.UnitOfWorkFactory",
+              "type":"org.qi4j.api.unitofwork.UnitOfWorkFactory",
               "visibility":"module",
               "types":[
-                "org.apache.polygene.api.unitofwork.UnitOfWorkFactory",
-                "org.apache.polygene.api.service.ServiceComposite"
+                "org.qi4j.api.unitofwork.UnitOfWorkFactory",
+                "org.qi4j.api.service.ServiceComposite"
               ],
               "mixins":[
                 {
-                  "mixin":"org.apache.polygene.runtime.unitofwork.UnitOfWorkFactoryMixin",
+                  "mixin":"org.qi4j.runtime.unitofwork.UnitOfWorkFactoryMixin",
                   "constructors":[
                     {
-                      "name":"org.apache.polygene.runtime.unitofwork.UnitOfWorkFactoryMixin_Stub"
+                      "name":"org.qi4j.runtime.unitofwork.UnitOfWorkFactoryMixin_Stub"
                     }
                   ],
                   "injection":{
@@ -100,10 +100,10 @@
                   }
                 },
                 {
-                  "mixin":"org.apache.polygene.api.identity.HasIdentity$HasIdentityMixin",
+                  "mixin":"org.qi4j.api.identity.HasIdentity$HasIdentityMixin",
                   "constructors":[
                     {
-                      "name":"org.apache.polygene.api.identity.HasIdentity_HasIdentityMixin_Stub"
+                      "name":"org.qi4j.api.identity.HasIdentity_HasIdentityMixin_Stub"
                     }
                   ],
                   "injection":{

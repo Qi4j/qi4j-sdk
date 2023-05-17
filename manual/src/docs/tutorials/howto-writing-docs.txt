@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////
 
 [[community-docs,Writing Documentation]]
-= Polygene™ Documentation =
+= Qi4j Documentation =
 
 The documents use the asciidoc format, see:
 
@@ -127,28 +127,28 @@ External links are added like this:
 
 [source]
 ----
-https://polygene.apache.org/[Link text here]
+https://qi4j.github.com/[Link text here]
 ----
 
-Which renders like: https://polygene.apache.org/[Link text here]
+Which renders like: https://qi4j.github.com/[Link text here]
 
 For short links it may be better not to add a link text, just do:
 
 [source]
 ----
-https://polygene.apache.org/
+https://qi4j.github.com/
 ----
 
-Which renders like: https://polygene.apache.org/
+Which renders like: https://qi4j.github.com/
 
 It's ok to have a dot right after the URL, it won't be part of the link.
 
 [source]
 ----
-https://polygene.apache.org/.
+https://qi4j.github.com/.
 ----
 
-Which renders like: https://polygene.apache.org/.
+Which renders like: https://qi4j.github.com/.
 
 == Text Formatting ==
 
@@ -226,7 +226,7 @@ Most source code that is included in the documentation should be extract via +SN
 ----
  [snippet,java]
  -----------
- source=tutorials/introduction/tenminutes/src/main/java/org/apache/polygene/demo/tenminute/OrderEntity.java
+ source=tutorials/introduction/tenminutes/src/main/java/org/qi4j/demo/tenminute/OrderEntity.java
  tag=mainClass
  -----------
 ----
@@ -236,11 +236,11 @@ The above could be bringing in content that looks like;
 
 [source]
 ----
-package org.apache.polygene.demo.tenminute;
+package org.qi4j.demo.tenminute;
 
-import org.apache.polygene.api.concern.Concerns;
-import org.apache.polygene.api.entity.EntityComposite;
-import org.apache.polygene.api.sideeffect.SideEffects;
+import concern.api.org.qi4j.Concerns;
+import entity.api.org.qi4j.EntityComposite;
+import sideeffect.api.org.qi4j.SideEffects;
 
 // START SNIPPET: sideEffect
 @SideEffects( MailNotifySideEffect.class )
@@ -259,7 +259,7 @@ which will be rendered as;
 
 [snippet,java]
 -----------
-source=tutorials/introduction/tenminutes/src/main/java/org/apache/polygene/demo/tenminute/OrderEntity.java
+source=tutorials/introduction/tenminutes/src/main/java/org/qi4j/demo/tenminute/OrderEntity.java
 tag=mainClass
 -----------
 
@@ -322,8 +322,8 @@ For other highlighters we could add see http://alexgorbatchev.com/SyntaxHighligh
 
 Common attributes you can use in documents:
 
-* \{polygene-revnumber} - rendered as "{polygene-revnumber}"
-* \{polygene-importdir} - rendered as "{polygene-importdir}"
+* \{qi4j-revnumber} - rendered as "{qi4j-revnumber}"
+* \{qi4j-importdir} - rendered as "{qi4j-importdir}"
 
 These can substitute part of URLs that point to for example APIdocs or source code.
 

@@ -1,6 +1,6 @@
 package ${PACKAGE_NAME};
 
-import org.apache.polygene.api.concern.GenericConcern;
+import concern.api.org.qi4j.GenericConcern;
 
 #parse("File Header.java")
 public class ${NAME} extends GenericConcern

@@ -24,13 +24,13 @@ TIP: Find Serialization extensions in the <<extensions>> list.
 
 == Overview ==
 
-The Polygene™ Core Runtime use Serialization to provide string representation of ValueComposites via their `toString()`
+The Qi4j Core Runtime use Serialization to provide string representation of ValueComposites via their `toString()`
 method, and, their instantiation from the very same representation via the `newValueFromSerializedState(..)` method of
 the ValueBuilderFactory API.
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/value/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/value/DocumentationSupport.java
 tag=default
 --------------
 
@@ -38,7 +38,7 @@ In each Module, if no Serialization service is assembled, a default one supporti
 
 [snippet,java]
 --------------
-source=core/api/src/test/java/org/apache/polygene/api/value/DocumentationSupport.java
+source=core/api/src/test/java/org/qi4j/api/value/DocumentationSupport.java
 tag=service
 --------------
 
@@ -51,13 +51,13 @@ For text based serialization:
 
 [snippet,java]
 --------------
-source=core/spi/src/main/java/org/apache/polygene/spi/serialization/AbstractTextSerializer.java
+source=core/spi/src/main/java/org/qi4j/spi/serialization/AbstractTextSerializer.java
 tag=text
 --------------
 
 [snippet,java]
 --------------
-source=core/spi/src/main/java/org/apache/polygene/spi/serialization/AbstractTextDeserializer.java
+source=core/spi/src/main/java/org/qi4j/spi/serialization/AbstractTextDeserializer.java
 tag=text
 --------------
 
@@ -65,13 +65,13 @@ For bytes based serialization:
 
 [snippet,java]
 --------------
-source=core/spi/src/main/java/org/apache/polygene/spi/serialization/AbstractBinarySerializer.java
+source=core/spi/src/main/java/org/qi4j/spi/serialization/AbstractBinarySerializer.java
 tag=binary
 --------------
 
 [snippet,java]
 --------------
-source=core/spi/src/main/java/org/apache/polygene/spi/serialization/AbstractBinaryDeserializer.java
+source=core/spi/src/main/java/org/qi4j/spi/serialization/AbstractBinaryDeserializer.java
 tag=binary
 --------------
 
@@ -85,7 +85,7 @@ Here is an example using the `JsonSerialization` service:
 
 [snippet,java]
 --------------
-source=extensions/serialization-javaxjson/src/test/java/org/apache/polygene/serialization/javaxjson/JavaxJsonValueCompositeSerializationTest.java
+source=extensions/serialization-javaxjson/src/test/java/org/qi4j/serialization/javaxjson/JavaxJsonValueCompositeSerializationTest.java
 tag=json-serialization
 --------------
 
@@ -93,7 +93,7 @@ And another using the `XmlSerialization` service:
 
 [snippet,java]
 --------------
-source=extensions/serialization-javaxxml/src/test/java/org/apache/polygene/serialization/javaxxml/JavaxXmlValueCompositeSerializationTest.java
+source=extensions/serialization-javaxxml/src/test/java/org/qi4j/serialization/javaxxml/JavaxXmlValueCompositeSerializationTest.java
 tag=xml-serialization
 --------------
 

@@ -30,6 +30,6 @@
         <appender-ref ref="stdout" />
     </root>
 
-    <logger name="org.apache.polygene.entitystore.sql" level="debug"/>
+    <logger name="org.qi4j.entitystore.sql" level="debug"/>
 
 </configuration>

@@ -16,7 +16,7 @@
    id="svg8"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
    sodipodi:docname="blockchain-architecture.svg"
-   inkscape:export-filename="/home/niclas/dev/polygene/java/artwork/blockchain-architecture.png"
+   inkscape:export-filename="/home/niclas/dev/qi4j-sdk/java/artwork/blockchain-architecture.png"
    inkscape:export-xdpi="55.950001"
    inkscape:export-ydpi="55.950001">
   <defs
@@ -488,7 +488,7 @@
          id="tspan1208"
          x="17.4625"
          y="287.21045"
-         style="font-size:5.64444447px;stroke-width:0.26458332">* Standard entity caching in Polygene</tspan><tspan
+         style="font-size:5.64444447px;stroke-width:0.26458332">* Standard entity caching in Qi4j</tspan><tspan
          sodipodi:role="line"
          x="17.4625"
          y="295.65784"

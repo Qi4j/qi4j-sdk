@@ -1,0 +1,123 @@
+<%#
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+-%>
+package <%= qi4j.packageName %>.bootstrap.domain;
+
+import bootstrap.org.qi4j.AssemblyException;
+import bootstrap.org.qi4j.LayerAssembly;
+import bootstrap.org.qi4j.ModuleAssembly;
+import layered.bootstrap.org.qi4j.ModuleAssembler;
+import org.qi4j.library.restlet.assembly.RestletCrudModuleAssembler;
+
+<% for( var idx in qi4j.current.cruds) {
+%><%= "import " + qi4j.packageName + ".model." + qi4j.current.name + "." + qi4j.current.cruds[idx].name + ";" %>
+<%
+}
+
+for( var idx in qi4j.current.values) {
+%><%= "import " + qi4j.packageName + ".model." + qi4j.current.name + "." + qi4j.current.values[idx].name + ";" %>
+<%
+}
+for( var idx in qi4j.current.entities) {
+%><%= "import " + qi4j.packageName + ".model." + qi4j.current.name + "." + qi4j.current.entities[idx].name + ";" %>
+<%
+}
+
+for( var idx in qi4j.current.transients) {
+%><%= "import " + qi4j.packageName + ".model." + qi4j.current.name + "." + qi4j.current.transients[idx].name + ";" %>
+<%
+}
+
+for( var idx in qi4j.current.objects) {
+%><%= "import " + qi4j.packageName + ".model." + qi4j.current.name + "." + qi4j.current.objects[idx].name + ";" %>
+<%
+}
+
+for( var idx in qi4j.current.services) {
+%><%= "import " + qi4j.packageName + ".model." + qi4j.current.name + "." + qi4j.current.services[idx].name + ";" %>
+<%= "import " + qi4j.packageName + ".model." + qi4j.current.name + "." + qi4j.configurationClassName(qi4j.current.services[idx].name) + ";" %>
+<%
+} %>
+
+import static common.api.org.qi4j.Visibility.*;
+
+public class <%- firstUpper(qi4j.current.name) %>Module
+    implements ModuleAssembler
+{
+    @Override
+    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+        throws AssemblyException
+    {
+<%
+if( qi4j.current.cruds ) {
+    for( var value in qi4j.current.cruds ) {
+        var crud = qi4j.current.cruds[value];
+%>
+        new RestletCrudModuleAssembler( <%- crud.name %>.class )
+            .assemble( module );
+<%
+    }
+}
+if( qi4j.current.values ) {
+    for( var value in qi4j.current.values ) {
+        var v = qi4j.current.values[value];
+%>
+        <%- "module.values( " + v.name + ".class )" + (v.visibility ? ".visibleIn(" + v.visibility +" )" : "" ) %>;
+<%
+    }
+}
+if( qi4j.current.entities ) {
+    for( var value in qi4j.current.entities ) {
+        var entity = qi4j.current.entities[value];
+%>
+        <%- "module.entities( " + entity.name + ".class )" + (entity.visibility ? ".visibleIn( " + entity.visibility +" )" : "" ) %>;
+<%
+    }
+}
+if( qi4j.current.transients ) {
+    for( var value in qi4j.current.transients ) {
+        var trans = qi4j.current.transients[value];
+%>
+        <%- "module.transients( " + trans.name + ".class )" + (trans.visibility ? ".visibleIn( " + trans.visibility +" )" : "" ) %>;
+<%
+    }
+}
+if( qi4j.current.objects ) {
+    for( var value in qi4j.current.objects ) {
+        var obj = qi4j.current.objects[value];
+%>
+        <%- "module.objects( " + obj.name + ".class )" + (obj.visibility ? ".visibleIn( " + obj.visibility +" )" : "" ) %>;
+<%
+    }
+}
+if( qi4j.current.services ) {
+    for( var value in qi4j.current.services ) {
+        var service = qi4j.current.services[value];
+%>
+        module.services( <%- service.name %>.class )
+            .identifiedBy("<%- service.name %>")
+        <%- (service.visibility ? "    .visibleIn( " + service.visibility + " )" : "" )
+%>;
+        <%- "module.configurations( " + qi4j.configurationClassName(service.name) + ".class )" %>;
+<%
+    }
+} %>
+        return module;
+    }
+}

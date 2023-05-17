@@ -1,0 +1,99 @@
+<%#
+ *  Licensed to the Apache Software Foundation (ASF) under one
+ *  or more contributor license agreements.  See the NOTICE file
+ *  distributed with this work for additional information
+ *  regarding copyright ownership.  The ASF licenses this file
+ *  to you under the Apache License, Version 2.0 (the
+ *  "License"); you may not use this file except in compliance
+ *  with the License.  You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *
+-%>
+package <%= qi4j.packageName %>.bootstrap.infrastructure;
+
+import common.api.org.qi4j.Visibility;
+import identity.api.org.qi4j.IdentityGenerator;
+import identity.api.org.qi4j.UuidGeneratorMixin;
+import bootstrap.org.qi4j.AssemblyException;
+import bootstrap.org.qi4j.LayerAssembly;
+import bootstrap.org.qi4j.ModuleAssembly;
+import layered.bootstrap.org.qi4j.ModuleAssembler;
+<%
+if( qi4j.entitystore !== 'Memory' && qi4j.entitystore !== 'Preferences' && qi4j.entitystore.indexOf('SQL') == -1 ) {
+%>
+import org.qi4j.entitystore.<%- qi4j.entitystoremodule %>.<%- qi4j.entitystore %>EntityStoreConfiguration;
+<%
+}
+if( qi4j.entitystore.indexOf('SQL') >= 0 ) {
+%>
+import sql.entitystore.org.qi4j.SqlEntityStoreConfiguration;
+<%
+}
+%>
+import org.qi4j.entitystore.<%- qi4j.entitystoremodule %>.assembly.<%- qi4j.entitystore %>EntityStoreAssembler;
+<%
+if( qi4j.entitystore.indexOf('SQL') >= 0 ) {
+%>import assembly.sql.library.org.qi4j.DataSourceAssembler;
+import org.qi4j.library.sql.<%= qi4j.dbpool.toLowerCase() %>.<%= qi4j.dbpool %>DataSourceServiceAssembler;
+<%
+}
+%>
+
+public class <%- qi4j.entitystore %>StorageModule
+    implements ModuleAssembler
+{
+    public static final String NAME = "<%- qi4j.entitystore %> Storage Module";
+    private final ModuleAssembly configModule;
+
+    <%- qi4j.entitystore %>StorageModule( ModuleAssembly configModule )
+    {
+        this.configModule = configModule;
+    }
+
+    @Override
+    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+        throws AssemblyException
+    {
+<%
+if( qi4j.entitystore.indexOf( 'SQL' ) >= 0 ) {
+%>        // DataSourceService
+        new <%= qi4j.dbpool %>DataSourceServiceAssembler()
+            .identifiedBy( "<%= qi4j.entitystore.toLowerCase() %>-datasource-service" )
+            .visibleIn( Visibility.module )
+            .withConfig( configModule, Visibility.application )
+            .assemble( module );
+
+        // DataSource
+        new DataSourceAssembler()
+            .withDataSourceServiceIdentity( "<%= qi4j.entitystore.toLowerCase() %>-datasource-service" )
+            .identifiedBy( "ds-es-<%= qi4j.entitystore.toLowerCase() %>" )
+            .visibleIn( Visibility.module )
+            .withCircuitBreaker()
+            .assemble( module );
+<%
+}
+%>        new <%- qi4j.entitystore %>EntityStoreAssembler()
+            .visibleIn( Visibility.application  )
+            .withConfig( configModule, Visibility.application )
+            .identifiedBy( "es-<%- qi4j.entitystore.toLowerCase() %>" )
+            .assemble( module );
+<%
+if( qi4j.entitystore === 'Cassandra' ) {
+%>        configModule.forMixin( CassandraEntityStoreConfiguration.class );
+<%
+}
+%>
+        module.services( IdentityGenerator.class )
+            .visibleIn( Visibility.application )
+            .withMixins( UuidGeneratorMixin.class );
+        return module;
+    }
+}
