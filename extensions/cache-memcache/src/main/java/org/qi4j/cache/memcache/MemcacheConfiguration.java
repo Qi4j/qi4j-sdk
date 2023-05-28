@@ -20,6 +20,7 @@
 package org.qi4j.cache.memcache;
 
 import org.qi4j.api.common.Optional;
+import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.property.Property;
 
 /**
@@ -76,5 +77,9 @@ public interface MemcacheConfiguration
      */
     @Optional
     Property<String> authMechanism();
+
+
+    @Optional
+    Property<String> opTimeout();
 }
 // END SNIPPET: config

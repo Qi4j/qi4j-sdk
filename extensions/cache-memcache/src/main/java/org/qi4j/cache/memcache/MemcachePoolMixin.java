@@ -66,7 +66,20 @@ public class MemcachePoolMixin
                           ? "PLAIN"
                           : config.authMechanism().get();
 
+        long opTimeout;
+        try
+        {
+            opTimeout = ( config.opTimeout().get() == null )
+                    ? 2500
+                    : Long.parseLong( config.opTimeout().get() );
+        }
+        catch( NumberFormatException e )
+        {
+            opTimeout = 2500;
+        }
+
         ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
+        builder.setOpTimeout( opTimeout );
         builder.setProtocol( protocol );
         if( username != null && !username.isEmpty() )
         {

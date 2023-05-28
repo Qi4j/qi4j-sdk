@@ -347,7 +347,7 @@ where the content of the +../model.json+ is as follows,
     }
   }
 }
-----------------
+----
 
 we will create a complete project, like this
 

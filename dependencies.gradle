@@ -270,8 +270,8 @@ dependencies.dependencySubstitutionSpec = { DependencySubstitution substitution,
 
 // NodeJS
 dependencies.nodeVersions << [
-        node: '6.10.2',
-        npm : '4.4.4'
+        node: '19.9.0',
+        npm : '8.15.0'
 ]
 
 // Build Tools

@@ -97,7 +97,7 @@ The possible types are;
     * Qi4jAPI
     * Qi4jSPI
 
-[[core-api-service,@Service]]
+[[core-api-service-injection,@Service]]
 == @Service ==
 Services are injected either in a number of ways, either direct, via List or via ServiceReference types. The following
 combinations are allowed;

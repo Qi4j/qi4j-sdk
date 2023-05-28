@@ -11,8 +11,9 @@
  * and limitations under the License.
 //////////////////////
 
-[[core-api-application,Application]]
 = Application =
+[[core-api-application,Application]]
+
 There is one and only one Application instance per Qi4j runtime instance. But there is nothing preventing code to
 create additional Qi4j Runtime instances inside the same JVM. However, these runtimes are isolated from each other.
 

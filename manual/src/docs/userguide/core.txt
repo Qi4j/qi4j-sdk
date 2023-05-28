@@ -85,7 +85,7 @@ perhaps that a new Core Extension SPI is needed.
 //____
 
 
-:leveloffset: 2
+:leveloffset: 1 
 
 include::../../../../core/api/src/docs/api.txt[]
 
@@ -101,7 +101,7 @@ include::../../../../core/testsupport/src/docs/testsupport.txt[]
 
 include::../../../../core/spi/src/docs/spi.txt[]
 
-:leveloffset: 2
+:leveloffset: 1
 
 include::../../../../core/runtime/src/docs/runtime.txt[]
 

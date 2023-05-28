@@ -45,43 +45,44 @@ dependencies {
 }
 
 // Do not run vhost tests on Java >= 9 because they use internal JDK apis
-if( JavaVersion.current() < JavaVersion.VERSION_1_9 )
-{
-  sourceSets {
-    vhostTest {
-      java {
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-        srcDir file( 'src/vhost-test/java' )
-      }
-      resources {
-        srcDir file( 'src/vhost-test/resources' )
-      }
-    }
-  }
-  configurations {
-    vhostTestImplementation.extendsFrom testImplementation
-    vhostTestRuntimeOnly.extendsFrom testRuntimeOnly
-  }
-  dependencies {
-    vhostTestImplementation libraries.dnsjava
-  }
-  task vhostTest( type: Test ) {
-    // TODO Test JVM won't start when offline
-    try
-    {
-      new URL( 'https://qi4j.org/' ).text
-      enabled = true
-    }
-    catch( Exception ex )
-    {
-      enabled = false
-    }
-    testClassesDirs = sourceSets.vhostTest.output.classesDirs
-    classpath = sourceSets.vhostTest.runtimeClasspath
-    systemProperties 'networkaddress.cache.ttl': '0'
-    systemProperties 'sun.net.spi.nameservice.provider.1': 'dns,LocalManagedDns'
-  }
-  check.dependsOn vhostTest
-  vhostTest.mustRunAfter test
-}
+// TODO: Figure out what this was for!!! Taking 2 minutes for "nothing"...
+//if( JavaVersion.current() < JavaVersion.VERSION_1_9 )
+//{
+//  sourceSets {
+//    vhostTest {
+//      java {
+//        compileClasspath += main.output + test.output
+//        runtimeClasspath += main.output + test.output
+//        srcDir file( 'src/vhost-test/java' )
+//      }
+//      resources {
+//        srcDir file( 'src/vhost-test/resources' )
+//      }
+//    }
+//  }
+//  configurations {
+//    vhostTestImplementation.extendsFrom testImplementation
+//    vhostTestRuntimeOnly.extendsFrom testRuntimeOnly
+//  }
+//  dependencies {
+//    vhostTestImplementation libraries.dnsjava
+//  }
+//  task vhostTest( type: Test ) {
+//    // TODO Test JVM won't start when offline
+//    try
+//    {
+//      new URL( 'https://qi4j.org/' ).text
+//      enabled = true
+//    }
+//    catch( Exception ex )
+//    {
+//      enabled = false
+//    }
+//    testClassesDirs = sourceSets.vhostTest.output.classesDirs
+//    classpath = sourceSets.vhostTest.runtimeClasspath
+//    systemProperties 'networkaddress.cache.ttl': '0'
+//    systemProperties 'sun.net.spi.nameservice.provider.1': 'dns,LocalManagedDns'
+//  }
+//  check.dependsOn vhostTest
+//  vhostTest.mustRunAfter test
+//}

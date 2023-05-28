@@ -28,10 +28,6 @@ include::../../../../tutorials/introduction/src/docs/highlights.txt[]
 
 :leveloffset: 2
 
-include::../../../../tools/src/docs/yeoman_qi4j.txt[]
-
-:leveloffset: 2
-
 include::../../../../tutorials/introduction/src/docs/background.txt[]
 
 :leveloffset: 2
