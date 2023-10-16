@@ -19,6 +19,8 @@
  */
 package org.qi4j.bootstrap;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Qi4j runtime factory.
  */
@@ -39,13 +41,13 @@ public interface RuntimeFactory
             try
             {
                 Class<? extends Qi4jRuntime> runtimeClass = loadRuntimeClass( loader );
-                return runtimeClass.newInstance();
+                return runtimeClass.getConstructor().newInstance();
             }
             catch( ClassNotFoundException e )
             {
                 System.err.println( "Qi4j Runtime jar is not present in the classpath." );
             }
-            catch( InstantiationException | IllegalAccessException e )
+            catch( InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e )
             {
                 System.err.println( "Invalid Qi4j Runtime class. If you are providing your own Qi4j Runtime, please " +
                                     "contact qi4j-dev@googlegroups.com mailing list for assistance." );

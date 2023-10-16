@@ -291,7 +291,7 @@ public class ZookeeperEntityStoreMixin
                     iterator.queue.offer( new StringReader( json ) );
                 }
             }
-            return StreamSupport.stream( Spliterators.spliterator( iterator, DISTINCT | NONNULL | IMMUTABLE, 1 ), false );
+            return StreamSupport.stream( Spliterators.spliterator( iterator, children.size(), DISTINCT | NONNULL | IMMUTABLE ), false );
         }
         catch( KeeperException | InterruptedException e )
         {
@@ -299,7 +299,7 @@ public class ZookeeperEntityStoreMixin
         }
     }
 
-    private class ItemIterator
+    private static class ItemIterator
         implements Iterator<Reader>
     {
         private final BlockingQueue<Reader> queue = new LinkedBlockingQueue<>();
@@ -324,7 +324,7 @@ public class ZookeeperEntityStoreMixin
         }
     }
 
-    private class EntityStoreWatcher
+    private static class EntityStoreWatcher
         implements Watcher
     {
         // TODO: Invalidate cache?

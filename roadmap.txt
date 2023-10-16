@@ -1,0 +1,21 @@
+
+Branch 4.x
+----------
+
+Main goals of Version 4 of Qi4j.
+
+1. Upgrade to Java 17 and later versions. Qi4j has been stuck in Java 8 for too
+   long. Need to grab it by the horns.
+     - Java 9 Module support and handling
+     - Remove deprecated Java Reflection usages, such as isAccessible().
+     - Make sure that ASM bytecode generation is still correct where used.
+     - Support for Records?
+     - Support for interface methods?
+
+2. Messaging SPI. Consuming and Producing messages for systems like Kafka,
+   Pulsar, RabbitMQ and others should be pluggable, just like we have done with
+   entity stores.
+
+3. Removal of old cruft. There are many parts of Qi4j that is simply
+   unmaintainable, and should be removed to avoid confusion. Better to focus
+   on what works well and can be supported.

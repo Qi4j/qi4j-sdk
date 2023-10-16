@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j File Configuration Library provides platform specific file locations."
 
-jar { manifest { name = "Qi4j Library - FileConfig" } }
+//jar { manifest { name = "Qi4j Library - FileConfig" } }
 
 dependencies {
   api qi4j.core.bootstrap

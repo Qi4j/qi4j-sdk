@@ -59,12 +59,12 @@ tag=direct
 
 == Using Groovy function scripts ==
 
-Declare a Groovy function in a resource file located in the same package as the implemented type with the name +<type>.groovy+:
+Declare a Groovy function in a resource file located in the same package as the implemented type with the name +Qi4j<type>.groovy+:
 
 .HelloSpeaker.groovy
 [snippet,groovy]
 ----
-source=libraries/scripting/src/test/resources/org/qi4j/library/scripting/HelloSpeaker.groovy
+source=libraries/scripting/src/test/resources/org/qi4j/library/scripting/QiHelloSpeaker.groovy
 tag=script
 ----
 

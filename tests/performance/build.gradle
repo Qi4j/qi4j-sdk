@@ -21,7 +21,7 @@ apply plugin: 'qi4j-test'
 
 description = "Qi4j Performance Test Suite."
 
-jar { manifest { name = "Qi4j Tests - Performance" } }
+//jar { manifest { name = "Qi4j Tests - Performance" } }
 
 apply plugin: PerformanceTestsPlugin
 

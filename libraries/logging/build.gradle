@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Logging Library provides an advanced logging framework which separates trace, debug and log systems."
 
-jar { manifest { name = "Qi4j Library - Logging" } }
+//jar { manifest { name = "Qi4j Library - Logging" } }
 
 dependencies {
   api qi4j.core.bootstrap

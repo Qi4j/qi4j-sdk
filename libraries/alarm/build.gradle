@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Alarm Library provides industrial automation style alarm point workflow semantics."
 
-jar { manifest { name = "Qi4j Library - Alarm - APi" } }
+//jar { manifest { name = "Qi4j Library - Alarm - APi" } }
 
 dependencies {
   api qi4j.core.bootstrap

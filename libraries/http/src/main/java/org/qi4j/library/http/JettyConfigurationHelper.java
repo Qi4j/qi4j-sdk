@@ -22,10 +22,9 @@ package org.qi4j.library.http;
 import java.security.Provider;
 import java.security.Security;
 import java.util.Map;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContextListener;
-import org.eclipse.jetty.server.ConnectorStatistics;
+import jakarta.servlet.Filter;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContextListener;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.LowResourceMonitor;
 import org.eclipse.jetty.server.Server;
@@ -72,7 +71,8 @@ final class JettyConfigurationHelper
         // Statistics
         if( config.statistics().get() )
         {
-            server.addBean( new ConnectorStatistics() );
+// TODO: What happened to ConnectorStatistics??
+//            server.addBean( new ConnectorStatistics() );
         }
     }
 
@@ -175,16 +175,17 @@ final class JettyConfigurationHelper
         }
 
         // Need / Want Client Auth
-        Boolean want = config.wantClientAuth().get();
-        if( want != null )
-        {
-            ssl.setWantClientAuth( want );
-        }
-        Boolean need = config.needClientAuth().get();
-        if( need != null )
-        {
-            ssl.setNeedClientAuth( need );
-        }
+// TODO: setWantClientAuth() is now in the SSLEngine class. Not sure how we are going to reach it.
+//        Boolean want = config.wantClientAuth().get();
+//        if( want != null )
+//        {
+//            ssl.setWantClientAuth( want );
+//        }
+//        Boolean need = config.needClientAuth().get();
+//        if( need != null )
+//        {
+//            ssl.setNeedClientAuth( need );
+//        }
 
         // Algorithms
         String secureRandomAlgo = config.secureRandomAlgorithm().get();

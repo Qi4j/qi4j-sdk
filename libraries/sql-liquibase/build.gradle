@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j SQL Liquibase Library provides Liquibase support."
 
-jar { manifest { name = "Qi4j Library - SQL Liquibase" } }
+//jar { manifest { name = "Qi4j Library - SQL Liquibase" } }
 
 dependencies {
   api qi4j.library( 'sql' )

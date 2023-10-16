@@ -49,7 +49,7 @@ public final class AssemblerCollection
         {
             try
             {
-                Assembler assembler = assemblyClass.newInstance();
+                Assembler assembler = assemblyClass.getConstructor().newInstance();
                 assemblers.add( assembler );
             }
             catch( Exception e )

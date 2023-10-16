@@ -19,7 +19,7 @@
  */
 package org.qi4j.library.shiro.web;
 
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 import org.qi4j.api.mixin.Mixins;
 import org.apache.shiro.web.servlet.ShiroFilter;
 

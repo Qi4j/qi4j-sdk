@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.eclipse.rdf4j.model.IRI;
 import org.qi4j.api.activation.ActivatorAdapter;
 import org.qi4j.api.activation.Activators;
 import org.qi4j.api.entity.EntityDescriptor;
@@ -39,15 +40,14 @@ import org.qi4j.library.rdf.entity.EntityTypeSerializer;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entitystore.StateChangeListener;
-import org.openrdf.model.Graph;
-import org.openrdf.model.Resource;
-import org.openrdf.model.Statement;
-import org.openrdf.model.URI;
-import org.openrdf.model.ValueFactory;
-import org.openrdf.model.impl.GraphImpl;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
+import org.eclipse.rdf4j.model.Graph;
+import org.eclipse.rdf4j.model.Resource;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.GraphImpl;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
 
 @Mixins( RdfIndexerService.RdfEntityIndexerMixin.class )
 @Activators( RdfIndexerService.Activator.class )
@@ -169,16 +169,16 @@ public interface RdfIndexerService extends StateChangeListener
         private void removeEntityStates( Iterable<EntityState> entityStates, RepositoryConnection connection )
             throws RepositoryException
         {
-            List<URI> removedStates = new ArrayList<>();
+            List<IRI> removedStates = new ArrayList<>();
             for( EntityState entityState : entityStates )
             {
                 if( entityState.status().equals( EntityStatus.REMOVED ) )
                 {
-                    removedStates.add( stateSerializer.createEntityURI( getValueFactory(), entityState.entityReference() ) );
+                    removedStates.add( stateSerializer.createEntityIRI( getValueFactory(), entityState.entityReference() ) );
                 }
                 else if( entityState.status().equals( EntityStatus.UPDATED ) )
                 {
-                    removedStates.add( stateSerializer.createEntityURI( getValueFactory(), entityState.entityReference() ) );
+                    removedStates.add( stateSerializer.createEntityIRI( getValueFactory(), entityState.entityReference() ) );
                 }
             }
 
@@ -197,10 +197,10 @@ public interface RdfIndexerService extends StateChangeListener
             if( entityState.entityDescriptor().queryable() )
             {
                 EntityReference reference = entityState.entityReference();
-                final URI entityURI = stateSerializer.createEntityURI( getValueFactory(), reference);
+                final IRI entityIRI = stateSerializer.createEntityIRI( getValueFactory(), reference);
                 Graph graph = new GraphImpl();
                 stateSerializer.serialize( entityState, false, graph );
-                connection.add( graph, entityURI );
+                connection.add( graph, entityIRI );
             }
         }
 
@@ -212,7 +212,7 @@ public interface RdfIndexerService extends StateChangeListener
             if( entityType.queryable() )
             {
                 String uri = Classes.toURI(entityType.types().findFirst().orElse(null));
-                final URI compositeURI = getValueFactory().createURI( uri );
+                final IRI compositeURI = getValueFactory().createIRI( uri );
                 // remove composite type if already present
                 connection.clear( compositeURI );
 

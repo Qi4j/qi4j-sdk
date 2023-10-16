@@ -21,7 +21,12 @@
 package org.qi4j.library.rdf.serializer;
 
 import java.lang.reflect.Method;
-import org.openrdf.model.*;
+import org.eclipse.rdf4j.model.Graph;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Literal;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.model.ValueFactory;
 import org.qi4j.api.util.Classes;
 import org.qi4j.library.rdf.Rdfs;
 
@@ -74,7 +79,7 @@ public final class SerializerContext
         return layerUri + "/" + module;
     }
 
-    public void setNameAndType( String node, String name, URI type )
+    public void setNameAndType( String node, String name, IRI type )
     {
         addType( node, type );
         addName( node, name );
@@ -84,36 +89,36 @@ public final class SerializerContext
     public void addName( String subject, String name )
     {
         Value nameValue = valueFactory.createLiteral( name );
-        URI subjectUri = valueFactory.createURI( subject );
+        IRI subjectUri = valueFactory.createIRI( subject );
         graph.add( valueFactory.createStatement( subjectUri, Rdfs.LABEL, nameValue ) );
     }
 
-    public void addType( String subject, URI type )
+    public void addType( String subject, IRI type )
     {
-        URI subjectUri = valueFactory.createURI( subject );
+        IRI subjectUri = valueFactory.createIRI( subject );
         Statement statement = valueFactory.createStatement( subjectUri, Rdfs.TYPE, type );
         graph.add( statement );
     }
 
-    public void addStatement( String subject, URI predicate, String literal )
+    public void addStatement( String subject, IRI predicate, String literal )
     {
         Literal object = valueFactory.createLiteral( literal );
-        URI subjectUri = valueFactory.createURI( subject );
+        IRI subjectUri = valueFactory.createIRI( subject );
         Statement statement = valueFactory.createStatement( subjectUri, predicate, object );
         graph.add( statement );
     }
 
-    public void addRelationship( String subject, URI relationship, String object )
+    public void addRelationship( String subject, IRI relationship, String object )
     {
-        URI subjectUri = valueFactory.createURI( subject );
-        URI objectUri = valueFactory.createURI( object );
+        IRI subjectUri = valueFactory.createIRI( subject );
+        IRI objectUri = valueFactory.createIRI( object );
         Statement statement = valueFactory.createStatement( subjectUri, relationship, objectUri );
         graph.add( statement );
     }
 
-    public void addStatement( String subject, URI predicate, boolean literal )
+    public void addStatement( String subject, IRI predicate, boolean literal )
     {
-        URI subjectUri = valueFactory.createURI( subject );
+        IRI subjectUri = valueFactory.createIRI( subject );
         Literal object = valueFactory.createLiteral( literal );
         Statement statement = valueFactory.createStatement( subjectUri, predicate, object );
         graph.add( statement );

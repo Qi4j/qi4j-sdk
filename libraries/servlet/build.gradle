@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Servlet Library provides integration of Qi4j into web applications."
 
-jar { manifest { name = "Qi4j Library - Servlet" } }
+//jar { manifest { name = "Qi4j Library - Servlet" } }
 
 dependencies {
   compileOnly libraries.servlet_api

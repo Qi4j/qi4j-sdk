@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j REST Client Library provides a client library for the Qi4j REST Server library"
 
-jar { manifest { name = "Qi4j Library - REST Client" } }
+//jar { manifest { name = "Qi4j Library - REST Client" } }
 
 dependencies {
   api qi4j.library( 'rest-common' )

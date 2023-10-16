@@ -38,6 +38,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.Protocol;
+import redis.clients.jedis.params.SetParams;
 
 /**
  * Redis implementation of MapEntityStore.
@@ -115,7 +116,7 @@ public class RedisEntityStoreMixin
                             throws IOException
                         {
                             super.close();
-                            String statusCode = jedis.set( ref.identity().toString(), toString(), "NX" );
+                            String statusCode = jedis.set( ref.identity().toString(), toString(), SetParams.setParams().nx() );
                             if( !"OK".equals( statusCode ) )
                             {
                                 throw new EntityAlreadyExistsException( ref );
@@ -136,8 +137,7 @@ public class RedisEntityStoreMixin
                         {
                             super.close();
                             String statusCode = jedis.set( mapChange.reference().identity().toString(),
-                                                           toString(),
-                                                           "XX" );
+                                                           toString(), SetParams.setParams().xx());
                             if( !"OK".equals( statusCode ) )
                             {
                                 throw new EntityNotFoundException( mapChange.reference() );

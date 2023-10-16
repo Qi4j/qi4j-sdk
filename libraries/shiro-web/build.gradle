@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Shiro Library integrates Apache Shiro security framework into Qi4j. This bundle provides Servlet support."
 
-jar { manifest { name = "Qi4j Library - Shiro Web" } }
+//jar { manifest { name = "Qi4j Library - Shiro Web" } }
 
 dependencies {
 

@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j RDF Index/Query Extension"
 
-jar { manifest { name = "Qi4j Extension - Index/Query - RDF" } }
+//jar { manifest { name = "Qi4j Extension - Index/Query - RDF" } }
 
 dependencies {
   api qi4j.core.bootstrap

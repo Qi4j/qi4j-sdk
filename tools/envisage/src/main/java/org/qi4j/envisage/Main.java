@@ -31,11 +31,11 @@ import org.qi4j.bootstrap.Energy4Java;
 public class Main
 {
     public static void main( String[] args )
-        throws ClassNotFoundException, IllegalAccessException, InstantiationException
+        throws Exception
     {
         String applicationAssemblerName = args[0];
         Class applicationAssemblerClass = Class.forName( applicationAssemblerName );
-        ApplicationAssembler assembler = (ApplicationAssembler) applicationAssemblerClass.newInstance();
+        ApplicationAssembler assembler = (ApplicationAssembler) applicationAssemblerClass.getConstructor().newInstance();
 
         Energy4Java qi4j = new Energy4Java();
 

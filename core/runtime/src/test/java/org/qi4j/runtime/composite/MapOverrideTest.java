@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.concern.ConcernOf;
 import org.qi4j.api.injection.scope.Invocation;
@@ -32,8 +34,6 @@ import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -41,81 +41,89 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * This test shows how to override any java.util.Map to become read-only. HashMap will be used as the Mixin!!
- *
+ * <p>
  * Note that keySet(), values() and entrySet() would ALSO require overloading, but this has been left out for
  * clarity reasons.
  */
-@Disabled( "Awaiting QI-298 - Allow Transients to be declared by classes" )
+@Disabled( "Depends on a design decision, whether Concerns are invoked during BUILD of the instance, and if so, we probably need a way to differentiate between normal call and call during BUILD." )
 public class MapOverrideTest
     extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
+        module.defaultServices();
         // unable to add the concern, since it is applied on the prototype too!
         // this seems to be a generic problem with prototypes.
-        module.transients( Map.class ).withMixins( HashMap.class ).withConcerns( ReadOnlyMapConcern.class );
+        module.values(Map.class).withMixins(HashMap.class).withConcerns(ReadOnlyMapConcern.class);
+
     }
 
     @Test
+    @SuppressWarnings( { "rawtypes", "unchecked" } )
     public void givenReadOnlyAnnotatedHashMapWhenCallingSizeExpectSuccess()
     {
-        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder( Map.class );
+        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
         Map<String, String> prototype = builder.prototype();
-        prototype.put( "Niclas", "Hedhman" );
+        prototype.put("Niclas", "Hedhman");
         Map<String, String> underTest = builder.newInstance();
-        assertThat( underTest.size(), equalTo( 1 ) );
+        assertThat(underTest.size(), equalTo(1));
     }
 
     @Test
+    @SuppressWarnings( { "rawtypes", "unchecked" } )
     public void givenReadOnlyAnnotatedHashMapWhenCallingIsEmptyExpectSuccess()
     {
-        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder( Map.class );
+        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
         Map<String, String> prototype = builder.prototype();
-        prototype.put( "Niclas", "Hedhman" );
+        prototype.put("Niclas", "Hedhman");
         Map<String, String> underTest = builder.newInstance();
-        assertThat( underTest.isEmpty(), equalTo( false ) );
+        assertThat(underTest.isEmpty(), equalTo(false));
     }
 
     @Test
+    @SuppressWarnings( { "rawtypes", "unchecked" } )
     public void givenReadOnlyAnnotatedHashMapWhenCallingContainsKeyExpectSuccess()
     {
-        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder( Map.class );
+        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
         Map<String, String> prototype = builder.prototype();
-        prototype.put( "Niclas", "Hedhman" );
+        prototype.put("Niclas", "Hedhman");
         Map<String, String> underTest = builder.newInstance();
-        assertThat( underTest.containsKey( "Niclas" ), equalTo( true ) );
+        assertThat(underTest.containsKey("Niclas"), equalTo(true));
     }
 
     @Test
+    @SuppressWarnings( { "rawtypes", "unchecked" } )
     public void givenReadOnlyAnnotatedHashMapWhenCallingContainsValueExpectSuccess()
     {
-        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder( Map.class );
+        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
         Map<String, String> prototype = builder.prototype();
-        prototype.put( "Niclas", "Hedhman" );
+        prototype.put("Niclas", "Hedhman");
         Map<String, String> underTest = builder.newInstance();
-        assertThat( underTest.containsValue( "Hedhman" ), equalTo( true ) );
+        assertThat(underTest.containsValue("Hedhman"), equalTo(true));
     }
 
     @Test
+    @SuppressWarnings( { "rawtypes", "unchecked" } )
     public void givenReadOnlyAnnotatedHashMapWhenCallingGetExpectSuccess()
     {
-        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder( Map.class );
+        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
         Map<String, String> prototype = builder.prototype();
-        prototype.put( "Niclas", "Hedhman" );
+        prototype.put("Niclas", "Hedhman");
         Map<String, String> underTest = builder.newInstance();
-        assertThat( underTest.get( "Niclas" ), equalTo( "Hedhman" ) );
+        assertThat(underTest.get("Niclas"), equalTo("Hedhman"));
     }
 
     @Test
+    @SuppressWarnings( { "rawtypes", "unchecked" } )
     public void givenReadOnlyAnnotatedHashMapWhenCallingKeySetExpectSuccess()
     {
-        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder( Map.class );
+        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
         Map<String, String> prototype = builder.prototype();
-        prototype.put( "Niclas", "Hedhman" );
+        prototype.put("Niclas", "Hedhman");
         Map<String, String> underTest = builder.newInstance();
-        assertThat( underTest.keySet(), equalTo( Collections.singleton( "Niclas" ) ) );
+        assertThat(underTest.keySet(), equalTo(Collections.singleton("Niclas")));
     }
 
     @Test
@@ -125,49 +133,51 @@ public class MapOverrideTest
     }
 
     @Test
+    @SuppressWarnings( { "rawtypes", "unchecked" } )
     public void givenReadOnlyAnnotatedHashMapWhenCallingValuesExpectSuccess()
     {
-        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder( Map.class );
+        ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
         Map<String, String> prototype = builder.prototype();
-        prototype.put( "Niclas", "Hedhman" );
+        prototype.put("Niclas", "Hedhman");
         Map<String, String> underTest = builder.newInstance();
-        Collection<String> values = Collections.singletonList( "Hedhman" );
-        assertThat( underTest.values().size(), equalTo( values.size() ) );
-        assertThat( underTest.values().contains( "Hedhman" ), equalTo( true ) );
+        Collection<String> values = Collections.singletonList("Hedhman");
+        assertThat(underTest.values().size(), equalTo(values.size()));
+        assertThat(underTest.containsValue("Hedhman"), equalTo(true));
     }
 
     @Test
     public void givenReadOnlyAnnotatedHashMapWhenCallingPutExpectReadOnlyException()
     {
-        assertThrows( ReadOnlyException.class, () -> {
+        assertThrows(ReadOnlyException.class, () -> {
             // TODO
-        } );
+        });
     }
 
     @Test
     public void givenReadOnlyAnnotatedHashMapWhenCallingRemoveExpectReadOnlyException()
     {
-        assertThrows( ReadOnlyException.class, () -> {
+        assertThrows(ReadOnlyException.class, () -> {
             // TODO
-        } );
+        });
     }
 
     @Test
     public void givenReadOnlyAnnotatedHashMapWhenCallingPutAllExpectReadOnlyException()
     {
-        assertThrows( ReadOnlyException.class, () -> {
+        assertThrows(ReadOnlyException.class, () -> {
             // TODO
-        } );
+        });
     }
 
     @Test
     public void givenReadOnlyAnnotatedHashMapWhenCallingClearExpectReadOnlyException()
     {
-        assertThrows( ReadOnlyException.class, () -> {
+        assertThrows(ReadOnlyException.class, () -> {
             // TODO
-        } );
+        });
     }
 
+    @SuppressWarnings( { "rawtypes" } )
     public static abstract class ReadOnlyMapConcern extends ConcernOf<Map>
         implements Map
     {
@@ -178,36 +188,37 @@ public class MapOverrideTest
         private Composite me;
 
         @Override
-        public Object put( Object key, Object value )
+        public Object put(Object key, Object value)
         {
-            throw new ReadOnlyException( me, method );
+            throw new ReadOnlyException(me, method);
         }
 
         @Override
-        public Object remove( Object key )
+        public Object remove(Object key)
         {
-            throw new ReadOnlyException( me, method );
+            throw new ReadOnlyException(me, method);
         }
 
         @Override
-        public void putAll( Map m )
+        @SuppressWarnings( "NullableProblems" )
+        public void putAll(Map m)
         {
-            throw new ReadOnlyException( me, method );
+            throw new ReadOnlyException(me, method);
         }
 
         @Override
         public void clear()
         {
-            throw new ReadOnlyException( me, method );
+            throw new ReadOnlyException(me, method);
         }
     }
 
     private static class ReadOnlyException
         extends RuntimeException
     {
-        public ReadOnlyException( Composite me, Method method )
+        public ReadOnlyException(Composite me, Method method)
         {
-            super( "Method " + method.getName() + " in [" + me.toString() + "] is READ ONLY." );
+            super("Method " + method.getName() + " in [" + me.toString() + "] is READ ONLY.");
         }
     }
 

@@ -123,16 +123,12 @@ public class InteractionConstraintsService
                 {
                     try
                     {
-                        Constraint<Annotation, Object> constraint = (Constraint<Annotation, Object>) aClass.newInstance();
+                        Constraint<Annotation, Object> constraint = (Constraint<Annotation, Object>) aClass.getConstructor().newInstance();
                         Class roleClass = (Class) ( (ParameterizedType) aClass.getGenericInterfaces()[ 0 ] ).getActualTypeArguments()[ 1 ];
                         ConstraintBinding constraintBinding = new ConstraintBinding( constraint, annotation, roleClass );
                         methodConstraintBindings.add( constraintBinding );
                     }
-                    catch( InstantiationException e )
-                    {
-                        e.printStackTrace();
-                    }
-                    catch( IllegalAccessException e )
+                    catch( Exception e )
                     {
                         e.printStackTrace();
                     }
@@ -152,7 +148,7 @@ public class InteractionConstraintsService
                     }
                     catch( NoSuchObjectTypeException e )
                     {
-                        constraint = constraintClass.newInstance();
+                        constraint = constraintClass.getConstructor().newInstance();
                     }
                 }
                 catch( Exception e )
@@ -186,17 +182,13 @@ public class InteractionConstraintsService
                 {
                     try
                     {
-                        Constraint<Annotation, Object> constraint = (Constraint<Annotation, Object>) constraintClass.newInstance();
+                        Constraint<Annotation, Object> constraint = (Constraint<Annotation, Object>) constraintClass.getConstructor().newInstance();
                         Class roleClass = (Class) ( (ParameterizedType) constraint.getClass()
                             .getGenericInterfaces()[ 0 ] ).getActualTypeArguments()[ 1 ];
                         ConstraintBinding constraintBinding = new ConstraintBinding( constraint, annotation, roleClass );
                         classConstraintBindings.add( constraintBinding );
                     }
-                    catch( InstantiationException e )
-                    {
-                        e.printStackTrace();
-                    }
-                    catch( IllegalAccessException e )
+                    catch( Exception e )
                     {
                         e.printStackTrace();
                     }
@@ -216,7 +208,7 @@ public class InteractionConstraintsService
                     }
                     catch( NoSuchObjectTypeException e )
                     {
-                        constraint = constraintClass.newInstance();
+                        constraint = constraintClass.getConstructor().newInstance();
                     }
                 }
                 catch( Exception e )

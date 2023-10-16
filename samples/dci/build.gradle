@@ -22,7 +22,7 @@ apply plugin: 'qi4j-sample'
 
 description = "Sample of how DCI (Data, Context & Interaction) pattern is implemented with Qi4j."
 
-jar { manifest { name = "Qi4j Sample - DCI" } }
+//jar { manifest { name = "Qi4j Sample - DCI" } }
 
 dependencies {
   implementation qi4j.core.bootstrap

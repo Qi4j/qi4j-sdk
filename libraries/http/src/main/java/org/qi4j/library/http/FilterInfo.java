@@ -22,7 +22,7 @@ package org.qi4j.library.http;
 import java.io.Serializable;
 import java.util.EnumSet;
 import java.util.Map;
-import javax.servlet.DispatcherType;
+import jakarta.servlet.DispatcherType;
 
 public class FilterInfo
     implements Serializable

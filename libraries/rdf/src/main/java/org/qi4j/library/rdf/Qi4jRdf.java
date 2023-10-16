@@ -20,8 +20,8 @@
 
 package org.qi4j.library.rdf;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 
 /**
@@ -38,49 +38,49 @@ public interface Qi4jRdf
     String QI4J_MODEL_PROPERTIES = "http://qi4j.org/rdf/model/1.0/property#";
 
     // Types
-    URI TYPE_APPLICATION = new URIImpl( QI4J_MODEL_TYPES + "application" );
-    URI TYPE_LAYER = new URIImpl( QI4J_MODEL_TYPES + "layer" );
-    URI TYPE_MODULE = new URIImpl( QI4J_MODEL_TYPES + "module" );
-    URI TYPE_ENTITY = new URIImpl( QI4J_MODEL_TYPES + "entity" );
-    URI TYPE_QUALIFIER = new URIImpl( QI4J_MODEL_TYPES + "qualifier" );
-    URI TYPE_COMPOSITE = new URIImpl( QI4J_MODEL_TYPES + "composite" );
-    URI TYPE_SERVICE = new URIImpl( QI4J_MODEL_TYPES + "service" );
-    URI TYPE_METHOD = new URIImpl( QI4J_MODEL_TYPES + "method" );
-    URI TYPE_CONSTRAINT = new URIImpl( QI4J_MODEL_TYPES + "constraint" );
-    URI TYPE_CONCERN = new URIImpl( QI4J_MODEL_TYPES + "concern" );
-    URI TYPE_CONSTRUCTOR = new URIImpl( QI4J_MODEL_TYPES + "constructor" );
-    URI TYPE_SIDEEFFECT = new URIImpl( QI4J_MODEL_TYPES + "sideeffect" );
-    URI TYPE_MIXIN = new URIImpl( QI4J_MODEL_TYPES + "mixin" );
-    URI TYPE_FIELD = new URIImpl( QI4J_MODEL_TYPES + "field" );
-    URI TYPE_CLASS = new URIImpl( QI4J_MODEL_TYPES + "class" );
-    URI TYPE_OBJECT = new URIImpl( QI4J_MODEL_TYPES + "object" );
-    URI TYPE_PARAMETER = new URIImpl( QI4J_MODEL_TYPES + "parameter" );
-    URI TYPE_INJECTION = new URIImpl( QI4J_MODEL_TYPES + "injection" );
-    URI TYPE_INFO = new URIImpl( QI4J_MODEL_TYPES + "info" );
+    IRI TYPE_APPLICATION = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "application" );
+    IRI TYPE_LAYER = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "layer" );
+    IRI TYPE_MODULE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "module" );
+    IRI TYPE_ENTITY = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "entity" );
+    IRI TYPE_QUALIFIER = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "qualifier" );
+    IRI TYPE_COMPOSITE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "composite" );
+    IRI TYPE_SERVICE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "service" );
+    IRI TYPE_METHOD = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "method" );
+    IRI TYPE_CONSTRAINT = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "constraint" );
+    IRI TYPE_CONCERN = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "concern" );
+    IRI TYPE_CONSTRUCTOR = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "constructor" );
+    IRI TYPE_SIDEEFFECT = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "sideeffect" );
+    IRI TYPE_MIXIN = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "mixin" );
+    IRI TYPE_FIELD = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "field" );
+    IRI TYPE_CLASS = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "class" );
+    IRI TYPE_OBJECT = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "object" );
+    IRI TYPE_PARAMETER = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "parameter" );
+    IRI TYPE_INJECTION = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "injection" );
+    IRI TYPE_INFO = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_TYPES + "info" );
 
     // Properties
-    URI HAS_INJECTIONS = new URIImpl( QI4J_MODEL_PROPERTIES + "hasinjections" );
+    IRI HAS_INJECTIONS = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_PROPERTIES + "hasinjections" );
 
     // Relationship
-    URI RELATIONSHIP_COMPOSITE = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "composite" );
-    URI RELATIONSHIP_ENTITY = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "entity" );
-    URI RELATIONSHIP_SERVICE = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "service" );
-    URI RELATIONSHIP_OBJECT = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "object" );
-    URI RELATIONSHIP_PRIVATE_METHOD = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "private/method" );
-    URI RELATIONSHIP_INJECTION = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "injection" );
-    URI RELATIONSHIP_CONSTRUCTOR = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "constructor" );
-    URI RELATIONSHIP_FIELD = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "field" );
-    URI RELATIONSHIP_APPLIESTO = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "appliesto" );
-    URI RELATIONSHIP_METHOD = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "method" );
-    URI RELATIONSHIP_CONSTRAINT = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "constraint" );
-    URI RELATIONSHIP_CONCERN = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "concern" );
-    URI RELATIONSHIP_SIDEEFFECT = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "sideeffect" );
-    URI RELATIONSHIP_PUBLIC_SERVICE = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "public/service" );
-    URI RELATIONSHIP_PRIVATE_SERVICE = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "private/service" );
-    URI RELATIONSHIP_PROVIDEDBY = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "providedby" );
-    URI RELATIONSHIP_SERVICEINFO = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "info/service" );
-    URI RELATIONSHIP_INFOVALUE = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "info/value" );
-    URI RELATIONSHIP_MIXIN = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "mixin" );
-    URI RELATIONSHIP_LAYER = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "layer" );
-    URI RELATIONSHIP_MODULE = new URIImpl( QI4J_MODEL_RELATIONSHIPS + "module" );
+    IRI RELATIONSHIP_COMPOSITE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "composite" );
+    IRI RELATIONSHIP_ENTITY = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "entity" );
+    IRI RELATIONSHIP_SERVICE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "service" );
+    IRI RELATIONSHIP_OBJECT = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "object" );
+    IRI RELATIONSHIP_PRIVATE_METHOD = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "private/method" );
+    IRI RELATIONSHIP_INJECTION = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "injection" );
+    IRI RELATIONSHIP_CONSTRUCTOR = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "constructor" );
+    IRI RELATIONSHIP_FIELD = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "field" );
+    IRI RELATIONSHIP_APPLIESTO = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "appliesto" );
+    IRI RELATIONSHIP_METHOD = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "method" );
+    IRI RELATIONSHIP_CONSTRAINT = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "constraint" );
+    IRI RELATIONSHIP_CONCERN = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "concern" );
+    IRI RELATIONSHIP_SIDEEFFECT = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "sideeffect" );
+    IRI RELATIONSHIP_PUBLIC_SERVICE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "public/service" );
+    IRI RELATIONSHIP_PRIVATE_SERVICE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "private/service" );
+    IRI RELATIONSHIP_PROVIDEDBY = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "providedby" );
+    IRI RELATIONSHIP_SERVICEINFO = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "info/service" );
+    IRI RELATIONSHIP_INFOVALUE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "info/value" );
+    IRI RELATIONSHIP_MIXIN = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "mixin" );
+    IRI RELATIONSHIP_LAYER = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "layer" );
+    IRI RELATIONSHIP_MODULE = SimpleValueFactory.getInstance().createIRI( QI4J_MODEL_RELATIONSHIPS + "module" );
 }

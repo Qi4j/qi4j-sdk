@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j SQL Library provides SQL support."
 
-jar { manifest { name = "Qi4j Library - SQL" } }
+//jar { manifest { name = "Qi4j Library - SQL" } }
 
 dependencies {
   api libraries.slf4j_api

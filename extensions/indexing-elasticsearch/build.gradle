@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j ElasticSearch Index/Query Extension"
 
-jar { manifest { name = "Qi4j Extension - Index/Query - ElasticSearch" } }
+//jar { manifest { name = "Qi4j Extension - Index/Query - ElasticSearch" } }
 
 dependencies {
   api qi4j.core.bootstrap

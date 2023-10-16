@@ -33,7 +33,7 @@ import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.api.query.grammar.QuerySpecification;
 import org.qi4j.spi.query.EntityFinder;
 import org.qi4j.spi.query.EntityFinderException;
-import org.openrdf.query.QueryLanguage;
+import org.eclipse.rdf4j.query.QueryLanguage;
 
 /**
  * JAVADOC Add JavaDoc

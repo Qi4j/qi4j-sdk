@@ -28,8 +28,8 @@ import org.qi4j.library.sql.generator.implementation.transformation.spi.SQLProce
 /**
  *
  */
-public abstract class AbstractBooleanExpression<ExpressionType extends BooleanExpression> extends
-                                                                                          SQLSyntaxElementBase<ValueExpression, ExpressionType>
+public abstract class AbstractBooleanExpression<ExpressionType extends BooleanExpression>
+    extends SQLSyntaxElementBase<ValueExpression, ExpressionType>
     implements BooleanExpression
 {
 

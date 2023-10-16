@@ -20,10 +20,9 @@
 
 package org.qi4j.sample.rental.web;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
-public class RenderException
-    extends ServletException
+public class RenderException extends ServletException
 {
     public RenderException( String message )
     {

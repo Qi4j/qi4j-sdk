@@ -37,7 +37,7 @@ include::../../build/docs/buildinfo/artifact.txt[]
 Extends `AbstractQi4jServletBootstrap` to easily bind a Qi4j `Application` activation/passivation to your webapp
 lifecycle.
 
-Use `Qi4jServletSupport#application(javax.servlet.ServletContext)` to get a handle on the `Application` from the
+Use `Qi4jServletSupport#application(jakarta.servlet.ServletContext)` to get a handle on the `Application` from the
 `ServletContext`.
 
 Here is an example ServletContextListener:

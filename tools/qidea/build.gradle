@@ -22,7 +22,7 @@ apply plugin: 'qi4j-tool'
 
 description = "IntelliJ IDEA Plugin for Qi4j development."
 
-jar { manifest { name = "Qi4j IDEA plugin" }}
+//jar { manifest { name = "Qi4j IDEA plugin" }}
 
 dependencies {
   api qi4j.core.bootstrap

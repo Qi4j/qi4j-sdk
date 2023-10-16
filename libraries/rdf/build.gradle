@@ -22,11 +22,11 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j RDF Library provides commonalities of various RDF based services in Qi4j, such as RDF Indexing."
 
-jar { manifest { name = "Qi4j Library - RDF" } }
+//jar { manifest { name = "Qi4j Library - RDF" } }
 
 dependencies {
   api qi4j.core.spi
-  api libraries.sesame
+  api libraries.rdf4j
 
   implementation qi4j.library( 'constraints' )
   implementation qi4j.library( 'fileconfig' )

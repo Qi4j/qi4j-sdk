@@ -17,6 +17,7 @@
  */
 package org.qi4j.api.serialization;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -160,11 +161,11 @@ public interface Converters
             }
             try
             {
-                Converter<T> converter = castConverter( converterClass.newInstance() );
+                Converter<T> converter = castConverter( converterClass.getConstructor().newInstance() );
                 convertersInstancesCache.put( converterClass, converter );
                 return converter;
             }
-            catch( InstantiationException | IllegalAccessException ex )
+            catch( InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ex )
             {
                 throw new SerializationException( "Unable to instantiate Converter: " + converterClass.getName(), ex );
             }

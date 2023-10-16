@@ -20,7 +20,7 @@
 
 apply plugin: 'qi4j-extension'
 
-jar { manifest { name = "Qi4j Extension - EntityStore - Memory" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - Memory" } }
 
 dependencies {
   api qi4j.core.bootstrap

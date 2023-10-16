@@ -20,7 +20,7 @@
 
 apply plugin: 'qi4j-core'
 
-jar { manifest { name = "Qi4j Core SPI" } }
+//jar { manifest { name = "Qi4j Core SPI" } }
 
 dependencies {
   api qi4j.core.api

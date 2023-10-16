@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.transform.TransformerException;
@@ -294,6 +295,7 @@ public class JavaxXmlDeserializer extends AbstractTextDeserializer
         {
             return collectionSupplier.get();
         }
+        Collector<Object, ?, Collection> collection = Collectors.toCollection(collectionSupplier);
         return JavaxXml
             .childElements( xml )
             .map( element ->
@@ -305,7 +307,7 @@ public class JavaxXmlDeserializer extends AbstractTextDeserializer
                       }
                       return doDeserialize( module, collectionType.collectedType(), element );
                   } )
-            .collect( Collectors.toCollection( collectionSupplier ) );
+            .collect(collection);
     }
 
     @SuppressWarnings( "unchecked" )

@@ -20,7 +20,7 @@
 
 package org.qi4j.library.rdf.serializer;
 
-import org.openrdf.rio.rdfxml.util.RDFXMLPrettyWriterFactory;
+import org.eclipse.rdf4j.rio.rdfxml.util.RDFXMLPrettyWriterFactory;
 
 public final class RdfXmlSerializer extends AbstractSerializer
 {

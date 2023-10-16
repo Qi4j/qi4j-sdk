@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Spring Library allows for tight integration of Spring Framework and Qi4j applications."
 
-jar { manifest { name = "Qi4j Library - Spring" } }
+//jar { manifest { name = "Qi4j Library - Spring" } }
 
 dependencies {
   api qi4j.core.bootstrap

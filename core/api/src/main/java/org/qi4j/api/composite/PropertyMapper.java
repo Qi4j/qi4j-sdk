@@ -361,7 +361,7 @@ public final class PropertyMapper
         @Override
         public Object map( Composite composite, Type type, String value )
         {
-            return new Integer( value.trim() );
+            return Integer.valueOf( value.trim() );
         }
     }
 
@@ -371,7 +371,7 @@ public final class PropertyMapper
         @Override
         public Object map( Composite composite, Type type, String value )
         {
-            return new Float( value.trim() );
+            return Float.valueOf( value.trim() );
         }
     }
 
@@ -381,7 +381,7 @@ public final class PropertyMapper
         @Override
         public Object map( Composite composite, Type type, String value )
         {
-            return new Double( value.trim() );
+            return Double.valueOf( value.trim() );
         }
     }
 
@@ -391,7 +391,7 @@ public final class PropertyMapper
         @Override
         public Object map( Composite composite, Type type, String value )
         {
-            return new Long( value.trim() );
+            return Long.valueOf( value.trim() );
         }
     }
 
@@ -401,7 +401,7 @@ public final class PropertyMapper
         @Override
         public Object map( Composite composite, Type type, String value )
         {
-            return new Short( value.trim() );
+            return Short.valueOf( value.trim() );
         }
     }
 
@@ -411,7 +411,7 @@ public final class PropertyMapper
         @Override
         public Object map( Composite composite, Type type, String value )
         {
-            return new Byte( value.trim() );
+            return Byte.valueOf( value.trim() );
         }
     }
 

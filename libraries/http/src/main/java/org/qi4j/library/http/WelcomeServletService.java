@@ -20,7 +20,7 @@
 
 package org.qi4j.library.http;
 
-import javax.servlet.Servlet;
+import jakarta.servlet.Servlet;
 import org.qi4j.api.mixin.Mixins;
 
 /**

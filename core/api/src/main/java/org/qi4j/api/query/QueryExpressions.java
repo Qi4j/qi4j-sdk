@@ -21,6 +21,7 @@ package org.qi4j.api.query;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -100,7 +101,7 @@ public final class QueryExpressions
         {
             try
             {
-                T mixin = clazz.newInstance();
+                T mixin = clazz.getConstructor().newInstance();
                 for( Field field : clazz.getFields() )
                 {
                     if( field.getAnnotation( State.class ) != null )
@@ -137,9 +138,13 @@ public final class QueryExpressions
                 }
                 return mixin;
             }
-            catch( IllegalAccessException | IllegalArgumentException | InstantiationException | SecurityException e )
+            catch( InvocationTargetException | IllegalAccessException | IllegalArgumentException | InstantiationException | SecurityException e )
             {
                 throw new IllegalArgumentException( "Cannot use class as template", e );
+            }
+            catch( NoSuchMethodException e )
+            {
+                throw new RuntimeException(e);
             }
         }
     }

@@ -24,7 +24,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.index.rdf.assembly.RdfMemoryStoreAssembler;
 import org.qi4j.index.rdf.assembly.RdfNativeSesameStoreAssembler;
-import org.qi4j.index.rdf.assembly.RdfRdbmsSesameStoreAssembler;
 
 public class DocumentationSupport
 {
@@ -68,7 +67,7 @@ public class DocumentationSupport
                 throws AssemblyException
         {
             // START SNIPPET: rdbms
-            new RdfRdbmsSesameStoreAssembler().assemble( module );
+            // It seems that the RDBMS backend is no longer supported by the RDF4J project,
             // END SNIPPET: rdbms
         }
 

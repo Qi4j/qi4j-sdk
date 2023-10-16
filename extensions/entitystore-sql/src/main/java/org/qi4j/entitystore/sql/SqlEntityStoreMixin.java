@@ -146,7 +146,7 @@ public class SqlEntityStoreMixin
         {
             if( value instanceof Double )       // MariaDB/MySQL returns a Double
             {
-                return new Float( (Double) value );
+                return ((Double) value).floatValue();
             }
             return value;
         }

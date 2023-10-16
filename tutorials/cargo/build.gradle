@@ -22,7 +22,7 @@ apply plugin: 'qi4j-tutorial'
 
 description = "Tutorial on how to convert existing application into a Qi4j one, step-by-step."
 
-jar { manifest { name = "Qi4j Tutorial - Cargo" } }
+//jar { manifest { name = "Qi4j Tutorial - Cargo" } }
 
 dependencies {
   implementation qi4j.core.bootstrap

@@ -29,11 +29,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.TreeMap;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -119,25 +119,18 @@ public class QuikitServlet
         ClassLoader loader = getClass().getClassLoader();
         Class<?> assemblerClass = loader.loadClass( assemblerClassname );
         ApplicationAssembler assembler;
-        Constructor cons = assemblerClass.getConstructor( Application.Mode.class );
-        if( cons == null )
+        Constructor<?> cons = assemblerClass.getConstructor( Application.Mode.class );
+        Application.Mode mode;
+        String modeSetting = config.getInitParameter( "qi4j-application-mode" );
+        if( modeSetting == null )
         {
-            assembler = (ApplicationAssembler) assemblerClass.newInstance();
+            mode = Application.Mode.development;
         }
         else
         {
-            Application.Mode mode;
-            String modeSetting = config.getInitParameter( "qi4j-application-mode" );
-            if( modeSetting == null )
-            {
-                mode = Application.Mode.development;
-            }
-            else
-            {
-                mode = Application.Mode.valueOf( modeSetting );
-            }
-            assembler = (ApplicationAssembler) cons.newInstance( mode );
+            mode = Application.Mode.valueOf( modeSetting );
         }
+        assembler = (ApplicationAssembler) cons.newInstance( mode );
         return assembler;
     }
 

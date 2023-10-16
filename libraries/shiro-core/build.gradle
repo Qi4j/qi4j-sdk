@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Shiro Library integrates Apache Shiro security framework into Qi4j."
 
-jar { manifest { name = "Qi4j Library - Shiro Core" } }
+//jar { manifest { name = "Qi4j Library - Shiro Core" } }
 
 dependencies {
   api qi4j.core.bootstrap

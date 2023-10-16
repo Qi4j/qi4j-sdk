@@ -1,30 +1,32 @@
 /*
- *  Licensed to the Apache Software Foundation (ASF) under one
- *  or more contributor license agreements.  See the NOTICE file
- *  distributed with this work for additional information
- *  regarding copyright ownership.  The ASF licenses this file
- *  to you under the Apache License, Version 2.0 (the
- *  "License"); you may not use this file except in compliance
- *  with the License.  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+* Copyright 2008-2023 Qi4j Community (see commit log). All Rights Reserved
+*
+* Licensed  under the  Apache License,  Version 2.0  (the "License");
+* you may not use  this file  except in  compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed  under the  License is distributed on an "AS IS" BASIS,
+* WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+* implied.
+*
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package org.qi4j.gradle.structure.distributions
 
-import groovy.transform.CompileStatic
-import groovy.transform.TypeCheckingMode
 import org.qi4j.gradle.BasePlugin
 import org.qi4j.gradle.TaskGroups
 import org.qi4j.gradle.code.PublishedCodePlugin
+import org.qi4j.gradle.dependencies.DependenciesDeclarationExtension
+import org.qi4j.gradle.dependencies.DependenciesPlugin
 import org.qi4j.gradle.structure.release.ReleaseSpecExtension
 import org.qi4j.gradle.tasks.ExecLogged
-import org.apache.rat.gradle.RatTask
+import groovy.transform.CompileStatic
+import groovy.transform.TypeCheckingMode
+import java.nio.file.Files
 import org.apache.tools.ant.filters.ReplaceTokens
 import org.gradle.api.Action
 import org.gradle.api.Plugin
@@ -45,15 +47,13 @@ import org.gradle.api.tasks.bundling.Zip
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.maven.MavenModule
 import org.gradle.maven.MavenPomArtifact
-//import org.gradle.plugins.ide.internal.IdeDependenciesExtractor
-//import org.gradle.plugins.ide.internal.resolver.model.IdeExtendedRepoFileDependency
 import org.gradle.plugins.signing.Sign
 import org.gradle.plugins.signing.SigningExtension
-import org.gradle.process.ExecSpec
-import org.qi4j.gradle.dependencies.DependenciesDeclarationExtension
-import org.qi4j.gradle.dependencies.DependenciesPlugin
 
-import java.nio.file.Files
+//import org.gradle.plugins.ide.internal.IdeDependenciesExtractor
+//import org.gradle.plugins.ide.internal.resolver.model.IdeExtendedRepoFileDependency
+
+import org.gradle.process.ExecSpec
 
 // TODO Split each distribution as a separate plugin
 // TODO Expose all project outputs into configurations
@@ -133,7 +133,6 @@ class DistributionsPlugin implements Plugin<Project>
       }
       spec.include 'distributions/**'
       spec.include 'reports/**'
-      spec.include 'internals/**'
       spec.include 'release/**'
       spec.include 'manual/**'
       spec.include 'samples/**'
@@ -209,7 +208,7 @@ class DistributionsPlugin implements Plugin<Project>
       spec.into '.'
     }
     def srcDistCopySpec = project.copySpec { CopySpec spec ->
-      spec.into "qi4j-sdk-$project.version-src"
+      spec.into "qi4j-java-$project.version-src"
       spec.with srcDistFilesCopySpec
       spec.with srcDistSupplementaryFilesCopySpec
       spec.with srcDistFilteredFilesCopySpec
@@ -218,17 +217,17 @@ class DistributionsPlugin implements Plugin<Project>
     def zipSources = project.tasks.create( TaskNames.ZIP_SOURCE_DIST, Zip ) { Zip task ->
       task.group = TaskGroups.DISTRIBUTION
       task.description = 'Assembles .zip source distribution.'
-      task.baseName = 'qi4j-sdk'
+      task.archiveBaseName.set( 'qi4j-java' )
       task.with srcDistCopySpec
-      task.classifier = 'src'
+      task.archiveClassifier.set( 'src' )
     }
     def tarSources = project.tasks.create( TaskNames.TAR_SOURCE_DIST, Tar ) { Tar task ->
       task.group = TaskGroups.DISTRIBUTION
       task.description = 'Assembles .tar.gz source distribution.'
-      task.baseName = 'qi4j-sdk'
+      task.archiveBaseName.set( 'qi4j-java' )
       task.with srcDistCopySpec
       task.compression = Compression.GZIP
-      task.classifier = 'src'
+      task.archiveClassifier.set( 'src' )
     }
     project.artifacts.add( 'archives', zipSources )
     project.artifacts.add( 'archives', tarSources )
@@ -243,118 +242,119 @@ class DistributionsPlugin implements Plugin<Project>
 
   private static Task applySourceDistributionCheck( Project project )
   {
-    def releaseSpec = project.extensions.getByType ReleaseSpecExtension
-    project.plugins.apply 'org.nosphere.apache.rat-base'
-    def unpackedSrcDistDir = project.file( "build/stage/source-distribution/qi4j-sdk-$project.version-src" )
-    project.tasks.create( TaskNames.RAT_SOURCE_DIST, RatTask, { RatTask task ->
-      task.group = TaskGroups.DISTRIBUTION_VERIFICATION
-      task.description = 'Checks the source distribution using Apache RAT.'
-      task.dependsOn TaskNames.STAGE_SOURCE_DIST
-      task.plainOutput = true
-      task.htmlOutput = true
-      task.xmlOutput = false
-      task.setInputDir unpackedSrcDistDir.absolutePath
-      task.onlyIf { !releaseSpec.developmentVersion }
-      task.excludes = [
-        '**/.DS_Store/**', '**/._*',
-        // Git Files
-        '**/.git/**', '**/.gitignore',
-        // Gradle Files
-        'gradle/wrapper/**', '**/gradlew', '**/gradlew.bat', '**/.gradle/**',
-        // Build Output
-        '**/build/**', '**/derby.log', 'out/**',
-        // IDE Files
-        '**/.idea/**', '**/*.iml', '**/*.ipr', '**/*.iws',
-        '**/.settings/**', '**/.classpath', '**/.project',
-        '**/.gradletasknamecache', '**/private/cache/**',
-        '**/.nb-gradle-properties', '**/.nb-gradle/**',
-        // JSON files are not allowed to have comments, according to http://www.json.org/ and http://www.ietf.org/rfc/rfc4627.txt
-        '**/*.json',
-        // Various Text Resources
-        '**/README.*', '**/README*.*', '**/TODO',
-        '**/src/main/resources/**/*.txt',
-        '**/src/test/resources/**/*.txt',
-        'libraries/rest-server/src/main/resources/**/*.htm',
-        'libraries/rest-server/src/main/resources/**/*.atom',
-        'tools/generator-qi4j/app/templates/**/*.tmpl',
-        'tools/generator-qi4j/app/templates/**/*.*_',
-        'tools/qidea/src/main/resources/**/*.ft',
-        'tools/qidea/src/main/resources/**/*.template',
-        // Graphic Resources
-        '**/*.svg', '**/*.gif', '**/*.png', '**/*.jpg', '**/*.psd',
-        // Keystores
-        '**/*.jceks', '**/*.p12',
-        // Syntax Highlighter - MIT
-        'manual/**/sh*.css', 'manual/**/sh*.js',
-        // jQuery & plugins - MIT
-        'manual/**/jquery*.js',
-        // W3C XML Schemas - W3C Software License
-        'samples/rental/src/main/resources/*.xsd',
-      ]
-    } as Action<RatTask> )
-    project.tasks.create( TaskNames.INSPECT_SOURCE_DIST ) { Task task ->
-      task.group = TaskGroups.DISTRIBUTION_VERIFICATION
-      task.description = 'Inspects various aspects of the source distribution.'
-      task.dependsOn TaskNames.STAGE_SOURCE_DIST
-      task.onlyIf { !releaseSpec.developmentVersion }
-      task.doLast {
-        // ad-hoc checks to the source distribution -----------------------
-        def assertFilePresent = { String path -> assert new File( unpackedSrcDistDir, path ).isFile() }
-        def assertFileAbsent = { String path -> assert !new File( unpackedSrcDistDir, path ).isFile() }
-
-        assertFileAbsent 'gradlew'
-        assertFileAbsent 'gradlew.bat'
-        assertFileAbsent 'gradle/wrapper/gradle-wrapper.jar'
-        assertFileAbsent 'gradle/wrapper/gradle-wrapper.properties'
-        assertFilePresent 'gradle/wrapper-install/build.gradle'
-
-        def wrapperFiles = []
-        unpackedSrcDistDir.traverse { File file ->
-          if(file.file &&
-             (file.name.contains( 'gradle-wrapper' ) || file.name.contains('gradlew'))) {
-            wrapperFiles << file
-          }
-        }
-        assert wrapperFiles.empty
-      }
-    }
-    project.tasks.create( TaskNames.BUILD_SOURCE_DIST, ExecLogged, { ExecLogged task ->
-      task.group = TaskGroups.DISTRIBUTION_VERIFICATION
-      task.description = 'Checks the source distribution by running `gradle check assemble` inside.'
-      task.dependsOn TaskNames.STAGE_SOURCE_DIST
-      task.mustRunAfter TaskNames.RAT_SOURCE_DIST
-      task.mustRunAfter TaskNames.INSPECT_SOURCE_DIST
-      def workDir = project.file( "$project.buildDir/tmp/${ TaskNames.BUILD_SOURCE_DIST }" )
-      task.inputs.dir unpackedSrcDistDir
-      task.workingDir = workDir
-      def gradlew = new File( workDir, 'gradlew' ).absolutePath
-      def settings = new File( workDir, 'settings.gradle' ).absolutePath
-      task.commandLine = [ gradlew, '-c', settings, 'check', 'assemble', '-u', '-s', /* '-g', workDir */ ]
-      task.doFirst {
-        project.copy { CopySpec spec ->
-          spec.from unpackedSrcDistDir
-          spec.into workDir
-        }
-        def logName = "${ TaskNames.BUILD_SOURCE_DIST }_installWrapper"
-        def stdout = project.file( "${ project.buildDir }/log/$logName/$logName-stdout.log" )
-        def stderr = project.file( "${ project.buildDir }/log/$logName/$logName-stderr.log" )
-        def rootGradlew = new File( project.rootDir, 'gradlew' ).absolutePath
-        ExecLogged.execLogged( project, stdout, stderr, { ExecSpec spec ->
-          spec.workingDir = workDir
-          spec.commandLine = [ rootGradlew, '-i', '-s', '-b', 'gradle/wrapper-install/build.gradle', 'install' ]
-        } as Action )
-      }
-      task.doLast {
-        if( workDir.exists() )
-        {
-          workDir.deleteDir()
-        }
-      }
-    } as Action<ExecLogged> )
-    project.tasks.create( TaskNames.CHECK_SOURCE_DIST ) { Task task ->
-      task.description = "Checks the source distribution."
-      task.dependsOn TaskNames.RAT_SOURCE_DIST, TaskNames.INSPECT_SOURCE_DIST, TaskNames.BUILD_SOURCE_DIST
-    }
+// TODO (Paul?)
+//    def releaseSpec = project.extensions.getByType ReleaseSpecExtension
+//    project.plugins.apply 'org.nosphere.apache.rat-base'
+//    def unpackedSrcDistDir = project.file( "build/stage/source-distribution/qi4j-java-$project.version-src" )
+//    project.tasks.create( TaskNames.RAT_SOURCE_DIST, RatTask, { RatTask task ->
+//      task.group = TaskGroups.DISTRIBUTION_VERIFICATION
+//      task.description = 'Checks the source distribution using Apache RAT.'
+//      task.dependsOn TaskNames.STAGE_SOURCE_DIST
+//      task.plainOutput = true
+//      task.htmlOutput = true
+//      task.xmlOutput = false
+//      task.setInputDir unpackedSrcDistDir.absolutePath
+//      task.onlyIf { !releaseSpec.developmentVersion }
+//      task.excludes = [
+//        '**/.DS_Store/**', '**/._*',
+//        // Git Files
+//        '**/.git/**', '**/.gitignore',
+//        // Gradle Files
+//        'gradle/wrapper/**', '**/gradlew', '**/gradlew.bat', '**/.gradle/**',
+//        // Build Output
+//        '**/build/**', '**/derby.log', 'out/**',
+//        // IDE Files
+//        '**/.idea/**', '**/*.iml', '**/*.ipr', '**/*.iws',
+//        '**/.settings/**', '**/.classpath', '**/.project',
+//        '**/.gradletasknamecache', '**/private/cache/**',
+//        '**/.nb-gradle-properties', '**/.nb-gradle/**',
+//        // JSON files are not allowed to have comments, according to http://www.json.org/ and http://www.ietf.org/rfc/rfc4627.txt
+//        '**/*.json',
+//        // Various Text Resources
+//        '**/README.*', '**/README*.*', '**/TODO',
+//        '**/src/main/resources/**/*.txt',
+//        '**/src/test/resources/**/*.txt',
+//        'libraries/rest-server/src/main/resources/**/*.htm',
+//        'libraries/rest-server/src/main/resources/**/*.atom',
+//        'tools/generator-qi4j/app/templates/**/*.tmpl',
+//        'tools/generator-qi4j/app/templates/**/*.*_',
+//        'tools/qidea/src/main/resources/**/*.ft',
+//        'tools/qidea/src/main/resources/**/*.template',
+//        // Graphic Resources
+//        '**/*.svg', '**/*.gif', '**/*.png', '**/*.jpg', '**/*.psd',
+//        // Keystores
+//        '**/*.jceks', '**/*.p12',
+//        // Syntax Highlighter - MIT
+//        'manual/**/sh*.css', 'manual/**/sh*.js',
+//        // jQuery & plugins - MIT
+//        'manual/**/jquery*.js',
+//        // W3C XML Schemas - W3C Software License
+//        'samples/rental/src/main/resources/*.xsd',
+//      ]
+//    } as Action<RatTask> )
+//    project.tasks.create( TaskNames.INSPECT_SOURCE_DIST ) { Task task ->
+//      task.group = TaskGroups.DISTRIBUTION_VERIFICATION
+//      task.description = 'Inspects various aspects of the source distribution.'
+//      task.dependsOn TaskNames.STAGE_SOURCE_DIST
+//      task.onlyIf { !releaseSpec.developmentVersion }
+//      task.doLast {
+//        // ad-hoc checks to the source distribution -----------------------
+//        def assertFilePresent = { String path -> assert new File( unpackedSrcDistDir, path ).isFile() }
+//        def assertFileAbsent = { String path -> assert !new File( unpackedSrcDistDir, path ).isFile() }
+//
+//        assertFileAbsent 'gradlew'
+//        assertFileAbsent 'gradlew.bat'
+//        assertFileAbsent 'gradle/wrapper/gradle-wrapper.jar'
+//        assertFileAbsent 'gradle/wrapper/gradle-wrapper.properties'
+//        assertFilePresent 'gradle/wrapper-install/build.gradle'
+//
+//        def wrapperFiles = []
+//        unpackedSrcDistDir.traverse { File file ->
+//          if(file.file &&
+//             (file.name.contains( 'gradle-wrapper' ) || file.name.contains('gradlew'))) {
+//            wrapperFiles << file
+//          }
+//        }
+//        assert wrapperFiles.empty
+//      }
+//    }
+//    project.tasks.create( TaskNames.BUILD_SOURCE_DIST, ExecLogged, { ExecLogged task ->
+//      task.group = TaskGroups.DISTRIBUTION_VERIFICATION
+//      task.description = 'Checks the source distribution by running `gradle check assemble` inside.'
+//      task.dependsOn TaskNames.STAGE_SOURCE_DIST
+//      task.mustRunAfter TaskNames.RAT_SOURCE_DIST
+//      task.mustRunAfter TaskNames.INSPECT_SOURCE_DIST
+//      def workDir = project.file( "$project.buildDir/tmp/${ TaskNames.BUILD_SOURCE_DIST }" )
+//      task.inputs.dir unpackedSrcDistDir
+//      task.workingDir = workDir
+//      def gradlew = new File( workDir, 'gradlew' ).absolutePath
+//      def settings = new File( workDir, 'settings.gradle' ).absolutePath
+//      task.commandLine = [ gradlew, '-c', settings, 'check', 'assemble', '-u', '-s', /* '-g', workDir */ ]
+//      task.doFirst {
+//        project.copy { CopySpec spec ->
+//          spec.from unpackedSrcDistDir
+//          spec.into workDir
+//        }
+//        def logName = "${ TaskNames.BUILD_SOURCE_DIST }_installWrapper"
+//        def stdout = project.file( "${ project.buildDir }/log/$logName/$logName-stdout.log" )
+//        def stderr = project.file( "${ project.buildDir }/log/$logName/$logName-stderr.log" )
+//        def rootGradlew = new File( project.rootDir, 'gradlew' ).absolutePath
+//        ExecLogged.execLogged( project, stdout, stderr, { ExecSpec spec ->
+//          spec.workingDir = workDir
+//          spec.commandLine = [ rootGradlew, '-i', '-s', '-b', 'gradle/wrapper-install/build.gradle', 'install' ]
+//        } as Action )
+//      }
+//      task.doLast {
+//        if( workDir.exists() )
+//        {
+//          workDir.deleteDir()
+//        }
+//      }
+//    } as Action<ExecLogged> )
+//    project.tasks.create( TaskNames.CHECK_SOURCE_DIST ) { Task task ->
+//      task.description = "Checks the source distribution."
+//      task.dependsOn TaskNames.RAT_SOURCE_DIST, TaskNames.INSPECT_SOURCE_DIST, TaskNames.BUILD_SOURCE_DIST
+//    }
   }
 
   private static void applyBinaryDistribution( Project project )
@@ -386,7 +386,7 @@ class DistributionsPlugin implements Plugin<Project>
       spec.into '.'
     }
     def binDistImage = project.copySpec { CopySpec spec ->
-      spec.into "qi4j-sdk-$project.version-bin"
+      spec.into "qi4j-java-$project.version-bin"
       spec.with binDistNoticesCopySpec
       spec.with docsCopySpec
       spec.with extraDistTextCopySpec
@@ -404,16 +404,16 @@ class DistributionsPlugin implements Plugin<Project>
       task.group = TaskGroups.DISTRIBUTION
       task.description = 'Assembles .zip binary distribution.'
       task.dependsOn binariesBuildDependencies
-      task.baseName = 'qi4j-sdk'
-      task.classifier = 'bin'
+      task.archiveBaseName.set( 'qi4j-java' )
+      task.archiveClassifier.set( 'bin' )
       task.with binDistImage
     }
     def tarBinaries = project.tasks.create( TaskNames.TAR_BINARY_DIST, Tar ) { Tar task ->
       task.group = TaskGroups.DISTRIBUTION
       task.description = 'Assembles .tar.gz binary distribution.'
       task.dependsOn binariesBuildDependencies
-      task.baseName = 'qi4j-sdk'
-      task.classifier = 'bin'
+      task.archiveBaseName.set( 'qi4j-java' )
+      task.archiveClassifier.set( 'bin' )
       task.compression = Compression.GZIP
       task.with binDistImage
     }
@@ -430,9 +430,11 @@ class DistributionsPlugin implements Plugin<Project>
 
   private static Task applyBinaryDistributionCheck( Project project )
   {
+// TODO (Paul?)
+/*
     def releaseSpec = project.extensions.getByType ReleaseSpecExtension
     project.plugins.apply 'org.nosphere.apache.rat-base'
-    def unpackedBinDistDir = project.file( "build/stage/binary-distribution/qi4j-sdk-$project.version-bin" )
+    def unpackedBinDistDir = project.file( "build/stage/binary-distribution/qi4j-java-$project.version-bin" )
     project.tasks.create( TaskNames.RAT_BINARY_DIST, RatTask, { RatTask task ->
       task.group = TaskGroups.DISTRIBUTION_VERIFICATION
       task.description = "Checks the binary distribution using Apache RAT."
@@ -454,6 +456,7 @@ class DistributionsPlugin implements Plugin<Project>
       task.description = 'Checks the binary distribution.'
       task.dependsOn TaskNames.RAT_BINARY_DIST
     }
+ */
   }
 
   @CompileStatic( TypeCheckingMode.SKIP )
@@ -461,14 +464,14 @@ class DistributionsPlugin implements Plugin<Project>
   {
     project.tasks.withType( Zip ) { Zip task ->
       task.doLast {
-        project.ant.checksum file: task.archivePath, algorithm: 'MD5'
-        project.ant.checksum file: task.archivePath, algorithm: 'SHA-512'
+        project.ant.checksum file: task.archiveFile.get().asFile, algorithm: 'MD5'
+        project.ant.checksum file: task.archiveFile.get().asFile, algorithm: 'SHA-512'
       }
     }
     project.tasks.withType( Tar ) { Tar task ->
       task.doLast {
-        project.ant.checksum file: task.archivePath, algorithm: 'MD5'
-        project.ant.checksum file: task.archivePath, algorithm: 'SHA-512'
+        project.ant.checksum file: task.archiveFile.get().asFile, algorithm: 'MD5'
+        project.ant.checksum file: task.archiveFile.get().asFile, algorithm: 'SHA-512'
       }
     }
   }
@@ -581,10 +584,10 @@ class DistributionsPlugin implements Plugin<Project>
     project.tasks.create( TaskNames.ZIP_DEPENDENCIES_DIST, Zip ) { Zip task ->
       task.group = TaskGroups.DISTRIBUTION
       task.description = 'Assemble .zip dependencies distribution (BIG)'
-      task.baseName = 'qi4j-sdk'
-      task.classifier = 'dependencies'
+      task.archiveBaseName.set( 'qi4j-java' )
+      task.archiveClassifier.set( 'dependencies' )
       task.from stageTask
-      task.into "q4j-sdk-$project.version-dependencies"
+      task.into "qi4j-java-$project.version-dependencies"
     }
   }
 }

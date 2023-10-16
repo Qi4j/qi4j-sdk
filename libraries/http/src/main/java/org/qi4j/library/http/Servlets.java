@@ -23,10 +23,10 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.UUID;
-import javax.servlet.DispatcherType;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.Filter;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContextListener;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.library.http.ConstraintInfo.Constraint;
@@ -36,7 +36,6 @@ import static org.qi4j.api.common.Visibility.layer;
 
 public final class Servlets
 {
-
     private Servlets()
     {
     }

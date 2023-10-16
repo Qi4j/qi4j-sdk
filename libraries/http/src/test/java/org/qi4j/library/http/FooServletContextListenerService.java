@@ -19,7 +19,7 @@
  */
 package org.qi4j.library.http;
 
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextListener;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceComposite;
 

@@ -20,7 +20,6 @@
 
 package org.qi4j.library.rest.admin;
 
-import info.aduna.xml.XMLWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,17 +27,27 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import org.openrdf.http.protocol.Protocol;
-import org.openrdf.model.URI;
-import org.openrdf.model.Value;
-import org.openrdf.query.*;
-import org.openrdf.query.impl.DatasetImpl;
-import org.openrdf.query.resultio.TupleQueryResultWriter;
-import org.openrdf.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
-import org.openrdf.query.resultio.sparqlxml.SPARQLResultsXMLWriter;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
+import org.eclipse.rdf4j.common.xml.XMLWriter;
+import org.eclipse.rdf4j.http.protocol.Protocol;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.Value;
+import org.eclipse.rdf4j.query.BooleanQuery;
+import org.eclipse.rdf4j.query.GraphQuery;
+import org.eclipse.rdf4j.query.MalformedQueryException;
+import org.eclipse.rdf4j.query.Query;
+import org.eclipse.rdf4j.query.QueryEvaluationException;
+import org.eclipse.rdf4j.query.QueryLanguage;
+import org.eclipse.rdf4j.query.QueryResultUtil;
+import org.eclipse.rdf4j.query.TupleQuery;
+import org.eclipse.rdf4j.query.TupleQueryResult;
+import org.eclipse.rdf4j.query.UnsupportedQueryLanguageException;
+import org.eclipse.rdf4j.query.impl.DatasetImpl;
+import org.eclipse.rdf4j.query.resultio.TupleQueryResultWriter;
+import org.eclipse.rdf4j.query.resultio.sparqljson.SPARQLResultsJSONWriterFactory;
+import org.eclipse.rdf4j.query.resultio.sparqlxml.SPARQLResultsXMLWriter;
+import org.eclipse.rdf4j.repository.Repository;
+import org.eclipse.rdf4j.repository.RepositoryConnection;
+import org.eclipse.rdf4j.repository.RepositoryException;
 import org.qi4j.api.injection.scope.Service;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -51,7 +60,9 @@ import org.restlet.representation.Variant;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
-import static org.openrdf.http.protocol.Protocol.*;
+import static org.eclipse.rdf4j.http.protocol.Protocol.BINDING_PREFIX;
+import static org.eclipse.rdf4j.http.protocol.Protocol.DEFAULT_GRAPH_PARAM_NAME;
+import static org.eclipse.rdf4j.http.protocol.Protocol.NAMED_GRAPH_PARAM_NAME;
 
 /**
  * JAVADOC
@@ -295,7 +306,7 @@ public class SPARQLResource
                 {
                     try
                     {
-                        URI uri = repository.getValueFactory().createURI( defaultGraphURI );
+                        IRI uri = repository.getValueFactory().createIRI( defaultGraphURI );
                         dataset.addDefaultGraph( uri );
                     }
                     catch( IllegalArgumentException e )
@@ -312,7 +323,7 @@ public class SPARQLResource
                 {
                     try
                     {
-                        URI uri = repository.getValueFactory().createURI( namedGraphURI );
+                        IRI uri = repository.getValueFactory().createIRI( namedGraphURI );
                         dataset.addNamedGraph( uri );
                     }
                     catch( IllegalArgumentException e )

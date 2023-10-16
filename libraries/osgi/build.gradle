@@ -22,12 +22,11 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j OSGi Library provides integration of OSGi and Qi4j, so that services in each system can be shared."
 
-jar { manifest { name = "Qi4j Library - OSGi Integration" } }
+//jar { manifest { name = "Qi4j Library - OSGi Integration" } }
 
 dependencies {
   api qi4j.core.api
   api libraries.osgi_core
-  api libraries.osgi_compendium
 
   runtimeOnly qi4j.core.runtime
 

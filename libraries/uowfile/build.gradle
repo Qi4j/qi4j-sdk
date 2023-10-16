@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j UoWFile Library provides file operations binding to UoWs."
 
-jar { manifest { name = "Qi4j Library - UoWFile" } }
+//jar { manifest { name = "Qi4j Library - UoWFile" } }
 
 dependencies {
   api qi4j.core.bootstrap

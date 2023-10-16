@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j JClouds EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - JClouds" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - JClouds" } }
 
 dependencies {
   api qi4j.core.bootstrap

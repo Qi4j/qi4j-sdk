@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j SQL BoneCP Library provides BoneCP support."
 
-jar { manifest { name = "Qi4j Library - SQL BoneCP" } }
+//jar { manifest { name = "Qi4j Library - SQL BoneCP" } }
 
 dependencies {
   api qi4j.library( 'sql' )

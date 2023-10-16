@@ -20,7 +20,7 @@
 package org.qi4j.index.rdf;
 
 import org.qi4j.api.indexing.IndexingException;
-import org.openrdf.query.QueryLanguage;
+import org.eclipse.rdf4j.query.QueryLanguage;
 
 public class UnsupportedLanguageException extends IndexingException
 {

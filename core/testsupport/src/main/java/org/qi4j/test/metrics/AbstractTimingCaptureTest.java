@@ -42,6 +42,7 @@ public abstract class AbstractTimingCaptureTest extends AbstractQi4jTest
     public void assemble( ModuleAssembly module )
         throws Exception
     {
+        module.defaultServices();
         module.layer().application().setName( "SomeApplication" );
         module.transients( Country1.class );
         module.transients( Country2.class ).withConcerns( TimingCaptureAllConcern.class );

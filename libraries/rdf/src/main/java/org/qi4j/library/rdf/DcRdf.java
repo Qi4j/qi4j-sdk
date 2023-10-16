@@ -20,12 +20,12 @@
 
 package org.qi4j.library.rdf;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 public interface DcRdf
 {
     String NAMESPACE = "http://purl.org/dc/elements/1.1/";
-    URI ABOUT = new URIImpl( NAMESPACE + "about" );
-    URI TITLE = new URIImpl( NAMESPACE + "title" );
+    IRI ABOUT = SimpleValueFactory.getInstance().createIRI( NAMESPACE + "about" );
+    IRI TITLE = SimpleValueFactory.getInstance().createIRI( NAMESPACE + "title" );
 }

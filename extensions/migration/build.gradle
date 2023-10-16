@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Migration Extension"
 
-jar { manifest { name = "Qi4j Extension - Migration" }}
+//jar { manifest { name = "Qi4j Extension - Migration" }}
 
 dependencies {
   api qi4j.core.spi

@@ -28,11 +28,11 @@ import org.qi4j.library.shiro.ini.ShiroIniConfiguration;
 import org.qi4j.library.shiro.web.EnvironmentLoaderService;
 import org.qi4j.library.shiro.web.ShiroFilterService;
 
-import static javax.servlet.DispatcherType.ASYNC;
-import static javax.servlet.DispatcherType.ERROR;
-import static javax.servlet.DispatcherType.FORWARD;
-import static javax.servlet.DispatcherType.INCLUDE;
-import static javax.servlet.DispatcherType.REQUEST;
+import static jakarta.servlet.DispatcherType.ASYNC;
+import static jakarta.servlet.DispatcherType.ERROR;
+import static jakarta.servlet.DispatcherType.FORWARD;
+import static jakarta.servlet.DispatcherType.INCLUDE;
+import static jakarta.servlet.DispatcherType.REQUEST;
 import static org.qi4j.library.http.Servlets.addContextListeners;
 import static org.qi4j.library.http.Servlets.addFilters;
 import static org.qi4j.library.http.Servlets.filter;

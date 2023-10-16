@@ -21,10 +21,11 @@
 package org.qi4j.library.rdf.serializer;
 
 import java.io.Writer;
-import org.openrdf.model.Statement;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFWriter;
-import org.openrdf.rio.RDFWriterFactory;
+import java.lang.reflect.InvocationTargetException;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
+import org.eclipse.rdf4j.rio.RDFWriter;
+import org.eclipse.rdf4j.rio.RDFWriterFactory;
 import org.qi4j.library.rdf.Qi4jRdf;
 import org.qi4j.library.rdf.Rdfs;
 
@@ -53,13 +54,9 @@ abstract class AbstractSerializer
         RDFWriterFactory writerFactory;
         try
         {
-            writerFactory = writerFactoryClass.newInstance();
+            writerFactory = writerFactoryClass.getConstructor().newInstance();
         }
-        catch( InstantiationException e )
-        {
-            throw new InternalError();
-        }
-        catch( IllegalAccessException e )
+        catch( IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e )
         {
             throw new InternalError();
         }

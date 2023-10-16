@@ -31,12 +31,12 @@ tag=speaker
 ----
 
 
-we need a implementation in a resource file (visible on classpath) named +org/qi4j/library/scripting/HelloSpeaker.js+
+we need a implementation in a resource file (visible on classpath) named +org/qi4j/library/scripting/QiHelloSpeaker.js+
 that looks like this;
 
 [snippet,javascript]
 ----
-source=libraries/scripting/src/test/resources/org/qi4j/library/scripting/HelloSpeaker.js
+source=libraries/scripting/src/test/resources/org/qi4j/library/scripting/QiHelloSpeaker.js
 tag=script
 ----
 

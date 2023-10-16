@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-apply plugin: 'qi4j-settings'
+//apply plugin: 'qi4j-settings'
 
 rootProject.name = 'qi4j-sdk'
 
@@ -37,14 +37,15 @@ include 'core:api',
         'libraries:logging',
         'libraries:osgi',
         'libraries:rdf',
-        'libraries:rest',
-        'libraries:rest-client',
-        'libraries:rest-common',
-        'libraries:rest-server',
+//        'libraries:rest',
+//        'libraries:rest-client',
+//        'libraries:rest-common',
+//        'libraries:rest-server',
         'libraries:scripting',
         'libraries:servlet',
-        'libraries:shiro-core',
-        'libraries:shiro-web',
+// TODO: Shiro is on javax.servlet, even on latest dev branch and expect server to handling some strange shading of classes. Not sure exactly what they mean.
+//        'libraries:shiro-core',
+//        'libraries:shiro-web',
         'libraries:spring',
         'libraries:sql',
         'libraries:sql-bonecp',
@@ -67,22 +68,22 @@ include 'core:api',
         'extensions:entitystore-mongodb',
         'extensions:entitystore-preferences',
         'extensions:entitystore-redis',
-        'extensions:entitystore-riak',
+//        'extensions:entitystore-riak',
         'extensions:entitystore-sql',
         'extensions:entitystore-sqlkv',
         'extensions:entitystore-zookeeper',
         'extensions:indexing-elasticsearch',
         'extensions:indexing-rdf',
-        'extensions:indexing-solr',
         'extensions:indexing-sql',
         'extensions:metrics-codahale',
+        'extensions:messaging-pulsar',
         'extensions:migration',
         'extensions:reindexer',
         'extensions:serialization-javaxjson',
         'extensions:serialization-javaxxml',
         'extensions:serialization-messagepack',
         'tools:model-detail',
-        'tools:envisage',
+//        'tools:envisage',
 //        'tools:generator-qi4j',
 //        'tools:qidea',
         'tests:regression',
@@ -97,11 +98,11 @@ include 'core:api',
 //        'tutorials:introduction:twohours',
         'tutorials:services',
         'samples:dci',
-        'samples:forum',
+//        'samples:forum',
         'samples:rental',
         'samples:sql-support',
         'samples:swing'
 
-include 'internals:testsupport-internal'
+//include 'internals:testsupport-internal'
 
-include 'manual', 'reports', 'distributions', 'release'
+// include 'manual', 'reports', 'distributions', 'release'

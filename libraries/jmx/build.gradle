@@ -23,7 +23,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j JMX Library provides Java Management Extension (JMX) integration for Qi4j applications."
 
-jar { manifest { name = "Qi4j Library - JMX" } }
+//jar { manifest { name = "Qi4j Library - JMX" } }
 
 dependencies {
   api qi4j.core.bootstrap

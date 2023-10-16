@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j SQL Key/Value EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - SQL Key/Value" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - SQL Key/Value" } }
 
 dependencies {
   api qi4j.core.bootstrap

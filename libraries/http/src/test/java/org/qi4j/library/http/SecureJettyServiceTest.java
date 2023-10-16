@@ -30,7 +30,7 @@ import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.util.FreePortFinder;
 import org.junit.jupiter.api.Test;
 
-import static javax.servlet.DispatcherType.REQUEST;
+import static jakarta.servlet.DispatcherType.REQUEST;
 import static org.qi4j.library.http.Servlets.addFilters;
 import static org.qi4j.library.http.Servlets.addServlets;
 import static org.qi4j.library.http.Servlets.filter;

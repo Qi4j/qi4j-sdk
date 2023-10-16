@@ -20,48 +20,48 @@
 
 package org.qi4j.library.rdf;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 public interface Rdfs
 {
     String RDFS = "http://www.w3.org/2000/01/rdf-schema#";
     String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 
-    URI ID = new URIImpl( RDF + "ID" );
+    IRI ID = SimpleValueFactory.getInstance().createIRI(RDF + "ID" );
 
     // Classes
-    URI RESOURCE = new URIImpl( RDF + "resource" );
-    URI LITERAL = new URIImpl( RDFS + "Literal" );
-    URI XML_LITERAL = new URIImpl( RDF + "XMLLiteral" );
-    URI CLASS = new URIImpl( RDFS + "Class" );
-    URI PROPERTY = new URIImpl( RDF + "Property" );
-    URI DATATYPE = new URIImpl( RDFS + "Datatype" );
-    URI STATEMENT = new URIImpl( RDF + "Statement" );
-    URI BAG = new URIImpl( RDF + "Bag" );
-    URI SEQ = new URIImpl( RDF + "Seq" );
-    URI ALT = new URIImpl( RDF + "Alt" );
-    URI CONTAINER = new URIImpl( RDFS + "Container" );
-    URI CONTAINER_MEMBERSHIP_PROPERTY = new URIImpl( RDFS + "ContainerMembershipProperty" );
-    URI LIST = new URIImpl( RDF + "List" );
-    URI LIST_ITEM = new URIImpl( RDF + "li" );
+    IRI RESOURCE = SimpleValueFactory.getInstance().createIRI( RDF + "resource" );
+    IRI LITERAL = SimpleValueFactory.getInstance().createIRI( RDFS + "Literal" );
+    IRI XML_LITERAL = SimpleValueFactory.getInstance().createIRI( RDF + "XMLLiteral" );
+    IRI CLASS = SimpleValueFactory.getInstance().createIRI( RDFS + "Class" );
+    IRI PROPERTY = SimpleValueFactory.getInstance().createIRI( RDF + "Property" );
+    IRI DATATYPE = SimpleValueFactory.getInstance().createIRI( RDFS + "Datatype" );
+    IRI STATEMENT = SimpleValueFactory.getInstance().createIRI( RDF + "Statement" );
+    IRI BAG = SimpleValueFactory.getInstance().createIRI( RDF + "Bag" );
+    IRI SEQ = SimpleValueFactory.getInstance().createIRI( RDF + "Seq" );
+    IRI ALT = SimpleValueFactory.getInstance().createIRI( RDF + "Alt" );
+    IRI CONTAINER = SimpleValueFactory.getInstance().createIRI( RDFS + "Container" );
+    IRI CONTAINER_MEMBERSHIP_PROPERTY = SimpleValueFactory.getInstance().createIRI( RDFS + "ContainerMembershipProperty" );
+    IRI LIST = SimpleValueFactory.getInstance().createIRI( RDF + "List" );
+    IRI LIST_ITEM = SimpleValueFactory.getInstance().createIRI( RDF + "li" );
 
     // Properties
-    URI TYPE = new URIImpl( RDF + "type" );
-    URI SUB_CLASS_OF = new URIImpl( RDFS + "subClassOf" );
-    URI SUB_PROPERTY_OF = new URIImpl( RDFS + "subPropertyOf" );
-    URI DOMAIN = new URIImpl( RDFS + "domain" );
-    URI RANGE = new URIImpl( RDFS + "range" );
-    URI LABEL = new URIImpl( RDFS + "label" );
-    URI COMMENT = new URIImpl( RDFS + "comment" );
-    URI MEMBER = new URIImpl( RDFS + "member" );
-    URI FIRST = new URIImpl( RDF + "first" );
-    URI REST = new URIImpl( RDF + "rest" );
-    URI SEE_ALSO = new URIImpl( RDFS + "seeAlso" );
-    URI IS_DEFINED_BY = new URIImpl( RDFS + "isDefinedBy" );
-    URI VALUE = new URIImpl( RDF + "value" );
-    URI SUBJECT = new URIImpl( RDF + "subject" );
-    URI PREDICATE = new URIImpl( RDF + "predicate" );
-    URI OBJECT = new URIImpl( RDF + "object" );
+    IRI TYPE = SimpleValueFactory.getInstance().createIRI( RDF + "type" );
+    IRI SUB_CLASS_OF = SimpleValueFactory.getInstance().createIRI( RDFS + "subClassOf" );
+    IRI SUB_PROPERTY_OF = SimpleValueFactory.getInstance().createIRI( RDFS + "subPropertyOf" );
+    IRI DOMAIN = SimpleValueFactory.getInstance().createIRI( RDFS + "domain" );
+    IRI RANGE = SimpleValueFactory.getInstance().createIRI( RDFS + "range" );
+    IRI LABEL = SimpleValueFactory.getInstance().createIRI( RDFS + "label" );
+    IRI COMMENT = SimpleValueFactory.getInstance().createIRI( RDFS + "comment" );
+    IRI MEMBER = SimpleValueFactory.getInstance().createIRI( RDFS + "member" );
+    IRI FIRST = SimpleValueFactory.getInstance().createIRI( RDF + "first" );
+    IRI REST = SimpleValueFactory.getInstance().createIRI( RDF + "rest" );
+    IRI SEE_ALSO = SimpleValueFactory.getInstance().createIRI( RDFS + "seeAlso" );
+    IRI IS_DEFINED_BY = SimpleValueFactory.getInstance().createIRI( RDFS + "isDefinedBy" );
+    IRI VALUE = SimpleValueFactory.getInstance().createIRI( RDF + "value" );
+    IRI SUBJECT = SimpleValueFactory.getInstance().createIRI( RDF + "subject" );
+    IRI PREDICATE = SimpleValueFactory.getInstance().createIRI( RDF + "predicate" );
+    IRI OBJECT = SimpleValueFactory.getInstance().createIRI( RDF + "object" );
 
 }

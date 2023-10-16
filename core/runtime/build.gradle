@@ -20,7 +20,7 @@
 
 apply plugin: 'qi4j-core'
 
-jar { manifest { name = "Qi4j Core Runtime" } }
+//jar { manifest { name = "Qi4j Core Runtime" } }
 
 dependencies {
   compileOnly libraries.osgi_core
@@ -28,6 +28,7 @@ dependencies {
   api qi4j.core.spi
 
   implementation qi4j.core.bootstrap
+  implementation libraries.annotation
   implementation libraries.asm
   implementation libraries.asm_util
   implementation libraries.asm_commons

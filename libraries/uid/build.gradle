@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j UID Library contains various Identity generation services."
 
-jar { manifest { name = "Qi4j Library - UID" } }
+//jar { manifest { name = "Qi4j Library - UID" } }
 
 dependencies {
   api qi4j.core.bootstrap

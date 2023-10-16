@@ -20,7 +20,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j MessagePack Serialization Extension"
 
-jar { manifest { name = "Qi4j Extension - Serialization - MessagePack" } }
+//jar { manifest { name = "Qi4j Extension - Serialization - MessagePack" } }
 
 dependencies {
   api qi4j.core.bootstrap

@@ -5,9 +5,8 @@ import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.junit.platform.commons.util.ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP;
-import static org.junit.platform.commons.util.ReflectionUtils.findFields;
+import static org.junit.platform.commons.support.ReflectionSupport.findFields;
+import static org.junit.platform.commons.support.HierarchyTraversalMode.BOTTOM_UP;
 
 public class TestName
     implements BeforeAllCallback, BeforeEachCallback

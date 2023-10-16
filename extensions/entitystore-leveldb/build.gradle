@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j LevelDB EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - LevelDB" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - LevelDB" } }
 
 dependencies {
   api qi4j.core.bootstrap

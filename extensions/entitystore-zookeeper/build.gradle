@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Zookeeper EntityStore Extension. NOTE: Meant for configuration and other very light loads."
 
-jar { manifest { name = "Qi4j Extension - EntityStore - Zookeeper" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - Zookeeper" } }
 
 dependencies {
   api qi4j.core.bootstrap

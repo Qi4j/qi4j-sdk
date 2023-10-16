@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j SQL Indexing Extension"
 
-jar { manifest { name = "Qi4j Extension - Indexing - SQL" } }
+//jar { manifest { name = "Qi4j Extension - Indexing - SQL" } }
 
 dependencies {
   api qi4j.core.bootstrap

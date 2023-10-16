@@ -20,7 +20,7 @@
 
 package org.qi4j.library.rdf.serializer;
 
-import org.openrdf.rio.turtle.TurtleWriterFactory;
+import org.eclipse.rdf4j.rio.turtle.TurtleWriterFactory;
 
 public final class TurtleSerializer extends AbstractSerializer
 {

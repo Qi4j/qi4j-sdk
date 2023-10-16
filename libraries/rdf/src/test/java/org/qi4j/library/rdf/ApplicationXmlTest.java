@@ -36,12 +36,12 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.library.rdf.model.ApplicationSerializer;
 import org.qi4j.test.AbstractQi4jTest;
 import org.junit.jupiter.api.Test;
-import org.openrdf.model.Statement;
-import org.openrdf.rio.RDFHandlerException;
-import org.openrdf.rio.RDFWriter;
-import org.openrdf.rio.RDFWriterFactory;
-import org.openrdf.rio.n3.N3WriterFactory;
-import org.openrdf.rio.rdfxml.RDFXMLWriterFactory;
+import org.eclipse.rdf4j.model.Statement;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
+import org.eclipse.rdf4j.rio.RDFWriter;
+import org.eclipse.rdf4j.rio.RDFWriterFactory;
+import org.eclipse.rdf4j.rio.n3.N3WriterFactory;
+import org.eclipse.rdf4j.rio.rdfxml.RDFXMLWriterFactory;
 
 /**
  * JAVADOC

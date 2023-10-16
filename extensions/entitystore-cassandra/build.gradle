@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Cassandra EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - Cassandra" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - Cassandra" } }
 
 dependencies {
   api qi4j.core.bootstrap

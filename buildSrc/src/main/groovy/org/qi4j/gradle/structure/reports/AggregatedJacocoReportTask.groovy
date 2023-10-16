@@ -1,20 +1,20 @@
 /*
- *  Licensed to the Apache Software Foundation (ASF) under one
- *  or more contributor license agreements.  See the NOTICE file
- *  distributed with this work for additional information
- *  regarding copyright ownership.  The ASF licenses this file
- *  to you under the Apache License, Version 2.0 (the
- *  "License"); you may not use this file except in compliance
- *  with the License.  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+* Copyright 2008-2023 Qi4j Community (see commit log). All Rights Reserved
+*
+* Licensed  under the  Apache License,  Version 2.0  (the "License");
+* you may not use  this file  except in  compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed  under the  License is distributed on an "AS IS" BASIS,
+* WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+* implied.
+*
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package org.qi4j.gradle.structure.reports
 
 import groovy.transform.CompileStatic
@@ -22,7 +22,7 @@ import groovy.transform.TypeCheckingMode
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSet
@@ -58,7 +58,7 @@ class AggregatedJacocoReportTask extends DefaultTask
 
     def sourceSetsOf = { String projectPathPrefix, Set<Project> projects ->
       projects.findAll { p -> p.path.startsWith( projectPathPrefix ) }
-              .collect { it.convention.getPlugin( JavaPluginConvention ).sourceSets }
+              .collect { it.extensions.getByType( JavaPluginExtension ).sourceSets }
               .flatten() as List<SourceSet>
     }
     def sourceDirsOf = { List<SourceSet> sourceSets ->
@@ -82,7 +82,7 @@ class AggregatedJacocoReportTask extends DefaultTask
       mkdir dir: outputDirectory
       jacocoreport {
         executiondata { allExecutionData.collect { fileset( dir: it ) { include name: '*.exec' } } }
-        structure( name: 'Qi4j SDK' ) {
+        structure( name: 'Qi4j™ (Java Edition) SDK' ) {
           group( name: 'Core' ) {
             classfiles { classesDirsOf(coreSourceSets).collect { fileset( dir: it ) } }
             sourcefiles { sourceDirsOf(coreSourceSets).collect { fileset( dir: it ) } }
@@ -110,7 +110,7 @@ class AggregatedJacocoReportTask extends DefaultTask
         }
         csv destfile: "${ outputDirectory }/jacoco.csv", encoding: 'UTF-8'
         xml destfile: "${ outputDirectory }/jacoco.xml", encoding: 'UTF-8'
-        html destdir: outputDirectory, encoding: 'UTF-8', locale: 'en', footer: 'Qi4j SDK'
+        html destdir: outputDirectory, encoding: 'UTF-8', locale: 'en', footer: 'Qi4j™ (Java Edition) SDK'
       }
     }
   }

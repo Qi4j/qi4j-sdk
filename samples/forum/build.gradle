@@ -23,7 +23,7 @@ apply plugin: 'qi4j-sample'
 
 description = "Sample of how to build a web forum"
 
-jar { manifest { name = "Qi4j Sample - Forum" } }
+//jar { manifest { name = "Qi4j Sample - Forum" } }
 
 dependencies {
   implementation qi4j.core.bootstrap

@@ -20,9 +20,8 @@
 
 package org.qi4j.library.rdf;
 
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
-
+import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 
 /**
  * This is the RDF vocabulary for Qi4j Entity data.
@@ -33,7 +32,7 @@ public interface Qi4jEntity
     String NAMESPACE = "http://qi4j.org/rdf/entity/1.0/";
 
     // Types
-    URI ENTITY = new URIImpl( NAMESPACE + "entity" );
-    URI ENTITYTYPEREFERENCE = new URIImpl( NAMESPACE + "entitytypereference" );
-    URI QUALIFIER = new URIImpl( NAMESPACE + "qualifier" );
+    IRI ENTITY = SimpleValueFactory.getInstance().createIRI(NAMESPACE + "entity" );
+    IRI ENTITYTYPEREFERENCE = SimpleValueFactory.getInstance().createIRI( NAMESPACE + "entitytypereference" );
+    IRI QUALIFIER = SimpleValueFactory.getInstance().createIRI( NAMESPACE + "qualifier" );
 }

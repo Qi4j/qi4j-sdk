@@ -19,8 +19,8 @@
  */
 package org.qi4j.library.http;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 public class FooServletContextListener
         implements ServletContextListener

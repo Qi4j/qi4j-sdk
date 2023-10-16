@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Codahale Metrics Extension"
 
-jar { manifest { name = "Qi4j Extension - Metrics - Codahale" } }
+//jar { manifest { name = "Qi4j Extension - Metrics - Codahale" } }
 
 dependencies {
   api qi4j.core.bootstrap

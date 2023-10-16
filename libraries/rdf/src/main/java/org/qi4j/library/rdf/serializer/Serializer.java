@@ -21,8 +21,8 @@
 package org.qi4j.library.rdf.serializer;
 
 import java.io.Writer;
-import org.openrdf.model.Statement;
-import org.openrdf.rio.RDFHandlerException;
+import org.eclipse.rdf4j.rio.RDFHandlerException;
+import org.eclipse.rdf4j.model.Statement;
 
 public interface Serializer
 {

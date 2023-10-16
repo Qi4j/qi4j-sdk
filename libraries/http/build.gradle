@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Http Library provides embedded Jetty for Qi4j application use."
 
-jar { manifest { name = "Qi4j Library - Http" } }
+//jar { manifest { name = "Qi4j Library - Http" } }
 
 dependencies {
   api qi4j.core.bootstrap

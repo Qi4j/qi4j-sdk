@@ -29,12 +29,10 @@ import org.qi4j.dci.moneytransfer.context.TransferMoneyContext;
 /**
  * You can transfer money to and from a checking account
  */
-public interface CheckingAccountRolemap
-    extends CheckingAccountEntity,
+public interface CheckingAccountRolemap extends CheckingAccountEntity,
     // Roles
-        TransferMoneyContext.SourceAccountRole,
-            TransferMoneyContext.DestinationAccountRole,
-
-        PayBillsContext.SourceAccountRole
+    TransferMoneyContext.SourceAccountRole,
+    TransferMoneyContext.DestinationAccountRole,
+    PayBillsContext.SourceAccountRole
 {
 }

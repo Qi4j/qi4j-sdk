@@ -27,7 +27,7 @@ import org.qi4j.index.rdf.UnsupportedLanguageException;
 import org.qi4j.index.rdf.query.internal.RdfQueryParserImpl;
 import org.qi4j.spi.Qi4jSPI;
 import org.qi4j.spi.serialization.JsonSerializer;
-import org.openrdf.query.QueryLanguage;
+import org.eclipse.rdf4j.query.QueryLanguage;
 
 @Mixins( RdfQueryParserFactory.RdfQueryParserFactoryMixin.class )
 public interface RdfQueryParserFactory

@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Execution Library provides common set of execution primitives and services."
 
-jar { manifest { name = "Qi4j Library - Constraints"}}
+//jar { manifest { name = "Qi4j Library - Constraints"}}
 
 dependencies {
   api qi4j.core.bootstrap

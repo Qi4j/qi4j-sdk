@@ -19,7 +19,6 @@
  */
 package org.qi4j.library.osgi;
 
-
 import java.lang.reflect.Method;
 import org.osgi.framework.ServiceReference;
 

@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Hazelcast EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - Hazelcast" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - Hazelcast" } }
 
 dependencies {
   api qi4j.core.bootstrap

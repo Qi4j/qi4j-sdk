@@ -198,7 +198,7 @@ public class PropertyEqualityTest
                            equalTo( some2.characterProperty().get() ),
                            equalTo( other.characterProperty().get() ) ) );
         assertThat( "Property state hashcode equal",
-                    new Character( 'q' ).hashCode(),
+                    Character.valueOf( 'q' ).hashCode(),
                     allOf( equalTo( primitives.characterProperty().get().hashCode() ),
                            equalTo( some.characterProperty().get().hashCode() ),
                            equalTo( some2.characterProperty().get().hashCode() ),

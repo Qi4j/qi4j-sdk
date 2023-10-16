@@ -27,9 +27,8 @@ import org.qi4j.dci.moneytransfer.context.TransferMoneyContext;
 /**
  * A savings account can be a source account, but not a destination account
  */
-public interface SavingsAccountRolemap
-    extends SavingsAccountEntity,
+public interface SavingsAccountRolemap extends SavingsAccountEntity,
     // Roles
-        TransferMoneyContext.SourceAccountRole
+    TransferMoneyContext.SourceAccountRole
 {
 }

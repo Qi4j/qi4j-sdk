@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Locking Library provides lock management for methods."
 
-jar { manifest { name = "Qi4j Library - Locking" } }
+//jar { manifest { name = "Qi4j Library - Locking" } }
 
 dependencies {
   api qi4j.core.api

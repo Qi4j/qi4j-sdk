@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Geode EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - Geode" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - Geode" } }
 
 dependencies {
   api qi4j.core.bootstrap

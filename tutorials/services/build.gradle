@@ -22,7 +22,7 @@ apply plugin: 'qi4j-tutorial'
 
 description = "Tutorial on how to use Qi4j service concept."
 
-jar { manifest { name = "Qi4j Tutorial - Services" } }
+//jar { manifest { name = "Qi4j Tutorial - Services" } }
 
 dependencies {
   implementation qi4j.core.bootstrap

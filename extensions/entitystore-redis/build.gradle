@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Redis EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - Redis" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - Redis" } }
 
 dependencies {
   api qi4j.core.bootstrap

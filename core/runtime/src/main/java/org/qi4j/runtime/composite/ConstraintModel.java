@@ -39,12 +39,12 @@ public final class ConstraintModel
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings( { "unchecked", "rawtypes" } )
     public ConstraintInstance<?, ?> newInstance()
     {
         try
         {
-            Constraint<?, ?> constraint = constraintClass.newInstance();
+            Constraint<?, ?> constraint = constraintClass.getConstructor().newInstance();
             return new ConstraintInstance( constraint, annotation );
         }
         catch( Exception e )

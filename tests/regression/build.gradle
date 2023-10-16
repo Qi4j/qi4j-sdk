@@ -22,7 +22,7 @@ apply plugin: 'qi4j-test'
 
 description = "Qi4j Regression Tests are added by community members who find bugs and typically reported via Jira issues. These tests are not run as part of the normal build, but is accessible from './gradlew regression' to allow builds to still work."
 
-jar { manifest { name = "Qi4j Tests - Regression" } }
+//jar { manifest { name = "Qi4j Tests - Regression" } }
 
 dependencies {
   implementation qi4j.core.testsupport

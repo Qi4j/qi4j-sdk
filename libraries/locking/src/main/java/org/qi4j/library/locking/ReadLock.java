@@ -19,15 +19,15 @@
  */
 package org.qi4j.library.locking;
 
+
 import java.lang.annotation.*;
 
 /**
  * Mark methods which should cause a read-lock with this annotation.
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.METHOD } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
 @Documented
 @Inherited
-public @interface ReadLock
-{
+public @interface ReadLock {
 }

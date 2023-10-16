@@ -176,7 +176,7 @@ public class ModuleDeclaration
         }
         try
         {
-            return (Assembler) assemblerClass.newInstance();
+            return (Assembler) assemblerClass.getConstructor().newInstance();
         }
         catch( Exception e )
         {

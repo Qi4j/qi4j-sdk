@@ -36,7 +36,7 @@ description = "Sample of implementation of a Car Rental application."
 // And then go to:
 //      http://localhost:8080/rental/rental/main
 
-jar { manifest { name = "Qi4j Sample - Car Rental" } }
+//jar { manifest { name = "Qi4j Sample - Car Rental" } }
 
 dependencies {
   implementation qi4j.core.bootstrap

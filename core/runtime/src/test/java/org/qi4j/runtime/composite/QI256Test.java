@@ -161,7 +161,7 @@ public class QI256Test
             {
                 try
                 {
-                    throw clazz.newInstance();
+                    throw clazz.getConstructor().newInstance();
                 }
                 catch( Throwable t )
                 {
@@ -177,7 +177,7 @@ public class QI256Test
             {
                 try
                 {
-                    throw clazz.newInstance();
+                    throw clazz.getConstructor().newInstance();
                 }
                 catch( Throwable t )
                 {
@@ -193,7 +193,7 @@ public class QI256Test
             {
                 try
                 {
-                    throw clazz.newInstance();
+                    throw clazz.getConstructor().newInstance();
                 }
                 catch( Throwable t )
                 {

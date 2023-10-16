@@ -1,41 +1,40 @@
 /*
- *  Licensed to the Apache Software Foundation (ASF) under one
- *  or more contributor license agreements.  See the NOTICE file
- *  distributed with this work for additional information
- *  regarding copyright ownership.  The ASF licenses this file
- *  to you under the Apache License, Version 2.0 (the
- *  "License"); you may not use this file except in compliance
- *  with the License.  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+* Copyright 2008-2023 Qi4j Community (see commit log). All Rights Reserved
+*
+* Licensed  under the  Apache License,  Version 2.0  (the "License");
+* you may not use  this file  except in  compliance with the License.
+* You may obtain a copy of the License at
+*
+*   http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed  under the  License is distributed on an "AS IS" BASIS,
+* WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+* implied.
+*
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package org.qi4j.gradle.structure.reports
 
-import groovy.transform.CompileStatic
 import org.qi4j.gradle.BasePlugin
-import org.qi4j.gradle.TaskGroups
 import org.qi4j.gradle.code.CodePlugin
 import org.qi4j.gradle.code.PublishedCodePlugin
+import org.qi4j.gradle.dependencies.DependenciesDeclarationExtension
+import org.qi4j.gradle.dependencies.DependenciesPlugin
 import org.qi4j.gradle.structure.RootPlugin
+import org.qi4j.gradle.structure.release.ReleaseSpecExtension
+import org.qi4j.gradle.structure.release.ReleaseSpecPlugin
+import groovy.transform.CompileStatic
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.plugins.ReportingBasePlugin
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.TestReport
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.language.base.plugins.LifecycleBasePlugin
-import org.qi4j.gradle.dependencies.DependenciesDeclarationExtension
-import org.qi4j.gradle.dependencies.DependenciesPlugin
-import org.qi4j.gradle.structure.release.ReleaseSpecExtension
-import org.qi4j.gradle.structure.release.ReleaseSpecPlugin
 
 // TODO Expose project output into configurations
 @CompileStatic
@@ -64,7 +63,7 @@ class ReportsPlugin implements Plugin<Project>
   private static void applyTest( Project project )
   {
     def task = project.tasks.create( TaskNames.TEST, TestReport ) { TestReport task ->
-      task.group = TaskGroups.VERIFICATION
+//      task.group = TaskGroups.VERIFICATION
       task.description = 'Generates global test report'
       task.destinationDir = project.file( "$project.buildDir/reports/tests" )
       task.reportOn {
@@ -84,7 +83,7 @@ class ReportsPlugin implements Plugin<Project>
                              "org.jacoco:org.jacoco.ant:${ dependencies.buildToolsVersions.jacoco }"
     def task = project.tasks.create( TaskNames.COVERAGE, AggregatedJacocoReportTask )
       { AggregatedJacocoReportTask task ->
-        task.group = TaskGroups.VERIFICATION
+//        task.group = TaskGroups.VERIFICATION
         task.description = 'Generates global coverage report'
         task.dependsOn {
           project.rootProject.subprojects
@@ -100,7 +99,7 @@ class ReportsPlugin implements Plugin<Project>
     def releaseSpec = project.extensions.getByType ReleaseSpecExtension
     def javadocsTask = project.tasks.create( TaskNames.JAVADOCS, Javadoc ) { Javadoc task ->
       task.onlyIf { !releaseSpec.developmentVersion }
-      task.group = TaskGroups.DOCUMENTATION
+//      task.group = TaskGroups.DOCUMENTATION
       task.description = 'Builds the whole SDK public Javadoc'
       task.dependsOn { project.rootProject.tasks.getByName ReleaseSpecPlugin.TaskNames.RELEASE_APPROVED_PROJECTS }
       task.destinationDir = project.file "$project.buildDir/docs/javadocs"
@@ -134,9 +133,9 @@ class ReportsPlugin implements Plugin<Project>
                             "org.qi4j.test.*" ]
       ] )
       options.links = [
-        'http://docs.oracle.com/javase/8/docs/api/',
+        'https://docs.oracle.com/en/java/javase/14/docs/api/',
         'https://stleary.github.io/JSON-java/',
-        'http://junit.org/junit4/javadoc/latest/'
+        'https://junit.org/junit4/javadoc/latest/'
       ]
     }
     project.tasks.getByName( LifecycleBasePlugin.CHECK_TASK_NAME ).dependsOn javadocsTask
@@ -149,9 +148,9 @@ class ReportsPlugin implements Plugin<Project>
       }
       apiSources.each { Project apiProject ->
         apiProject.afterEvaluate { Project evaluatedApiProject ->
-          def javaConvention = evaluatedApiProject.convention.findPlugin( JavaPluginConvention )
-          if(javaConvention) {
-              def mainSourceSet = javaConvention.sourceSets.getByName( 'main' )
+          def javaExtension = evaluatedApiProject.extensions.getByType JavaPluginExtension
+          if(javaExtension) {
+              def mainSourceSet = javaExtension.sourceSets.getByName( 'main' )
               task.source mainSourceSet.allJava
               task.classpath += mainSourceSet.compileClasspath
           }

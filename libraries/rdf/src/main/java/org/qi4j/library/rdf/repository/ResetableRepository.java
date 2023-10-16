@@ -20,7 +20,7 @@
 
 package org.qi4j.library.rdf.repository;
 
-import org.openrdf.repository.RepositoryException;
+import org.eclipse.rdf4j.repository.RepositoryException;
 
 public interface ResetableRepository
 {

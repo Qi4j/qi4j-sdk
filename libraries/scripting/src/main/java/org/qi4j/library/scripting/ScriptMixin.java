@@ -76,7 +76,7 @@ public class ScriptMixin
     {
         Scripting scripting = descriptor.metaInfo( Scripting.class );
         ScriptEngine engine = getScriptEngine( scripting );
-        String scriptName = descriptor.primaryType().getName().replaceAll( "\\.", "/" ) + scripting.extension();
+        String scriptName = "Qi" + descriptor.primaryType().getName().replaceAll( "\\.", "/" ) + scripting.extension();
         try( BufferedReader reader = new BufferedReader( new InputStreamReader( getClass().getClassLoader().getResourceAsStream( scriptName ) ) ) )
         {
             engine.eval( reader );

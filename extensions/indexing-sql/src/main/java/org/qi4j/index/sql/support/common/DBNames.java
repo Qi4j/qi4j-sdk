@@ -21,8 +21,6 @@ package org.qi4j.index.sql.support.common;
 
 /**
  * This is helper class to contain all the SQL constants used throughout the SQL Indexing.
- * 
- *
  */
 public class DBNames
 {

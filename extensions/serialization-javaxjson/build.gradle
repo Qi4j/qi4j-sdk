@@ -20,7 +20,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j javax.json Serialization Extension"
 
-jar { manifest { name = "Qi4j Extension - Serialization - javax.json" } }
+//jar { manifest { name = "Qi4j Extension - Serialization - javax.json" } }
 
 dependencies {
   api qi4j.core.bootstrap

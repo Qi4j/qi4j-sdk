@@ -22,7 +22,7 @@ apply plugin: 'qi4j-library'
 
 description = "Qi4j Common Scripting Library contains common classes across scripting implementations."
 
-jar { manifest { name = "Qi4j Library - Scripting - Common" } }
+//jar { manifest { name = "Qi4j Library - Scripting - Common" } }
 
 apply plugin: 'groovy'
 

@@ -22,7 +22,7 @@ apply plugin: 'qi4j-tutorial'
 
 description = "Basic tutorial on how to covert a simple 'Hello World' application to Qi4j, using more and more features for each step."
 
-jar { manifest { name = "Qi4j Tutorial - Composites" } }
+//jar { manifest { name = "Qi4j Tutorial - Composites" } }
 
 dependencies {
   implementation qi4j.core.bootstrap

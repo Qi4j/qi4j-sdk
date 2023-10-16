@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Berkeley DB (Java Edition) EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - BDB/JE" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - BDB/JE" } }
 
 dependencies {
     api qi4j.core.bootstrap

@@ -22,10 +22,10 @@ package org.qi4j.library.http;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.cert.X509Certificate;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class HelloWorldServlet
         extends HttpServlet
@@ -36,7 +36,7 @@ public class HelloWorldServlet
     protected final void doGet( HttpServletRequest req, HttpServletResponse resp )
             throws ServletException, IOException
     {
-        X509Certificate[] certs = ( X509Certificate[] ) req.getAttribute( "javax.servlet.request.X509Certificate" );
+        X509Certificate[] certs = ( X509Certificate[] ) req.getAttribute( "jakarta.servlet.request.X509Certificate" );
         PrintWriter writer = resp.getWriter();
         if ( certs != null && certs.length > 0 ) {
             writer.append( "Hello Mutual World" );

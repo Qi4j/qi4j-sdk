@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Ehcache Cache Extension"
 
-jar { manifest { name = "Qi4j Extension: EhCache" } }
+//jar { manifest { name = "Qi4j Extension: EhCache" } }
 
 dependencies {
   api qi4j.core.bootstrap

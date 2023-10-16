@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j Memcache Cache Extension"
 
-jar { manifest { name = "Qi4j Extension - Cache - Memcache" } }
+//jar { manifest { name = "Qi4j Extension - Cache - Memcache" } }
 
 dependencies {
   api qi4j.core.bootstrap

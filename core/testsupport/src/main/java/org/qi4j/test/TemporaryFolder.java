@@ -34,8 +34,8 @@ import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
-import static org.junit.platform.commons.util.ReflectionUtils.HierarchyTraversalMode.BOTTOM_UP;
-import static org.junit.platform.commons.util.ReflectionUtils.findFields;
+import static org.junit.platform.commons.support.HierarchyTraversalMode.BOTTOM_UP;
+import static org.junit.platform.commons.support.ReflectionSupport.findFields;
 
 public class TemporaryFolder
     implements Extension, BeforeEachCallback, AfterEachCallback, BeforeAllCallback, AfterAllCallback

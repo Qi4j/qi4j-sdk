@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j JDBM EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - JDBM" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - JDBM" } }
 
 dependencies {
   api qi4j.core.bootstrap

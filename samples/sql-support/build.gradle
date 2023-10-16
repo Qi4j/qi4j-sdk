@@ -23,7 +23,7 @@ apply plugin: 'qi4j-sample'
 
 description = "SQL Support Sample."
 
-jar { manifest { name = "Qi4j Sample - SQL Support" } }
+//jar { manifest { name = "Qi4j Sample - SQL Support" } }
 
 dependencies {
 

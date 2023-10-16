@@ -128,7 +128,7 @@ public interface JavaxJsonFactories
                 try
                 {
                     Class<?> clazz = Class.forName( jsonProviderClassName );
-                    jsonProvider = (JsonProvider) clazz.newInstance();
+                    jsonProvider = (JsonProvider) clazz.getConstructor().newInstance();
                 }
                 catch( ClassNotFoundException ex )
                 {

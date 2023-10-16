@@ -70,12 +70,13 @@ public class InterfaceDefaultMethodsMixin
         Class<?> declaringClass = method.getDeclaringClass();
         try
         {
-            Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class.getDeclaredConstructor( Class.class, int.class );
-            MethodHandles.Lookup lookup = accessible( constructor ).newInstance( declaringClass, PRIVATE | PUBLIC | PROTECTED | PACKAGE);
+//            Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class.getDeclaredConstructor( Class.class, int.class );
+//            MethodHandles.Lookup lookup = accessible( constructor ).newInstance( declaringClass, PRIVATE | PUBLIC | PROTECTED | PACKAGE);
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
             MethodHandle handle = lookup.unreflectSpecial( method, declaringClass );
             return ( proxy, args ) -> handle.bindTo( proxy ).invokeWithArguments( args );
         }
-        catch( IllegalAccessException | NoSuchMethodException | InstantiationException | InvocationTargetException e )
+        catch( IllegalAccessException e )
         {
             throw new RuntimeException( e );
         }

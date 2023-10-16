@@ -23,7 +23,7 @@ apply plugin: 'qi4j-tool'
 
 description = "Visualizer of a Qi4j Application Structure."
 
-jar { manifest { name = "Qi4j Envisage" } }
+//jar { manifest { name = "Qi4j Envisage" } }
 
 dependencies {
   api qi4j.core.bootstrap

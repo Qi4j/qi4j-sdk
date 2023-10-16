@@ -19,10 +19,10 @@
  */
 package org.qi4j.library.servlet;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import org.qi4j.api.structure.Application;
 import org.qi4j.library.servlet.lifecycle.AbstractQi4jServletBootstrap;
 

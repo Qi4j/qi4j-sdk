@@ -20,7 +20,7 @@
 
 package org.qi4j.library.rdf.serializer;
 
-import org.openrdf.rio.n3.N3WriterFactory;
+import org.eclipse.rdf4j.rio.n3.N3WriterFactory;
 
 public final class N3Serializer extends AbstractSerializer
 {

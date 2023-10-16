@@ -23,7 +23,7 @@ apply plugin: 'qi4j-sample'
 
 description = "Sample of how to use the Swing bindings."
 
-jar { manifest { name = "Qi4j Sample - Swing Bindings" } }
+//jar { manifest { name = "Qi4j Sample - Swing Bindings" } }
 
 dependencies {
   implementation qi4j.core.bootstrap

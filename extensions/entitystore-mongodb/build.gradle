@@ -22,7 +22,7 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j MongoDB EntityStore Extension"
 
-jar { manifest { name = "Qi4j Extension - EntityStore - MongoDB" } }
+//jar { manifest { name = "Qi4j Extension - EntityStore - MongoDB" } }
 
 dependencies {
   api qi4j.core.bootstrap

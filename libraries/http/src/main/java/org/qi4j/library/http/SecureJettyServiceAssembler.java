@@ -22,7 +22,6 @@ package org.qi4j.library.http;
 public class SecureJettyServiceAssembler
         extends JettyServiceAssembler
 {
-
     @Override
     protected Class<? extends JettyConfiguration> configurationEntity()
     {

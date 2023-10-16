@@ -20,7 +20,7 @@
 
 apply plugin: 'qi4j-core'
 
-jar { manifest { name = "Qi4j Core Test Support" } }
+//jar { manifest { name = "Qi4j Core Test Support" } }
 
 dependencies {
   api qi4j.core.bootstrap

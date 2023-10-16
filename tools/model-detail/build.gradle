@@ -22,7 +22,7 @@ apply plugin: 'qi4j-tool'
 
 description = "Detailled Model of a Qi4j Application Structure."
 
-jar { manifest { name = "Qi4j Model Detail" }}
+//jar { manifest { name = "Qi4j Model Detail" }}
 
 dependencies {
   api qi4j.core.bootstrap
