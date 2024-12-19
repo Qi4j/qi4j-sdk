@@ -1,8 +1,8 @@
 package org.qi4j.spi.messaging;
 
-import org.qi4j.api.messaging.Consumer;
+import org.qi4j.api.messaging.MessageReceiver;
 
 public interface ConsumerFactory
 {
-    Consumer create(String topicAlias);
+    MessageReceiver create( String topicAlias);
 }

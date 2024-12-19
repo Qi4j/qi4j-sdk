@@ -24,7 +24,6 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.ServiceDeclaration;
 import org.qi4j.entitystore.mongodb.MongoDBEntityStoreConfiguration;
 import org.qi4j.entitystore.mongodb.MongoDBEntityStoreService;
-import org.qi4j.entitystore.mongodb.MongoDBEntityStoreConfiguration;
 
 public class MongoDBEntityStoreAssembler
     extends Assemblers.VisibilityIdentityConfig<MongoDBEntityStoreAssembler>

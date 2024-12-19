@@ -23,18 +23,20 @@ apply plugin: 'qi4j-extension'
 description = "Qi4j Pulsar Messaging extension."
 
 dependencies {
+  api qi4j.core.api
   api qi4j.core.bootstrap
 
   implementation qi4j.library( 'locking' )
   implementation qi4j.library( 'constraints' )
   implementation qi4j.library( 'execution' )
+  implementation libraries.commons_pool
   implementation libraries.pulsar
 
   runtimeOnly qi4j.core.runtime
 
   testImplementation qi4j.core.testsupport
   testImplementation libraries.awaitility
-  testImplementation libraries.docker_junit
+  testImplementation libraries.testcontainer_pulsar
 
   testRuntimeOnly libraries.logback
 }

@@ -20,8 +20,8 @@
 package org.qi4j.tools.model.descriptor;
 
 import java.util.Objects;
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.Json;
+import jakarta.json.JsonObjectBuilder;
 import org.qi4j.api.composite.InjectedParametersDescriptor;
 
 public class InjectedParametersDetailDescriptor

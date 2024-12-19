@@ -19,7 +19,7 @@
  */
 package org.qi4j.entitystore.mongodb;
 
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 
 public interface MongoDBAccessors

@@ -19,34 +19,30 @@
  */
 package org.qi4j.index.sql.postgresql;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Port;
-import com.github.junit5docker.WaitFor;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.BeforeEach;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.indexing.AbstractComplexQueryTest;
-import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Docker( image = "mariadb:10.1.21",
-         ports = @Port( exposed = 8801, inner = 5432),
-         waitFor = @WaitFor( value = "PostgreSQL init process complete; ready for start up.", timeoutInMillis = 30000),
-         newForEachCase = false
-)
-@Disabled("I have removed the customer containers, and haven't figured out how to initialize postgres in the default Docker container. Seems I can't mount files into the container (--volume)")
+@Testcontainers
 public class PostgreSQLComplexQueryTest
     extends AbstractComplexQueryTest
 {
+    @Container
+    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:17-alpine")
+        .withDatabaseName("jdbc_test_db")
+        .withReuse(true);
 
     @Override
-    public void assemble( ModuleAssembly mainModule )
+    public void assemble(ModuleAssembly mainModule)
         throws AssemblyException
     {
         SQLTestHelper.sleep();
-        super.assemble( mainModule );
-        String host = "localhost";
-        int port = 8801;
-        SQLTestHelper.assembleWithMemoryEntityStore( mainModule, host, port );
+        super.assemble(mainModule);
+        SQLTestHelper.assembleWithMemoryEntityStore(mainModule, postgres.getHost(), postgres.getFirstMappedPort(), postgres.getUsername(), postgres.getPassword());
     }
 
     @Override
@@ -58,12 +54,12 @@ public class PostgreSQLComplexQueryTest
         {
             super.setUp();
         }
-        catch( Exception e )
+        catch (Exception e)
         {
             // Let's check if exception was because database was not available
-            if( this.module != null )
+            if (this.module != null)
             {
-                SQLTestHelper.setUpTest( this.serviceFinder );
+                SQLTestHelper.setUpTest(this.serviceFinder);
             }
 
             // If we got this far, the database must have been available, and exception must have

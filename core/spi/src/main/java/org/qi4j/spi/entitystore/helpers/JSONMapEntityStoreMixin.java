@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonReader;
 import org.qi4j.api.cache.CacheOptions;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.entity.EntityDescriptor;
@@ -50,7 +50,7 @@ import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.unitofwork.NoSuchEntityTypeException;
 import org.qi4j.api.usecase.Usecase;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.cache.Cache;
 import org.qi4j.spi.cache.CachePool;
 import org.qi4j.spi.cache.NullCache;
@@ -64,8 +64,6 @@ import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.entitystore.StateCommitter;
 import org.qi4j.spi.serialization.JsonSerialization;
 import org.qi4j.entitystore.memory.MemoryMapEntityStoreMixin;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
-import org.qi4j.spi.serialization.JsonSerialization;
 
 import static java.util.stream.Collectors.joining;
 
@@ -93,7 +91,7 @@ public class JSONMapEntityStoreMixin
     private JsonSerialization serialization;
 
     @Service
-    private JavaxJsonFactories jsonFactories;
+    private JakartaJsonFactories jsonFactories;
 
     @Service
     private IdentityGenerator identityGenerator;

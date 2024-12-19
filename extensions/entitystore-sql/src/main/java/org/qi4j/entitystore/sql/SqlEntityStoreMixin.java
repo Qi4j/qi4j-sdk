@@ -150,6 +150,14 @@ public class SqlEntityStoreMixin
             }
             return value;
         }
+        if( type.equals( ValueType.BOOLEAN ) )
+        {
+            if( value instanceof Byte )       // MariaDB returns a Byte
+            {
+                return ((Byte) value) != 0;
+            }
+            return value;
+        }
         if( type.equals( ValueType.STRING )
             || type.equals( ValueType.INTEGER )
             || type.equals( ValueType.BOOLEAN )

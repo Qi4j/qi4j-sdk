@@ -22,11 +22,11 @@ package org.qi4j.migration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonException;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 import org.qi4j.api.activation.ActivatorAdapter;
 import org.qi4j.api.activation.Activators;
 import org.qi4j.api.configuration.Configuration;
@@ -43,16 +43,12 @@ import org.qi4j.migration.assembly.EntityMigrationRule;
 import org.qi4j.migration.assembly.MigrationBuilder;
 import org.qi4j.migration.assembly.MigrationContext;
 import org.qi4j.migration.assembly.MigrationRule;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entitystore.EntityStore;
 import org.qi4j.spi.entitystore.helpers.JSONKeys;
 import org.qi4j.spi.entitystore.helpers.Migration;
 import org.qi4j.spi.entitystore.helpers.StateStore;
 import org.qi4j.spi.serialization.JsonSerialization;
-import org.qi4j.migration.assembly.EntityMigrationRule;
-import org.qi4j.migration.assembly.MigrationBuilder;
-import org.qi4j.migration.assembly.MigrationContext;
-import org.qi4j.migration.assembly.MigrationRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +108,7 @@ public interface MigrationService
         private JsonSerialization serialization;
 
         @Service
-        private JavaxJsonFactories jsonFactories;
+        private JakartaJsonFactories jsonFactories;
 
         @Structure
         private UnitOfWorkFactory uowf;

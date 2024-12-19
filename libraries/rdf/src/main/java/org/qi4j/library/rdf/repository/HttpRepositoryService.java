@@ -37,7 +37,7 @@ public interface HttpRepositoryService
     extends Repository
 {
     @Override
-    void initialize()
+    void init()
             throws RepositoryException;
 
     @Override
@@ -52,7 +52,7 @@ public interface HttpRepositoryService
         public void afterActivation( ServiceReference<HttpRepositoryService> activated )
                 throws Exception
         {
-            activated.get().initialize();
+            activated.get().init();
         }
 
         @Override
@@ -64,8 +64,7 @@ public interface HttpRepositoryService
 
     }
 
-    class HttpRepositoryMixin
-        extends HTTPRepository
+    class HttpRepositoryMixin extends HTTPRepository
         implements Repository
     {
         public HttpRepositoryMixin( @This Configuration<HttpRepositoryConfiguration> configuration )

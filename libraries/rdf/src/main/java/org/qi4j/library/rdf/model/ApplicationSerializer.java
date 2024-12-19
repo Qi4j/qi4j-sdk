@@ -21,8 +21,8 @@
 package org.qi4j.library.rdf.model;
 
 import java.io.PrintWriter;
-import org.eclipse.rdf4j.model.Graph;
-import org.eclipse.rdf4j.model.impl.GraphImpl;
+import org.eclipse.rdf4j.model.Model;
+import org.eclipse.rdf4j.model.impl.DynamicModelFactory;
 import org.qi4j.api.structure.Application;
 import org.qi4j.library.rdf.serializer.RdfXmlSerializer;
 import org.qi4j.library.rdf.serializer.SerializerContext;
@@ -31,16 +31,16 @@ import org.qi4j.library.rdf.serializer.SerializerContext;
 
 public class ApplicationSerializer
 {
-    public Graph serialize( Application app )
+    public Model serialize( Application app )
     {
-        Graph graph = new GraphImpl();
+        Model graph = new DynamicModelFactory().createEmptyModel();
         SerializerContext context = new SerializerContext( graph );
         ApplicationVisitor applicationVisitor = new ApplicationVisitor( context );
         app.descriptor().accept( applicationVisitor );
         return graph;
     }
 
-    public void outputMetadata( Graph rdf, PrintWriter writer )
+    public void outputMetadata( Model rdf, PrintWriter writer )
         throws Exception
     {
         new RdfXmlSerializer().serialize( rdf, writer );

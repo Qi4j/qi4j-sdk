@@ -23,22 +23,34 @@ description = "Qi4j Performance Test Suite."
 
 //jar { manifest { name = "Qi4j Tests - Performance" } }
 
-apply plugin: PerformanceTestsPlugin
+// TODO: This line get an error; "Adding a Configuration as a dependency is no longer allowed as of Gradle 8.0."
+//apply plugin: PerformanceTestsPlugin
 
 dependencies {
   implementation qi4j.core.bootstrap
   implementation libraries.junit
   implementation libraries.slf4j_api
 
-  perfImplementation qi4j.core.testsupport
-  perfImplementation qi4j.library( 'sql-dbcp' )
-  perfImplementation qi4j.extension( 'entitystore-memory' )
-  perfImplementation qi4j.extension( 'entitystore-jdbm' )
-  perfImplementation qi4j.extension( 'entitystore-sqlkv' )
-  perfImplementation qi4j.extension( 'cache-ehcache' )
-  perfImplementation qi4j.extension( 'indexing-rdf' )
-  perfImplementation libraries.derby
+  implementation qi4j.core.testsupport
+  implementation qi4j.library( 'sql-dbcp' )
+  implementation qi4j.extension( 'entitystore-memory' )
+  implementation qi4j.extension( 'entitystore-jdbm' )
+  implementation qi4j.extension( 'entitystore-sqlkv' )
+  implementation qi4j.extension( 'cache-ehcache' )
+  implementation qi4j.extension( 'indexing-rdf' )
+  implementation libraries.derby
 
-  perfRuntimeOnly qi4j.core.runtime
-  perfRuntimeOnly libraries.logback
+  runtimeOnly qi4j.core.runtime
+  runtimeOnly libraries.logback
+//  perfImplementation qi4j.core.testsupport
+//  perfImplementation qi4j.library( 'sql-dbcp' )
+//  perfImplementation qi4j.extension( 'entitystore-memory' )
+//  perfImplementation qi4j.extension( 'entitystore-jdbm' )
+//  perfImplementation qi4j.extension( 'entitystore-sqlkv' )
+//  perfImplementation qi4j.extension( 'cache-ehcache' )
+//  perfImplementation qi4j.extension( 'indexing-rdf' )
+//  perfImplementation libraries.derby
+//
+//  perfRuntimeOnly qi4j.core.runtime
+//  perfRuntimeOnly libraries.logback
 }

@@ -38,16 +38,16 @@ import org.opentest4j.TestAbortedException;
 
 class SQLTestHelper
 {
-    static void assembleWithMemoryEntityStore( ModuleAssembly mainModule, String host, int port )
+    static void assembleWithMemoryEntityStore(ModuleAssembly mainModule, String host, int port, String username, String password)
         throws AssemblyException
     {
         // EntityStore
         new EntityTestAssembler().visibleIn( Visibility.application ).assemble( mainModule );
 
-        doCommonAssembling( mainModule, host, port );
+        doCommonAssembling( mainModule, host, port, username, password);
     }
 
-    private static void doCommonAssembling( ModuleAssembly mainModule, String host, int port )
+    private static void doCommonAssembling(ModuleAssembly mainModule, String host, int port, String username, String password)
         throws AssemblyException
     {
         ModuleAssembly config = mainModule.layer().module( "config" );
@@ -76,8 +76,10 @@ class SQLTestHelper
                                                assemble( mainModule );
         // END SNIPPET: assembly
 
-        config.forMixin( DataSourceConfiguration.class ).declareDefaults()
-              .url().set( "jdbc:postgresql://" + host + ":" + port + "/jdbc_test_db" );
+        DataSourceConfiguration defaults = config.forMixin(DataSourceConfiguration.class).declareDefaults();
+        defaults.url().set( "jdbc:postgresql://" + host + ":" + port + "/jdbc_test_db" );
+        defaults.username().set(username);
+        defaults.password().set(password);
 
         // Always re-build schema in test scenarios because of possibly different app structure in
         // various tests

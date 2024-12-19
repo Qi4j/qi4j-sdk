@@ -30,8 +30,7 @@ import org.qi4j.test.entity.AbstractEntityStoreTest;
 import org.jooq.SQLDialect;
 import org.junit.jupiter.api.AfterEach;
 
-public class DerbySQLEntityStoreTest
-    extends AbstractEntityStoreTest
+public class DerbySQLEntityStoreTest extends AbstractEntityStoreTest
 {
     @Override
     // START SNIPPET: assembly

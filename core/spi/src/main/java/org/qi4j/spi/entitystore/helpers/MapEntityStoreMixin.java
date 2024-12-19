@@ -27,14 +27,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonException;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonReader;
-import javax.json.JsonValue;
-import javax.json.JsonWriter;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonValue;
+import jakarta.json.JsonWriter;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.entity.EntityDescriptor;
@@ -49,7 +49,7 @@ import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.unitofwork.NoSuchEntityTypeException;
 import org.qi4j.api.usecase.Usecase;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entitystore.DefaultEntityStoreUnitOfWork;
@@ -60,8 +60,6 @@ import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.entitystore.StateCommitter;
 import org.qi4j.spi.serialization.JsonSerialization;
 import org.qi4j.entitystore.memory.MemoryMapEntityStoreMixin;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
-import org.qi4j.spi.serialization.JsonSerialization;
 
 import static org.qi4j.api.entity.EntityReference.parseEntityReference;
 
@@ -89,7 +87,7 @@ public class MapEntityStoreMixin
     private JsonSerialization jsonSerialization;
 
     @Service
-    private JavaxJsonFactories jsonFactories;
+    private JakartaJsonFactories jsonFactories;
 
     @Optional
     @Service

@@ -20,7 +20,7 @@
 package org.qi4j.migration.assembly;
 
 import java.util.Arrays;
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import org.qi4j.migration.Migrator;
 import org.qi4j.spi.entitystore.helpers.JSONKeys;
 import org.qi4j.spi.entitystore.helpers.StateStore;

@@ -28,17 +28,17 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonBuilderFactory;
-import javax.json.JsonException;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonBuilderFactory;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObjectBuilder;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.serialization.Serializer;
 import org.qi4j.library.rest.common.table.Cell;
 import org.qi4j.library.rest.common.table.Column;
 import org.qi4j.library.rest.common.table.Row;
 import org.qi4j.library.rest.common.table.Table;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.serialization.JsonSerializer;
 import org.restlet.Response;
 import org.restlet.data.CharacterSet;
@@ -59,7 +59,7 @@ public class TableResponseWriter extends AbstractResponseWriter
     private JsonSerializer jsonSerializer;
 
     @Service
-    private JavaxJsonFactories json;
+    private JakartaJsonFactories json;
 
     @Service
     private Configuration cfg;

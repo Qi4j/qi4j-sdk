@@ -27,15 +27,8 @@ import org.qi4j.api.property.Property;
 // START SNIPPET: config
 public interface MongoDBEntityStoreConfiguration
 {
-
     @Optional
-    Property<String> hostname();
-
-    @Optional
-    Property<Integer> port();
-
-    @UseDefaults
-    Property<List<String>> nodes();
+    Property<String> connectionString();
 
     @UseDefaults
     Property<String> username();

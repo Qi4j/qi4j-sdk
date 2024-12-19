@@ -22,8 +22,6 @@ apply plugin: 'qi4j-extension'
 
 description = "Qi4j MongoDB EntityStore Extension"
 
-//jar { manifest { name = "Qi4j Extension - EntityStore - MongoDB" } }
-
 dependencies {
   api qi4j.core.bootstrap
   api libraries.mongodb
@@ -33,7 +31,7 @@ dependencies {
   runtimeOnly qi4j.core.runtime
 
   testImplementation qi4j.core.testsupport
-  testImplementation libraries.docker_junit
+  testImplementation libraries.testcontainer_mongodb
 
   testRuntimeOnly libraries.logback
 }

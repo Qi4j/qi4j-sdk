@@ -31,72 +31,71 @@ dependencies.repositoriesUrls << [
 
 // Core dependencies
 def annotationVersion = '1.3.5'
-def asmVersion = '9.5'
-def javaxJsonVersion = '1.1.4'
+def asmVersion = '9.7.1'
+def jakartaJsonApiVersion = '2.1.3'
 def osgiVersion = '8.0.0'
 dependencies.libraries << [
-        annotation : "jakarta.annotation:jakarta.annotation-api:$annotationVersion",
-        asm        : "org.ow2.asm:asm:$asmVersion",
-        asm_commons: "org.ow2.asm:asm-commons:$asmVersion",
-        asm_util   : "org.ow2.asm:asm-util:$asmVersion",
-        javax_json : "javax.json:javax.json-api:$javaxJsonVersion",
-        osgi_core  : "org.osgi:osgi.core:$osgiVersion",
+        annotation  : "jakarta.annotation:jakarta.annotation-api:$annotationVersion",
+        asm         : "org.ow2.asm:asm:$asmVersion",
+        asm_commons : "org.ow2.asm:asm-commons:$asmVersion",
+        asm_util    : "org.ow2.asm:asm-util:$asmVersion",
+        jakarta_json: "jakarta.json:jakarta.json-api:$jakartaJsonApiVersion",
+        osgi_core   : "org.osgi:osgi.core:$osgiVersion",
 ]
 
 // Extensions, Libraries and Tools dependencies
 def accumuloVersion = '1.6.4'
-def bdbjeVersion = '18.3.12'
 def bonecpVersion = '0.8.0.RELEASE'
 def bouncyVersion = '1.57'
-def cassandraClientVersion = '3.3.0'
+def cassandraClientVersion = '3.11.5'
 def codahaleMetricsVersion = '3.2.3'
-def commonsDbcpVersion = '2.10.0'
-def commonsLangVersion = '3.13.0'
-def commonsValidatorVersion = '1.7'
+def commonsDbcpVersion = '2.13.0'
+def commonsPoolVersion = '2.12.0'
+def commonsLangVersion = '3.17.0'
+def commonsValidatorVersion = '1.9.0'
 def derbyVersion = '10.14.1.0'
-def ehcacheVersion = '3.4.0'
-def elasticsearchVersion = '5.5.2'
+def ehcacheVersion = '3.10.8'
 def freemarkerVersion = '2.3.26-incubating'
-def geodeVersion = '1.2.0'
+def geodeVersion = '1.15.1'
 def groovyVersion = '4.0.12'
-def hazelcastVersion = '3.8.5'
-def httpClientVersion = '4.5.3'
-def jacksonVersion = '2.8.9'
-def jaxbApiVersion = '2.2.12'
+def hazelcastVersion = '5.3.6'
+def httpCoreVersion = '4.4.16'
+def httpClientVersion = '4.5.14'
+def jacksonVersion = '2.18.2'
+def jaxbApiVersion = '4.0.2'
 def jdbmVersion = '2.0.1'
-def jcloudsVersion = '2.3.0'
+def jcloudsVersion = '2.6.0'
 
 def jedisVersion = '3.7.0'
-def jerseyVersion = '3.0.2'
+//def jerseyVersion = '4.0.0-M3'
 def jettyVersion = '11.0.6'
-def johnzonVersion = '1.1.13'
-def jooqVersion = '3.14.14'
+def johnzonVersion = '2.0.1'
+def jooqVersion = '3.19.16'
 def kafkaVersion = '2.8.0'
 def kotlinVersion = '1.2.31'
-def leveldbVersion = '0.12'
-def leveldbJniVersion = '1.8'
-def liquibaseVersion = '3.5.3'
+def leveldbVersion = '1.23.2'
+def liquibaseVersion = '4.27.0'
 def mariadbDriverVersion = '2.7.4'
 def mapdbVersion = '3.0.7'
-def mongodbVersion = '3.4.2'
+def memcachedVersion = '2.4.8'
+def mongodbVersion = '5.2.1'
 def msgpackVersion = '0.8.13'
+def nettyVersion = '4.1.113.Final'
+def openSearchVersion = '2.18.0'
 def pulsarVersion = '3.1.0'
 def restletVersion = '2.4.3'
-def rdf4jVersion = '2.3.1' // Version '3.1.2' is available, but Apache Rya wants 2.3.1
+def rdf4jVersion = '5.1.0'
 def riakVersion = '2.1.1'
-def ryaVersion = '4.0.0-incubating'
 def servletVersion = '5.0.0'
-def shiroVersion = '2.0.0-alpha-1'
-def slf4jVersion = '1.7.25'
+def shiroVersion = '1.13.0'
+def slf4jVersion = '2.0.12'
 def solrVersion = "5.5.4"
 def springVersion = '5.0.5.RELEASE'
-def spymemcachedVersion = '2.12.3'
 def velocityVersion = '1.7'
-def zookeeperVersion = '3.4.10'
+def zookeeperVersion = '3.9.3'
 
 dependencies.libraries << [
         accumulo          : ["org.apache.accumulo:accumulo-core:$accumuloVersion"],
-        bdb_je            : "com.sleepycat:je:$bdbjeVersion",
         bonecp            : "com.jolbox:bonecp:$bonecpVersion",
         bouncy_castle     : [
                 "org.bouncycastle:bcprov-jdk15on:$bouncyVersion",
@@ -108,29 +107,30 @@ dependencies.libraries << [
                              "io.dropwizard.metrics:metrics-healthchecks:$codahaleMetricsVersion"],
         commons_dbcp      : "org.apache.commons:commons-dbcp2:$commonsDbcpVersion",
         commons_lang      : "org.apache.commons:commons-lang3:$commonsLangVersion",
+        commons_pool      : "org.apache.commons:commons-pool2:$commonsPoolVersion",
         commons_validator : "commons-validator:commons-validator:$commonsValidatorVersion",
         ehcache           : "org.ehcache:ehcache:$ehcacheVersion",
-        elasticsearch     : ["org.elasticsearch:elasticsearch:$elasticsearchVersion",
-                             "org.elasticsearch.client:transport:$elasticsearchVersion",
-                             // Elasticsearch 5.0 do not work with log4j 2.7
-                             "org.apache.logging.log4j:log4j-api:2.8.2",
-                             "org.apache.logging.log4j:log4j-core:2.8.2"],
+        opensearch        : ["org.opensearch.client:opensearch-java:$openSearchVersion"],
         freemarker        : "org.freemarker:freemarker:$freemarkerVersion",
         geode             : "org.apache.geode:geode-core:$geodeVersion",
         groovy            : "org.apache.groovy:groovy-all:$groovyVersion",
         hazelcast         : "com.hazelcast:hazelcast:$hazelcastVersion",
+        httpcomponents    : [
+                "org.apache.httpcomponents:httpcore:$httpCoreVersion",
+                "org.apache.httpcomponents:httpcore-nio:$httpCoreVersion",
+        ],
         http_client       : "org.apache.httpcomponents:httpclient:$httpClientVersion",
         jackson_mapper    : "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
-        jaxb_api          : "javax.xml.bind:jaxb-api:$jaxbApiVersion",
+        jaxb_api          : "jakarta.xml.bind:jaxb-api:$jaxbApiVersion",
         jclouds_core      : "org.apache.jclouds:jclouds-core:$jcloudsVersion",
         jclouds_blobstore : "org.apache.jclouds:jclouds-allblobstore:$jcloudsVersion",
         jclouds_filesystem: "org.apache.jclouds.api:filesystem:$jcloudsVersion",
         jdbm              : "org.fusesource.jdbm:jdbm:$jdbmVersion",
-        jersey_server     : [
-                "org.glassfish.jersey.core:jersey-server:$jerseyVersion",
-                "org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion",
-                "org.glassfish.jersey.containers:jersey-container-servlet-core:$jerseyVersion"
-        ],
+//        jersey_server     : [
+//                "org.glassfish.jersey.core:jersey-server:$jerseyVersion",
+//                "org.glassfish.jersey.inject:jersey-hk2:$jerseyVersion",
+//                "org.glassfish.jersey.containers:jersey-container-servlet-core:$jerseyVersion"
+//        ],
         jetty_server      : "org.eclipse.jetty:jetty-server:$jettyVersion",
         jetty_webapp      : "org.eclipse.jetty:jetty-webapp:$jettyVersion",
         jetty_servlet     : "org.eclipse.jetty:jetty-servlet:$jettyVersion",
@@ -151,50 +151,47 @@ dependencies.libraries << [
                 "org.apache.kafka:kafka-streams:$kafkaVersion"
         ],
         kotlin            : "org.jetbrains.kotlin:kotlin-project:$kotlinVersion",
-        leveldb_api       : "org.iq80.leveldb:leveldb-api:$leveldbVersion",
-        leveldb_java      : "org.iq80.leveldb:leveldb:$leveldbVersion",
-        leveldb_jni_all   : "org.fusesource.leveldbjni:leveldbjni-all:$leveldbJniVersion",
+        leveldb           : "com.halibobor:leveldbjni-all:$leveldbVersion",
         liquibase         : "org.liquibase:liquibase-core:$liquibaseVersion",
         mariadb_driver    : "org.mariadb.jdbc:mariadb-java-client:$mariadbDriverVersion",
         mapdb             : "org.mapdb:mapdb:$mapdbVersion",
-        mongodb           : "org.mongodb:mongo-java-driver:$mongodbVersion",
+        memcached         : "com.googlecode.xmemcached:xmemcached:$memcachedVersion",
+        mongodb           : "org.mongodb:mongodb-driver-sync:$mongodbVersion",
         msgpack           : "org.msgpack:msgpack-core:$msgpackVersion",
         osgi_annotation   : "org.osgi:osgi.annotation:$osgiVersion",
         osgi_compendium   : "org.osgi:osgi.cmpn:$osgiVersion",
         osgi_enterprise   : "org.osgi:osgi.enterprise:$osgiVersion",
         osgi_promise      : "org.osgi:osgi.promise:$osgiVersion",
-        pulsar            : ["org.apache.pulsar:pulsar-client-api:$pulsarVersion",
-                             "org.apache.pulsar:pulsar-client-all:$pulsarVersion",
-                             "org.apache.pulsar:pulsar-client-admin-api:$pulsarVersion"
+        pulsar            : [
+                "org.apache.pulsar:pulsar-client-api:$pulsarVersion",
+                "org.apache.pulsar:pulsar-client-all:$pulsarVersion",
+                "org.apache.pulsar:pulsar-client-admin-api:$pulsarVersion"
         ],
-        rdf4j             : ["org.eclipse.rdf4j:rdf4j-query:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-queryresultio-sparqlxml:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-queryresultio-sparqljson:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-repository-dataset:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-repository-api:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-repository-http:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-repository-sparql:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-repository-event:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-rio:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-rio-n3:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-rio-ntriples:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-rio-rdfjson:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-rio-rdfxml:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-rio-jsonld:$rdf4jVersion",
+        rdf4j             : [
+                "org.eclipse.rdf4j:rdf4j-queryresultio-sparqlxml:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-queryresultio-sparqljson:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-repository-dataset:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-repository-api:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-repository-http:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-repository-sparql:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-repository-event:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-rio:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-rio-api:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-rio-n3:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-rio-ntriples:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-rio-rdfjson:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-rio-rdfxml:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-rio-jsonld:$rdf4jVersion",
 //                             "org.eclipse.rdf4j:rdf4j-sail-extensible-store:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-sail-nativerdf:$rdf4jVersion",
-                             "org.eclipse.rdf4j:rdf4j-sail-memory:$rdf4jVersion"],
+                "org.eclipse.rdf4j:rdf4j-sail-base:$rdf4jVersion",
+                "org.eclipse.rdf4j:rdf4j-storage:$rdf4jVersion"
+        ],
         restlet           : ["org.restlet.jee:org.restlet:$restletVersion",
                              "org.restlet.jee:org.restlet.ext.atom:$restletVersion",
                              "org.restlet.jee:org.restlet.ext.servlet:$restletVersion",
                              "org.restlet.jee:org.restlet.ext.slf4j:$restletVersion"],
         restlet_xml       : "org.restlet.jee:org.restlet.ext.xml:$restletVersion",
         riak              : "com.basho.riak:riak-client:$riakVersion",
-        rya               : ["org.apache.rya:rya.api:$ryaVersion",
-                             "org.apache.rya:rya.common:$ryaVersion",
-                             "org.apache.rya:rya.dao:$ryaVersion",
-                             "org.apache.rya:rya.prospector:$ryaVersion",
-                             "org.apache.rya:rya.sail:$ryaVersion"],
         servlet_api       : "jakarta.servlet:jakarta.servlet-api:$servletVersion",
         shiro             : "org.apache.shiro:shiro-core:$shiroVersion",
         shiro_web         : "org.apache.shiro:shiro-web:$shiroVersion",
@@ -203,7 +200,6 @@ dependencies.libraries << [
                              "org.apache.solr:solr-solrj:$solrVersion"],
         spring_core       : ["org.springframework:spring-beans:$springVersion",
                              "org.springframework:spring-context:$springVersion"],
-        spymemcached      : "net.spy:spymemcached:$spymemcachedVersion",
         velocity          : "org.apache.velocity:velocity:$velocityVersion",
         zookeeper         : "org.apache.zookeeper:zookeeper:$zookeeperVersion"
 ]
@@ -220,60 +216,107 @@ dependencies.libraries << [
 
 // Runtime, Test and Samples dependencies
 def awaitilityVersion = '3.0.0'
-def dnsJavaVersion = '3.0.2'
-def dockerJUnit5Version = '1.0.0'
-def dockerJavaVersion = '3.3.3'
+def dnsJavaVersion = '3.6.2'
+//def dockerJUnit5Version = '1.0.0'
+//def dockerJavaVersion = '3.4.1'
 
 def easyMockVersion = '3.4'
 def h2Version = '1.4.196'
 def hamcrestVersion = '2.2'
-def jaxRsApiVersion = '2.0.1'
-def junitVersion = '5.10.0'
-def logbackVersion = '1.2.3' // TODO Replace with Apache Log4j 2
+def jaxRsApiVersion = '4.0.0'
+def junitVersion = '5.11.3'
+def logbackVersion = '3.3.0' // TODO Replace with Apache Log4j 2
 def mockitoVersion = '3.12.4'
 def mysqlVersion = '8.0.25'
-def postgresqlVersion = '42.1.4'
+def postgresqlVersion = '42.7.4'
 def sqliteVersion = '3.19.3'
-def testcontainersVersion = '1.16.0'
+def testcontainersVersion = '1.20.4'
 def xmlUnitVersion = '2.3.0'
 dependencies.libraries << [
-        awaitility        : "org.awaitility:awaitility:$awaitilityVersion",
-        derby             : "org.apache.derby:derby:$derbyVersion",
-        dnsjava           : "dnsjava:dnsjava:$dnsJavaVersion",
-        docker_junit      : [
-                "com.github.faustxvi:junit5-docker:$dockerJUnit5Version",
-                "com.github.docker-java:docker-java:$dockerJavaVersion"
+        awaitility              : "org.awaitility:awaitility:$awaitilityVersion",
+        derby                   : [
+                "org.apache.derby:derby:$derbyVersion",
+                "org.apache.derby:derbyclient:$derbyVersion"
         ],
-        docker_java       : "com.github.docker-java:docker-java:$dockerJavaVersion",
+        dnsjava                 : "dnsjava:dnsjava:$dnsJavaVersion",
+//        docker_junit      : [
+//                "com.github.faustxvi:junit5-docker:$dockerJUnit5Version",
+//                "com.github.docker-java:docker-java-core:$dockerJavaVersion",
+//                "com.github.docker-java:docker-java-transport-httpclient5:$dockerJavaVersion"
+//        ],
 
-        easymock          : "org.easymock:easymock:$easyMockVersion",
-        h2                : "com.h2database:h2:$h2Version",
-        hamcrest          : ["org.hamcrest:hamcrest-core:$hamcrestVersion",
-                             "org.hamcrest:hamcrest-library:$hamcrestVersion"],
-        jersey_test       : [
-                "org.junit.vintage:junit-vintage-engine:$junitVersion",
-                "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:$jerseyVersion"
+        easymock                : "org.easymock:easymock:$easyMockVersion",
+        h2                      : "com.h2database:h2:$h2Version",
+        hamcrest                : ["org.hamcrest:hamcrest-core:$hamcrestVersion",
+                                   "org.hamcrest:hamcrest-library:$hamcrestVersion"],
+//        jersey_test       : [
+//                "org.junit.vintage:junit-vintage-engine:$junitVersion",
+//                "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-grizzly2:$jerseyVersion"
+//        ],
+        junit                   : ["org.junit.jupiter:junit-jupiter-api:$junitVersion",
+                                   "org.junit.jupiter:junit-jupiter-params:$junitVersion",
         ],
-        junit             : ["org.junit.jupiter:junit-jupiter-api:$junitVersion",
-                             "org.junit.jupiter:junit-jupiter-params:$junitVersion",
-        ],
-        junit_engine      : "org.junit.jupiter:junit-jupiter-engine:$junitVersion",
+        junit_engine            : "org.junit.jupiter:junit-jupiter-engine:$junitVersion",
 
-        logback           : "ch.qos.logback:logback-classic:$logbackVersion",
-        mockito           : "org.mockito:mockito-core:$mockitoVersion",
-        mysql_connector   : "mysql:mysql-connector-java:$mysqlVersion",
-        postgres          : "org.postgresql:postgresql:$postgresqlVersion",
-        spring_testsupport: "org.springframework:spring-test:$springVersion",
-        sqlite            : "org.xerial:sqlite-jdbc:$sqliteVersion",
-        testcontainers    : [
-                "org.testcontainers:mysql:$testcontainersVersion",
-                "org.testcontainers:postgresql:$testcontainersVersion",
-                "org.testcontainers:mariadb:$testcontainersVersion",
+        logback                 : "com.newrelic.logging:logback:$logbackVersion",
+        mockito                 : "org.mockito:mockito-core:$mockitoVersion",
+        mysql_connector         : "mysql:mysql-connector-java:$mysqlVersion",
+        postgres                : "org.postgresql:postgresql:$postgresqlVersion",
+        spring_testsupport      : "org.springframework:spring-test:$springVersion",
+        sqlite                  : "org.xerial:sqlite-jdbc:$sqliteVersion",
+        testcontainer_cassandra: [
+                "org.testcontainers:cassandra:$testcontainersVersion",
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_kafka     : [
                 "org.testcontainers:kafka:$testcontainersVersion",
                 "org.testcontainers:testcontainers:$testcontainersVersion",
                 "org.testcontainers:junit-jupiter:$testcontainersVersion"
         ],
-        xmlunit           : "org.xmlunit:xmlunit-matchers:$xmlUnitVersion",
+        testcontainer_mariadb   : [
+                "org.testcontainers:mariadb:$testcontainersVersion",
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_memcached : [
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_mongodb : [
+                "org.testcontainers:mongodb:$testcontainersVersion",
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_mysql     : [
+                "org.testcontainers:mysql:$testcontainersVersion",
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_postgresql: [
+                "org.testcontainers:postgresql:$testcontainersVersion",
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_pulsar: [
+                "org.testcontainers:pulsar:$testcontainersVersion",
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_redis     : [
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_riak     : [
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_zookeeper     : [
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        xmlunit                 :
+                "org.xmlunit:xmlunit-matchers:$xmlUnitVersion",
 ]
 
 // Default dependencies
@@ -301,7 +344,11 @@ dependencies.dependencySubstitutionSpec = { DependencySubstitution substitution,
     }
     // Always resolve JAX-RS API to the same version
     else if (['jaxrs-api', 'jsr311-api', 'javax.ws.rs-api'].contains(dep.module)) {
-        substitution.useTarget group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: jaxRsApiVersion
+        substitution.useTarget group: 'jakarta.ws.rs', name: 'jakarta.ws.rs-api', version: jaxRsApiVersion
+    }
+    // Always resolve JAXB API to the same version
+    else if (dep.module == 'javax.xml.bind-api' || dep.module == 'jaxb-api' || dep.module == 'jakarta.xml.bind-api') {
+        substitution.useTarget group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: jaxbApiVersion
     }
     // woodstox:wstx-asl is broken (no pom), use org.codehaus.woodstox:wstx-asl instead
     else if (dep.group == 'woodstox' && dep.module == 'wstx-asl') {
@@ -310,6 +357,9 @@ dependencies.dependencySubstitutionSpec = { DependencySubstitution substitution,
     // some bad citizens have SNAPSHOT parents ...
     else if (dep.module == 'commons-sandbox-parent' && dep.version == '3-SNAPSHOT') {
         substitution.useTarget group: dep.group, name: dep.module, version: '3'
+    }
+    else if (dep.group == 'io.netty' && !['netty-tcnative-boringssl-static', 'netty-tcnative-classes'].contains(dep.module)) {
+        substitution.useTarget group: dep.group, name: dep.module, version: nettyVersion
     }
     // Findbugs Annotation is LGPL, use https://github.com/stephenc/findbugs-annotations which is
     // Apache 2 licensed instead
@@ -326,19 +376,19 @@ dependencies.nodeVersions << [
 
 // Build Tools
 dependencies.buildToolsVersions << [
-        jacoco: '0.8.7'
+        jacoco: '0.8.12'
 ]
 
 // Docker Images
 dependencies.dockerImagesVersions << [
-        cassandra: 'cassandra:3.11',
-        memcached: 'memcached:1.4.39-alpine',
-        mariadb  : 'mariadb:10.1.21',
-        mongo    : 'mongo:3.5.10',
-        mysql    : 'mysql:8',
-        postgres : 'postgres:9-alpine',
-        redis    : 'redis:4.0.0-alpine',
-        riak     : 'basho/riak-kv:ubuntu-2.2.3',
-        s3server : 'scality/s3server:mem-bb2a38c0',
-        zookeeper: 'zookeeper:3.4.11'
+        cassandra: 'cassandra:5.0',
+        memcached: 'memcached:1.6.33-alpine',
+        mariadb  : 'mariadb:11.6',
+        mongo    : 'mongo:5',
+        mysql    : 'mysql:9',
+        postgres : 'postgres:17.2-alpine',
+        redis    : 'redis:7.4-alpine',
+        riak     : 'theblitzapp/riak_kv_2.9:debian',
+        s3server : 'scality/s3server:mem-6018536a',
+        zookeeper: 'zookeeper:3.9'
 ]

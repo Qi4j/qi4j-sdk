@@ -20,7 +20,7 @@ package org.qi4j.spi.serialization;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.json.JsonValue;
+import jakarta.json.JsonValue;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.serialization.Deserializer;
 import org.qi4j.api.structure.ModuleDescriptor;
@@ -28,7 +28,7 @@ import org.qi4j.api.type.ValueType;
 import org.qi4j.spi.module.ModuleSpi;
 
 /**
- * {@literal javax.json} deserializer.
+ * {@literal jakarta.json} deserializer.
  */
 public interface JsonDeserializer extends Deserializer
 {

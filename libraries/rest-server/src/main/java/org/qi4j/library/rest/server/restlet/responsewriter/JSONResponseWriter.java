@@ -22,7 +22,7 @@ package org.qi4j.library.rest.server.restlet.responsewriter;
 
 import java.util.Arrays;
 import java.util.List;
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import org.restlet.Response;
 import org.restlet.data.MediaType;
 import org.restlet.representation.StringRepresentation;

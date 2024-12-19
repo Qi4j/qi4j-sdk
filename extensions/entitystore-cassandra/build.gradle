@@ -18,6 +18,10 @@
  *
  */
 
+plugins {
+  id "org.javamodularity.moduleplugin" version "1.8.12"
+}
+
 apply plugin: 'qi4j-extension'
 
 description = "Qi4j Cassandra EntityStore Extension"
@@ -35,7 +39,7 @@ dependencies {
   runtimeOnly qi4j.core.runtime
 
   testImplementation qi4j.core.testsupport
-  testImplementation libraries.docker_junit
+  testImplementation libraries.testcontainer_cassandra
 
   testRuntimeOnly libraries.logback
 }

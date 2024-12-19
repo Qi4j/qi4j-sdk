@@ -19,12 +19,9 @@
  */
 package org.qi4j.entitystore.sqlkv;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Port;
-import com.github.junit5docker.WaitFor;
-import org.junit.jupiter.api.Disabled;
+import org.jooq.SQLDialect;
+import org.junit.jupiter.api.AfterEach;
 import org.qi4j.api.common.Visibility;
-import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.sqlkv.assembly.PostgreSQLEntityStoreAssembler;
 import org.qi4j.library.sql.assembly.DataSourceAssembler;
@@ -32,17 +29,17 @@ import org.qi4j.library.sql.datasource.DataSourceConfiguration;
 import org.qi4j.library.sql.dbcp.DBCPDataSourceServiceAssembler;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
-import org.jooq.SQLDialect;
-import org.junit.jupiter.api.AfterEach;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Docker( image = "mariadb:10.1.21",
-         ports = @Port( exposed = 8801, inner = 5432),
-         waitFor = @WaitFor( value = "PostgreSQL init process complete; ready for start up.", timeoutInMillis = 30000),
-         newForEachCase = false
-)
-@Disabled("I have removed the customer containers, and haven't figured out how to initialize postgres in the default Docker container. Seems I can't mount files into the container (--volume)")
+@Testcontainers
 public class PostgreSQLEntityStoreTest extends AbstractEntityStoreTest
 {
+    @Container
+    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:17-alpine")
+        .withDatabaseName("jdbc_test_db");
+
     @Override
     // START SNIPPET: assembly
     public void assemble( ModuleAssembly module )
@@ -76,10 +73,11 @@ public class PostgreSQLEntityStoreTest extends AbstractEntityStoreTest
             .withConfig( config, Visibility.layer )
             .assemble( module );
         // END SNIPPET: assembly
-        String host = "localhost";
-        int port = 8801;
         DataSourceConfiguration defaults = config.forMixin( DataSourceConfiguration.class ).declareDefaults();
-        defaults.url().set( "jdbc:postgresql://" + host + ":" + port + "/jdbc_test_db" );
+        defaults.url().set(postgres.getJdbcUrl());
+        defaults.driver().set(postgres.getDriverClassName());
+        defaults.username().set(postgres.getUsername());
+        defaults.password().set(postgres.getPassword());
         // START SNIPPET: assembly
     }
 

@@ -23,7 +23,7 @@ import common.api.org.qi4j.Visibility;
 import bootstrap.org.qi4j.LayerAssembly;
 import bootstrap.org.qi4j.ModuleAssembly;
 import layered.bootstrap.org.qi4j.ModuleAssembler;
-import assembly.javaxjson.serialization.org.qi4j.JavaxJsonSerializationAssembler;
+import assembly.jakartajson.serialization.org.qi4j.JavaxJsonSerializationAssembler;
 
 public class SerializationModule
     implements ModuleAssembler
@@ -33,7 +33,7 @@ public class SerializationModule
     @Override
     public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
     {
-        new JavaxJsonSerializationAssembler()
+        new JakartaJsonSerializationAssembler()
             .visibleIn( Visibility.application )
             .assemble( module );
         return module;

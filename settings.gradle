@@ -19,7 +19,6 @@
 //apply plugin: 'qi4j-settings'
 
 rootProject.name = 'qi4j-sdk'
-
 include 'core:api',
         'core:spi',
         'core:testsupport',
@@ -55,31 +54,39 @@ include 'core:api',
         'libraries:uid',
         'libraries:uowfile',
         'extensions:cache-ehcache',
+        // TODO: Keep an eye on when/if TestContainers supports Memcached
         'extensions:cache-memcache',
-        'extensions:entitystore-berkeleydb',
         'extensions:entitystore-cassandra',
         'extensions:entitystore-file',
         'extensions:entitystore-geode',
         'extensions:entitystore-hazelcast',
-        'extensions:entitystore-jclouds',
         'extensions:entitystore-jdbm',
         'extensions:entitystore-leveldb',
         'extensions:entitystore-memory',
         'extensions:entitystore-mongodb',
         'extensions:entitystore-preferences',
+        // TODO: Keep an eye on when/if TestContainers supports Redis
         'extensions:entitystore-redis',
-//        'extensions:entitystore-riak',
+        // TODO: Keep an eye on when/if TestContainers supports Riak
+        'extensions:entitystore-riak',
         'extensions:entitystore-sql',
         'extensions:entitystore-sqlkv',
+        // TODO: Keep an eye on when/if TestContainers supports Zookeeper
         'extensions:entitystore-zookeeper',
-        'extensions:indexing-elasticsearch',
+
+// TODO; migrating from ElasticSearch to OpenSearch is not trivial in Qi4j. Started but quickly realized it is quite massive change.
+//        'extensions:indexing-opensearch',
         'extensions:indexing-rdf',
         'extensions:indexing-sql',
         'extensions:metrics-codahale',
-        'extensions:messaging-pulsar',
+//        'extensions:messaging-activemq',
+//        'extensions:messaging-jms',
+//        'extensions:messaging-kafka',
+//        'extensions:messaging-rabbitmq',
+//        'extensions:messaging-pulsar',
         'extensions:migration',
         'extensions:reindexer',
-        'extensions:serialization-javaxjson',
+        'extensions:serialization-jakartajson',
         'extensions:serialization-javaxxml',
         'extensions:serialization-messagepack',
         'tools:model-detail',
@@ -102,6 +109,7 @@ include 'core:api',
         'samples:rental',
         'samples:sql-support',
         'samples:swing'
+
 
 //include 'internals:testsupport-internal'
 

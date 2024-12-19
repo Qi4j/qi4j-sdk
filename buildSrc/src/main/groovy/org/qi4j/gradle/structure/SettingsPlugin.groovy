@@ -32,10 +32,10 @@ class SettingsPlugin implements Plugin<Settings>
   static void checkPreconditions( Settings setting )
   {
     def java = JavaVersion.current()
-    def minimum = JavaVersion.VERSION_14
+    def minimum = JavaVersion.VERSION_17
     if( java < minimum )
     {
-      throw new Exception( "Cannot build using Java ${ java }, please use ${ JavaVersion.VERSION_14 } or greater." )
+      throw new Exception( "Cannot build using Java ${ java }, please use ${ JavaVersion.VERSION_17 } or greater." )
     }
   }
 }

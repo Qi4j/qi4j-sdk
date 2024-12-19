@@ -23,9 +23,9 @@ import org.qi4j.api.serialization.Serialization;
 import org.qi4j.api.serialization.Serializer;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.serialization.javaxjson.JavaxJsonAdapters;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
-import org.qi4j.serialization.javaxjson.JavaxJsonSerialization;
+import org.qi4j.serialization.jakartajson.JakartaJsonAdapters;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonSerialization;
 import org.qi4j.spi.serialization.JsonDeserializer;
 import org.qi4j.spi.serialization.JsonSerialization;
 import org.qi4j.spi.serialization.JsonSerializer;
@@ -38,14 +38,14 @@ public class DefaultSerializationAssembler
     @Override
     public void assemble( ModuleAssembly module )
     {
-        module.services( JavaxJsonSerialization.class )
+        module.services( JakartaJsonSerialization.class )
               .withTypes( Serialization.class,
                           Serializer.class, Deserializer.class,
                           Converters.class,
                           JsonSerialization.class,
                           JsonSerializer.class, JsonDeserializer.class,
-                          JavaxJsonAdapters.class,
-                          JavaxJsonFactories.class )
+                          JakartaJsonAdapters.class,
+                          JakartaJsonFactories.class )
               .identifiedBy( IDENTITY )
               .taggedWith( Serialization.Format.JSON );
     }

@@ -21,14 +21,13 @@ package org.qi4j.spi.entitystore.helpers;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-import javax.json.JsonArray;
-import javax.json.JsonException;
-import javax.json.JsonValue;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonException;
+import jakarta.json.JsonValue;
 import org.qi4j.api.entity.EntityReference;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.entitystore.EntityStoreException;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
 
 /**
  * JSON implementation of ManyAssociationState.
@@ -37,11 +36,11 @@ import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
 public final class JSONManyAssociationState
     implements ManyAssociationState
 {
-    private final JavaxJsonFactories jsonFactories;
+    private final JakartaJsonFactories jsonFactories;
     private final JSONEntityState entityState;
     private final String stateName;
 
-    /* package */ JSONManyAssociationState( JavaxJsonFactories jsonFactories,
+    /* package */ JSONManyAssociationState( JakartaJsonFactories jsonFactories,
                                             JSONEntityState entityState,
                                             String stateName )
     {

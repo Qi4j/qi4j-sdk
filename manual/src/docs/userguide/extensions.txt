@@ -45,7 +45,7 @@ for our users.
 
 :leveloffset: 2
 
-include::../../../../extensions/serialization-javaxjson/src/docs/serialization-javaxjson.txt[]
+include::../../../../extensions/serialization-jakartajson/src/docs/serialization-jakartajson.txt[]
 
 :leveloffset: 2
 

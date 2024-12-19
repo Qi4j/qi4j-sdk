@@ -19,28 +19,10 @@
  */
 package org.qi4j.entitystore.mongodb;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import com.mongodb.WriteConcern;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.util.JSON;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import com.mongodb.*;
+import com.mongodb.client.*;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
@@ -49,11 +31,14 @@ import org.qi4j.api.service.ServiceActivation;
 import org.qi4j.spi.entitystore.EntityNotFoundException;
 import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.entitystore.helpers.MapEntityStore;
-import org.bson.Document;
-import org.bson.conversions.Bson;
+
+import java.io.*;
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static com.mongodb.client.model.Filters.eq;
-import static java.util.stream.Collectors.toList;
 
 /**
  * MongoDB implementation of MapEntityStore.
@@ -67,7 +52,7 @@ public class MongoDBEntityStoreMixin
     public static final String STATE_COLUMN = "state";
     @This
     private Configuration<MongoDBEntityStoreConfiguration> configuration;
-    private List<ServerAddress> serverAddresses;
+    private String connectionString;
     private String databaseName;
     private String collectionName;
     private WriteConcern writeConcern;
@@ -83,23 +68,25 @@ public class MongoDBEntityStoreMixin
         loadConfiguration();
 
         // Create Mongo driver and open the database
-        MongoClientOptions options = MongoClientOptions.builder().writeConcern( writeConcern ).build();
-        if( username.isEmpty() )
+        MongoClientSettings.Builder builder = MongoClientSettings.builder()
+            .applyConnectionString(new ConnectionString(connectionString))
+            .writeConcern(writeConcern);
+        if (!username.isEmpty())
         {
-            mongo = new MongoClient( serverAddresses, options );
+            MongoCredential credential = MongoCredential.createCredential(username, databaseName, password);
+            builder.credential(credential);
         }
-        else
-        {
-            MongoCredential credential = MongoCredential.createMongoCRCredential( username, databaseName, password );
-            mongo = new MongoClient( serverAddresses, Collections.singletonList( credential ), options );
-        }
-        db = mongo.getDatabase( databaseName );
+        mongo = MongoClients.create(builder.build());
+        db = mongo.getDatabase(databaseName);
 
         // Create index if needed
-        MongoCollection<Document> entities = db.getCollection( collectionName );
-        if( !entities.listIndexes().iterator().hasNext() )
+        MongoCollection<Document> entities = db.getCollection(collectionName);
+        try (MongoCursor<Document> iterator = entities.listIndexes().iterator())
         {
-            entities.createIndex( new BasicDBObject( IDENTITY_COLUMN, 1 ) );
+            if (!iterator.hasNext())
+            {
+                entities.createIndex(new BasicDBObject(IDENTITY_COLUMN, 1));
+            }
         }
     }
 
@@ -111,81 +98,55 @@ public class MongoDBEntityStoreMixin
 
         // Combine hostname, port and nodes configuration properties
         // If no configuration, use 127.0.0.1:27017
-        serverAddresses = new ArrayList<>();
-        int port = config.port().get() == null ? 27017 : config.port().get();
-        List<String> nodes = config.nodes().get();
-        if( nodes.isEmpty() )
+        connectionString = config.connectionString().get();
+        if (connectionString == null)
         {
-            String hostname = config.hostname().get() == null ? "127.0.0.1" : config.hostname().get();
-            serverAddresses.add( new ServerAddress( hostname, port ) );
-        }
-        else
-        {
-            if( config.hostname().get() != null && !config.hostname().get().isEmpty() )
-            {
-                serverAddresses.add( new ServerAddress( config.hostname().get(), port ) );
-            }
-            serverAddresses.addAll( nodes.stream()
-                                         .map( this::parseNode )
-                                         .collect( toList() )
-                                  );
+            connectionString = "mongodb://127.0.0.1:27017";
         }
 
         // If database name not configured, set it to qi4j:entitystore
         databaseName = config.database().get();
-        if( databaseName == null )
+        if (databaseName == null)
         {
             databaseName = DEFAULT_DATABASE_NAME;
         }
 
         // If collection name not configured, set it to qi4j:entitystore:entities
         collectionName = config.collection().get();
-        if( collectionName == null )
+        if (collectionName == null)
         {
             collectionName = DEFAULT_COLLECTION_NAME;
         }
 
         // If write concern not configured, set it to normal
-        switch( config.writeConcern().get() )
+        switch (config.writeConcern().get())
         {
-        case W1:
-            writeConcern = WriteConcern.W1;
-            break;
-        case W2:
-            writeConcern = WriteConcern.W2;
-            break;
-        case W3:
-            writeConcern = WriteConcern.W3;
-            break;
-        case UNACKNOWLEDGED:
-            writeConcern = WriteConcern.UNACKNOWLEDGED;
-            break;
-        case JOURNALED:
-            writeConcern = WriteConcern.JOURNALED;
-            break;
-        case MAJORITY:
-            writeConcern = WriteConcern.MAJORITY;
-            break;
-        case ACKNOWLEDGED:
-        default:
-            writeConcern = WriteConcern.ACKNOWLEDGED;
+            case W1:
+                writeConcern = WriteConcern.W1;
+                break;
+            case W2:
+                writeConcern = WriteConcern.W2;
+                break;
+            case W3:
+                writeConcern = WriteConcern.W3;
+                break;
+            case UNACKNOWLEDGED:
+                writeConcern = WriteConcern.UNACKNOWLEDGED;
+                break;
+            case JOURNALED:
+                writeConcern = WriteConcern.JOURNALED;
+                break;
+            case MAJORITY:
+                writeConcern = WriteConcern.MAJORITY;
+                break;
+            case ACKNOWLEDGED:
+            default:
+                writeConcern = WriteConcern.ACKNOWLEDGED;
         }
 
         // Username and password are defaulted to empty strings
         username = config.username().get();
         password = config.password().get().toCharArray();
-    }
-
-    private <R> ServerAddress parseNode( String nodeString )
-    {
-        String[] parts = nodeString.split( ":" );
-        String host = parts[ 0 ];
-        if( parts.length == 2 )
-        {
-            int port = Integer.parseInt( parts[ 1 ] );
-            return new ServerAddress( host, port );
-        }
-        return new ServerAddress( host );
     }
 
     @Override
@@ -198,7 +159,7 @@ public class MongoDBEntityStoreMixin
         collectionName = null;
         writeConcern = null;
         username = null;
-        Arrays.fill( password, ' ' );
+        Arrays.fill(password, ' ');
         password = null;
         db = null;
     }
@@ -222,101 +183,105 @@ public class MongoDBEntityStoreMixin
     }
 
     @Override
-    public Reader get( EntityReference entityReference )
+    public Reader get(EntityReference entityReference)
         throws EntityStoreException
     {
-        MongoCursor<Document> cursor = db.getCollection( collectionName )
-                                         .find( byIdentity( entityReference ) )
-                                         .limit( 1 ).iterator();
-        if( !cursor.hasNext() )
+        try (MongoCursor<Document> cursor = db.getCollection(collectionName)
+            .find(byIdentity(entityReference))
+            .limit(1).iterator())
         {
-            throw new EntityNotFoundException( entityReference );
+            if (!cursor.hasNext())
+            {
+                throw new EntityNotFoundException(entityReference);
+            }
+            Document bsonState = (Document) cursor.next().get(STATE_COLUMN);
+            String jsonState = bsonState.toJson();
+            return new StringReader(jsonState);
         }
-        Document bsonState = (Document) cursor.next().get( STATE_COLUMN );
-        String jsonState = JSON.serialize( bsonState );
-        return new StringReader( jsonState );
     }
 
     @Override
-    public void applyChanges( MapChanges changes )
+    public void applyChanges(MapChanges changes)
         throws Exception
     {
-        final MongoCollection<Document> entities = db.getCollection( collectionName );
+        final MongoCollection<Document> entities = db.getCollection(collectionName);
 
-        changes.visitMap( new MapChanger()
+        changes.visitMap(new MapChanger()
         {
             @Override
-            public Writer newEntity( EntityReference ref, EntityDescriptor entityDescriptor )
+            public Writer newEntity(EntityReference ref, EntityDescriptor entityDescriptor)
                 throws IOException
             {
-                return new StringWriter( 1000 )
+                return new StringWriter(1000)
                 {
                     @Override
                     public void close()
                         throws IOException
                     {
                         super.close();
-                        Document bsonState = Document.parse( toString() );
+                        Document bsonState = Document.parse(toString());
                         Document entity = new Document();
-                        entity.put( IDENTITY_COLUMN, ref.identity().toString() );
-                        entity.put( STATE_COLUMN, bsonState );
-                        entities.insertOne( entity );
+                        entity.put(IDENTITY_COLUMN, ref.identity().toString());
+                        entity.put(STATE_COLUMN, bsonState);
+                        entities.insertOne(entity);
                     }
                 };
             }
 
             @Override
-            public Writer updateEntity( MapChange mapChange )
+            public Writer updateEntity(MapChange mapChange)
                 throws IOException
             {
-                return new StringWriter( 1000 )
+                return new StringWriter(1000)
                 {
                     @Override
                     public void close()
                         throws IOException
                     {
                         super.close();
-                        Document bsonState = Document.parse( toString() );
+                        Document bsonState = Document.parse(toString());
                         Document entity = new Document();
-                        entity.put( IDENTITY_COLUMN, mapChange.reference().identity().toString() );
-                        entity.put( STATE_COLUMN, bsonState );
-                        entities.replaceOne( byIdentity( mapChange.reference() ), entity );
+                        entity.put(IDENTITY_COLUMN, mapChange.reference().identity().toString());
+                        entity.put(STATE_COLUMN, bsonState);
+                        entities.replaceOne(byIdentity(mapChange.reference()), entity);
                     }
                 };
             }
 
             @Override
-            public void removeEntity( EntityReference ref, EntityDescriptor entityDescriptor )
+            public void removeEntity(EntityReference ref, EntityDescriptor entityDescriptor)
                 throws EntityNotFoundException
             {
-                Bson byIdFilter = byIdentity( ref );
-                MongoCursor<Document> cursor = db.getCollection( collectionName )
-                                                 .find( byIdFilter )
-                                                 .limit( 1 ).iterator();
-                if( !cursor.hasNext() )
+                Bson byIdFilter = byIdentity(ref);
+                try (MongoCursor<Document> cursor = db.getCollection(collectionName)
+                    .find(byIdFilter)
+                    .limit(1).iterator())
                 {
-                    throw new EntityNotFoundException( ref );
+                    if (!cursor.hasNext())
+                    {
+                        throw new EntityNotFoundException(ref);
+                    }
+                    entities.deleteOne(byIdFilter);
                 }
-                entities.deleteOne( byIdFilter );
             }
-        } );
+        });
     }
 
     @Override
     public Stream<Reader> entityStates()
     {
         return StreamSupport
-            .stream( db.getCollection( collectionName ).find().spliterator(), false )
-            .map( eachEntity ->
-                  {
-                      Document bsonState = (Document) eachEntity.get( STATE_COLUMN );
-                      String jsonState = JSON.serialize( bsonState );
-                      return new StringReader( jsonState );
-                  } );
+            .stream(db.getCollection(collectionName).find().spliterator(), false)
+            .map(eachEntity ->
+            {
+                Document bsonState = (Document) eachEntity.get(STATE_COLUMN);
+                String jsonState = bsonState.toJson();
+                return new StringReader(jsonState);
+            });
     }
 
-    private Bson byIdentity( EntityReference entityReference )
+    private Bson byIdentity(EntityReference entityReference)
     {
-        return eq( IDENTITY_COLUMN, entityReference.identity().toString() );
+        return eq(IDENTITY_COLUMN, entityReference.identity().toString());
     }
 }

@@ -44,7 +44,7 @@ import org.qi4j.library.fileconfig.FileConfiguration;
 public interface NativeRepositoryService extends Repository, Availability
 {
     @Override
-    void initialize()
+    void init()
         throws RepositoryException;
 
     @Override
@@ -59,7 +59,7 @@ public interface NativeRepositoryService extends Repository, Availability
         public void afterActivation( ServiceReference<NativeRepositoryService> activated )
             throws Exception
         {
-            activated.get().initialize();
+            activated.get().init();
         }
 
         @Override
@@ -102,7 +102,7 @@ public interface NativeRepositoryService extends Repository, Availability
         }
 
         @Override
-        public void initialize()
+        public void init()
             throws RepositoryException
         {
             String dataDir = configuration.get().dataDirectory().get();
@@ -219,7 +219,7 @@ public interface NativeRepositoryService extends Repository, Availability
             store.setDataDir( dataDir );
             store.setTripleIndexes( tripleIndexes );
             store.setForceSync( forceSync );
-            repo.initialize();
+            repo.init();
             isNotInitialized = false;
         }
 

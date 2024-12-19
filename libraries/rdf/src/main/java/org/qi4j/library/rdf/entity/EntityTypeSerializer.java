@@ -32,14 +32,16 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.rdf4j.model.IRI;
+import org.eclipse.rdf4j.model.impl.DynamicModel;
+import org.eclipse.rdf4j.model.impl.DynamicModelFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.util.Classes;
 import org.qi4j.library.rdf.Rdfs;
 import org.qi4j.library.rdf.Qi4jEntityType;
-import org.eclipse.rdf4j.model.Graph;
+import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.GraphImpl;
 import org.eclipse.rdf4j.model.vocabulary.OWL;
 import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
 
@@ -74,8 +76,8 @@ public class EntityTypeSerializer
 
     public Iterable<Statement> serialize( final EntityDescriptor entityDescriptor )
     {
-        Graph graph = new GraphImpl();
-        ValueFactory values = graph.getValueFactory();
+        Model graph = new DynamicModelFactory().createEmptyModel();
+        ValueFactory values = SimpleValueFactory.getInstance();
         IRI entityTypeIri = values.createIRI( Classes.toURI( entityDescriptor.types().findFirst().orElse( null ) ) );
 
         graph.add( entityTypeIri, Rdfs.TYPE, Rdfs.CLASS );
@@ -97,11 +99,11 @@ public class EntityTypeSerializer
     }
 
     private void serializeMixinTypes( final EntityDescriptor entityDescriptor,
-                                      final Graph graph,
+                                      final Model graph,
                                       final IRI entityTypeIri
     )
     {
-        ValueFactory values = graph.getValueFactory();
+        ValueFactory values = SimpleValueFactory.getInstance();
 
         entityDescriptor.mixinTypes().forEach( mixinType -> {
             graph.add( entityTypeIri, Rdfs.SUB_CLASS_OF, values.createIRI( Classes.toURI( mixinType ) ) );
@@ -109,11 +111,11 @@ public class EntityTypeSerializer
     }
 
     private void serializeManyAssociationTypes( final EntityDescriptor entityDescriptor,
-                                                final Graph graph,
+                                                final Model graph,
                                                 final IRI entityTypeIri
     )
     {
-        ValueFactory values = graph.getValueFactory();
+        ValueFactory values = SimpleValueFactory.getInstance();
         // ManyAssociations
         entityDescriptor.state().manyAssociations().forEach( manyAssociationType -> {
             IRI associationURI = values.createIRI( manyAssociationType.qualifiedName().toURI() );
@@ -128,11 +130,11 @@ public class EntityTypeSerializer
     }
 
     private void serializeAssociationTypes( final EntityDescriptor entityDescriptor,
-                                            final Graph graph,
+                                            final Model graph,
                                             final IRI entityTypeIri
     )
     {
-        ValueFactory values = graph.getValueFactory();
+        ValueFactory values = SimpleValueFactory.getInstance();
         // Associations
         entityDescriptor.state().associations().forEach( associationType -> {
             IRI associationURI = values.createIRI( associationType.qualifiedName().toURI() );
@@ -146,11 +148,11 @@ public class EntityTypeSerializer
     }
 
     private void serializePropertyTypes( final EntityDescriptor entityDescriptor,
-                                         final Graph graph,
+                                         final Model graph,
                                          final IRI entityTypeIri
     )
     {
-        ValueFactory values = graph.getValueFactory();
+        ValueFactory values = SimpleValueFactory.getInstance();
 
         // Properties
         entityDescriptor.state().properties().forEach( persistentProperty -> {

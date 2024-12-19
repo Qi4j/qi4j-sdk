@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.eclipse.rdf4j.model.IRI;
+
+import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.impl.DynamicModelFactory;
 import org.qi4j.api.activation.ActivatorAdapter;
 import org.qi4j.api.activation.Activators;
 import org.qi4j.api.entity.EntityDescriptor;
@@ -40,11 +42,6 @@ import org.qi4j.library.rdf.entity.EntityTypeSerializer;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entitystore.StateChangeListener;
-import org.eclipse.rdf4j.model.Graph;
-import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.GraphImpl;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
 import org.eclipse.rdf4j.repository.RepositoryException;
@@ -198,7 +195,7 @@ public interface RdfIndexerService extends StateChangeListener
             {
                 EntityReference reference = entityState.entityReference();
                 final IRI entityIRI = stateSerializer.createEntityIRI( getValueFactory(), reference);
-                Graph graph = new GraphImpl();
+                Model graph = new DynamicModelFactory().createEmptyModel();
                 stateSerializer.serialize( entityState, false, graph );
                 connection.add( graph, entityIRI );
             }

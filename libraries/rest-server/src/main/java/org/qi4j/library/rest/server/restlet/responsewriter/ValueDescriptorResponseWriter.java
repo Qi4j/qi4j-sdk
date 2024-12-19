@@ -28,14 +28,14 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.json.JsonException;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.value.ValueDescriptor;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.serialization.JsonSerializer;
 import org.restlet.Response;
 import org.restlet.data.MediaType;
@@ -61,7 +61,7 @@ public class ValueDescriptorResponseWriter extends AbstractResponseWriter
     private JsonSerializer jsonSerializer;
 
     @Service
-    private JavaxJsonFactories json;
+    private JakartaJsonFactories json;
 
     @Service
     private Configuration cfg;

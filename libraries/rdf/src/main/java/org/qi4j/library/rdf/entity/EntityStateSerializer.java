@@ -21,7 +21,10 @@
 package org.qi4j.library.rdf.entity;
 
 import java.util.stream.Stream;
-import org.eclipse.rdf4j.model.IRI;
+
+import org.eclipse.rdf4j.model.*;
+import org.eclipse.rdf4j.model.impl.DynamicModelFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.entity.EntityDescriptor;
@@ -37,13 +40,6 @@ import org.qi4j.library.rdf.Rdfs;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.serialization.JsonSerializer;
-import org.eclipse.rdf4j.model.BNode;
-import org.eclipse.rdf4j.model.Graph;
-import org.eclipse.rdf4j.model.Literal;
-import org.eclipse.rdf4j.model.Resource;
-import org.eclipse.rdf4j.model.Statement;
-import org.eclipse.rdf4j.model.ValueFactory;
-import org.eclipse.rdf4j.model.impl.GraphImpl;
 
 /**
  * JAVADOC
@@ -67,17 +63,17 @@ public class EntityStateSerializer
                                          final boolean includeNonQueryable
     )
     {
-        Graph graph = new GraphImpl();
+        Model graph = new DynamicModelFactory().createEmptyModel();
         serialize(entityState, includeNonQueryable, graph);
         return graph;
     }
 
     public void serialize(final EntityState entityState,
                           final boolean includeNonQueryable,
-                          final Graph graph
+                          final Model graph
     )
     {
-        ValueFactory values = graph.getValueFactory();
+        ValueFactory values = SimpleValueFactory.getInstance();
         EntityReference reference = entityState.entityReference();
         IRI entityIri = createEntityIRI(values, reference);
 
@@ -105,7 +101,7 @@ public class EntityStateSerializer
     }
 
     private void serializeProperties(EntityState entityState,
-                                     Graph graph, Resource subject,
+                                     Model graph, Resource subject,
                                      EntityDescriptor entityType,
                                      boolean includeNonQueryable)
     {
@@ -122,7 +118,7 @@ public class EntityStateSerializer
     }
 
     private void serializeProperty(PropertyDescriptor persistentProperty, Object property,
-                                   Resource subject, Graph graph,
+                                   Resource subject, Model graph,
                                    boolean includeNonQueryable)
     {
         if( !(includeNonQueryable || persistentProperty.queryable()) )
@@ -132,7 +128,7 @@ public class EntityStateSerializer
 
         ValueType valueType = persistentProperty.valueType();
 
-        final ValueFactory valueFactory = graph.getValueFactory();
+        final ValueFactory valueFactory = SimpleValueFactory.getInstance();
 
         String propertyURI = persistentProperty.qualifiedName().toURI();
         IRI predicate = valueFactory.createIRI(propertyURI);
@@ -154,12 +150,12 @@ public class EntityStateSerializer
     private void serializeValueComposite(Resource subject, IRI predicate,
                                          ValueComposite value,
                                          ValueType valueType,
-                                         Graph graph,
+                                         Model graph,
                                          String baseUri,
                                          boolean includeNonQueryable
     )
     {
-        final ValueFactory valueFactory = graph.getValueFactory();
+        final ValueFactory valueFactory = SimpleValueFactory.getInstance();
         BNode collection = valueFactory.createBNode();
         graph.add(subject, predicate, collection);
 
@@ -192,12 +188,12 @@ public class EntityStateSerializer
     }
 
     private void serializeAssociations(final EntityState entityState,
-                                       final Graph graph, IRI entityIri,
+                                       final Model graph, IRI entityIri,
                                        final Stream<? extends AssociationDescriptor> associations,
                                        final boolean includeNonQueryable
     )
     {
-        ValueFactory values = graph.getValueFactory();
+        ValueFactory values = SimpleValueFactory.getInstance();
 
         // Associations
         associations.filter(type -> includeNonQueryable || type.queryable()).forEach(
@@ -218,13 +214,13 @@ public class EntityStateSerializer
     }
 
     private void serializeManyAssociations(final EntityState entityState,
-                                           final Graph graph,
+                                           final Model graph,
                                            final IRI entityIri,
                                            final Stream<? extends AssociationDescriptor> associations,
                                            final boolean includeNonQueryable
     )
     {
-        ValueFactory values = graph.getValueFactory();
+        ValueFactory values = SimpleValueFactory.getInstance();
 
         // Many-Associations
         associations.filter(type -> includeNonQueryable || type.queryable()).forEach(

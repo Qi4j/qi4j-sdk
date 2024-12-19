@@ -21,18 +21,18 @@
 package org.qi4j.library.rest.client.responsereader;
 
 import java.io.IOException;
-import javax.json.JsonException;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonString;
-import javax.json.JsonValue;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueCompositeType;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.library.rest.client.spi.ResponseReader;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.serialization.JsonDeserializer;
 import org.restlet.Response;
 import org.restlet.data.Form;
@@ -52,7 +52,7 @@ public class JSONResponseReader
     private JsonDeserializer jsonDeserializer;
 
     @Service
-    private JavaxJsonFactories jsonFactories;
+    private JakartaJsonFactories jsonFactories;
 
     @Override
     public Object readResponse( Response response, Class<?> resultType )

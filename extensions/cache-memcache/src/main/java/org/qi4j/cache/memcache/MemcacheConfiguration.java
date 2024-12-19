@@ -34,7 +34,7 @@ public interface MemcacheConfiguration
      * Defaulted to 3600 seconds, one hour.
      * @return Cached items expiration configuration property
      */
-    @Optional
+    @UseDefaults("3600")
     Property<Integer> expiration();
 
     /**
@@ -43,16 +43,16 @@ public interface MemcacheConfiguration
      * Defaulted to {@literal "127.0.0.1:11211"}.
      * @return Memcached server addresses configuration property
      */
-    @Optional
+    @UseDefaults("127.0.0.1:11211")
     Property<String> addresses();
 
     /**
      * Memcache Protocol.
-     * Can be {@literal text} or {@literal binary}
+     * Can be {@literal Text} or {@literal Binary} or {@literal Kestrel}
      * Defaulted to {@literal text}.
      * @return Memcache Protocol configuration property
      */
-    @Optional
+    @UseDefaults("Text")
     Property<String> protocol();
 
     /**
@@ -75,7 +75,7 @@ public interface MemcacheConfiguration
      * Defaulted to PLAIN.
      * @return Authentication mechanism configuration property
      */
-    @Optional
+    @UseDefaults("PLAIN")
     Property<String> authMechanism();
 
 

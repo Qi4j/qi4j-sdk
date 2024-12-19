@@ -80,7 +80,6 @@ import static org.qi4j.entitystore.cassandra.CassandraCluster.VERSION_COLUMN;
 import static org.qi4j.entitystore.cassandra.CassandraEntityStoreService.CURRENT_STORAGE_VERSION;
 
 /**
- * MongoDB implementation of MapEntityStore.
  */
 public class CassandraEntityStoreMixin
     implements EntityStore, EntityStoreSPI, ServiceActivation

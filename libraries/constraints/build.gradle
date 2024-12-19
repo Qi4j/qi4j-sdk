@@ -18,10 +18,6 @@
  *
  */
 
-plugins {
-  id "org.javamodularity.moduleplugin" version "1.8.12"
-}
-
 apply plugin: 'qi4j-library'
 
 description = "Qi4j Constraint Library provides common set of constraints."

@@ -45,7 +45,7 @@ if( qi4j.entitystore.indexOf('SQL') >= 0 || qi4j.indexing === 'SQL' ) {
 %>
   implementation "org.qi4j.extensions:org.qi4j.extension.entitystore-<%= qi4j.entitystoremodule.toLowerCase() %>:$qi4jVersion"
   implementation "org.qi4j.extensions:org.qi4j.extension.indexing-<%= qi4j.indexing.toLowerCase() %>:$qi4jVersion"
-  implementation "org.qi4j.extensions:org.qi4j.extension.serialization-javaxjson:$qi4jVersion"
+  implementation "org.qi4j.extensions:org.qi4j.extension.serialization-jakartajson:$qi4jVersion"
 <%
 if( qi4j.caching !== "None" ) {
 %>  implementation "org.qi4j.extensions:org.qi4j.extension.cache-<%= qi4j.caching.toLowerCase() %>:$qi4jVersion"

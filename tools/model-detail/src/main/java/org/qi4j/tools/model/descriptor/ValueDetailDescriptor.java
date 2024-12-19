@@ -19,7 +19,7 @@
  */
 package org.qi4j.tools.model.descriptor;
 
-import javax.json.JsonObjectBuilder;
+import jakarta.json.JsonObjectBuilder;
 import org.qi4j.api.util.Visitable;
 import org.qi4j.api.util.Visitor;
 import org.qi4j.api.value.ValueDescriptor;

@@ -19,6 +19,10 @@
  */
 import org.qi4j.gradle.TaskGroups
 
+plugins {
+  id "org.javamodularity.moduleplugin" version "1.8.12"
+}
+
 apply plugin: 'qi4j-library'
 
 description = "Qi4j JMX Library provides Java Management Extension (JMX) integration for Qi4j applications."

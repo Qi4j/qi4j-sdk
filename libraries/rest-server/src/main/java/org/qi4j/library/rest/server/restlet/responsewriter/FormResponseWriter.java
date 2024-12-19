@@ -29,11 +29,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.json.JsonException;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonValue;
 import org.qi4j.api.injection.scope.Service;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.restlet.Response;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
@@ -56,7 +56,7 @@ public class FormResponseWriter
     private Configuration cfg;
 
     @Service
-    private JavaxJsonFactories jsonFactories;
+    private JaKartaJsonFactories jsonFactories;
 
     @Override
     public boolean writeResponse( final Object result, final Response response )

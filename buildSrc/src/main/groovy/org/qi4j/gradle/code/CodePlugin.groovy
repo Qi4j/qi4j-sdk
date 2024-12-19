@@ -62,8 +62,8 @@ class CodePlugin implements Plugin<Project> {
     private static void applyJava(Project project) {
         project.plugins.apply 'java-library'
         def javaExtension = project.extensions.getByType JavaPluginExtension
-        javaExtension.targetCompatibility = JavaVersion.VERSION_17
-        javaExtension.sourceCompatibility = JavaVersion.VERSION_17
+        javaExtension.targetCompatibility = JavaVersion.VERSION_21
+        javaExtension.sourceCompatibility = JavaVersion.VERSION_21
         project.tasks.withType(JavaCompile) { JavaCompile task ->
             task.options.encoding = 'UTF-8'
             task.options.compilerArgs << '-Xlint:deprecation'
@@ -94,7 +94,7 @@ class CodePlugin implements Plugin<Project> {
         def parallel = project.gradle.startParameter.parallelProjectExecutionEnabled
         def maxTestWorkers = (parallel ? project.gradle.startParameter.maxWorkerCount : 1) as int
         // The space in the directory name is intentional
-        def allTestsDir = project.file "$project.buildDir/tmp/test files"
+        def allTestsDir = project.file project.layout.buildDirectory.dir("/tmp/test files")
         def testTasks = project.tasks.withType(Test) { Test testTask ->
             testTask.onlyIf { !project.hasProperty('skipTests') }
             testTask.testLogging.info.exceptionFormat = TestExceptionFormat.FULL

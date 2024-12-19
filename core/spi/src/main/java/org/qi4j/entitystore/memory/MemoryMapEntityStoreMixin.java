@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entitystore.BackupRestore;
 import org.qi4j.spi.entitystore.EntityAlreadyExistsException;
 import org.qi4j.spi.entitystore.EntityNotFoundException;
@@ -38,7 +38,7 @@ import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.entitystore.helpers.JSONKeys;
 import org.qi4j.spi.entitystore.helpers.MapEntityStore;
 import org.qi4j.spi.entitystore.helpers.MapEntityStoreActivation;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 
 /**
  * In-memory implementation of MapEntityStore.
@@ -49,7 +49,7 @@ public class MemoryMapEntityStoreMixin
     private final Map<EntityReference, String> store;
 
     @Service
-    private JavaxJsonFactories jsonFactories;
+    private JakartaJsonFactories jsonFactories;
 
     public MemoryMapEntityStoreMixin()
     {

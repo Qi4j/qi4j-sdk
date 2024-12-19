@@ -104,6 +104,9 @@ public abstract class AbstractQi4jTest extends AbstractQi4jBaseTest
                 }
                 else
                 {
+                    System.err.println( "UnitOfWork Active but not Open:" + uow.usecase().name() );
+                    uow.discard();
+
                     throw new InternalError( "I have seen a case where a UoW is on the stack, but not opened. First is: " + uow
                         .usecase()
                         .name() );

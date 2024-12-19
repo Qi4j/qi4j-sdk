@@ -19,6 +19,7 @@
  */
 package org.qi4j.entitystore.leveldb;
 
+import org.junit.jupiter.api.Disabled;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
@@ -30,6 +31,7 @@ import org.qi4j.test.TemporaryFolder;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+@Disabled("Java variant of LevelDB is not maintained.")
 @ExtendWith( TemporaryFolder.class )
 public class JavaLevelDBEntityStoreTest extends AbstractEntityStoreTest
 {

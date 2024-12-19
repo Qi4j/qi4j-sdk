@@ -23,20 +23,18 @@ package org.qi4j.library.rest.client.responsereader;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonString;
-import javax.json.JsonValue;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.structure.Module;
 import org.qi4j.library.rest.client.spi.ResponseReader;
 import org.qi4j.library.rest.common.table.Table;
-import org.qi4j.library.rest.common.table.TableBuilder;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.serialization.JsonDeserializer;
-import org.qi4j.library.rest.common.table.Table;
 import org.qi4j.library.rest.common.table.TableBuilder;
 import org.restlet.Response;
 import org.restlet.data.MediaType;
@@ -56,7 +54,7 @@ public class TableResponseReader
     private JsonDeserializer jsonDeserializer;
 
     @Service
-    private JavaxJsonFactories jsonFactories;
+    private JakartaJsonFactories jsonFactories;
 
     @Override
     public Object readResponse( Response response, Class<?> resultType ) throws ResourceException

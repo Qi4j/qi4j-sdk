@@ -19,6 +19,7 @@
  */
 package org.qi4j.entitystore.sql;
 
+import org.junit.jupiter.api.Disabled;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
@@ -34,6 +35,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith( TemporaryFolder.class )
+// FIXME Investogate the issue.
+//@Disabled("Syntax error in a SQL statement.")
 public class SqlEntityStoreTest extends AbstractEntityStoreTest
 {
     private TemporaryFolder tmpDir;

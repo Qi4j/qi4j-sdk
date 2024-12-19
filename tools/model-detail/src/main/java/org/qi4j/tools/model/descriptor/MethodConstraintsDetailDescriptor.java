@@ -22,7 +22,7 @@ package org.qi4j.tools.model.descriptor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.JsonObjectBuilder;
 import org.qi4j.api.constraint.ConstraintsDescriptor;
 
 public final class MethodConstraintsDetailDescriptor

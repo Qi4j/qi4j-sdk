@@ -19,26 +19,24 @@ package org.qi4j.spi.entitystore.helpers;
 
 import java.time.Instant;
 import java.util.Objects;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonString;
-import javax.json.JsonValue;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.serialization.SerializationException;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.entity.NamedAssociationState;
 import org.qi4j.spi.entitystore.EntityStoreException;
-import org.qi4j.spi.serialization.JsonSerialization;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
 import org.qi4j.spi.serialization.JsonSerialization;
 
 import static org.qi4j.api.serialization.Serializer.Options.ALL_TYPE_INFO;
@@ -54,7 +52,7 @@ public final class JSONEntityState
     private final EntityReference reference;
     private final EntityDescriptor entityDescriptor;
     private final JsonSerialization serialization;
-    private final JavaxJsonFactories jsonFactories;
+    private final JakartaJsonFactories jsonFactories;
 
     private EntityStatus status;
     private Instant lastModified;
@@ -62,7 +60,7 @@ public final class JSONEntityState
 
     /* package */ JSONEntityState( ModuleDescriptor module,
                                    JsonSerialization serialization,
-                                   JavaxJsonFactories jsonFactories,
+                                   JakartaJsonFactories jsonFactories,
                                    String version,
                                    Instant lastModified,
                                    EntityReference reference,

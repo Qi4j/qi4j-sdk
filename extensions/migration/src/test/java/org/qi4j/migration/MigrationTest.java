@@ -22,7 +22,7 @@ package org.qi4j.migration;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.service.importer.NewObjectImporter;

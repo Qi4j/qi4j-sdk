@@ -23,7 +23,6 @@ import org.qi4j.bootstrap.Assemblers;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.cassandra.CassandraEntityStoreConfiguration;
 import org.qi4j.entitystore.cassandra.CassandraEntityStoreService;
-import org.qi4j.entitystore.cassandra.CassandraEntityStoreService;
 
 public class CassandraEntityStoreAssembler
     extends Assemblers.VisibilityIdentityConfig<CassandraEntityStoreAssembler>

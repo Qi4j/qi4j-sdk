@@ -19,9 +19,12 @@
  */
 package org.qi4j.cache.memcache;
 
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.transcoders.SerializingTranscoder;
+
+import net.rubyeye.xmemcached.MemcachedClient;
+import net.rubyeye.xmemcached.exception.MemcachedException;
+import net.rubyeye.xmemcached.transcoders.SerializingTranscoder;
 import org.qi4j.spi.cache.Cache;
 
 /**
@@ -49,40 +52,105 @@ import org.qi4j.spi.cache.Cache;
         this.expiration = expiration;
     }
 
+    @SuppressWarnings("TryWithIdenticalCatches")
     @Override
     public T get( String key )
     {
-        Object value = client.get( prefix( key ), new SerializingTranscoder() );
-        client.touch( prefix( key ), expiration );
-        if( value == null )
+        try
+        {
+            Object value = client.get( prefix( key ), new SerializingTranscoder() );
+            client.touch( prefix( key ), expiration );
+            if( value == null )
+            {
+                return null;
+            }
+            return valueType.cast( value );
+        }
+        // TODO: Work out how to handle this gracefully. Is returning null enough? Should probably disable caching for a while and try again later.
+        catch (TimeoutException e)
         {
             return null;
         }
-        return valueType.cast( value );
+        catch (InterruptedException e)
+        {
+            return null;
+        }
+        catch (MemcachedException e)
+        {
+            return null;
+        }
     }
 
+    @SuppressWarnings("TryWithIdenticalCatches")
     @Override
     public T remove( String key )
     {
-        String prefixedKey = prefix( key );
-        Object old = client.get( prefixedKey, new SerializingTranscoder() );
-        if( old != null )
+        try
         {
-            client.delete( prefixedKey );
+            String prefixedKey = prefix( key );
+            Object old = client.get( prefixedKey, new SerializingTranscoder() );
+            if( old != null )
+            {
+                client.delete( prefixedKey );
+            }
+            return valueType.cast( old );
         }
-        return valueType.cast( old );
+        // TODO: Work out how to handle this gracefully. Is returning null enough? Should probably disable caching for a while and try again later.
+        catch (TimeoutException e)
+        {
+            return null;
+        }
+        catch (InterruptedException e)
+        {
+            return null;
+        }
+        catch (MemcachedException e)
+        {
+            return null;
+        }
     }
 
+    @SuppressWarnings({"TryWithIdenticalCatches", "CatchMayIgnoreException"})
     @Override
     public void put( String key, T value )
     {
-        client.set( prefix( key ), expiration, value, new SerializingTranscoder() );
+        try
+        {
+            client.set( prefix( key ), expiration, value, new SerializingTranscoder() );
+        }
+        // TODO: Work out how to handle this gracefully.
+        catch (TimeoutException e)
+        {
+        }
+        catch (InterruptedException e)
+        {
+        }
+        catch (MemcachedException e)
+        {
+        }
     }
 
+    @SuppressWarnings("TryWithIdenticalCatches")
     @Override
     public boolean exists( String key )
     {
-        return client.get( prefix( key ) ) != null;
+        try
+        {
+            return client.get( prefix( key ) ) != null;
+        }
+        // TODO: Work out how to handle this gracefully.
+        catch (TimeoutException e)
+        {
+            return false;
+        }
+        catch (InterruptedException e)
+        {
+            return false;
+        }
+        catch (MemcachedException e)
+        {
+            return false;
+        }
     }
 
     private String prefix( String key )

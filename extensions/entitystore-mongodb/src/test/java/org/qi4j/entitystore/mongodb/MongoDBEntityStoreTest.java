@@ -19,54 +19,54 @@
  */
 package org.qi4j.entitystore.mongodb;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Port;
-import com.github.junit5docker.WaitFor;
-import com.mongodb.Mongo;
+import com.mongodb.client.MongoClient;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Visibility;
-import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.mongodb.assembly.MongoDBEntityStoreAssembler;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Test the MongoDBEntityStoreService.
  */
-@Docker( image = "mongo:3.5.10",
-         ports = @Port( exposed = 8801, inner = 27017),
-         newForEachCase = false
-)
+@Testcontainers
 public class MongoDBEntityStoreTest extends AbstractEntityStoreTest
 {
+    @Container
+    public static MongoDBContainer mongoContainer = new MongoDBContainer("mongo:5")
+        .withReuse(true);
+
     @Override
     // START SNIPPET: assembly
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws Exception
     {
         // END SNIPPET: assembly
-        super.assemble( module );
+        super.assemble(module);
 
-        ModuleAssembly config = module.layer().module( "config" );
-        new EntityTestAssembler().defaultServicesVisibleIn( Visibility.layer ).assemble( config );
+        ModuleAssembly config = module.layer().module("config");
+        new EntityTestAssembler().defaultServicesVisibleIn(Visibility.layer).assemble(config);
 
         // START SNIPPET: assembly
-        new MongoDBEntityStoreAssembler().withConfig( config, Visibility.layer ).assemble( module );
+        new MongoDBEntityStoreAssembler().withConfig(config, Visibility.layer).assemble(module);
         // END SNIPPET: assembly
 
-        MongoDBEntityStoreConfiguration mongoConfig = config.forMixin( MongoDBEntityStoreConfiguration.class ).declareDefaults();
-        mongoConfig.writeConcern().set( MongoDBEntityStoreConfiguration.WriteConcern.MAJORITY );
-        mongoConfig.database().set( "qi4j:test" );
-        mongoConfig.collection().set( "qi4j:test:entities" );
-        mongoConfig.hostname().set( "localhost" );
-        mongoConfig.port().set( 8801 );
+        MongoDBEntityStoreConfiguration mongoConfig = config.forMixin(MongoDBEntityStoreConfiguration.class).declareDefaults();
+        mongoConfig.writeConcern().set(MongoDBEntityStoreConfiguration.WriteConcern.MAJORITY);
+        mongoConfig.database().set("qi4j:test");
+        mongoConfig.collection().set("qi4j:test:entities");
+        mongoConfig.connectionString().set(mongoContainer.getConnectionString());
         // START SNIPPET: assembly
     }
 
     // END SNIPPET: assembly
-    private Mongo mongo;
+    private MongoClient mongo;
     private String dbName;
 
     @Override
@@ -75,7 +75,7 @@ public class MongoDBEntityStoreTest extends AbstractEntityStoreTest
         throws Exception
     {
         super.setUp();
-        MongoDBEntityStoreService es = serviceFinder.findService( MongoDBEntityStoreService.class ).get();
+        MongoDBEntityStoreService es = serviceFinder.findService(MongoDBEntityStoreService.class).get();
         mongo = es.mongoInstanceUsed();
         dbName = es.dbInstanceUsed().getName();
     }
@@ -84,7 +84,7 @@ public class MongoDBEntityStoreTest extends AbstractEntityStoreTest
     @AfterEach
     public void tearDown()
     {
-        mongo.dropDatabase( dbName );
+        mongo.getDatabase(dbName).drop();
         super.tearDown();
     }
 }

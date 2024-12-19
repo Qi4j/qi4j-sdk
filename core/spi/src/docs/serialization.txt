@@ -77,7 +77,7 @@ tag=binary
 
 == JSON or XML?
 
-The Core SPI provides JSON and XML serialization respectively based on `javax.json` and `javax.xml` types and APIs to
+The Core SPI provides JSON and XML serialization respectively based on `jakarta.json` and `javax.xml` types and APIs to
 work directly with these types so you can work with the actual object representations without serializing to text or
 bytes. They both rely on the text serialization adapters shown above.
 
@@ -85,7 +85,7 @@ Here is an example using the `JsonSerialization` service:
 
 [snippet,java]
 --------------
-source=extensions/serialization-javaxjson/src/test/java/org/qi4j/serialization/javaxjson/JavaxJsonValueCompositeSerializationTest.java
+source=extensions/serialization-jakartajson/src/test/java/org/qi4j/serialization/javaxjson/JavaxJsonValueCompositeSerializationTest.java
 tag=json-serialization
 --------------
 

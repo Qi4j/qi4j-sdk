@@ -19,26 +19,29 @@
  */
 package org.qi4j.entitystore.redis;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Port;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.qi4j.api.common.Visibility;
-import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.redis.assembly.RedisEntityStoreAssembler;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.cache.AbstractEntityStoreWithCacheTest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
-@Docker( image = "redis:4.0.0-alpine",
-         ports = @Port( exposed = 8801, inner = 6379),
-         newForEachCase = false
-)
+@Testcontainers
 public class RedisEntityStoreWithCacheTest
     extends AbstractEntityStoreWithCacheTest
 {
+    @Container
+    public static GenericContainer<?> redisContainer = new GenericContainer<>( "redis:7.4-alpine" )
+        .withExposedPorts( 6379 )
+        .withReuse(true)
+        ;
+
     @Override
     public void assemble( ModuleAssembly module )
         throws Exception
@@ -49,8 +52,8 @@ public class RedisEntityStoreWithCacheTest
         new RedisEntityStoreAssembler().withConfig( config, Visibility.layer ).assemble( module );
         RedisEntityStoreConfiguration redisConfig = config.forMixin( RedisEntityStoreConfiguration.class )
                                                           .declareDefaults();
-        redisConfig.host().set( "localhost" );
-        redisConfig.port().set( 8801 );
+        redisConfig.host().set( redisContainer.getHost() );
+        redisConfig.port().set( redisContainer.getFirstMappedPort() );
     }
 
     private JedisPool jedisPool;

@@ -19,48 +19,53 @@
  */
 package org.qi4j.entitystore.zookeeper;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Port;
+import org.junit.jupiter.api.AfterEach;
 import org.qi4j.api.common.Visibility;
-import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.zookeeper.assembly.ZookeeperEntityStoreAssembler;
 import org.qi4j.test.EntityTestAssembler;
-import org.qi4j.test.TemporaryFolder;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.time.Duration;
 
 import static java.lang.Thread.sleep;
 import static java.util.Collections.singletonList;
 
 
-@Docker( image = "zookeeper:3.4.11",
-         ports = @Port( exposed = 32181, inner = 2181),
-         newForEachCase = false
-)
+@Testcontainers
 public class ZookeeperEntityStoreTest extends AbstractEntityStoreTest
 {
+    @Container
+    public static GenericContainer<?> zookeeper = new GenericContainer<>("zookeeper:latest")
+        .withExposedPorts(2181)
+        .waitingFor(Wait.forLogMessage(".*binding to port /0\\.0\\.0\\.0:2181.*", 1))
+        .withLogConsumer( out -> System.out.println( out.getUtf8StringWithoutLineEnding() ) )
+        .withStartupTimeout(Duration.ofSeconds(90))
+        .withReuse(true);
 
     static final String TEST_ZNODE_NAME = "/qi4j/entitystore-test";
 
     @Override
     // START SNIPPET: assembly
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws Exception
     {
         // END SNIPPET: assembly
         sleep(1000);
-        super.assemble( module );
-        ModuleAssembly config = module.layer().module( "config" );
-        new EntityTestAssembler().defaultServicesVisibleIn( Visibility.layer ).assemble( config );
+        super.assemble(module);
+        ModuleAssembly config = module.layer().module("config");
+        new EntityTestAssembler().defaultServicesVisibleIn(Visibility.layer).assemble(config);
         // START SNIPPET: assembly
         ZookeeperEntityStoreAssembler zkAssembler = new ZookeeperEntityStoreAssembler();
-        zkAssembler.withConfig( config, Visibility.layer ).assemble( module );
+        zkAssembler.withConfig(config, Visibility.layer).assemble(module);
         // END SNIPPET: assembly
-        ZookeeperEntityStoreConfiguration defaults = zkAssembler.configModule().forMixin( ZookeeperEntityStoreConfiguration.class ).declareDefaults();
-        defaults.hosts().set( singletonList( "localhost:32181" ) );
-        defaults.storageNode().set( TEST_ZNODE_NAME );
+        ZookeeperEntityStoreConfiguration defaults = zkAssembler.configModule().forMixin(ZookeeperEntityStoreConfiguration.class).declareDefaults();
+        defaults.hosts().set(singletonList(zookeeper.getHost() + ":" + zookeeper.getFirstMappedPort()));
+        defaults.storageNode().set(TEST_ZNODE_NAME);
         // START SNIPPET: assembly
     }
     // END SNIPPET: assembly
@@ -69,6 +74,6 @@ public class ZookeeperEntityStoreTest extends AbstractEntityStoreTest
     void cleanUp()
         throws Exception
     {
-        ZkUtil.cleanUp( "localhost:32181", TEST_ZNODE_NAME );
+        ZkUtil.cleanUp(zookeeper.getHost() + ":" + zookeeper.getFirstMappedPort(), TEST_ZNODE_NAME);
     }
 }

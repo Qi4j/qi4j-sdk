@@ -20,7 +20,7 @@ package org.qi4j.spi.serialization;
 import org.qi4j.api.serialization.Serialization;
 
 /**
- * {@literal javax.json} serialization.
+ * {@literal jakarta.json} serialization.
  */
 public interface JsonSerialization extends Serialization, JsonSerializer, JsonDeserializer
 {

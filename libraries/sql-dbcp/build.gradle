@@ -18,6 +18,10 @@
  *
  */
 
+plugins {
+  id "org.javamodularity.moduleplugin" version "1.8.12"
+}
+
 apply plugin: 'qi4j-library'
 
 description = "Qi4j SQL DBCP Library provides DBCP support."

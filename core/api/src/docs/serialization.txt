@@ -57,7 +57,7 @@ Methods of +Serializer+ allow to specify if the serialized state should contain 
 serialized value. Having type information in the serialized payload allows to keep actual ValueComposite types and by so
 circumvent +AmbiguousTypeException+ when deserializing.
 
-Core Runtime provides a default Serialization system based on `javax.json` types.
+Core Runtime provides a default Serialization system based on `jakarta.json` types.
 
 Let's see how it works in practice.
 
@@ -96,7 +96,7 @@ In this second example, we ;
 
     . declare a ValueComposite,
     . assemble it,
-    . assemble a Serialization Service backed by the +javax.json+ types,
+    . assemble a Serialization Service backed by the +jakarta.json+ types,
     . get the +Serializer+ and +Deserializer+ Services injected,
     . create a new Value instance,
     . use the +Serializer#serialize()+ method to get a JSON representation of the Value,

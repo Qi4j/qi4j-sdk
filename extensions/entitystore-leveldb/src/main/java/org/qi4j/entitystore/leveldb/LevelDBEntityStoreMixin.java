@@ -78,18 +78,18 @@ public class LevelDBEntityStoreMixin
         // Choose flavour
         String flavour = config.flavour().get();
         DBFactory factory;
-        if( "jni".equalsIgnoreCase( flavour ) )
-        {
+//        if( "jni".equalsIgnoreCase( flavour ) )
+//        {
             factory = newJniDBFactory();
-        }
-        else if( "java".equalsIgnoreCase( flavour ) )
-        {
-            factory = newJavaDBFactory();
-        }
-        else
-        {
-            factory = newDBFactory();
-        }
+//        }
+//        else if( "java".equalsIgnoreCase( flavour ) )
+//        {
+//            factory = newJavaDBFactory();
+//        }
+//        else
+//        {
+//            factory = newDBFactory();
+//        }
 
         // Apply configuration
         Options options = new Options();
@@ -149,16 +149,16 @@ public class LevelDBEntityStoreMixin
         }
         catch( Exception ex )
         {
-            try
-            {
-                return newJavaDBFactory();
-            }
-            catch( Exception ex2 )
-            {
-                throw new RuntimeException( "Unable to create a LevelDB DBFactory instance. "
-                                            + "Tried JNI and pure Java. "
-                                            + "The stacktrace is the pure Java attempt.", ex2 );
-            }
+//            try
+//            {
+//                return newJavaDBFactory();
+//            }
+//            catch( Exception ex2 )
+//            {
+                throw new RuntimeException( "Unable to create a LevelDB DBFactory instance. " );
+//                                            + "Tried JNI and pure Java. "
+//                                            + "The stacktrace is the pure Java attempt.", ex2 );
+//            }
         }
     }
 
@@ -168,11 +168,11 @@ public class LevelDBEntityStoreMixin
         return (DBFactory) Class.forName( "org.fusesource.leveldbjni.JniDBFactory" ).newInstance();
     }
 
-    private DBFactory newJavaDBFactory()
-        throws Exception
-    {
-        return (DBFactory) Class.forName( "org.iq80.leveldb.impl.Iq80DBFactory" ).newInstance();
-    }
+//    private DBFactory newJavaDBFactory()
+//        throws Exception
+//    {
+//        return (DBFactory) Class.forName( "org.iq80.leveldb.impl.Iq80DBFactory" ).newInstance();
+//    }
 
     @Override
     public void passivateService()

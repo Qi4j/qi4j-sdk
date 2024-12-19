@@ -29,11 +29,9 @@ dependencies {
   api qi4j.library( 'fileconfig' )
 
   implementation qi4j.library( 'locking' )
-  implementation libraries.leveldb_api
+  implementation libraries.leveldb
 
   runtimeOnly qi4j.core.runtime
-  runtimeOnly libraries.leveldb_java
-  runtimeOnly libraries.leveldb_jni_all
 
   testImplementation qi4j.core.testsupport
 

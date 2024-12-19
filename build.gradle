@@ -19,3 +19,4 @@ apply plugin: 'qi4j-dependencies-declaration'
 apply from: 'dependencies.gradle'
 apply plugin: 'qi4j-root'
 
+

@@ -36,7 +36,7 @@ dependencies {
 
   testImplementation qi4j.core.testsupport
   testImplementation libraries.awaitility
-  testImplementation libraries.docker_junit
+  testImplementation libraries.testcontainer_zookeeper
 
   testRuntimeOnly libraries.logback
 }

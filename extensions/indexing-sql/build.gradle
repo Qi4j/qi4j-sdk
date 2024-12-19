@@ -35,7 +35,7 @@ dependencies {
 
   testImplementation qi4j.core.testsupport
   testImplementation qi4j.library( 'sql-dbcp' )
-  testImplementation libraries.docker_junit
+  testImplementation libraries.testcontainer_postgresql
 
   testRuntimeOnly libraries.logback
   testRuntimeOnly libraries.derby

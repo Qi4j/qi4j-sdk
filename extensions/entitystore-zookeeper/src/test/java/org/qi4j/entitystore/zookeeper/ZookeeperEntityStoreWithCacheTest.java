@@ -19,29 +19,28 @@
  */
 package org.qi4j.entitystore.zookeeper;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Port;
+import org.junit.jupiter.api.AfterEach;
 import org.qi4j.api.common.Visibility;
-import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.zookeeper.assembly.ZookeeperEntityStoreAssembler;
 import org.qi4j.test.EntityTestAssembler;
-import org.qi4j.test.TemporaryFolder;
 import org.qi4j.test.cache.AbstractEntityStoreWithCacheTest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static java.lang.Thread.sleep;
 import static java.util.Collections.singletonList;
-import static org.qi4j.entitystore.zookeeper.ZookeeperEntityStoreTest.TEST_ZNODE_NAME;
 
-@Docker( image = "zookeeper:3.4.11",
-         ports = @Port( exposed = 32181, inner = 2181),
-         newForEachCase = false
-)
+@Testcontainers
 public class ZookeeperEntityStoreWithCacheTest
     extends AbstractEntityStoreWithCacheTest
 {
+    @Container
+    public static GenericContainer<?> zookeeper = new GenericContainer<>("zookeeper:latest")
+        .withExposedPorts(2181)
+        .withReuse(true);
+
     @Override
     public void assemble( ModuleAssembly module )
         throws Exception
@@ -54,7 +53,7 @@ public class ZookeeperEntityStoreWithCacheTest
         zkAssembler.withConfig( config, Visibility.layer ).assemble( module );
 
         ZookeeperEntityStoreConfiguration defaults = zkAssembler.configModule().forMixin( ZookeeperEntityStoreConfiguration.class ).declareDefaults();
-        defaults.hosts().set( singletonList( "localhost:32181" ) );
+        defaults.hosts().set( singletonList( zookeeper.getHost() + ":" + zookeeper.getFirstMappedPort() ) );
         defaults.storageNode().set( ZookeeperEntityStoreTest.TEST_ZNODE_NAME );
 
         new EntityTestAssembler().defaultServicesVisibleIn( Visibility.layer ).assemble( config );
@@ -65,7 +64,7 @@ public class ZookeeperEntityStoreWithCacheTest
     void cleanUp()
         throws Exception
     {
-        ZkUtil.cleanUp( "localhost:32181", ZookeeperEntityStoreTest.TEST_ZNODE_NAME );
+        ZkUtil.cleanUp( zookeeper.getHost() + ":" + zookeeper.getFirstMappedPort(), ZookeeperEntityStoreTest.TEST_ZNODE_NAME );
     }
 
 }

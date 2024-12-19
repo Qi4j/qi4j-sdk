@@ -21,19 +21,14 @@ import java.lang.reflect.Type;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.jooq.*;
+import org.jooq.Record;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.property.PropertyDescriptor;
 import org.qi4j.api.util.Classes;
-import org.jooq.Constraint;
-import org.jooq.CreateTableColumnStep;
-import org.jooq.DataType;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.Result;
-import org.jooq.SQLDialect;
-import org.jooq.Table;
 import org.jooq.impl.DSL;
 
 /**
@@ -50,12 +45,12 @@ class TypesTable
     private static final String TABLENAME_COLUMN_NAME = "_table_name";
 
     // Common Fields
-    private Field<String> identityColumn;
-    private Field<Timestamp> createdColumn;
-    private Field<Timestamp> modifiedColumn;
+    private final Field<String> identityColumn;
+    private final Field<Timestamp> createdColumn;
+    private final Field<Timestamp> modifiedColumn;
 
     // Types Table
-    private Field<String> tableNameColumn;
+    private final Field<String> tableNameColumn;
 
     private final Map<Class<?>, Table<Record>> mixinTablesCache = new ConcurrentHashMap<>();
 
@@ -75,7 +70,7 @@ class TypesTable
         this.config = config;
         typesTable = dsl.tableOf( typesTablesName );
         this.dsl = dsl;
-        Integer idMaxLength = config.identityLength().get();
+//        Integer idMaxLength = config.identityLength().get();
         identityColumn = SqlType.makeField( IDENTITY_COLUMN_NAME, String.class, dialect );
         createdColumn = SqlType.makeField( CREATED_COLUMN_NAME, Timestamp.class, dialect );
         modifiedColumn = SqlType.makeField( LASTMODIFIED_COLUMN_NAME, Timestamp.class, dialect );
@@ -118,7 +113,7 @@ class TypesTable
     {
         String mixinTypeName = mixinType.getName();
         String tableName = createNewTableName( mixinType );
-        CreateTableColumnStep primaryTable = dsl.createTable( dsl.tableOf( tableName ) )
+        CreateTableElementListStep primaryTable = dsl.createTable( dsl.tableOf( tableName ) )
                                                 .column( identityColumn )
                                                 .column( createdColumn );
         descriptor.state().properties().forEach(
@@ -171,10 +166,10 @@ class TypesTable
         {
             return true;
         }
-        return dsl.select()
-                  .from( typesTable )
-                  .where( tableNameColumn.eq( tableName ) )
-                  .fetch().size() > 0;
+        return !dsl.select()
+            .from(typesTable)
+            .where(tableNameColumn.eq(tableName))
+            .fetch().isEmpty();
     }
 
     Field<Object> fieldOf( PropertyDescriptor descriptor )

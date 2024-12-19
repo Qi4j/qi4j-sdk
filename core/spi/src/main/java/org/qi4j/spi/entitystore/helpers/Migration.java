@@ -20,8 +20,8 @@
 
 package org.qi4j.spi.entitystore.helpers;
 
-import javax.json.JsonException;
-import javax.json.JsonObject;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 
 /**
  * State Migration SPI.

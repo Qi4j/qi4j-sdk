@@ -20,6 +20,8 @@
 
 apply plugin: 'qi4j-extension'
 
+description = "Qi4j Hazelcast EntityStore Extension"
+
 //jar { manifest { name = "Qi4j Extension - EntityStore - File system" } }
 
 dependencies {
@@ -30,6 +32,7 @@ dependencies {
   implementation qi4j.library( 'constraints' )
 
   runtimeOnly qi4j.core.runtime
+
   testImplementation qi4j.core.testsupport
 
   testRuntimeOnly libraries.logback

@@ -33,7 +33,7 @@ dependencies {
   runtimeOnly qi4j.core.runtime
 
   testImplementation qi4j.core.testsupport
-  testImplementation libraries.docker_junit
+  testImplementation libraries.testcontainer_redis
 
   testRuntimeOnly libraries.logback
 }

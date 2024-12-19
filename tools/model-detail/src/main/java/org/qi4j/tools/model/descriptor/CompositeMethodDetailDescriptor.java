@@ -22,9 +22,9 @@ package org.qi4j.tools.model.descriptor;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Objects;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonObjectBuilder;
 import org.qi4j.api.composite.MethodDescriptor;
 
 public final class CompositeMethodDetailDescriptor

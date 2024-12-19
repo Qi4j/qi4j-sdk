@@ -20,8 +20,8 @@
 
 package org.qi4j.migration.assembly;
 
-import javax.json.JsonException;
-import javax.json.JsonObject;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
 import org.qi4j.migration.Migrator;
 import org.qi4j.spi.entitystore.helpers.StateStore;
 

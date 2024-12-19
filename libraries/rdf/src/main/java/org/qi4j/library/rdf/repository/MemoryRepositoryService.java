@@ -39,7 +39,7 @@ public interface MemoryRepositoryService
 {
 
     @Override
-    void initialize()
+    void init()
         throws RepositoryException;
 
     @Override
@@ -54,7 +54,7 @@ public interface MemoryRepositoryService
         public void afterActivation( ServiceReference<MemoryRepositoryService> activated )
             throws Exception
         {
-            activated.get().initialize();
+            activated.get().init();
         }
 
         @Override
@@ -77,10 +77,10 @@ public interface MemoryRepositoryService
         }
 
         @Override
-        public void initialize()
+        public void init()
             throws RepositoryException
         {
-            repo.initialize();
+            repo.init();
         }
 
         @Override

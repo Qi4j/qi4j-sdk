@@ -23,14 +23,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import javax.json.JsonException;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import jakarta.json.JsonException;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
 import org.qi4j.api.entity.EntityReference;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.NamedAssociationState;
 import org.qi4j.spi.entitystore.EntityStoreException;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
 
 /**
  * JSON implementation of NamedAssociationState.
@@ -39,11 +38,11 @@ import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
 public final class JSONNamedAssociationState
     implements NamedAssociationState
 {
-    private final JavaxJsonFactories jsonFactories;
+    private final JakartaJsonFactories jsonFactories;
     private final JSONEntityState entityState;
     private final String stateName;
 
-    /* package */ JSONNamedAssociationState( JavaxJsonFactories jsonFactories,
+    /* package */ JSONNamedAssociationState( JakartaJsonFactories jsonFactories,
                                              JSONEntityState entityState,
                                              String stateName )
     {

@@ -19,29 +19,29 @@
  */
 package org.qi4j.entitystore.cassandra;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Port;
-import com.github.junit5docker.WaitFor;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.qi4j.api.common.Visibility;
-import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.cassandra.assembly.CassandraEntityStoreAssembler;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
 import org.qi4j.test.entity.CanRemoveAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.cassandra.CassandraContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Test the CassandraEntityStoreService.
  */
-@Docker( image = "cassandra:3.10",
-         ports = @Port( exposed = 8801, inner = 9042),
-         waitFor = @WaitFor( value = "Starting listening for CQL clients", timeoutInMillis = 60000),
-         newForEachCase = false)
+@Testcontainers
 public class CassandraEntityStoreTest
     extends AbstractEntityStoreTest
 {
+    @Container
+    public static CassandraContainer cassandra = new CassandraContainer("cassandra:5")
+        .withReuse(true);
+
     @Override
     // START SNIPPET: assembly
     public void assemble( ModuleAssembly module )
@@ -61,8 +61,8 @@ public class CassandraEntityStoreTest
         // END SNIPPET: assembly
 
         CassandraEntityStoreConfiguration cassandraDefaults = config.forMixin( CassandraEntityStoreConfiguration.class ).declareDefaults();
-        String host = "localhost";
-        int port = 8801;
+        String host = cassandra.getHost();
+        int port = cassandra.getFirstMappedPort();
         // TODO: Logging system output here.
 //        System.out.println("Cassandra: " + host + ":" + port);
         cassandraDefaults.hostnames().set( host + ':' + port );

@@ -22,8 +22,8 @@ package org.qi4j.tools.model.descriptor;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
+import jakarta.json.Json;
+import jakarta.json.JsonArrayBuilder;
 import org.qi4j.api.sideeffect.SideEffectsDescriptor;
 
 public final class MethodSideEffectsDetailDescriptor

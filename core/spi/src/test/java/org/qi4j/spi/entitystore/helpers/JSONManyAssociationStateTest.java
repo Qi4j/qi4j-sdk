@@ -21,14 +21,14 @@ package org.qi4j.spi.entitystore.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.time.SystemTime;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.serialization.JsonSerialization;
 import org.qi4j.test.AbstractQi4jTest;
@@ -50,7 +50,7 @@ public class JSONManyAssociationStateTest extends AbstractQi4jTest
     private JsonSerialization serialization;
 
     @Service
-    private JavaxJsonFactories jsonFactories;
+    private JakartaJsonFactories jsonFactories;
 
     @Test
     public void givenEmptyJSONManyAssociationStateWhenAddingTwoRefsAtZeroIndexExpectCorrectOrder()

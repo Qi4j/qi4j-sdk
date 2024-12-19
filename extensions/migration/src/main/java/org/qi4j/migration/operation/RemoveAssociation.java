@@ -20,7 +20,7 @@
 
 package org.qi4j.migration.operation;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import org.qi4j.migration.Migrator;
 import org.qi4j.migration.assembly.EntityMigrationOperation;
 import org.qi4j.migration.assembly.MigrationContext;

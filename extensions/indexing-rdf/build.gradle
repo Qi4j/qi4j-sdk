@@ -27,7 +27,7 @@ description = "Qi4j RDF Index/Query Extension"
 dependencies {
   api qi4j.core.bootstrap
   api qi4j.library( 'rdf' )
-
+  implementation libraries.rdf4j
   implementation libraries.commons_lang
 
   runtimeOnly qi4j.core.runtime
@@ -35,6 +35,7 @@ dependencies {
   testImplementation qi4j.core.testsupport
   testImplementation qi4j.extension( 'entitystore-preferences' )
   testImplementation qi4j.extension( 'entitystore-jdbm' )
+
 
   testRuntimeOnly libraries.logback
 }

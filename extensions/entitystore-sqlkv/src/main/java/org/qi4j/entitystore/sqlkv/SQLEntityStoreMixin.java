@@ -17,15 +17,10 @@
  */
 package org.qi4j.entitystore.sqlkv;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-import javax.sql.DataSource;
+import org.jooq.Record;
+import org.jooq.*;
+import org.jooq.conf.Settings;
+import org.jooq.impl.*;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
@@ -34,23 +29,16 @@ import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.service.ServiceActivation;
 import org.qi4j.api.service.ServiceDescriptor;
-import org.qi4j.serialization.javaxjson.JavaxJsonFactories;
+import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entitystore.EntityNotFoundException;
 import org.qi4j.spi.entitystore.helpers.JSONKeys;
 import org.qi4j.spi.entitystore.helpers.MapEntityStore;
-import org.jooq.ConnectionProvider;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Query;
-import org.jooq.Record;
-import org.jooq.SQLDialect;
-import org.jooq.Table;
-import org.jooq.TransactionProvider;
-import org.jooq.conf.Settings;
-import org.jooq.impl.DSL;
-import org.jooq.impl.DataSourceConnectionProvider;
-import org.jooq.impl.DefaultConfiguration;
-import org.jooq.impl.ThreadLocalTransactionProvider;
+
+import javax.sql.DataSource;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class SQLEntityStoreMixin
     implements ServiceActivation, MapEntityStore
@@ -63,7 +51,7 @@ public class SQLEntityStoreMixin
     private DataSource dataSource;
 
     @Service
-    private JavaxJsonFactories jsonFactories;
+    private JakartaJsonFactories jsonFactories;
 
     @Uses
     private ServiceDescriptor descriptor;
@@ -97,10 +85,9 @@ public class SQLEntityStoreMixin
             .set( settings );
         dsl = DSL.using( configuration );
         table = DSL.table( DSL.name( tableName ) );
-        identityColumn = DSL.field( DSL.name( IDENTITY_COLUMN_NAME ), String.class );
+        identityColumn = DSL.field( DSL.name( IDENTITY_COLUMN_NAME ), SQLDataType.VARCHAR.length(200).nullable(false));
         versionColumn = DSL.field( DSL.name( VERSION_COLUMN_NAME ), String.class );
         stateColumn = DSL.field( DSL.name( STATE_COLUMN_NAME ), String.class );
-
         if( config.createIfMissing().get() )
         {
             dsl.transaction( t -> dsl.createTableIfNotExists( table )

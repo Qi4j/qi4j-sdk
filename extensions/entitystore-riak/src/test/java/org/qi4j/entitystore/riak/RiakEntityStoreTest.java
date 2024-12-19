@@ -17,25 +17,33 @@
  */
 package org.qi4j.entitystore.riak;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Port;
-import com.github.junit5docker.WaitFor;
-import java.util.Collections;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.riak.assembly.RiakEntityStoreAssembler;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Docker( image = "basho/riak-kv:ubuntu-2.2.3",
-         ports = @Port( exposed = 8801, inner = 8087),
-         waitFor = @WaitFor( value = "riak_auth_mods started on node", timeoutInMillis = 60000),
-         newForEachCase = false
-)
+import java.time.Duration;
+import java.util.Collections;
+
+@Testcontainers
 public class RiakEntityStoreTest extends AbstractEntityStoreTest
 {
+    @Container
+    public static GenericContainer<?> riakContainer = new GenericContainer<>( "theblitzapp/riak_kv_2.9:debian" )
+        .withExposedPorts( 8087 )
+        .withReuse(true)
+        .waitingFor(Wait.forLogMessage(".*Starting TCP Monitor.*", 1))
+        .withLogConsumer( out -> System.out.println( out.getUtf8StringWithoutLineEnding() ) )
+        .withStartupTimeout(Duration.ofSeconds(90))
+        ;
+
     private RiakFixture riakFixture;
 
     @BeforeEach
@@ -66,10 +74,9 @@ public class RiakEntityStoreTest extends AbstractEntityStoreTest
         // START SNIPPET: assembly
         new RiakEntityStoreAssembler().withConfig( config, Visibility.layer ).assemble( module );
         // END SNIPPET: assembly
-        RiakEntityStoreConfiguration riakConfig = config.forMixin( RiakEntityStoreConfiguration.class )
-                                                        .declareDefaults();
-        String host = "localhost";
-        int port = 8801;
+        RiakEntityStoreConfiguration riakConfig = config.forMixin( RiakEntityStoreConfiguration.class ).declareDefaults();
+        String host = riakContainer.getHost();
+        int port = riakContainer.getFirstMappedPort();
         riakConfig.hosts().set( Collections.singletonList( host + ':' + port ) );
         // START SNIPPET: assembly
     }

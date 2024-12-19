@@ -20,7 +20,7 @@
 
 package org.qi4j.spi.entitystore.helpers;
 
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import org.qi4j.spi.entitystore.EntityStoreException;
 
 /**

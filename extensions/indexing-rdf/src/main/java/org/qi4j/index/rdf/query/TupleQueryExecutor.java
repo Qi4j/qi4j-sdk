@@ -22,7 +22,6 @@ package org.qi4j.index.rdf.query;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.rdf4j.model.Value;
-import org.eclipse.rdf4j.model.impl.ValueFactoryImpl;
 import org.eclipse.rdf4j.query.*;
 import org.eclipse.rdf4j.repository.Repository;
 import org.eclipse.rdf4j.repository.RepositoryConnection;
@@ -135,10 +134,11 @@ public interface TupleQueryExecutor
         private Map<String, Value> getBindings(Map<String, Object> variables)
         {
             Map<String, Value> bindings = new HashMap<>();
-            for (Map.Entry<String, Object> stringObjectEntry : variables.entrySet())
+            for (Map.Entry<String, Object> entry : variables.entrySet())
             {
-                if (!stringObjectEntry.getValue().getClass().equals(Object.class))
-                    bindings.put(stringObjectEntry.getKey(), ValueFactoryImpl.getInstance().createLiteral(stringObjectEntry.getValue().toString()));
+                Value value = repository.getValueFactory().createLiteral(entry.getValue().toString());
+                if (!entry.getValue().getClass().equals(Object.class))
+                    bindings.put(entry.getKey(), value);
             }
             return bindings;
         }

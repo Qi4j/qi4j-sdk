@@ -20,12 +20,12 @@ package org.qi4j.spi.serialization;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import javax.json.JsonValue;
+import jakarta.json.JsonValue;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.serialization.Serializer;
 
 /**
- * {@literal javax.json} serializer.
+ * {@literal jakarta.json} serializer.
  */
 public interface JsonSerializer extends Serializer
 {

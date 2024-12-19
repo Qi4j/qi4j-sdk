@@ -27,12 +27,13 @@ description = "Qi4j Memcache Cache Extension"
 dependencies {
   api qi4j.core.bootstrap
 
-  implementation libraries.spymemcached
+  implementation libraries.slf4j_api
 
   runtimeOnly qi4j.core.runtime
 
   testImplementation qi4j.core.testsupport
-  testImplementation libraries.docker_junit
-
+  testImplementation libraries.testcontainer_memcached
+  testImplementation libraries.junit
+  testImplementation libraries.easymock
   testRuntimeOnly libraries.logback
 }

@@ -19,8 +19,8 @@
  */
 package org.qi4j.tools.model.descriptor;
 
-import javax.json.Json;
-import javax.json.JsonObjectBuilder;
+import jakarta.json.Json;
+import jakarta.json.JsonObjectBuilder;
 
 public final class ServiceUsage
 {

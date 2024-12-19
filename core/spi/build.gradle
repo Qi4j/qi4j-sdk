@@ -24,7 +24,7 @@ apply plugin: 'qi4j-core'
 
 dependencies {
   api qi4j.core.api
-  api libraries.javax_json
+  api libraries.jakarta_json
 
   runtimeOnly libraries.johnzon
 

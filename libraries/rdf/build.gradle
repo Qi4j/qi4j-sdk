@@ -18,15 +18,32 @@
  *
  */
 
+plugins {
+  id "org.javamodularity.moduleplugin" version "1.8.12"
+}
+
 apply plugin: 'qi4j-library'
 
 description = "Qi4j RDF Library provides commonalities of various RDF based services in Qi4j, such as RDF Indexing."
 
 //jar { manifest { name = "Qi4j Library - RDF" } }
+//compileJava {
+//  modularity.inferModulePath.set(true)
+//}
+configurations {
+  all {
+    exclude group: 'org.apache.httpcomponents', module: 'httpcore-osgi'
+    exclude group: 'org.apache.httpcomponents', module: 'httpclient-osgi'
+    exclude group: 'org.eclipse.rdf4j', module: 'rdf4j-queryalgebra-evaluation'
+    exclude group: 'org.eclipse.rdf4j', module: 'rdf4j-sail-base'
+  }
+}
 
 dependencies {
   api qi4j.core.spi
   api libraries.rdf4j
+
+  implementation libraries.httpcomponents
 
   implementation qi4j.library( 'constraints' )
   implementation qi4j.library( 'fileconfig' )

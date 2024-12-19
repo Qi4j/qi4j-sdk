@@ -19,13 +19,8 @@
  */
 package org.qi4j.entitystore.sql;
 
-import com.github.junit5docker.Docker;
-import com.github.junit5docker.Environment;
-import com.github.junit5docker.Port;
-import com.github.junit5docker.WaitFor;
 import org.jooq.SQLDialect;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Disabled;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.sql.assembly.PostgreSQLEntityStoreAssembler;
@@ -34,82 +29,65 @@ import org.qi4j.library.sql.datasource.DataSourceConfiguration;
 import org.qi4j.library.sql.dbcp.DBCPDataSourceServiceAssembler;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Docker( image = "mariadb:10.1.21",
-         ports = @Port( exposed = 8801, inner = 5432),
-         waitFor = @WaitFor( value = "PostgreSQL init process complete; ready for start up.", timeoutInMillis = 30000),
-         newForEachCase = false,
-         environments = {
-             @Environment( key = "POSTGRES_USER", value = "qi4j" ),
-             @Environment( key = "POSTGRES_PASSWORD", value = "ThisIsGreat!" )
-         }
-)
-@Disabled("I have removed the customer containers, and haven't figured out how to initialize postgres in the default Docker container. Seems I can't mount files into the container (--volume)")
+@Testcontainers
 public class PostgreSQLEntityStoreTest
     extends AbstractEntityStoreTest
 {
+    @Container
+    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:17-alpine")
+        .withDatabaseName("jdbc_test_db")
+        .withReuse(true);
+
     @Override
     // START SNIPPET: assembly
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws Exception
     {
         // END SNIPPET: assembly
-        delay();
-        super.assemble( module );
-        ModuleAssembly config = module.layer().module( "config" );
-        new EntityTestAssembler().defaultServicesVisibleIn( Visibility.layer ).assemble( config );
+        super.assemble(module);
+        ModuleAssembly config = module.layer().module("config");
+        new EntityTestAssembler().defaultServicesVisibleIn(Visibility.layer).assemble(config);
 
         // START SNIPPET: assembly
         // DataSourceService
         new DBCPDataSourceServiceAssembler()
-            .identifiedBy( "postgresql-datasource-service" )
-            .visibleIn( Visibility.module )
-            .withConfig( config, Visibility.layer )
-            .assemble( module );
+            .identifiedBy("postgresql-datasource-service")
+            .visibleIn(Visibility.module)
+            .withConfig(config, Visibility.layer)
+            .assemble(module);
 
         // DataSource
         new DataSourceAssembler()
-            .withDataSourceServiceIdentity( "postgresql-datasource-service" )
-            .identifiedBy( "postgresql-datasource" )
-            .visibleIn( Visibility.module )
+            .withDataSourceServiceIdentity("postgresql-datasource-service")
+            .identifiedBy("postgresql-datasource")
+            .visibleIn(Visibility.module)
             .withCircuitBreaker()
-            .assemble( module );
+            .assemble(module);
 
         // SQL EntityStore
         new PostgreSQLEntityStoreAssembler()
-            .visibleIn( Visibility.application )
-            .withConfig( config, Visibility.layer )
-            .assemble( module );
+            .visibleIn(Visibility.application)
+            .withConfig(config, Visibility.layer)
+            .assemble(module);
         // END SNIPPET: assembly
 
-//        String host = DOCKER.getDockerHost();
-//        int port = DOCKER.getExposedContainerPort( "5432/tcp" );
-        int port = 8801;
-        String host = "localhost";
-        DataSourceConfiguration defaults = config.forMixin( DataSourceConfiguration.class ).declareDefaults();
-        defaults.url().set( "jdbc:postgresql://" + host + ":" + port + "/jdbc_test_db" );
-        defaults.username().set( "qi4j" );
-        defaults.password().set( "ThisIsGreat!" );
+        DataSourceConfiguration defaults = config.forMixin(DataSourceConfiguration.class).declareDefaults();
+        defaults.url().set(postgres.getJdbcUrl());
+        defaults.driver().set(postgres.getDriverClassName());
+        defaults.username().set(postgres.getUsername());
+        defaults.password().set(postgres.getPassword());
 
         // START SNIPPET: assembly
-    }
-
-    static void delay()
-    {
-        try
-        {
-            Thread.sleep( 5000L );
-        }
-        catch( InterruptedException e )
-        {
-            // ignore.
-        }
     }
     // END SNIPPET: assembly
 
     @AfterEach
     public void cleanUpData()
     {
-        TearDown.dropTables( moduleInstance, SQLDialect.POSTGRES, super::tearDown );
+        TearDown.dropTables(moduleInstance, SQLDialect.POSTGRES, super::tearDown);
     }
 }

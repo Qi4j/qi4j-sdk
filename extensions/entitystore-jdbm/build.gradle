@@ -18,6 +18,10 @@
  *
  */
 
+plugins {
+  id "org.javamodularity.moduleplugin" version "1.8.12"
+}
+
 apply plugin: 'qi4j-extension'
 
 description = "Qi4j JDBM EntityStore Extension"

@@ -19,18 +19,24 @@
  */
 package org.qi4j.cache.memcache;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import net.spy.memcached.AddrUtil;
-import net.spy.memcached.ConnectionFactoryBuilder;
-import net.spy.memcached.ConnectionFactoryBuilder.Protocol;
-import net.spy.memcached.MemcachedClient;
-import net.spy.memcached.auth.AuthDescriptor;
-import net.spy.memcached.auth.PlainCallbackHandler;
+import net.rubyeye.xmemcached.MemcachedClient;
+import net.rubyeye.xmemcached.MemcachedClientBuilder;
+import net.rubyeye.xmemcached.XMemcachedClientBuilder;
+import net.rubyeye.xmemcached.auth.AuthInfo;
+import net.rubyeye.xmemcached.command.BinaryCommandFactory;
+import net.rubyeye.xmemcached.command.KestrelCommandFactory;
+import net.rubyeye.xmemcached.command.TextCommandFactory;
+import net.rubyeye.xmemcached.utils.AddrUtil;
+import net.rubyeye.xmemcached.utils.Protocol;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.spi.cache.Cache;
+
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Memcache CachePool Mixin.
@@ -51,83 +57,93 @@ public class MemcachePoolMixin
         throws Exception
     {
         MemcacheConfiguration config = configuration.get();
-        expiration = ( config.expiration().get() == null )
-                     ? 3600
-                     : config.expiration().get();
-        String addresses = ( config.addresses().get() == null )
-                           ? "localhost:11211"
-                           : config.addresses().get();
-        Protocol protocol = ( config.protocol().get() == null )
-                            ? Protocol.TEXT
-                            : Protocol.valueOf( config.protocol().get().toUpperCase() );
+        expiration = config.expiration().get();
+        String addresses = config.addresses().get();
+        Protocol protocol = Protocol.valueOf(config.protocol().get());
         String username = config.username().get();
         String password = config.password().get();
-        String authMech = config.authMechanism().get() == null
-                          ? "PLAIN"
-                          : config.authMechanism().get();
+        String authMech = config.authMechanism().get();
 
         long opTimeout;
         try
         {
-            opTimeout = ( config.opTimeout().get() == null )
-                    ? 2500
-                    : Long.parseLong( config.opTimeout().get() );
+            opTimeout = (config.opTimeout().get() == null)
+                ? 2500
+                : Long.parseLong(config.opTimeout().get());
         }
-        catch( NumberFormatException e )
+        catch (NumberFormatException e)
         {
             opTimeout = 2500;
         }
 
-        ConnectionFactoryBuilder builder = new ConnectionFactoryBuilder();
-        builder.setOpTimeout( opTimeout );
-        builder.setProtocol( protocol );
-        if( username != null && !username.isEmpty() )
+        List<InetSocketAddress> addressList = AddrUtil.getAddresses(addresses);
+        MemcachedClientBuilder builder = new XMemcachedClientBuilder(addressList);
+        builder.setOpTimeout(opTimeout);
+        if (username != null && !username.isEmpty())
         {
-            String[] authType = { authMech };
-            AuthDescriptor to = new AuthDescriptor( authType, new PlainCallbackHandler( username, password ) );
-            builder.setAuthDescriptor( to );
+            switch (authMech)
+            {
+                case "PLAIN":
+                    addressList.forEach(addr -> builder.addAuthInfo(addr, AuthInfo.plain(username, password)));
+                    break;
+                case "CRAM-MD5":
+                    addressList.forEach(addr -> builder.addAuthInfo(addr, AuthInfo.cramMD5(username, password)));
+                    break;
+            }
         }
-
-        client = new MemcachedClient( builder.build(), AddrUtil.getAddresses( addresses ) );
+        if(protocol.equals(Protocol.Binary))
+        {
+            builder.setCommandFactory(new BinaryCommandFactory());
+        }
+        if(protocol.equals(Protocol.Text))
+        {
+            builder.setCommandFactory(new TextCommandFactory());
+        }
+        if(protocol.equals(Protocol.Kestrel))
+        {
+            builder.setCommandFactory(new KestrelCommandFactory());
+        }
+        MemcachedClient client = builder.build();
+        client.flushAll();
     }
 
     @Override
     public void passivateService()
         throws Exception
     {
-        if( client != null )
+        if (client != null)
         {
             client.shutdown();
         }
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> Cache<T> fetchCache( String cacheId, Class<T> valueType )
+    @SuppressWarnings("unchecked")
+    public <T> Cache<T> fetchCache(String cacheId, Class<T> valueType)
     {
-        Objects.requireNonNull( cacheId, "cacheId" );
-        if( cacheId.isEmpty() )
+        Objects.requireNonNull(cacheId, "cacheId");
+        if (cacheId.isEmpty())
         {
-            throw new IllegalArgumentException( "cacheId was empty string" );
+            throw new IllegalArgumentException("cacheId was empty string");
         }
-        synchronized( caches )
+        synchronized (caches)
         {
-            MemcacheImpl<?> cache = caches.computeIfAbsent( cacheId, identity -> new MemcacheImpl<>( client, identity, valueType, expiration ) );
+            MemcacheImpl<?> cache = caches.computeIfAbsent(cacheId, identity -> new MemcacheImpl<>(client, identity, valueType, expiration));
             cache.incRefCount();
             return (Cache<T>) cache;
         }
     }
 
     @Override
-    public void returnCache( Cache<?> cache )
+    public void returnCache(Cache<?> cache)
     {
         MemcacheImpl<?> memcache = (MemcacheImpl<?>) cache;
         memcache.decRefCount();
-        synchronized( caches )
+        synchronized (caches)
         {
-            if( memcache.isNotUsed() )
+            if (memcache.isNotUsed())
             {
-                caches.remove( memcache.cacheId() );
+                caches.remove(memcache.cacheId());
             }
         }
     }

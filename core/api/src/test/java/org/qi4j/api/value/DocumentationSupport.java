@@ -31,7 +31,7 @@ import org.qi4j.api.property.Property;
 import org.qi4j.api.serialization.Deserializer;
 import org.qi4j.api.serialization.Serializer;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.serialization.javaxjson.assembly.JavaxJsonSerializationAssembler;
+import org.qi4j.serialization.jakartajson.assembly.JakartaJsonSerializationAssembler;
 import org.qi4j.test.AbstractQi4jTest;
 import org.junit.jupiter.api.Test;
 
@@ -64,7 +64,7 @@ public class DocumentationSupport extends AbstractQi4jTest
         module.defaultServices(); // (3)
         // END SNIPPET: default
         // START SNIPPET: service
-        new JavaxJsonSerializationAssembler().assemble( module ); // (3)
+        new JakartaJsonSerializationAssembler().assemble( module ); // (3)
         // END SNIPPET: service
         // START SNIPPET: default
         // START SNIPPET: service

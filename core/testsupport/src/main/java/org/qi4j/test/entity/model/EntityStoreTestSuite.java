@@ -22,6 +22,8 @@ package org.qi4j.test.entity.model;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.jupiter.api.Disabled;
 import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.identity.Identity;

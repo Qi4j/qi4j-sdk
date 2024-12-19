@@ -52,7 +52,7 @@ ephemeral, then on the next start, any changes to the configuration will NOT be 
 To be able to read JSON, YAML and XML configuration, you must configure a Serialization system that supports
 the configuration format that you want to use.
 
-* extension/serialization-javaxjson supports JSON
+* extension/serialization-jakartajson supports JSON
 * extension/serialization-javaxxml supports XML
 
 == Support for Complex Types ==

@@ -21,27 +21,28 @@
 package org.qi4j.library.rdf.serializer;
 
 import java.lang.reflect.Method;
-import org.eclipse.rdf4j.model.Graph;
+import org.eclipse.rdf4j.model.Model;
 import org.eclipse.rdf4j.model.IRI;
 import org.eclipse.rdf4j.model.Literal;
 import org.eclipse.rdf4j.model.Statement;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.ValueFactory;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.qi4j.api.util.Classes;
 import org.qi4j.library.rdf.Rdfs;
 
 public final class SerializerContext
 {
-    private final Graph graph;
+    private final Model graph;
     private final ValueFactory valueFactory;
 
-    public SerializerContext( Graph graph )
+    public SerializerContext( Model graph )
     {
-        this.valueFactory = graph.getValueFactory();
+        valueFactory = SimpleValueFactory.getInstance();
         this.graph = graph;
     }
 
-    public Graph getGraph()
+    public Model getGraph()
     {
         return graph;
     }

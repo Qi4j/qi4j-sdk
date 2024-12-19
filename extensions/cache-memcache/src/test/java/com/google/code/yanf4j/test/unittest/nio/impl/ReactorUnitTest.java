@@ -1,0 +1,226 @@
+package com.google.code.yanf4j.test.unittest.nio.impl;
+
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.util.HashSet;
+import java.util.Set;
+import org.easymock.EasyMock;
+import org.easymock.IMocksControl;
+import com.google.code.yanf4j.config.Configuration;
+import com.google.code.yanf4j.core.EventType;
+import com.google.code.yanf4j.nio.NioSession;
+import com.google.code.yanf4j.nio.TCPController;
+import com.google.code.yanf4j.nio.impl.Reactor;
+import com.google.code.yanf4j.nio.impl.SelectorManager;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+/**
+ * 
+ * 
+ * 
+ * @author boyan
+ * 
+ * @since 1.0, 2009-12-24 01:18:18
+ */
+
+public class ReactorUnitTest {
+  private Reactor reactor;
+  private SelectorManager selectorManager;
+
+  @BeforeEach
+  public void setUp() throws Exception {
+    Configuration configuration = new Configuration();
+    TCPController controller = new TCPController(configuration);
+    this.selectorManager = new SelectorManager(1, controller, configuration);
+    this.selectorManager.start();
+    this.reactor = this.selectorManager.getReactorByIndex(0);
+    controller.setSessionTimeout(1000);
+    controller.getConfiguration().setSessionIdleTimeout(1000);
+  }
+
+  @Test
+  public void testRegisterOpenChannel() throws Exception {
+    MockSelectableChannel channel = new MockSelectableChannel();
+    channel.selectionKey = new MockSelectionKey();
+    this.reactor.registerChannel(channel, 1, "hello");
+    Thread.sleep(Reactor.DEFAULT_WAIT * 3);
+    Assertions.assertSame(this.reactor.getSelector(), channel.selector);
+    Assertions.assertSame(this.reactor.getSelector(), channel.selectionKey.selector);
+    Assertions.assertEquals(1, channel.ops);
+    Assertions.assertEquals("hello", channel.attch);
+  }
+
+  @Test
+  public void testRegisterCloseChannel() throws Exception {
+    MockSelectableChannel channel = new MockSelectableChannel();
+    channel.close();
+    this.reactor.registerChannel(channel, 1, "hello");
+    Thread.sleep(Reactor.DEFAULT_WAIT * 3);
+    Assertions.assertNull(channel.selector);
+    Assertions.assertEquals(0, channel.ops);
+    Assertions.assertNull(channel.attch);
+  }
+
+  @Test
+  public void testRegisterOpenSession() throws Exception {
+    IMocksControl control = EasyMock.createControl();
+    NioSession session = control.createMock(NioSession.class);
+    session.onEvent(EventType.ENABLE_READ, this.reactor.getSelector());
+    EasyMock.expectLastCall();
+    EasyMock.expect(session.isClosed()).andReturn(false);
+
+    control.replay();
+    this.reactor.registerSession(session, EventType.ENABLE_READ);
+    Thread.sleep(Reactor.DEFAULT_WAIT * 3);
+    control.verify();
+  }
+
+  @Test
+  public void testRegisterCloseSession() throws Exception {
+    IMocksControl control = EasyMock.createControl();
+    NioSession session = control.createMock(NioSession.class);
+    EasyMock.expect(session.isClosed()).andReturn(true);
+    control.replay();
+    this.reactor.registerSession(session, EventType.ENABLE_READ);
+    Thread.sleep(Reactor.DEFAULT_WAIT * 3);
+    control.verify();
+  }
+
+  @Test
+  public void testDispatchEventAllValid() throws Exception {
+    IMocksControl control = EasyMock.createControl();
+    Set<SelectionKey> keySet = new HashSet<SelectionKey>();
+    addReadableKey(keySet, control, this.reactor.getSelector());
+    addWritableKey(keySet, control, this.reactor.getSelector());
+    control.replay();
+    this.reactor.dispatchEvent(keySet);
+    Assertions.assertEquals(0, keySet.size());
+    control.verify();
+  }
+
+  @Test
+  public void testDispatchEventSomeInValid() throws Exception {
+    IMocksControl control = EasyMock.createControl();
+    Set<SelectionKey> keySet = new HashSet<SelectionKey>();
+    addInvalidKey(keySet);
+    addWritableKey(keySet, control, this.reactor.getSelector());
+    control.replay();
+    this.reactor.dispatchEvent(keySet);
+    Assertions.assertEquals(0, keySet.size());
+    control.verify();
+  }
+
+  @Test
+  public void testPostSelectOneTimeout() {
+    IMocksControl mocksControl = EasyMock.createControl();
+    Set<SelectionKey> selectedKeys = new HashSet<SelectionKey>();
+    Set<SelectionKey> allKeys = new HashSet<SelectionKey>();
+    addTimeoutKey(mocksControl, allKeys);
+    allKeys.addAll(selectedKeys);
+
+    mocksControl.replay();
+    this.reactor.postSelect(selectedKeys, allKeys);
+    mocksControl.verify();
+
+  }
+
+  private void addTimeoutKey(IMocksControl mocksControl, Set<SelectionKey> allKeys) {
+    MockSelectionKey key = new MockSelectionKey();
+    NioSession session = mocksControl.createMock(NioSession.class);
+    key.attach(session);
+    // �ж�session�Ƿ���ڣ�����Ϊ����
+    EasyMock.expect(session.isExpired()).andReturn(true);
+    // ���ھͻ����onSessionExpired�����ر�����
+    // ͬʱ��expired��session�����ж�idle
+    session.onEvent(EventType.EXPIRED, this.reactor.getSelector());
+    EasyMock.expectLastCall();
+    session.close();
+    EasyMock.expectLastCall();
+
+    allKeys.add(key);
+  }
+
+  @Test
+  public void testPostSelectOneIdle() {
+    IMocksControl mocksControl = EasyMock.createControl();
+    Set<SelectionKey> selectedKeys = new HashSet<SelectionKey>();
+    Set<SelectionKey> allKeys = new HashSet<SelectionKey>();
+    addIdleKey(mocksControl, allKeys);
+    allKeys.addAll(selectedKeys);
+
+    mocksControl.replay();
+    this.reactor.postSelect(selectedKeys, allKeys);
+    mocksControl.verify();
+
+  }
+
+  @Test
+  public void testPostSelectMoreKeys() {
+    IMocksControl mocksControl = EasyMock.createControl();
+    Set<SelectionKey> selectedKeys = new HashSet<SelectionKey>();
+    Set<SelectionKey> allKeys = new HashSet<SelectionKey>();
+    addIdleKey(mocksControl, allKeys);
+    addTimeoutKey(mocksControl, allKeys);
+    selectedKeys.add(new MockSelectionKey());
+    selectedKeys.add(new MockSelectionKey());
+    allKeys.addAll(selectedKeys);
+
+    mocksControl.replay();
+    this.reactor.postSelect(selectedKeys, allKeys);
+    mocksControl.verify();
+  }
+
+  private void addIdleKey(IMocksControl mocksControl, Set<SelectionKey> allKeys) {
+    MockSelectionKey key = new MockSelectionKey();
+    NioSession session = mocksControl.createMock(NioSession.class);
+    key.attach(session);
+    // session
+    EasyMock.expect(session.isExpired()).andReturn(false);
+    // session idle
+    EasyMock.expect(session.isIdle()).andReturn(true);
+    // idle onSessionIdle
+    session.onEvent(EventType.IDLE, this.reactor.getSelector());
+    EasyMock.expectLastCall();
+
+    allKeys.add(key);
+  }
+
+  private void addInvalidKey(Set<SelectionKey> keySet) {
+    MockSelectionKey key = new MockSelectionKey();
+    key.valid = false;
+    keySet.add(key);
+  }
+
+  private void addReadableKey(Set<SelectionKey> keySet, IMocksControl control, Selector selector) {
+    MockSelectionKey key = new MockSelectionKey();
+    key.interestOps = SelectionKey.OP_READ;
+    NioSession session = control.createMock(NioSession.class);
+    session.onEvent(EventType.READABLE, selector);
+    EasyMock.expectLastCall();
+    key.attach(session);
+    key.selector = selector;
+    keySet.add(key);
+  }
+
+  private void addWritableKey(Set<SelectionKey> keySet, IMocksControl control, Selector selector) {
+    MockSelectionKey key = new MockSelectionKey();
+    key.interestOps = SelectionKey.OP_WRITE;
+    NioSession session = control.createMock(NioSession.class);
+    session.onEvent(EventType.WRITEABLE, selector);
+    EasyMock.expectLastCall();
+    key.attach(session);
+    key.selector = selector;
+    keySet.add(key);
+  }
+
+  @AfterEach
+  public void tearDown() throws Exception {
+    if (this.selectorManager != null) {
+      this.selectorManager.stop();
+    }
+  }
+
+}

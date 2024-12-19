@@ -152,7 +152,7 @@ Serialization is a key concept in business applications, and in Qi4j that is a p
 
 [source,shell]
 ----
-> JavaxJson
+> JakartaJson
   JavaxXml
   MessagePack
 ----
@@ -197,14 +197,14 @@ Security installs Apache Shiro and binds Users, Groups and Roles to entity store
 ? Which entity store do you want to use? Cassandra
 ? Which indexing system do you want to use? Rdf
 ? Which caching system do you want to use? None
-? Which serialization system do you want to use? JavaxJson
+? Which serialization system do you want to use? JakartaJson
 ? Which metrics capturing system do you want to use? Codahale
 ? Other features? jmx, security
 app name Sink
 Entity Stores: Cassandra
 Indexing: Rdf
 Caching: None
-Serialization: JavaxJson
+Serialization: JakartaJson
 Features: [ 'jmx', 'security' ]
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/config/ConfigurationLayer.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/InfrastructureLayer.java
@@ -225,7 +225,7 @@ Features: [ 'jmx', 'security' ]
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/FileConfigurationModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/RdfIndexingModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/CodahaleMetricsModule.java
-   create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/JavaxJsonSerializationModule.java
+   create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/JakartaJsonSerializationModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/CassandraStorageModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/domain/CrudModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/domain/JmxModule.java
@@ -277,7 +277,7 @@ where the content of the +../model.json+ is as follows,
   "entitystore": "MongoDB",
   "indexing": "SQL",
   "caching": "Memcache",
-  "serialization": "JavaxJson",
+  "serialization": "JakartaJson",
   "metrics": "Codahale",
   "modules": {
     "user": {
@@ -380,7 +380,7 @@ we will create a complete project, like this
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/FileConfigurationModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/RdfIndexingModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/CodahaleMetricsModule.java
-   create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/JavaxJsonSerializationModule.java
+   create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/JakartaJsonSerializationModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/infrastructure/CassandraStorageModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/domain/CrudModule.java
    create bootstrap/src/main/java/com/sensetif/sink/bootstrap/domain/UserModule.java

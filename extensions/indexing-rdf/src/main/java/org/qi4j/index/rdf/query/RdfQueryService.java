@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.Nullable;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
@@ -66,11 +68,13 @@ public interface RdfQueryService
                                                      Map<String, Object> variables ) throws EntityFinderException
         {
             CollectingQualifiedIdentityResultCallback collectingCallback = new CollectingQualifiedIdentityResultCallback();
+            QueryLanguage queryLanguage = getQueryLanguage(whereClause);
 
+            // TODO: Why is SERQL different from other languages? Only SPARQL is hardcoded into RDF4J. Investigate.
             if( QuerySpecification.isQueryLanguage( "SERQL", whereClause ))
             {
                 String query = ((QuerySpecification)whereClause).query();
-                tupleExecutor.performTupleQuery( QueryLanguage.SERQL, query, variables, collectingCallback );
+                tupleExecutor.performTupleQuery( queryLanguage, query, variables, collectingCallback );
                 return collectingCallback.entities().stream();
 
             } else
@@ -88,11 +92,13 @@ public interface RdfQueryService
             throws EntityFinderException
         {
             final SingleQualifiedIdentityResultCallback singleCallback = new SingleQualifiedIdentityResultCallback();
+            QueryLanguage queryLanguage = getQueryLanguage(whereClause);
 
+            // TODO: Why is SERQL different from other languages? Only SPARQL is hardcoded into RDF4J. Investigate.
             if (QuerySpecification.isQueryLanguage( "SERQL", whereClause))
             {
                 String query = ((QuerySpecification)whereClause).query();
-                tupleExecutor.performTupleQuery( QueryLanguage.SERQL, query, variables, singleCallback );
+                tupleExecutor.performTupleQuery( queryLanguage, query, variables, singleCallback );
                 return singleCallback.qualifiedIdentity();
             } else
             {
@@ -107,10 +113,12 @@ public interface RdfQueryService
         public long countEntities( Class<?> resultType, Predicate<Composite> whereClause, Map<String, Object> variables )
             throws EntityFinderException
         {
+            // TODO: Why is SERQL different from other languages? Only SPARQL is hardcoded into RDF4J. Investigate.
+            QueryLanguage queryLanguage = getQueryLanguage(whereClause);
             if (QuerySpecification.isQueryLanguage( "SERQL", whereClause ))
             {
                 String query = ((QuerySpecification)whereClause).query();
-                return tupleExecutor.performTupleQuery( QueryLanguage.SERQL, query, variables, null );
+                return tupleExecutor.performTupleQuery( queryLanguage, query, variables, null );
 
             } else
             {
@@ -118,6 +126,17 @@ public interface RdfQueryService
                 String query = rdfQueryParser.constructQuery( resultType, whereClause, null, null, null, variables );
                 return tupleExecutor.performTupleQuery( language, query, variables, null );
             }
+        }
+
+        private static @Nullable QueryLanguage getQueryLanguage(Predicate<Composite> whereClause)
+        {
+            QueryLanguage queryLanguage = null;
+            if( whereClause instanceof QuerySpecification )
+            {
+                QuerySpecification spec = (QuerySpecification) whereClause;
+                queryLanguage = QueryLanguage.valueOf(spec.language());
+            }
+            return queryLanguage;
         }
     }
 }

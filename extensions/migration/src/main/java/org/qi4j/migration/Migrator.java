@@ -20,7 +20,7 @@
 package org.qi4j.migration;
 
 import java.util.Map;
-import javax.json.JsonObject;
+import jakarta.json.JsonObject;
 import org.qi4j.migration.assembly.MigrationContext;
 import org.qi4j.migration.assembly.MigrationContext;
 
