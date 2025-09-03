@@ -17,27 +17,30 @@
  */
 package org.qi4j.spi.serialization;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 // START SNIPPET: text
+
 /**
  * Base Text Deserializer.
- *
+ * <p>
  * Implementations work on Strings, this base deserializer decode bytes in UTF-8 to produce strings.
- *
+ * <p>
  * See {@link AbstractTextSerializer}.
  */
 public abstract class AbstractTextDeserializer extends AbstractDeserializer
 // END SNIPPET: text
 {
     @Override
-    public <T> T deserialize( ModuleDescriptor module, ValueType valueType, InputStream state )
+    public <T> T deserialize(ModuleDescriptor module, Options options, ValueType valueType, InputStream state)
     {
-        return deserialize( module, valueType, new InputStreamReader( state, UTF_8 ) );
+        return deserialize(module, options, valueType, new InputStreamReader(state, UTF_8));
     }
 }

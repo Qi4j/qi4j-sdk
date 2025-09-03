@@ -23,7 +23,7 @@ import org.qi4j.api.injection.scope.This;
 
 // START SNIPPET: private
 public abstract class CargoMixin
-        implements Cargo
+    implements Cargo
 {
     @This
     private CargoState state;
@@ -38,9 +38,9 @@ public abstract class CargoMixin
         return state.destination().get();
     }
 
-    public void changeDestination( String newDestination )
+    public void changeDestination(String newDestination)
     {
-        state.destination().set( newDestination );
+        state.destination().set(newDestination);
     }
 }
 

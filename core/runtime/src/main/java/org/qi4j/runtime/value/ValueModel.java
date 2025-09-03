@@ -20,8 +20,6 @@
 
 package org.qi4j.runtime.value;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
@@ -36,18 +34,13 @@ import org.qi4j.api.type.ValueCompositeType;
 import org.qi4j.api.unitofwork.NoSuchEntityTypeException;
 import org.qi4j.api.util.Classes;
 import org.qi4j.api.value.ValueDescriptor;
-import org.qi4j.runtime.composite.CompositeMethodsModel;
-import org.qi4j.runtime.composite.CompositeModel;
-import org.qi4j.runtime.composite.MixinModel;
-import org.qi4j.runtime.composite.MixinsModel;
-import org.qi4j.runtime.composite.UsesInstance;
-import org.qi4j.runtime.injection.InjectionContext;
-import org.qi4j.runtime.property.PropertyInstance;
-import org.qi4j.runtime.unitofwork.UnitOfWorkInstance;
 import org.qi4j.runtime.composite.*;
 import org.qi4j.runtime.injection.InjectionContext;
 import org.qi4j.runtime.property.PropertyInstance;
 import org.qi4j.runtime.unitofwork.UnitOfWorkInstance;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Model for ValueComposites
@@ -57,19 +50,19 @@ public final class ValueModel extends CompositeModel
 {
     private ValueCompositeType valueType;
 
-    public ValueModel( final ModuleDescriptor module,
-                       final List<Class<?>> types,
-                       final Visibility visibility,
-                       final MetaInfo metaInfo,
-                       final MixinsModel mixinsModel,
-                       final ValueStateModel stateModel,
-                       final CompositeMethodsModel compositeMethodsModel
-                     )
+    public ValueModel(final ModuleDescriptor module,
+                      final List<Class<?>> types,
+                      final Visibility visibility,
+                      final MetaInfo metaInfo,
+                      final MixinsModel mixinsModel,
+                      final ValueStateModel stateModel,
+                      final CompositeMethodsModel compositeMethodsModel
+    )
     {
-        super( module, types, visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel );
+        super(module, types, visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel);
 // TODO: When TypeLookup's lazy loading can be disabled during Model building, then uncomment the following line.
 //        checkAssociationVisibility();
-        valueType = ValueCompositeType.of( this );
+        valueType = ValueCompositeType.of(this);
     }
 
     @Override
@@ -85,7 +78,7 @@ public final class ValueModel extends CompositeModel
     }
 
     // This method is ONLY called by ValueBuilders
-    void checkConstraints( ValueStateInstance state )
+    void checkConstraints(ValueStateInstance state)
         throws ConstraintViolationException
     {
         List<ValueConstraintViolation> violations = new ArrayList<>();
@@ -95,96 +88,96 @@ public final class ValueModel extends CompositeModel
             {
                 try
                 {
-                    propertyModel.checkConstraints( state.propertyFor( propertyModel.accessor() ).get() );
+                    propertyModel.checkConstraints(state.propertyFor(propertyModel.accessor()).get());
                 }
-                catch( ConstraintViolationException e )
+                catch(ConstraintViolationException e)
                 {
-                    violations.addAll( e.constraintViolations() );
+                    violations.addAll(e.constraintViolations());
                 }
             }
-                                       );
+        );
 
         // IF no UnitOfWork is active, then the Association checks shouldn't be done.
-        if( ! UnitOfWorkInstance.getCurrent().empty() )
+        if(!UnitOfWorkInstance.getCurrent().empty())
         {
-            ( (ValueStateModel) stateModel ).associations().forEach(
+            ((ValueStateModel) stateModel).associations().forEach(
                 associationModel ->
                 {
                     try
                     {
-                        associationModel.checkConstraints( state.associationFor( associationModel.accessor() ).get() );
+                        associationModel.checkConstraints(state.associationFor(associationModel.accessor()).get());
                     }
-                    catch( ConstraintViolationException e )
+                    catch(ConstraintViolationException e)
                     {
-                        violations.addAll( e.constraintViolations() );
-                    }
-                }
-            );
-
-            ( (ValueStateModel) stateModel ).manyAssociations().forEach(
-                model ->
-                {
-                    try
-                    {
-                        model.checkAssociationConstraints( state.manyAssociationFor( model.accessor() ) );
-                    }
-                    catch( ConstraintViolationException e )
-                    {
-                        violations.addAll( e.constraintViolations() );
+                        violations.addAll(e.constraintViolations());
                     }
                 }
             );
 
-            ( (ValueStateModel) stateModel ).namedAssociations().forEach(
+            ((ValueStateModel) stateModel).manyAssociations().forEach(
                 model ->
                 {
                     try
                     {
-                        model.checkAssociationConstraints( state.namedAssociationFor( model.accessor() ) );
+                        model.checkAssociationConstraints(state.manyAssociationFor(model.accessor()));
                     }
-                    catch( ConstraintViolationException e )
+                    catch(ConstraintViolationException e)
                     {
-                        violations.addAll( e.constraintViolations() );
+                        violations.addAll(e.constraintViolations());
+                    }
+                }
+            );
+
+            ((ValueStateModel) stateModel).namedAssociations().forEach(
+                model ->
+                {
+                    try
+                    {
+                        model.checkAssociationConstraints(state.namedAssociationFor(model.accessor()));
+                    }
+                    catch(ConstraintViolationException e)
+                    {
+                        violations.addAll(e.constraintViolations());
                     }
                 }
             );
         }
 
-        if( !violations.isEmpty() )
+        if(!violations.isEmpty())
         {
-            ConstraintViolationException exception = new ConstraintViolationException( violations );
-            exception.setCompositeDescriptor( this );
-            exception.setIdentity( extractIdentity( state, exception ) );
+            ConstraintViolationException exception = new ConstraintViolationException(violations);
+            exception.setCompositeDescriptor(this);
+            exception.setIdentity(extractIdentity(state, exception));
             throw exception;
         }
     }
 
-    private Identity extractIdentity( ValueStateInstance state, ConstraintViolationException e )
+    private Identity extractIdentity(ValueStateInstance state, ConstraintViolationException e)
     {
         try
         {
-            PropertyInstance<Identity> identityProperty = state.propertyFor( HasIdentity.IDENTITY_METHOD );
+            PropertyInstance<Identity> identityProperty = state.propertyFor(HasIdentity.IDENTITY_METHOD);
             return identityProperty.get();
         }
-        catch( IllegalArgumentException e1 )
+        catch(IllegalArgumentException e1)
         {
             // ignore. is not a HasIdentity value
         }
         return null;
     }
 
-    public ValueInstance newValueInstance( ValueStateInstance state )
+    public ValueInstance newValueInstance(ValueStateInstance state)
     {
         Object[] mixins = mixinsModel.newMixinHolder();
 
-        ValueInstance instance = new ValueInstance( this, mixins, state );
+        ValueInstance instance = new ValueInstance(this, mixins, state);
 
         // Instantiate all mixins
         int i = 0;
-        InjectionContext injectionContext = new InjectionContext( instance, UsesInstance.EMPTY_USES, state );
-        for( MixinModel mixinModel : mixinsModel.mixinModels() )
+        InjectionContext injectionContext = new InjectionContext(instance, UsesInstance.EMPTY_USES, state);
+        for(MixinModel mixinModel : mixinsModel.mixinModels())
         {
-            mixins[ i++ ] = mixinModel.newInstance( injectionContext );
+            mixins[i++] = mixinModel.newInstance(injectionContext);
         }
 
         // Return
@@ -196,18 +189,18 @@ public final class ValueModel extends CompositeModel
         // All referenced entity types in any Associations must be visible from the module of this ValueModel.
         TypeLookup lookup = module.typeLookup();
         ValueStateModel stateModel = (ValueStateModel) this.stateModel;
-        stateModel.associations().forEach( model -> checkModel( lookup, model ) );
-        stateModel.manyAssociations().forEach( model -> checkModel( lookup, model ) );
-        stateModel.namedAssociations().forEach( model -> checkModel( lookup, model ) );
+        stateModel.associations().forEach(model -> checkModel(lookup, model));
+        stateModel.manyAssociations().forEach(model -> checkModel(lookup, model));
+        stateModel.namedAssociations().forEach(model -> checkModel(lookup, model));
     }
 
-    private void checkModel( TypeLookup lookup, AssociationDescriptor model )
+    private void checkModel(TypeLookup lookup, AssociationDescriptor model)
     {
-        Class<?> rawClass = Classes.RAW_CLASS.apply( model.type() );
-        List<EntityDescriptor> descriptors = lookup.lookupEntityModels( rawClass );
-        if( descriptors.size() == 0 )
+        Class<?> rawClass = Classes.RAW_CLASS.apply(model.type());
+        List<EntityDescriptor> descriptors = lookup.lookupEntityModels(rawClass);
+        if(descriptors.size() == 0)
         {
-            throw new NoSuchEntityTypeException( rawClass.getName(), module );
+            throw new NoSuchEntityTypeException(rawClass.getName(), module);
         }
     }
 }

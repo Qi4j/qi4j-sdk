@@ -22,7 +22,6 @@ package org.qi4j.runtime.bootstrap;
 
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.EntityDeclaration;
-import org.qi4j.bootstrap.EntityDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
 
 import static java.util.Arrays.asList;
@@ -35,25 +34,25 @@ public final class EntityDeclarationImpl
 {
     private final Iterable<EntityAssemblyImpl> entities;
 
-    public EntityDeclarationImpl( Iterable<EntityAssemblyImpl> entities )
+    public EntityDeclarationImpl(Iterable<EntityAssemblyImpl> entities)
     {
         this.entities = entities;
     }
 
     @Override
-    public EntityDeclaration setMetaInfo( Object info )
+    public EntityDeclaration setMetaInfo(Object info)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.metaInfo.set( info );
+            entity.metaInfo.set(info);
         }
         return this;
     }
 
     @Override
-    public EntityDeclaration visibleIn( Visibility visibility )
+    public EntityDeclaration visibleIn(Visibility visibility)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
             entity.visibility = visibility;
         }
@@ -61,41 +60,41 @@ public final class EntityDeclarationImpl
     }
 
     @Override
-    public EntityDeclaration withConcerns( Class<?>... concerns )
+    public EntityDeclaration withConcerns(Class<?>... concerns)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.concerns.addAll( asList( concerns ) );
+            entity.concerns.addAll(asList(concerns));
         }
         return this;
     }
 
     @Override
-    public EntityDeclaration withSideEffects( Class<?>... sideEffects )
+    public EntityDeclaration withSideEffects(Class<?>... sideEffects)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.sideEffects.addAll( asList( sideEffects ) );
+            entity.sideEffects.addAll(asList(sideEffects));
         }
         return this;
     }
 
     @Override
-    public EntityDeclaration withMixins( Class<?>... mixins )
+    public EntityDeclaration withMixins(Class<?>... mixins)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.mixins.addAll( asList( mixins ) );
+            entity.mixins.addAll(asList(mixins));
         }
         return this;
     }
 
     @Override
-    public EntityDeclaration withTypes( Class<?>... types )
+    public EntityDeclaration withTypes(Class<?>... types)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.types.addAll( asList( types ) );
+            entity.types.addAll(asList(types));
         }
         return this;
     }

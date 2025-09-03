@@ -34,7 +34,7 @@ public class ReferenceProperty
     {
     }
 
-    public ReferenceProperty( EntityReference reference )
+    public ReferenceProperty(EntityReference reference)
     {
         this.reference = reference;
     }
@@ -46,7 +46,7 @@ public class ReferenceProperty
     }
 
     @Override
-    public void set( EntityReference newValue )
+    public void set(EntityReference newValue)
         throws IllegalArgumentException, IllegalStateException
     {
         reference = newValue;

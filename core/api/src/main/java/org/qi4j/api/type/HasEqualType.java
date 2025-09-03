@@ -27,18 +27,18 @@ import static java.util.stream.Collectors.toList;
 
 public class HasEqualType<T extends HasTypes> extends HasTypesPredicate<T>
 {
-    public HasEqualType( Type type )
+    public HasEqualType(Type type)
     {
-        super( Collections.singletonList( type ) );
+        super(Collections.singletonList(type));
     }
 
-    public HasEqualType( T hasTypes )
+    public HasEqualType(T hasTypes)
     {
-        super( hasTypes.types().collect( toList() ) );
+        super(hasTypes.types().collect(toList()));
     }
 
     @Override
-    protected Predicate<Type> matchPredicate( Type candidate )
+    protected Predicate<Type> matchPredicate(Type candidate)
     {
         return candidate::equals;
     }

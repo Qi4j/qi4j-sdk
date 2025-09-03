@@ -19,15 +19,11 @@
  */
 package org.qi4j.regression.qi78;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ApplicationDescriptor;
 import org.qi4j.api.structure.LayerDescriptor;
 import org.qi4j.api.util.HierarchicalVisitorAdapter;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.Energy4Java;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.Energy4Java;
@@ -44,49 +40,49 @@ public class IssueTest
     {
         Energy4Java qi4j = new Energy4Java();
 
-        Application app = qi4j.newApplication( factory -> {
+        Application app = qi4j.newApplication(factory -> {
             ApplicationAssembly assembly = factory.newApplicationAssembly();
 
-            LayerAssembly domainLayer = assembly.layer( null );
-            domainLayer.setName( "Domain" );
+            LayerAssembly domainLayer = assembly.layer(null);
+            domainLayer.setName("Domain");
 
-            LayerAssembly infrastructureLayer = assembly.layer( null );
-            infrastructureLayer.setName( "Infrastructure" );
+            LayerAssembly infrastructureLayer = assembly.layer(null);
+            infrastructureLayer.setName("Infrastructure");
 
-            domainLayer.uses( infrastructureLayer );
+            domainLayer.uses(infrastructureLayer);
 
             return assembly;
-        } );
+        });
         ApplicationDescriptor model = app.descriptor();
-        model.accept( new HierarchicalVisitorAdapter<Object, Object, RuntimeException>()
+        model.accept(new HierarchicalVisitorAdapter<Object, Object, RuntimeException>()
         {
             @Override
-            public boolean visitEnter( Object visited )
+            public boolean visitEnter(Object visited)
                 throws RuntimeException
             {
                 return visited instanceof ApplicationDescriptor;
             }
 
             @Override
-            public boolean visitLeave( Object visited )
+            public boolean visitLeave(Object visited)
                 throws RuntimeException
             {
                 return visited instanceof LayerDescriptor;
             }
 
             @Override
-            public boolean visit( Object visited )
+            public boolean visit(Object visited)
                 throws RuntimeException
             {
-                if( visited instanceof LayerDescriptor )
+                if(visited instanceof LayerDescriptor)
                 {
-                    ( (LayerDescriptor) visited ).usedLayers().layers().forEach( usedLayerModel -> {
-                        assertThat( "Used layer model is null", usedLayerModel, notNullValue() );
-                    } );
+                    ((LayerDescriptor) visited).usedLayers().layers().forEach(usedLayerModel -> {
+                        assertThat("Used layer model is null", usedLayerModel, notNullValue());
+                    });
                 }
 
                 return false;
             }
-        } );
+        });
     }
 }

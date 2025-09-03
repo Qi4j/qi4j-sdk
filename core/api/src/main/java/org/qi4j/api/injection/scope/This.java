@@ -19,13 +19,9 @@
  */
 package org.qi4j.api.injection.scope;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import org.qi4j.api.injection.InjectionScope;
-import org.qi4j.api.injection.InjectionScope;
+
+import java.lang.annotation.*;
 
 /**
  * Annotation to denote the injection of a reference to the same Composite
@@ -39,8 +35,8 @@ import org.qi4j.api.injection.InjectionScope;
  * Specifically the same set of Modifiers will be used.
  * </p>
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.FIELD, ElementType.PARAMETER } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Documented
 @InjectionScope
 public @interface This

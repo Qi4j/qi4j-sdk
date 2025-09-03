@@ -32,14 +32,14 @@ import org.qi4j.api.property.Property;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.api.unitofwork.concern.UnitOfWorkPropagation;
 
-@Mixins( Person.Mixin.class )
+@Mixins(Person.Mixin.class)
 public interface Person extends HasIdentity
 {
-    @UnitOfWorkPropagation( UnitOfWorkPropagation.Propagation.MANDATORY )
-    void movedToNewAddress( String street, String zipCode, City city, Country country, Rent rent );
+    @UnitOfWorkPropagation(UnitOfWorkPropagation.Propagation.MANDATORY)
+    void movedToNewAddress(String street, String zipCode, City city, Country country, Rent rent);
 
-    @UnitOfWorkPropagation( UnitOfWorkPropagation.Propagation.MANDATORY )
-    void amendAddress( String street, String zipCode, City city, Country country );
+    @UnitOfWorkPropagation(UnitOfWorkPropagation.Propagation.MANDATORY)
+    void amendAddress(String street, String zipCode, City city, Country country);
 
     Property<String> name();
 
@@ -71,19 +71,19 @@ public interface Person extends HasIdentity
         private PeopleRepository repository;
 
         @Override
-        public void movedToNewAddress( String street, String zipCode, City city, Country country, Rent rent )
+        public void movedToNewAddress(String street, String zipCode, City city, Country country, Rent rent)
         {
-            Address newAddress = repository.createAddress( street, zipCode, city, country, rent );
+            Address newAddress = repository.createAddress(street, zipCode, city, country, rent);
             Address oldAddress = address().get();
-            oldAddresses().add( oldAddress );
-            address().set( newAddress );
+            oldAddresses().add(oldAddress);
+            address().set(newAddress);
         }
 
         @Override
-        public void amendAddress( String street, String zipCode, City city, Country country )
+        public void amendAddress(String street, String zipCode, City city, Country country)
         {
-            Address newAddress = repository.createAddress( street, zipCode, city, country, address().get().rent().get() );
-            address().set( newAddress );
+            Address newAddress = repository.createAddress(street, zipCode, city, country, address().get().rent().get());
+            address().set(newAddress);
         }
     }
 }

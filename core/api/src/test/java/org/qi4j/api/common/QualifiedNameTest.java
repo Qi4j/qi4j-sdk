@@ -30,59 +30,59 @@ public class QualifiedNameTest
     @Test
     public void testQualifiedNameWithDollar()
     {
-        assertThat( "Name containing dollar is modified",
-                    new QualifiedName( TypeName.nameOf( "Test$Test" ), "satisfiedBy" ).type(),
-                    equalTo( "Test-Test" )
+        assertThat("Name containing dollar is modified",
+            new QualifiedName(TypeName.nameOf("Test$Test"), "satisfiedBy").type(),
+            equalTo("Test-Test")
         );
     }
 
     @Test
     public void testQualifiedNameFromQNWithDollar()
     {
-        assertThat( "Name containing dollar is cleaned up",
-                    QualifiedName.fromFQN( "Test$Test:satisfiedBy" ).type(),
-                    equalTo( "Test-Test" ) );
+        assertThat("Name containing dollar is cleaned up",
+            QualifiedName.fromFQN("Test$Test:satisfiedBy").type(),
+            equalTo("Test-Test"));
     }
 
     @Test
     public void nonNullArguments1()
     {
-        assertThrows( NullPointerException.class, () -> new QualifiedName( TypeName.nameOf( "Test" ), null ) );
+        assertThrows(NullPointerException.class, () -> new QualifiedName(TypeName.nameOf("Test"), null));
     }
 
     @Test
     public void nonNullArguments2()
     {
-        assertThrows( NullPointerException.class, () -> new QualifiedName( null, "satisfiedBy" ) );
+        assertThrows(NullPointerException.class, () -> new QualifiedName(null, "satisfiedBy"));
     }
 
     @Test
     public void nonNullArguments3()
     {
-        assertThrows( NullPointerException.class, () -> new QualifiedName( null, null ) );
+        assertThrows(NullPointerException.class, () -> new QualifiedName(null, null));
     }
 
     @Test
     public void nonNullArguments4()
     {
-        assertThrows( NullPointerException.class, () -> QualifiedName.fromFQN( null ) );
+        assertThrows(NullPointerException.class, () -> QualifiedName.fromFQN(null));
     }
 
     @Test
     public void nonNullArguments5()
     {
-        assertThrows( NullPointerException.class, () -> QualifiedName.fromAccessor( null ) );
+        assertThrows(NullPointerException.class, () -> QualifiedName.fromAccessor(null));
     }
 
     @Test
     public void nonNullArguments6()
     {
-        assertThrows( NullPointerException.class, () -> QualifiedName.fromClass( null, "satisfiedBy" ) );
+        assertThrows(NullPointerException.class, () -> QualifiedName.fromClass(null, "satisfiedBy"));
     }
 
     @Test
     public void nonNullArguments7()
     {
-        assertThrows( NullPointerException.class, () -> QualifiedName.fromClass( null, null ) );
+        assertThrows(NullPointerException.class, () -> QualifiedName.fromClass(null, null));
     }
 }

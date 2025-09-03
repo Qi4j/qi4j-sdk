@@ -32,27 +32,27 @@ public class DefaultUnitOfWorkAssembler
     public static final String IDENTITY = "default-uow-factory";
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        Class factoryMixin = loadMixinClass( "org.qi4j.runtime.unitofwork.UnitOfWorkFactoryMixin" );
-        module.services( UnitOfWorkFactory.class )
-              .withMixins( factoryMixin )
-              .identifiedBy( IDENTITY );
+        Class factoryMixin = loadMixinClass("org.qi4j.runtime.unitofwork.UnitOfWorkFactoryMixin");
+        module.services(UnitOfWorkFactory.class)
+            .withMixins(factoryMixin)
+            .identifiedBy(IDENTITY);
 
-        Class uowMixin = loadMixinClass( "org.qi4j.runtime.unitofwork.ModuleUnitOfWork" );
-        module.transients( UnitOfWork.class )
-              .withMixins( uowMixin );
+        Class uowMixin = loadMixinClass("org.qi4j.runtime.unitofwork.ModuleUnitOfWork");
+        module.transients(UnitOfWork.class)
+            .withMixins(uowMixin);
     }
 
-    private Class<?> loadMixinClass( String name )
+    private Class<?> loadMixinClass(String name)
     {
         try
         {
-            return getClass().getClassLoader().loadClass( name );
+            return getClass().getClassLoader().loadClass(name);
         }
-        catch( ClassNotFoundException e )
+        catch(ClassNotFoundException e)
         {
-            throw new AssemblyException( "Default UnitOfWorkFactory mixin is not present in the system." );
+            throw new AssemblyException("Default UnitOfWorkFactory mixin is not present in the system.");
         }
     }
 }

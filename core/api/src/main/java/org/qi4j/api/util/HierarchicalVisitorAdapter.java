@@ -26,21 +26,21 @@ public class HierarchicalVisitorAdapter<NODE, LEAF, ThrowableType extends Throwa
     implements HierarchicalVisitor<NODE, LEAF, ThrowableType>
 {
     @Override
-    public boolean visitEnter( NODE visited )
+    public boolean visitEnter(NODE visited)
         throws ThrowableType
     {
         return true;
     }
 
     @Override
-    public boolean visitLeave( NODE visited )
+    public boolean visitLeave(NODE visited)
         throws ThrowableType
     {
         return true;
     }
 
     @Override
-    public boolean visit( LEAF visited )
+    public boolean visit(LEAF visited)
         throws ThrowableType
     {
         return true;

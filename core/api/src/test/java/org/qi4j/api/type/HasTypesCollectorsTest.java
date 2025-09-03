@@ -19,13 +19,14 @@
  */
 package org.qi4j.api.type;
 
+import org.junit.jupiter.api.Test;
+import org.qi4j.api.identity.Identity;
+import org.qi4j.api.identity.StringIdentity;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import org.qi4j.api.identity.Identity;
-import org.qi4j.api.identity.StringIdentity;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,99 +38,99 @@ public class HasTypesCollectorsTest
     public void selectMatchingTypes()
     {
         List<ValueType> valueTypes = Arrays.asList(
-            ValueType.of( String.class ),
-            ValueType.of( Integer.class ),
-            ValueType.of( Number.class )
+            ValueType.of(String.class),
+            ValueType.of(Integer.class),
+            ValueType.of(Number.class)
         );
 
-        List<ValueType> number = valueTypes.stream().collect( HasTypesCollectors.matchingTypes( Number.class ) );
-        assertThat( number.size(), is( 2 ) );
-        assertThat( number.get( 0 ), equalTo( ValueType.of( Number.class ) ) );
-        assertThat( number.get( 1 ), equalTo( ValueType.of( Integer.class ) ) );
+        List<ValueType> number = valueTypes.stream().collect(HasTypesCollectors.matchingTypes(Number.class));
+        assertThat(number.size(), is(2));
+        assertThat(number.get(0), equalTo(ValueType.of(Number.class)));
+        assertThat(number.get(1), equalTo(ValueType.of(Integer.class)));
 
-        List<ValueType> integer = valueTypes.stream().collect( HasTypesCollectors.matchingTypes( Integer.class ) );
-        assertThat( integer.size(), is( 1 ) );
-        assertThat( integer.get( 0 ), equalTo( ValueType.of( Integer.class ) ) );
+        List<ValueType> integer = valueTypes.stream().collect(HasTypesCollectors.matchingTypes(Integer.class));
+        assertThat(integer.size(), is(1));
+        assertThat(integer.get(0), equalTo(ValueType.of(Integer.class)));
     }
 
     @Test
     public void selectMatchingType()
     {
         List<ValueType> valueTypes = Arrays.asList(
-            ValueType.of( String.class ),
-            ValueType.of( Double.class ),
-            ValueType.of( Integer.class )
+            ValueType.of(String.class),
+            ValueType.of(Double.class),
+            ValueType.of(Integer.class)
         );
 
         Optional<ValueType> number = valueTypes.stream()
-                                               .collect( HasTypesCollectors.matchingType( Number.class ) );
-        assertThat( number.isPresent(), is( true ) );
-        assertThat( number.get(), equalTo( ValueType.of( Double.class ) ) );
+            .collect(HasTypesCollectors.matchingType(Number.class));
+        assertThat(number.isPresent(), is(true));
+        assertThat(number.get(), equalTo(ValueType.of(Double.class)));
 
         Optional<ValueType> integer = valueTypes.stream()
-                                                .collect( HasTypesCollectors.matchingType( Integer.class ) );
-        assertThat( integer.isPresent(), is( true ) );
-        assertThat( integer.get(), equalTo( ValueType.of( Integer.class ) ) );
+            .collect(HasTypesCollectors.matchingType(Integer.class));
+        assertThat(integer.isPresent(), is(true));
+        assertThat(integer.get(), equalTo(ValueType.of(Integer.class)));
     }
 
     @Test
     public void selectMatchingValueTypes()
     {
         List<ValueType> valueTypes = Arrays.asList(
-            ValueType.of( String.class ),
-            ValueType.of( Number.class, Integer.class ),
-            ValueType.of( Integer.class ),
-            ValueType.of( Number.class )
+            ValueType.of(String.class),
+            ValueType.of(Number.class, Integer.class),
+            ValueType.of(Integer.class),
+            ValueType.of(Number.class)
         );
 
         List<ValueType> number = valueTypes.stream()
-                                           .collect( HasTypesCollectors.matchingTypes( ValueType.of( Number.class ) ) );
-        System.out.println( number );
-        assertThat( number.size(), is( 2 ) );
-        assertThat( number.get( 0 ), equalTo( ValueType.of( Number.class ) ) );
-        assertThat( number.get( 1 ), equalTo( ValueType.of( Number.class, Integer.class ) ) );
+            .collect(HasTypesCollectors.matchingTypes(ValueType.of(Number.class)));
+        System.out.println(number);
+        assertThat(number.size(), is(2));
+        assertThat(number.get(0), equalTo(ValueType.of(Number.class)));
+        assertThat(number.get(1), equalTo(ValueType.of(Number.class, Integer.class)));
 
         List<ValueType> integer = valueTypes.stream()
-                                            .collect(
-                                                HasTypesCollectors.matchingTypes( ValueType.of( Integer.class ) ) );
-        assertThat( integer.size(), is( 2 ) );
-        assertThat( integer.get( 0 ), equalTo( ValueType.of( Integer.class ) ) );
-        assertThat( integer.get( 1 ), equalTo( ValueType.of( Number.class, Integer.class ) ) );
+            .collect(
+                HasTypesCollectors.matchingTypes(ValueType.of(Integer.class)));
+        assertThat(integer.size(), is(2));
+        assertThat(integer.get(0), equalTo(ValueType.of(Integer.class)));
+        assertThat(integer.get(1), equalTo(ValueType.of(Number.class, Integer.class)));
 
         List<ValueType> both = valueTypes.stream()
-                                         .collect( HasTypesCollectors.matchingTypes( ValueType.of( Number.class,
-                                                                                                   Integer.class ) ) );
-        assertThat( both.size(), is( 1 ) );
-        assertThat( both.get( 0 ), equalTo( ValueType.of( Number.class, Integer.class ) ) );
+            .collect(HasTypesCollectors.matchingTypes(ValueType.of(Number.class,
+                Integer.class)));
+        assertThat(both.size(), is(1));
+        assertThat(both.get(0), equalTo(ValueType.of(Number.class, Integer.class)));
     }
 
     @Test
     public void selectMatchingValueType()
     {
         List<ValueType> valueTypes = Arrays.asList(
-            ValueType.of( String.class ),
-            ValueType.of( Number.class, Integer.class ),
-            ValueType.of( Integer.class ),
-            ValueType.of( Number.class )
+            ValueType.of(String.class),
+            ValueType.of(Number.class, Integer.class),
+            ValueType.of(Integer.class),
+            ValueType.of(Number.class)
         );
 
         Optional<ValueType> number = valueTypes.stream()
-                                               .collect(
-                                                   HasTypesCollectors.matchingType( ValueType.of( Number.class ) ) );
-        assertThat( number.isPresent(), is( true ) );
-        assertThat( number.get(), equalTo( ValueType.of( Number.class ) ) );
+            .collect(
+                HasTypesCollectors.matchingType(ValueType.of(Number.class)));
+        assertThat(number.isPresent(), is(true));
+        assertThat(number.get(), equalTo(ValueType.of(Number.class)));
 
         Optional<ValueType> integer = valueTypes.stream()
-                                                .collect(
-                                                    HasTypesCollectors.matchingType( ValueType.of( Integer.class ) ) );
-        assertThat( integer.isPresent(), is( true ) );
-        assertThat( integer.get(), equalTo( ValueType.of( Integer.class ) ) );
+            .collect(
+                HasTypesCollectors.matchingType(ValueType.of(Integer.class)));
+        assertThat(integer.isPresent(), is(true));
+        assertThat(integer.get(), equalTo(ValueType.of(Integer.class)));
 
         Optional<ValueType> both = valueTypes.stream()
-                                             .collect( HasTypesCollectors.matchingType( ValueType.of( Number.class,
-                                                                                                      Integer.class ) ) );
-        assertThat( both.isPresent(), is( true ) );
-        assertThat( both.get(), equalTo( ValueType.of( Number.class, Integer.class ) ) );
+            .collect(HasTypesCollectors.matchingType(ValueType.of(Number.class,
+                Integer.class)));
+        assertThat(both.isPresent(), is(true));
+        assertThat(both.get(), equalTo(ValueType.of(Number.class, Integer.class)));
     }
 
     @Test
@@ -137,13 +138,13 @@ public class HasTypesCollectorsTest
     {
         List<ValueType> list = new ArrayList<ValueType>()
         {{
-            add( ValueType.of( String.class ) );
-            add( ValueType.of( Identity.class ) );
+            add(ValueType.of(String.class));
+            add(ValueType.of(Identity.class));
         }};
 
         List<ValueType> result = list.stream()
-                                     .collect( HasTypesCollectors.closestTypes( StringIdentity.class ) );
-        assertThat( result.size(), is( 1 ) );
-        assertThat( result.get( 0 ), equalTo( ValueType.of( Identity.class ) ) );
+            .collect(HasTypesCollectors.closestTypes(StringIdentity.class));
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), equalTo(ValueType.of(Identity.class)));
     }
 }

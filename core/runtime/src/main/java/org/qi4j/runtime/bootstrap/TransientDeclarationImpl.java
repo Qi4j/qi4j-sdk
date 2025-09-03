@@ -21,7 +21,6 @@
 package org.qi4j.runtime.bootstrap;
 
 import org.qi4j.api.common.Visibility;
-import org.qi4j.bootstrap.TransientDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.TransientDeclaration;
 
@@ -35,25 +34,25 @@ public final class TransientDeclarationImpl
 {
     private final Iterable<TransientAssemblyImpl> assemblies;
 
-    public TransientDeclarationImpl( Iterable<TransientAssemblyImpl> assemblies )
+    public TransientDeclarationImpl(Iterable<TransientAssemblyImpl> assemblies)
     {
         this.assemblies = assemblies;
     }
 
     @Override
-    public TransientDeclaration setMetaInfo( Object info )
+    public TransientDeclaration setMetaInfo(Object info)
     {
-        for( TransientAssemblyImpl assembly : assemblies )
+        for(TransientAssemblyImpl assembly : assemblies)
         {
-            assembly.metaInfo.set( info );
+            assembly.metaInfo.set(info);
         }
         return this;
     }
 
     @Override
-    public TransientDeclaration visibleIn( Visibility visibility )
+    public TransientDeclaration visibleIn(Visibility visibility)
     {
-        for( TransientAssemblyImpl assembly : assemblies )
+        for(TransientAssemblyImpl assembly : assemblies)
         {
             assembly.visibility = visibility;
         }
@@ -61,41 +60,41 @@ public final class TransientDeclarationImpl
     }
 
     @Override
-    public TransientDeclaration withConcerns( Class<?>... concerns )
+    public TransientDeclaration withConcerns(Class<?>... concerns)
     {
-        for( TransientAssemblyImpl assembly : assemblies )
+        for(TransientAssemblyImpl assembly : assemblies)
         {
-            assembly.concerns.addAll( asList( concerns ) );
+            assembly.concerns.addAll(asList(concerns));
         }
         return this;
     }
 
     @Override
-    public TransientDeclaration withSideEffects( Class<?>... sideEffects )
+    public TransientDeclaration withSideEffects(Class<?>... sideEffects)
     {
-        for( TransientAssemblyImpl assembly : assemblies )
+        for(TransientAssemblyImpl assembly : assemblies)
         {
-            assembly.sideEffects.addAll( asList( sideEffects ) );
+            assembly.sideEffects.addAll(asList(sideEffects));
         }
         return this;
     }
 
     @Override
-    public TransientDeclaration withMixins( Class<?>... mixins )
+    public TransientDeclaration withMixins(Class<?>... mixins)
     {
-        for( TransientAssemblyImpl assembly : assemblies )
+        for(TransientAssemblyImpl assembly : assemblies)
         {
-            assembly.mixins.addAll( asList( mixins ) );
+            assembly.mixins.addAll(asList(mixins));
         }
         return this;
     }
 
     @Override
-    public TransientDeclaration withTypes( Class<?>... types )
+    public TransientDeclaration withTypes(Class<?>... types)
     {
-        for( TransientAssemblyImpl assembly : assemblies )
+        for(TransientAssemblyImpl assembly : assemblies)
         {
-            assembly.types.addAll( asList( types ) );
+            assembly.types.addAll(asList(types));
         }
         return this;
     }

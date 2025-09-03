@@ -19,8 +19,6 @@
  */
 package org.qi4j.runtime.service;
 
-import java.lang.reflect.Method;
-import java.util.stream.Stream;
 import org.qi4j.api.activation.Activation;
 import org.qi4j.api.activation.ActivationEventListener;
 import org.qi4j.api.activation.ActivationException;
@@ -37,7 +35,9 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.service.ServiceUnavailableException;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.runtime.activation.ActivationDelegate;
-import org.qi4j.runtime.activation.ActivationDelegate;
+
+import java.lang.reflect.Method;
+import java.util.stream.Stream;
 
 /**
  * Implementation of ServiceReference.
@@ -48,6 +48,7 @@ import org.qi4j.runtime.activation.ActivationDelegate;
  * Whenever the service is requested a proxy is returned which points to this class. This means
  * that the instance can be passivated even though a client is holding on to a service proxy.
  * </p>
+ *
  * @param <T> Service Type
  */
 public final class ServiceReferenceInstance<T>
@@ -57,11 +58,11 @@ public final class ServiceReferenceInstance<T>
     private final T serviceProxy;
     private final ModuleDescriptor module;
     private final ServiceModel serviceModel;
-    private final ActivationDelegate activation = new ActivationDelegate( this );
+    private final ActivationDelegate activation = new ActivationDelegate(this);
     private boolean active = false;
     private ServiceInstance instanceBeingActivated;
 
-    ServiceReferenceInstance( ServiceModel serviceModel, ModuleDescriptor module )
+    ServiceReferenceInstance(ServiceModel serviceModel, ModuleDescriptor module)
     {
         this.module = module;
         this.serviceModel = serviceModel;
@@ -82,9 +83,9 @@ public final class ServiceReferenceInstance<T>
     }
 
     @Override
-    public <M> M metaInfo( Class<M> infoType )
+    public <M> M metaInfo(Class<M> infoType)
     {
-        return serviceModel.metaInfo( infoType );
+        return serviceModel.metaInfo(infoType);
     }
 
     @Override
@@ -120,7 +121,7 @@ public final class ServiceReferenceInstance<T>
     public void activate()
         throws ActivationException
     {
-        if( serviceModel.isInstantiateOnStartup() )
+        if(serviceModel.isInstantiateOnStartup())
         {
             getInstance();
         }
@@ -130,11 +131,14 @@ public final class ServiceReferenceInstance<T>
     public void passivate()
         throws PassivationException
     {
-        if( instance != null )
+        if(instance != null)
         {
-            try {
-                activation.passivate( () -> active = false );
-            } finally {
+            try
+            {
+                activation.passivate(() -> active = false);
+            }
+            finally
+            {
                 instance = null;
                 active = false;
             }
@@ -145,13 +149,13 @@ public final class ServiceReferenceInstance<T>
         throws ServiceImporterException
     {
         // DCL that works with Java 1.5 volatile semantics
-        if( instance == null )
+        if(instance == null)
         {
-            synchronized( this )
+            synchronized(this)
             {
-                if( instance == null )
+                if(instance == null)
                 {
-                    if( instanceBeingActivated != null )
+                    if(instanceBeingActivated != null)
                     {
                         // needed because activation may request its own service.
                         // There is possible complication with this, as activation may use another service, which in turn
@@ -160,17 +164,17 @@ public final class ServiceReferenceInstance<T>
                         // constructors to objects, which may then use an uninitilized object.
                         return instanceBeingActivated;
                     }
-                    instanceBeingActivated = serviceModel.newInstance( module );
+                    instanceBeingActivated = serviceModel.newInstance(module);
 
                     try
                     {
-                        activation.activate( serviceModel.newActivatorsInstance( module ),
-                                             instanceBeingActivated,
-                                             () -> active = true );
+                        activation.activate(serviceModel.newActivatorsInstance(module),
+                            instanceBeingActivated,
+                            () -> active = true);
                     }
-                    catch( Exception e )
+                    catch(Exception e)
                     {
-                        throw new ServiceUnavailableException( "Could not activate service " + serviceModel.identity(), e );
+                        throw new ServiceUnavailableException("Could not activate service " + serviceModel.identity(), e);
                     }
                     instance = instanceBeingActivated;
                     instanceBeingActivated = null;
@@ -187,10 +191,10 @@ public final class ServiceReferenceInstance<T>
         return serviceModel.identity() + "(active=" + isActive() + ",module='" + module.name() + "')";
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public T newProxy()
     {
-        return (T) serviceModel.newProxy( new ServiceReferenceInstance.ServiceInvocationHandler() );
+        return (T) serviceModel.newProxy(new ServiceReferenceInstance.ServiceInvocationHandler());
     }
 
     public ServiceDescriptor serviceDescriptor()
@@ -205,32 +209,32 @@ public final class ServiceReferenceInstance<T>
     }
 
     @Override
-    public boolean isAssignableTo( Class<?> type )
+    public boolean isAssignableTo(Class<?> type)
     {
-        return serviceModel.isAssignableTo( type );
+        return serviceModel.isAssignableTo(type);
     }
 
     public final class ServiceInvocationHandler
         implements CompositeInstance
     {
         @Override
-        @SuppressWarnings( "unchecked" )
+        @SuppressWarnings("unchecked")
         public <P> P proxy()
         {
             return (P) ServiceReferenceInstance.this.get();
         }
 
         @Override
-        public <P> P newProxy( Class<P> mixinType )
+        public <P> P newProxy(Class<P> mixinType)
             throws IllegalArgumentException
         {
-            return getInstance().newProxy( mixinType );
+            return getInstance().newProxy(mixinType);
         }
 
         @Override
-        public <M> M metaInfo( Class<M> infoType )
+        public <M> M metaInfo(Class<M> infoType)
         {
-            return ServiceReferenceInstance.this.metaInfo( infoType );
+            return ServiceReferenceInstance.this.metaInfo(infoType);
         }
 
         @Override
@@ -246,10 +250,10 @@ public final class ServiceReferenceInstance<T>
         }
 
         @Override
-        public Object invokeComposite( Method method, Object[] args )
+        public Object invokeComposite(Method method, Object[] args)
             throws Throwable
         {
-            return getInstance().invokeComposite( method, args );
+            return getInstance().invokeComposite(method, args);
         }
 
         @Override
@@ -259,12 +263,12 @@ public final class ServiceReferenceInstance<T>
         }
 
         @Override
-        public Object invoke( Object object, Method method, Object[] objects )
+        public Object invoke(Object object, Method method, Object[] objects)
             throws Throwable
         {
-            if( method.getDeclaringClass().equals( Object.class ) )
+            if(method.getDeclaringClass().equals(Object.class))
             {
-                switch( method.getName() )
+                switch(method.getName())
                 {
                     case "toString":
                         return serviceModel.toString();
@@ -275,7 +279,7 @@ public final class ServiceReferenceInstance<T>
                 }
             }
             ServiceInstance instance = getInstance();
-            return instance.invoke( object, method, objects );
+            return instance.invoke(object, method, objects);
         }
 
         @Override
@@ -292,15 +296,15 @@ public final class ServiceReferenceInstance<T>
     }
 
     @Override
-    public void registerActivationEventListener( ActivationEventListener listener )
+    public void registerActivationEventListener(ActivationEventListener listener)
     {
-        activation.registerActivationEventListener( listener );
+        activation.registerActivationEventListener(listener);
     }
 
     @Override
-    public void deregisterActivationEventListener( ActivationEventListener listener )
+    public void deregisterActivationEventListener(ActivationEventListener listener)
     {
-        activation.deregisterActivationEventListener( listener );
+        activation.deregisterActivationEventListener(listener);
     }
 
     @Override
@@ -310,17 +314,19 @@ public final class ServiceReferenceInstance<T>
     }
 
     @Override
-    @SuppressWarnings( "raw" )
-    public boolean equals( Object obj )
+    @SuppressWarnings("raw")
+    public boolean equals(Object obj)
     {
-        if ( obj == null ) {
+        if(obj == null)
+        {
             return false;
         }
-        if ( getClass() != obj.getClass() ) {
+        if(getClass() != obj.getClass())
+        {
             return false;
         }
-        final ServiceReference other = ( ServiceReference ) obj;
-        return identity().equals( other.identity() );
+        final ServiceReference other = (ServiceReference) obj;
+        return identity().equals(other.identity());
     }
 
 }

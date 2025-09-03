@@ -19,7 +19,8 @@
  */
 package org.qi4j.runtime.activation;
 
-import java.util.Arrays;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Layer;
 import org.qi4j.api.structure.Module;
@@ -30,11 +31,8 @@ import org.qi4j.runtime.activation.ActivatorOrderTestSupport.ActivationStepsReco
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.ActivationStepsRecorderInstance;
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.Expected;
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.OrderTestActivator;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
+
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -62,7 +60,7 @@ public class StructureActivatorOrderTest
 
         public AlphaApplicationActivator()
         {
-            super( "Alpha", RECORDER );
+            super("Alpha", RECORDER);
         }
     }
 
@@ -72,7 +70,7 @@ public class StructureActivatorOrderTest
 
         public BetaApplicationActivator()
         {
-            super( "Beta", RECORDER );
+            super("Beta", RECORDER);
         }
     }
 
@@ -82,7 +80,7 @@ public class StructureActivatorOrderTest
 
         public AlphaLayerActivator()
         {
-            super( "Alpha", RECORDER );
+            super("Alpha", RECORDER);
         }
     }
 
@@ -92,7 +90,7 @@ public class StructureActivatorOrderTest
 
         public BetaLayerActivator()
         {
-            super( "Beta", RECORDER );
+            super("Beta", RECORDER);
         }
     }
 
@@ -102,7 +100,7 @@ public class StructureActivatorOrderTest
 
         public AlphaModuleActivator()
         {
-            super( "Alpha", RECORDER );
+            super("Alpha", RECORDER);
         }
     }
 
@@ -112,7 +110,7 @@ public class StructureActivatorOrderTest
 
         public BetaModuleActivator()
         {
-            super( "Beta", RECORDER );
+            super("Beta", RECORDER);
         }
     }
 
@@ -127,17 +125,17 @@ public class StructureActivatorOrderTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.layer().application().withActivators( AlphaApplicationActivator.class,
-                                                             BetaApplicationActivator.class );
+                module.layer().application().withActivators(AlphaApplicationActivator.class,
+                    BetaApplicationActivator.class);
             }
         }.application().passivate();
 
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
-        System.out.println( "\n" + Expected.ALPHA_BETA_SINGLE + "\n" + actual + "\n" );
-        assertThat( actual, equalTo( Expected.ALPHA_BETA_SINGLE ) );
+        String actual = Arrays.toString(RECORDER.steps().toArray());
+        System.out.println("\n" + Expected.ALPHA_BETA_SINGLE + "\n" + actual + "\n");
+        assertThat(actual, equalTo(Expected.ALPHA_BETA_SINGLE));
     }
 
     @Test
@@ -148,17 +146,17 @@ public class StructureActivatorOrderTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.layer().withActivators( AlphaLayerActivator.class,
-                                               BetaLayerActivator.class );
+                module.layer().withActivators(AlphaLayerActivator.class,
+                    BetaLayerActivator.class);
             }
         }.application().passivate();
 
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
-        System.out.println( "\n" + Expected.ALPHA_BETA_SINGLE + "\n" + actual + "\n" );
-        assertThat( actual, equalTo( Expected.ALPHA_BETA_SINGLE ) );
+        String actual = Arrays.toString(RECORDER.steps().toArray());
+        System.out.println("\n" + Expected.ALPHA_BETA_SINGLE + "\n" + actual + "\n");
+        assertThat(actual, equalTo(Expected.ALPHA_BETA_SINGLE));
     }
 
     @Test
@@ -169,17 +167,17 @@ public class StructureActivatorOrderTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.withActivators( AlphaModuleActivator.class,
-                                       BetaModuleActivator.class );
+                module.withActivators(AlphaModuleActivator.class,
+                    BetaModuleActivator.class);
             }
         }.application().passivate();
 
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
-        System.out.println( "\n" + Expected.ALPHA_BETA_SINGLE + "\n" + actual + "\n" );
-        assertThat( actual, equalTo( Expected.ALPHA_BETA_SINGLE ) );
+        String actual = Arrays.toString(RECORDER.steps().toArray());
+        System.out.println("\n" + Expected.ALPHA_BETA_SINGLE + "\n" + actual + "\n");
+        assertThat(actual, equalTo(Expected.ALPHA_BETA_SINGLE));
     }
 
     @Test
@@ -190,19 +188,19 @@ public class StructureActivatorOrderTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.layer().application().withActivators( AlphaApplicationActivator.class,
-                                                             BetaApplicationActivator.class );
-                module.layer().withActivators( AlphaLayerActivator.class,
-                                               BetaLayerActivator.class );
-                module.withActivators( AlphaModuleActivator.class,
-                                       BetaModuleActivator.class );
+                module.layer().application().withActivators(AlphaApplicationActivator.class,
+                    BetaApplicationActivator.class);
+                module.layer().withActivators(AlphaLayerActivator.class,
+                    BetaLayerActivator.class);
+                module.withActivators(AlphaModuleActivator.class,
+                    BetaModuleActivator.class);
             }
         }.application().passivate();
 
-        String expected = Arrays.toString( new String[]{
+        String expected = Arrays.toString(new String[]{
             // Application.beforeActivation
             "Alpha.beforeActivation",
             "Beta.beforeActivation",
@@ -248,10 +246,10 @@ public class StructureActivatorOrderTest
             // Application.afterPassivation
             "Beta.afterPassivation",
             "Alpha.afterPassivation"
-        } );
+        });
 
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
-        System.out.println( "\n" + expected + "\n" + actual + "\n" );
-        assertThat( actual, equalTo( expected ) );
+        String actual = Arrays.toString(RECORDER.steps().toArray());
+        System.out.println("\n" + expected + "\n" + actual + "\n");
+        assertThat(actual, equalTo(expected));
     }
 }

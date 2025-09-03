@@ -26,7 +26,7 @@ import org.qi4j.api.service.ServiceReference;
 /**
  * Activation for MapEntityStoreMixin.
  */
-@Activators( MapEntityStoreActivation.Activator.class )
+@Activators(MapEntityStoreActivation.Activator.class)
 public interface MapEntityStoreActivation
 {
 
@@ -41,7 +41,7 @@ public interface MapEntityStoreActivation
     {
 
         @Override
-        public void afterActivation( ServiceReference<MapEntityStoreActivation> activated )
+        public void afterActivation(ServiceReference<MapEntityStoreActivation> activated)
             throws Exception
         {
             activated.get().activateMapEntityStore();

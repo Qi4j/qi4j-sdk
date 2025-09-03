@@ -20,12 +20,6 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.structure.Application;
@@ -33,10 +27,8 @@ import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.AssemblyVisitor;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.AssemblyVisitor;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.qi4j.bootstrap.ModuleAssembly;
+
+import java.util.*;
 
 /**
  * The representation of an entire application. From
@@ -55,75 +47,75 @@ public final class ApplicationAssemblyImpl
 
     public ApplicationAssemblyImpl()
     {
-        mode = Application.Mode.valueOf( System.getProperty( "mode", "production" ) );
+        mode = Application.Mode.valueOf(System.getProperty("mode", "production"));
     }
 
     @Override
-    public LayerAssembly layer(String name )
+    public LayerAssembly layer(String name)
     {
-        if( name != null )
+        if(name != null)
         {
-            LayerAssemblyImpl existing = layerAssemblies.get( name );
-            if( existing != null )
+            LayerAssemblyImpl existing = layerAssemblies.get(name);
+            if(existing != null)
             {
                 return existing;
             }
         }
-        LayerAssemblyImpl layerAssembly = new LayerAssemblyImpl( this, name );
-        layerAssemblies.put( name, layerAssembly );
+        LayerAssemblyImpl layerAssembly = new LayerAssemblyImpl(this, name);
+        layerAssemblies.put(name, layerAssembly);
         return layerAssembly;
     }
 
     @Override
-    public ModuleAssembly module(String layerName, String moduleName )
+    public ModuleAssembly module(String layerName, String moduleName)
     {
-        return layer( layerName ).module( moduleName );
+        return layer(layerName).module(moduleName);
     }
 
     @Override
-    public ApplicationAssembly setName( String name )
+    public ApplicationAssembly setName(String name)
     {
         this.name = name;
         return this;
     }
 
     @Override
-    public ApplicationAssembly setVersion( String version )
+    public ApplicationAssembly setVersion(String version)
     {
         this.version = version;
         return this;
     }
 
     @Override
-    public ApplicationAssembly setMode( Application.Mode mode )
+    public ApplicationAssembly setMode(Application.Mode mode)
     {
         this.mode = mode;
         return this;
     }
 
     @Override
-    public ApplicationAssembly setMetaInfo( Object info )
+    public ApplicationAssembly setMetaInfo(Object info)
     {
-        metaInfo.set( info );
+        metaInfo.set(info);
         return this;
     }
 
     @Override
     @SafeVarargs
-    public final ApplicationAssembly withActivators( Class<? extends Activator<Application>>... activators )
+    public final ApplicationAssembly withActivators(Class<? extends Activator<Application>>... activators)
     {
-        this.activators.addAll( Arrays.asList( activators ) );
+        this.activators.addAll(Arrays.asList(activators));
         return this;
     }
 
     @Override
-    public <ThrowableType extends Throwable> void visit( AssemblyVisitor<ThrowableType> visitor )
+    public <ThrowableType extends Throwable> void visit(AssemblyVisitor<ThrowableType> visitor)
         throws ThrowableType
     {
-        visitor.visitApplication( this );
-        for( LayerAssemblyImpl layerAssembly : layerAssemblies.values() )
+        visitor.visitApplication(this);
+        for(LayerAssemblyImpl layerAssembly : layerAssemblies.values())
         {
-            layerAssembly.visit( visitor );
+            layerAssembly.visit(visitor);
         }
     }
 

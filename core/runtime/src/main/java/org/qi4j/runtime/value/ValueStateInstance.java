@@ -19,11 +19,6 @@
  */
 package org.qi4j.runtime.value;
 
-import java.lang.reflect.AccessibleObject;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.value.ValueDescriptor;
@@ -36,15 +31,12 @@ import org.qi4j.runtime.property.PropertyInfo;
 import org.qi4j.runtime.property.PropertyInstance;
 import org.qi4j.runtime.structure.ModuleInstance;
 import org.qi4j.runtime.unitofwork.EntityFunction;
-import org.qi4j.runtime.association.AssociationInfo;
-import org.qi4j.runtime.association.AssociationInstance;
-import org.qi4j.runtime.association.ManyAssociationInstance;
-import org.qi4j.runtime.association.NamedAssociationInstance;
-import org.qi4j.runtime.composite.StateResolver;
-import org.qi4j.runtime.property.PropertyInfo;
-import org.qi4j.runtime.property.PropertyInstance;
-import org.qi4j.runtime.structure.ModuleInstance;
-import org.qi4j.runtime.unitofwork.EntityFunction;
+
+import java.lang.reflect.AccessibleObject;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static org.qi4j.api.util.Collectors.toMap;
@@ -60,70 +52,70 @@ public final class ValueStateInstance
     private final Map<AccessibleObject, ManyAssociationInstance<?>> manyAssociations;
     private final Map<AccessibleObject, NamedAssociationInstance<?>> namedAssociations;
 
-    public ValueStateInstance( ValueDescriptor compositeModelModule,
-                               ModuleInstance currentModule,
-                               StateResolver stateResolver
+    public ValueStateInstance(ValueDescriptor compositeModelModule,
+                              ModuleInstance currentModule,
+                              StateResolver stateResolver
     )
     {
-        EntityFunction entityFunction = new EntityFunction( currentModule.unitOfWorkFactory() );
+        EntityFunction entityFunction = new EntityFunction(currentModule.unitOfWorkFactory());
 
         ValueModel valueModel = (ValueModel) compositeModelModule;
         this.properties = new LinkedHashMap<>();
-        valueModel.state().properties().forEach( propertyDescriptor -> {
+        valueModel.state().properties().forEach(propertyDescriptor -> {
             PropertyInfo builderInfo = propertyDescriptor.getBuilderInfo();
-            Object value = stateResolver.getPropertyState( propertyDescriptor );
-            PropertyInstance<Object> propertyInstance = new PropertyInstance<>( builderInfo, value );
-            properties.put( propertyDescriptor.accessor(), propertyInstance );
-        } );
+            Object value = stateResolver.getPropertyState(propertyDescriptor);
+            PropertyInstance<Object> propertyInstance = new PropertyInstance<>(builderInfo, value);
+            properties.put(propertyDescriptor.accessor(), propertyInstance);
+        });
 
         this.associations = new LinkedHashMap<>();
-        valueModel.state().associations().forEach( associationDescriptor -> {
+        valueModel.state().associations().forEach(associationDescriptor -> {
             AssociationInfo builderInfo = associationDescriptor.builderInfo();
-            EntityReference value = stateResolver.getAssociationState( associationDescriptor );
+            EntityReference value = stateResolver.getAssociationState(associationDescriptor);
             AssociationInstance<Object> associationInstance1 = new AssociationInstance<>(
                 builderInfo,
                 entityFunction,
-                new ReferenceProperty( value ) );
-            associations.put( associationDescriptor.accessor(), associationInstance1 );
-        } );
+                new ReferenceProperty(value));
+            associations.put(associationDescriptor.accessor(), associationInstance1);
+        });
 
         this.manyAssociations = new LinkedHashMap<>();
-        valueModel.state().manyAssociations().forEach( associationDescriptor -> {
+        valueModel.state().manyAssociations().forEach(associationDescriptor -> {
             AssociationInfo builderInfo = associationDescriptor.builderInfo();
-            List<EntityReference> value = stateResolver.getManyAssociationState( associationDescriptor )
-                                                       .collect( toList() );
-            ManyAssociationValueState manyAssociationState = new ManyAssociationValueState( value );
+            List<EntityReference> value = stateResolver.getManyAssociationState(associationDescriptor)
+                .collect(toList());
+            ManyAssociationValueState manyAssociationState = new ManyAssociationValueState(value);
             ManyAssociationInstance<Object> associationInstance = new ManyAssociationInstance<>(
                 builderInfo,
                 entityFunction,
-                manyAssociationState );
-            manyAssociations.put( associationDescriptor.accessor(), associationInstance );
-        } );
+                manyAssociationState);
+            manyAssociations.put(associationDescriptor.accessor(), associationInstance);
+        });
 
         this.namedAssociations = new LinkedHashMap<>();
-        valueModel.state().namedAssociations().forEach( associationDescriptor -> {
+        valueModel.state().namedAssociations().forEach(associationDescriptor -> {
             AssociationInfo builderInfo = associationDescriptor.builderInfo();
-            Map<String, EntityReference> value = stateResolver.getNamedAssociationState( associationDescriptor )
-                                                              .collect( toMap( LinkedHashMap::new ) );
-            NamedAssociationValueState namedAssociationState = new NamedAssociationValueState( value );
+            Map<String, EntityReference> value = stateResolver.getNamedAssociationState(associationDescriptor)
+                .collect(toMap(LinkedHashMap::new));
+            NamedAssociationValueState namedAssociationState = new NamedAssociationValueState(value);
             NamedAssociationInstance<Object> associationInstance = new NamedAssociationInstance<>(
                 builderInfo,
                 entityFunction,
-                namedAssociationState );
-            namedAssociations.put( associationDescriptor.accessor(), associationInstance );
-        } );
+                namedAssociationState);
+            namedAssociations.put(associationDescriptor.accessor(), associationInstance);
+        });
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> PropertyInstance<T> propertyFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> PropertyInstance<T> propertyFor(AccessibleObject accessor)
         throws IllegalArgumentException
     {
-        PropertyInstance<T> property = (PropertyInstance<T>) properties.get( accessor );
+        PropertyInstance<T> property = (PropertyInstance<T>) properties.get(accessor);
 
-        if( property == null )
+        if(property == null)
         {
-            throw new IllegalArgumentException( "No such property:" + accessor );
+            throw new IllegalArgumentException("No such property:" + accessor);
         }
 
         return property;
@@ -136,14 +128,14 @@ public final class ValueStateInstance
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> AssociationInstance<T> associationFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> AssociationInstance<T> associationFor(AccessibleObject accessor)
     {
-        AssociationInstance<T> association = (AssociationInstance<T>) associations.get( accessor );
+        AssociationInstance<T> association = (AssociationInstance<T>) associations.get(accessor);
 
-        if( association == null )
+        if(association == null)
         {
-            throw new IllegalArgumentException( "No such association:" + accessor );
+            throw new IllegalArgumentException("No such association:" + accessor);
         }
 
         return association;
@@ -156,14 +148,14 @@ public final class ValueStateInstance
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> ManyAssociationInstance<T> manyAssociationFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> ManyAssociationInstance<T> manyAssociationFor(AccessibleObject accessor)
     {
-        ManyAssociationInstance<T> manyAssociation = (ManyAssociationInstance<T>) manyAssociations.get( accessor );
+        ManyAssociationInstance<T> manyAssociation = (ManyAssociationInstance<T>) manyAssociations.get(accessor);
 
-        if( manyAssociation == null )
+        if(manyAssociation == null)
         {
-            throw new IllegalArgumentException( "No such many-association:" + accessor );
+            throw new IllegalArgumentException("No such many-association:" + accessor);
         }
 
         return manyAssociation;
@@ -176,14 +168,14 @@ public final class ValueStateInstance
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> NamedAssociationInstance<T> namedAssociationFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> NamedAssociationInstance<T> namedAssociationFor(AccessibleObject accessor)
     {
-        NamedAssociationInstance<T> namedAssociation = (NamedAssociationInstance<T>) namedAssociations.get( accessor );
+        NamedAssociationInstance<T> namedAssociation = (NamedAssociationInstance<T>) namedAssociations.get(accessor);
 
-        if( namedAssociation == null )
+        if(namedAssociation == null)
         {
-            throw new IllegalArgumentException( "No such named-association:" + accessor );
+            throw new IllegalArgumentException("No such named-association:" + accessor);
         }
 
         return namedAssociation;
@@ -195,28 +187,28 @@ public final class ValueStateInstance
         return namedAssociations.values().stream();
     }
 
-    @SuppressWarnings( "SimplifiableIfStatement" )
+    @SuppressWarnings("SimplifiableIfStatement")
     @Override
-    public boolean equals( Object obj )
+    public boolean equals(Object obj)
     {
-        if( !( obj instanceof ValueStateInstance ) )
+        if(!(obj instanceof ValueStateInstance))
         {
             return false;
         }
         ValueStateInstance state = (ValueStateInstance) obj;
-        if( !properties.equals( state.properties ) )
+        if(!properties.equals(state.properties))
         {
             return false;
         }
-        if( !associations.equals( state.associations ) )
+        if(!associations.equals(state.associations))
         {
             return false;
         }
-        if( !manyAssociations.equals( state.manyAssociations ) )
+        if(!manyAssociations.equals(state.manyAssociations))
         {
             return false;
         }
-        return namedAssociations.equals( state.namedAssociations );
+        return namedAssociations.equals(state.namedAssociations);
     }
 
     @Override

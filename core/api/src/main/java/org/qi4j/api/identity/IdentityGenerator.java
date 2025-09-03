@@ -24,16 +24,15 @@ import org.qi4j.api.mixin.Mixins;
 /**
  * Generator for identities of EntityComposite's.
  */
-@Mixins( UuidGeneratorMixin.class )
+@Mixins(UuidGeneratorMixin.class)
 public interface IdentityGenerator
 {
     /**
      * Generate a new id for the given Composite type
      *
      * @param compositeType the type of composite
-     *
      * @return a new reference
      */
-    Identity generate( Class<?> compositeType );
+    Identity generate(Class<?> compositeType);
 
 }

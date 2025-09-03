@@ -20,6 +20,7 @@
 
 package org.qi4j.spi.service.importer;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.identity.StringIdentity;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.mixin.Mixins;
@@ -31,7 +32,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ImportedServiceDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -42,16 +42,16 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class ServiceInstanceImporterTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.importedServices( TestService.class ).
-            identifiedBy( "test" ).
-            setMetaInfo( StringIdentity.identityOf( "testimporter" ) ).
-            importedBy( ImportedServiceDeclaration.SERVICE_IMPORTER );
-        module.services( TestImporterService.class ).identifiedBy( "testimporter" );
+        module.importedServices(TestService.class).
+            identifiedBy("test").
+            setMetaInfo(StringIdentity.identityOf("testimporter")).
+            importedBy(ImportedServiceDeclaration.SERVICE_IMPORTER);
+        module.services(TestImporterService.class).identifiedBy("testimporter");
 
-        module.objects( ServiceInstanceImporterTest.class );
+        module.objects(ServiceInstanceImporterTest.class);
     }
 
     @Service
@@ -60,7 +60,7 @@ public class ServiceInstanceImporterTest
     @Test
     public void testImportServiceFromService()
     {
-        assertThat( service.helloWorld(), equalTo( "Hello World" ) );
+        assertThat(service.helloWorld(), equalTo("Hello World"));
     }
 
     public static class TestService
@@ -71,20 +71,20 @@ public class ServiceInstanceImporterTest
         }
     }
 
-    @Mixins( TestImporterService.Mixin.class )
+    @Mixins(TestImporterService.Mixin.class)
     interface TestImporterService
         extends ServiceComposite, ServiceImporter<TestService>
     {
         class Mixin
             implements ServiceImporter<TestService>
         {
-            public TestService importService( ImportedServiceDescriptor serviceDescriptor )
+            public TestService importService(ImportedServiceDescriptor serviceDescriptor)
                 throws ServiceImporterException
             {
                 return new TestService();
             }
 
-            public boolean isAvailable( TestService instance )
+            public boolean isAvailable(TestService instance)
             {
                 return true;
             }

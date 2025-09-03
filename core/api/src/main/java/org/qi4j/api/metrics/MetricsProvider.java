@@ -39,7 +39,7 @@ public interface MetricsProvider
 {
     /**
      * Creates a new factory instance.
-     *
+     * <p>
      * The instantiation is done by providing a Metric type, which is one of
      * <ul>
      * <li>{@link MetricsCounter}</li>
@@ -52,11 +52,9 @@ public interface MetricsProvider
      *
      * @param factoryType The class of the metric type needed.
      * @param <T>         The metric type requested.
-     *
      * @return A factory instance
-     *
      * @throws MetricsNotSupportedException when the MetricsProvider is not supporting the factory type requested.
      */
-    <T extends MetricsFactory> T createFactory( Class<T> factoryType )
+    <T extends MetricsFactory> T createFactory(Class<T> factoryType)
         throws MetricsNotSupportedException;
 }

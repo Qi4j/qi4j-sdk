@@ -20,12 +20,12 @@
 
 package org.qi4j.api.service;
 
+import org.qi4j.api.activation.ActivatorDescriptor;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.StatefulCompositeDescriptor;
 import org.qi4j.api.identity.Identifiable;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.composite.StatefulCompositeDescriptor;
-import org.qi4j.api.identity.Identifiable;
+
+import java.util.stream.Stream;
 
 /**
  * {@code ServiceDescriptor} provides meta informations of a service.
@@ -37,4 +37,5 @@ public interface ServiceDescriptor
 
     <T> Class<T> configurationType();
 
+    Stream<? extends ActivatorDescriptor> activators();
 }

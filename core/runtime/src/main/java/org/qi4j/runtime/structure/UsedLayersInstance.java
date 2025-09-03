@@ -20,8 +20,6 @@
 
 package org.qi4j.runtime.structure;
 
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.api.composite.TransientDescriptor;
@@ -30,6 +28,9 @@ import org.qi4j.api.object.ObjectDescriptor;
 import org.qi4j.api.structure.LayerDescriptor;
 import org.qi4j.api.value.ValueDescriptor;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 /**
  * JAVADOC
  */
@@ -37,7 +38,7 @@ public final class UsedLayersInstance
 {
     private final List<LayerDescriptor> usedLayerInstances;
 
-    public UsedLayersInstance( List<LayerDescriptor> usedLayerInstances )
+    public UsedLayersInstance(List<LayerDescriptor> usedLayerInstances)
     {
         this.usedLayerInstances = usedLayerInstances;
     }
@@ -45,30 +46,30 @@ public final class UsedLayersInstance
     Stream<? extends ObjectDescriptor> visibleObjects()
     {
         return usedLayerInstances.stream()
-            .flatMap( layerInstance -> layerInstance.visibleObjects( Visibility.application ) );
+            .flatMap(layerInstance -> layerInstance.visibleObjects(Visibility.application));
     }
 
     Stream<? extends TransientDescriptor> visibleTransients()
     {
         return usedLayerInstances.stream()
-            .flatMap( layerInstance -> layerInstance.visibleTransients( Visibility.application ) );
+            .flatMap(layerInstance -> layerInstance.visibleTransients(Visibility.application));
     }
 
     Stream<? extends EntityDescriptor> visibleEntities()
     {
         return usedLayerInstances.stream()
-            .flatMap( layerInstance -> layerInstance.visibleEntities( Visibility.application ) );
+            .flatMap(layerInstance -> layerInstance.visibleEntities(Visibility.application));
     }
 
     Stream<? extends ValueDescriptor> visibleValues()
     {
         return usedLayerInstances.stream()
-            .flatMap( layerInstance -> layerInstance.visibleValues( Visibility.application ) );
+            .flatMap(layerInstance -> layerInstance.visibleValues(Visibility.application));
     }
 
     Stream<? extends ModelDescriptor> visibleServices()
     {
         return usedLayerInstances.stream()
-            .flatMap( layerInstance -> layerInstance.visibleServices( Visibility.application ) );
+            .flatMap(layerInstance -> layerInstance.visibleServices(Visibility.application));
     }
 }

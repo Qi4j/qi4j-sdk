@@ -20,12 +20,11 @@
 package org.qi4j.api.util;
 
 import org.qi4j.api.composite.ModelDescriptor;
-import org.qi4j.api.composite.ModelDescriptor;
 
 /**
  * A modeldescriptor, that is also part of a VisitableHierarchy
  */
 public interface VisitableModelDescriptor
-        extends ModelDescriptor, VisitableHierarchy<Object, Object>
+    extends ModelDescriptor, VisitableHierarchy<Object, Object>
 {
 }

@@ -19,14 +19,15 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -37,30 +38,30 @@ public class QI247Test2
     extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TransientWithHandler.class );
+        module.transients(TransientWithHandler.class);
     }
 
-    private void checkToString( ObjectMethods instance )
+    private void checkToString(ObjectMethods instance)
     {
-        assertThat( instance.toString(), equalTo( ObjectMethods.MESSAGE ) );
+        assertThat(instance.toString(), equalTo(ObjectMethods.MESSAGE));
     }
 
-    private void checkHashCode( ObjectMethods instance )
+    private void checkHashCode(ObjectMethods instance)
     {
-        assertThat( instance.hashCode(), equalTo( ObjectMethods.CODE ) );
+        assertThat(instance.hashCode(), equalTo(ObjectMethods.CODE));
     }
 
-    private void checkSelfEquals( ObjectMethods instance )
+    private void checkSelfEquals(ObjectMethods instance)
     {
-        assertThat( instance, equalTo( instance ) );
+        assertThat(instance, equalTo(instance));
     }
 
-    private void checkTwoNotEqual( ObjectMethods first, ObjectMethods second )
+    private void checkTwoNotEqual(ObjectMethods first, ObjectMethods second)
     {
-        assertThat( first.equals( second ), is( false ) );
+        assertThat(first.equals(second), is(false));
     }
 
     //HANDLER
@@ -68,44 +69,44 @@ public class QI247Test2
     @Test
     public void testWithHandlerToString()
     {
-        ObjectMethods withHandler = transientBuilderFactory.newTransient( ObjectMethods.class );
-        checkToString( withHandler );
+        ObjectMethods withHandler = transientBuilderFactory.newTransient(ObjectMethods.class);
+        checkToString(withHandler);
     }
 
     @Test
     public void testWithHandlerHashCode()
     {
-        ObjectMethods withHandler = transientBuilderFactory.newTransient( ObjectMethods.class );
-        checkHashCode( withHandler );
+        ObjectMethods withHandler = transientBuilderFactory.newTransient(ObjectMethods.class);
+        checkHashCode(withHandler);
     }
 
     @Test
     public void testWithHandlerSelfEquals()
     {
-        ObjectMethods withHandler = transientBuilderFactory.newTransient( ObjectMethods.class );
-        checkSelfEquals( withHandler );
+        ObjectMethods withHandler = transientBuilderFactory.newTransient(ObjectMethods.class);
+        checkSelfEquals(withHandler);
     }
 
     @Test
     public void testWithHandlerSelfEquals2()
     {
-        ObjectMethods withHandler = transientBuilderFactory.newTransient( ObjectMethods.class );
-        assertThat( withHandler.equals( withHandler ), is( true ) );
+        ObjectMethods withHandler = transientBuilderFactory.newTransient(ObjectMethods.class);
+        assertThat(withHandler.equals(withHandler), is(true));
     }
 
     @Test
     public void testWithHandlerSelfSame()
     {
-        ObjectMethods withHandler = transientBuilderFactory.newTransient( ObjectMethods.class );
-        assertSame( withHandler, withHandler );
+        ObjectMethods withHandler = transientBuilderFactory.newTransient(ObjectMethods.class);
+        assertSame(withHandler, withHandler);
     }
 
     @Test
     public void testWithHandlerTwoNotEqual()
     {
-        ObjectMethods first = transientBuilderFactory.newTransient( ObjectMethods.class );
-        ObjectMethods second = transientBuilderFactory.newTransient( ObjectMethods.class );
-        checkTwoNotEqual( first, second );
+        ObjectMethods first = transientBuilderFactory.newTransient(ObjectMethods.class);
+        ObjectMethods second = transientBuilderFactory.newTransient(ObjectMethods.class);
+        checkTwoNotEqual(first, second);
     }
 
     public interface ObjectMethods
@@ -120,18 +121,18 @@ public class QI247Test2
     public static class ObjectMethodsHandler
         implements InvocationHandler
     {
-        public Object invoke( Object proxy, Method method, Object[] args )
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
-            System.out.println( "invoke(proxy, " + method.getName() + ", args" );
-            if( "someMethod".equals( method.getName() ) )
+            System.out.println("invoke(proxy, " + method.getName() + ", args");
+            if("someMethod".equals(method.getName()))
             {
-                System.out.println( "Hello." );
+                System.out.println("Hello.");
                 return null;
             }
             else
             {
-                throw new UnsupportedOperationException( method.toString() );
+                throw new UnsupportedOperationException(method.toString());
             }
         }
 
@@ -145,13 +146,13 @@ public class QI247Test2
             return ObjectMethods.CODE;
         }
 
-        public boolean equals( Object o )
+        public boolean equals(Object o)
         {
             return o == this;
         }
     }
 
-    @Mixins( ObjectMethodsHandler.class )
+    @Mixins(ObjectMethodsHandler.class)
     public interface TransientWithHandler
         extends TransientComposite, ObjectMethods
     {

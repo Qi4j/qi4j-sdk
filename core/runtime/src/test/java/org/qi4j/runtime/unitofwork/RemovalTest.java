@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.unitofwork;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.identity.Identity;
@@ -31,7 +32,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -41,13 +41,13 @@ public class RemovalTest
     extends AbstractQi4jTest
 {
 
-    private static final Identity TEST_IDENTITY = StringIdentity.identityOf( "123" );
+    private static final Identity TEST_IDENTITY = StringIdentity.identityOf("123");
 
-    public void assemble(ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( Abc.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(Abc.class);
     }
 
     @Test
@@ -57,13 +57,13 @@ public class RemovalTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<Abc> builder = uow.newEntityBuilder( Abc.class, TEST_IDENTITY);
-            builder.instance().name().set( "Niclas" );
+            EntityBuilder<Abc> builder = uow.newEntityBuilder(Abc.class, TEST_IDENTITY);
+            builder.instance().name().set("Niclas");
             builder.newInstance();
             uow.complete();
             uow = unitOfWorkFactory.newUnitOfWork();
-            Abc abc = uow.get( Abc.class, TEST_IDENTITY);
-            assertThat( abc.name().get(), equalTo( "Niclas" ) );
+            Abc abc = uow.get(Abc.class, TEST_IDENTITY);
+            assertThat(abc.name().get(), equalTo("Niclas"));
         }
         finally
         {
@@ -78,20 +78,20 @@ public class RemovalTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<Abc> builder = uow.newEntityBuilder( Abc.class, TEST_IDENTITY);
-            builder.instance().name().set( "Niclas" );
+            EntityBuilder<Abc> builder = uow.newEntityBuilder(Abc.class, TEST_IDENTITY);
+            builder.instance().name().set("Niclas");
             builder.newInstance();
             uow.complete();
             uow = unitOfWorkFactory.newUnitOfWork();
-            Abc abc = uow.get( Abc.class, TEST_IDENTITY);
-            assertThat( abc.name().get(), equalTo( "Niclas" ) );
-            uow.remove( abc );
+            Abc abc = uow.get(Abc.class, TEST_IDENTITY);
+            assertThat(abc.name().get(), equalTo("Niclas"));
+            uow.remove(abc);
             uow.complete();
             uow = unitOfWorkFactory.newUnitOfWork();
-            uow.get( Abc.class, TEST_IDENTITY);
-            fail( "This '123' entity should not exist." );
+            uow.get(Abc.class, TEST_IDENTITY);
+            fail("This '123' entity should not exist.");
         }
-        catch( NoSuchEntityException e )
+        catch(NoSuchEntityException e)
         {
             // Expected.
         }
@@ -108,19 +108,19 @@ public class RemovalTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<Abc> builder = uow.newEntityBuilder( Abc.class, TEST_IDENTITY);
-            builder.instance().name().set( "Niclas" );
+            EntityBuilder<Abc> builder = uow.newEntityBuilder(Abc.class, TEST_IDENTITY);
+            builder.instance().name().set("Niclas");
             Abc abc = builder.newInstance();
             uow.complete();
             uow = unitOfWorkFactory.newUnitOfWork();
-            abc = uow.get( abc );  // Attach the detached entity to 'uow' session.
-            uow.remove( abc );
+            abc = uow.get(abc);  // Attach the detached entity to 'uow' session.
+            uow.remove(abc);
             uow.complete();
             uow = unitOfWorkFactory.newUnitOfWork();
-            uow.get( Abc.class, TEST_IDENTITY);
-            fail( "This '123' entity should not exist." );
+            uow.get(Abc.class, TEST_IDENTITY);
+            fail("This '123' entity should not exist.");
         }
-        catch( NoSuchEntityException e )
+        catch(NoSuchEntityException e)
         {
             // Expected.
         }
@@ -137,16 +137,16 @@ public class RemovalTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<Abc> builder = uow.newEntityBuilder( Abc.class, TEST_IDENTITY);
-            builder.instance().name().set( "Niclas" );
+            EntityBuilder<Abc> builder = uow.newEntityBuilder(Abc.class, TEST_IDENTITY);
+            builder.instance().name().set("Niclas");
             Abc abc = builder.newInstance();
-            uow.remove( abc );
+            uow.remove(abc);
             uow.complete();
             uow = unitOfWorkFactory.newUnitOfWork();
-            uow.get( Abc.class, TEST_IDENTITY);
-            fail( "This '123' entity should not exist." );
+            uow.get(Abc.class, TEST_IDENTITY);
+            fail("This '123' entity should not exist.");
         }
-        catch( NoSuchEntityException e )
+        catch(NoSuchEntityException e)
         {
             // Expected.
         }

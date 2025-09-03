@@ -20,15 +20,14 @@
 package org.qi4j.bootstrap;
 
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.bootstrap.somepackage.Test2Value;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.somepackage.Test2Value;
 
-import static org.qi4j.bootstrap.ClassScanner.findClasses;
-import static org.qi4j.bootstrap.ClassScanner.matches;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.qi4j.bootstrap.ClassScanner.findClasses;
+import static org.qi4j.bootstrap.ClassScanner.matches;
 
 /**
  * Test and showcase of the ClassScanner assembly utility.
@@ -42,18 +41,19 @@ public class ClassScannerTest
         SingletonAssembler singleton = new SingletonAssembler(
             module -> {
                 // Find all classes starting from TestValue, but include only the ones that are named *Value
-                findClasses( TestValue.class ).filter( matches( ".*Value" ) )
-                    .forEach( module::values );
+                findClasses(TestValue.class).filter(matches(".*Value"))
+                    .forEach(module::values);
             }
         );
 
-        singleton.module().newValueBuilder( TestValue.class );
-        singleton.module().newValueBuilder( Test2Value.class );
+        singleton.module().newValueBuilder(TestValue.class);
+        singleton.module().newValueBuilder(Test2Value.class);
     }
 
-    @Test @Disabled("What test classes was this looking for originally? Now it says 154...")
+    @Test
+    @Disabled("What test classes was this looking for originally? Now it says 154...")
     public void testClassScannerJar()
     {
-        assertThat( findClasses( Test.class ).count(), equalTo( 89L ) );
+        assertThat(findClasses(Test.class).count(), equalTo(89L));
     }
 }

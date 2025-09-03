@@ -17,26 +17,19 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.composite.DefaultMethodsFilter;
 import org.qi4j.api.injection.scope.This;
 
-import static java.lang.invoke.MethodHandles.Lookup.PACKAGE;
-import static java.lang.invoke.MethodHandles.Lookup.PRIVATE;
-import static java.lang.invoke.MethodHandles.Lookup.PROTECTED;
-import static java.lang.invoke.MethodHandles.Lookup.PUBLIC;
-import static org.qi4j.api.util.AccessibleObjects.accessible;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-@AppliesTo( { DefaultMethodsFilter.class } )
+@AppliesTo({DefaultMethodsFilter.class})
 public class InterfaceDefaultMethodsMixin
     implements InvocationHandler
 {
@@ -47,25 +40,25 @@ public class InterfaceDefaultMethodsMixin
     private Composite me;
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
-        if( method.isDefault() )
+        if(method.isDefault())
         {
             // Call the interface's default method
-            MethodCallHandler callHandler = forMethod( method );
-            return callHandler.invoke( proxy, args );
+            MethodCallHandler callHandler = forMethod(method);
+            return callHandler.invoke(proxy, args);
         }
         // call the composite's method instead.
-        return method.invoke( me, args );
+        return method.invoke(me, args);
     }
 
-    private MethodCallHandler forMethod( Method method )
+    private MethodCallHandler forMethod(Method method)
     {
-        return methodHandleCache.computeIfAbsent( method, this::createMethodCallHandler );
+        return methodHandleCache.computeIfAbsent(method, this::createMethodCallHandler);
     }
 
-    private MethodCallHandler createMethodCallHandler( Method method )
+    private MethodCallHandler createMethodCallHandler(Method method)
     {
         Class<?> declaringClass = method.getDeclaringClass();
         try
@@ -73,19 +66,19 @@ public class InterfaceDefaultMethodsMixin
 //            Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class.getDeclaredConstructor( Class.class, int.class );
 //            MethodHandles.Lookup lookup = accessible( constructor ).newInstance( declaringClass, PRIVATE | PUBLIC | PROTECTED | PACKAGE);
             MethodHandles.Lookup lookup = MethodHandles.lookup();
-            MethodHandle handle = lookup.unreflectSpecial( method, declaringClass );
-            return ( proxy, args ) -> handle.bindTo( proxy ).invokeWithArguments( args );
+            MethodHandle handle = lookup.unreflectSpecial(method, declaringClass);
+            return (proxy, args) -> handle.bindTo(proxy).invokeWithArguments(args);
         }
-        catch( IllegalAccessException e )
+        catch(IllegalAccessException e)
         {
-            throw new RuntimeException( e );
+            throw new RuntimeException(e);
         }
     }
 
     @FunctionalInterface
     private interface MethodCallHandler
     {
-        Object invoke( Object proxy, Object[] args )
+        Object invoke(Object proxy, Object[] args)
             throws Throwable;
     }
 }

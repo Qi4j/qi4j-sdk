@@ -19,11 +19,12 @@
  */
 package org.qi4j.spi.entitystore.helpers;
 
+import org.qi4j.api.entity.EntityReference;
+import org.qi4j.spi.entity.NamedAssociationState;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.spi.entity.NamedAssociationState;
 
 /**
  * Default implementation of NamedAssociationState.
@@ -35,7 +36,7 @@ public final class DefaultNamedAssociationState
     private final DefaultEntityState entityState;
     private final Map<String, EntityReference> references;
 
-    public DefaultNamedAssociationState( DefaultEntityState entityState, Map<String, EntityReference> references )
+    public DefaultNamedAssociationState(DefaultEntityState entityState, Map<String, EntityReference> references)
     {
         this.entityState = entityState;
         this.references = references;
@@ -48,18 +49,18 @@ public final class DefaultNamedAssociationState
     }
 
     @Override
-    public boolean containsName( String name )
+    public boolean containsName(String name)
     {
-        return references.containsKey( name );
+        return references.containsKey(name);
     }
 
     @Override
-    public boolean put( String name, EntityReference entityReference )
+    public boolean put(String name, EntityReference entityReference)
     {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(entityReference, "entityReference");
-        EntityReference oldReference = references.put( name, entityReference );
-        if( entityReference.equals( oldReference ) )
+        EntityReference oldReference = references.put(name, entityReference);
+        if(entityReference.equals(oldReference))
         {
             return false;
         }
@@ -68,9 +69,9 @@ public final class DefaultNamedAssociationState
     }
 
     @Override
-    public boolean remove( String name )
+    public boolean remove(String name)
     {
-        if( references.remove( name ) == null )
+        if(references.remove(name) == null)
         {
             return false;
         }
@@ -81,7 +82,7 @@ public final class DefaultNamedAssociationState
     @Override
     public boolean clear()
     {
-        if( !references.isEmpty() )
+        if(!references.isEmpty())
         {
             references.clear();
             entityState.markUpdated();
@@ -91,17 +92,17 @@ public final class DefaultNamedAssociationState
     }
 
     @Override
-    public EntityReference get( String name )
+    public EntityReference get(String name)
     {
-        return references.get( name );
+        return references.get(name);
     }
 
     @Override
-    public String nameOf( EntityReference entityReference )
+    public String nameOf(EntityReference entityReference)
     {
-        for( Map.Entry<String, EntityReference> entry : references.entrySet() )
+        for(Map.Entry<String, EntityReference> entry : references.entrySet())
         {
-            if( entry.getValue().equals( entityReference ) )
+            if(entry.getValue().equals(entityReference))
             {
                 return entry.getKey();
             }

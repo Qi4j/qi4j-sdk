@@ -19,23 +19,19 @@
  */
 package org.qi4j.runtime.constraints;
 
-import java.lang.annotation.Retention;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.composite.TransientComposite;
-import org.qi4j.api.constraint.Constraint;
-import org.qi4j.api.constraint.ConstraintDeclaration;
-import org.qi4j.api.constraint.ConstraintViolationException;
-import org.qi4j.api.constraint.Constraints;
-import org.qi4j.api.constraint.Name;
-import org.qi4j.api.constraint.ValueConstraintViolation;
+import org.qi4j.api.constraint.*;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.annotation.Retention;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,30 +41,30 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ConstraintsTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( MyOneComposite.class );
-        module.transients( MyOneComposite2.class );
+        module.transients(MyOneComposite.class);
+        module.transients(MyOneComposite2.class);
     }
 
     @Test
     public void givenCompositeWithConstraintsWhenInstantiatedThenUseDeclarationOnComposite()
         throws Throwable
     {
-        MyOne my = transientBuilderFactory.newTransient( MyOneComposite.class );
+        MyOne my = transientBuilderFactory.newTransient(MyOneComposite.class);
         ArrayList<String> list = new ArrayList<String>();
-        list.add( "zout" );
-        my.doSomething( "habba", list );
+        list.add("zout");
+        my.doSomething("habba", list);
         try
         {
-            my.doSomething( "niclas", new ArrayList<String>() );
-            fail( "Should have thrown a ConstraintViolationException." );
+            my.doSomething("niclas", new ArrayList<String>());
+            fail("Should have thrown a ConstraintViolationException.");
         }
-        catch( ConstraintViolationException e )
+        catch(ConstraintViolationException e)
         {
             Collection<ValueConstraintViolation> violations = e.constraintViolations();
-            assertThat( violations.size(), equalTo( 2 ) );
+            assertThat(violations.size(), equalTo(2));
 //            assertThat( e.mixinTypeName() , equalTo( MyOne.class.getName()));
         }
     }
@@ -77,19 +73,19 @@ public class ConstraintsTest
     public void givenCompositeWithoutConstraintsWhenInstantiatedThenUseDeclarationOnConstraint()
         throws Throwable
     {
-        MyOne my = transientBuilderFactory.newTransient( MyOneComposite2.class );
+        MyOne my = transientBuilderFactory.newTransient(MyOneComposite2.class);
         ArrayList<String> list = new ArrayList<String>();
-        list.add( "zout" );
-        my.doSomething( "habba", list );
+        list.add("zout");
+        my.doSomething("habba", list);
         try
         {
-            my.doSomething( "niclas", new ArrayList<String>() );
-            fail( "Should have thrown a ConstraintViolationException." );
+            my.doSomething("niclas", new ArrayList<String>());
+            fail("Should have thrown a ConstraintViolationException.");
         }
-        catch( ConstraintViolationException e )
+        catch(ConstraintViolationException e)
         {
             Collection<ValueConstraintViolation> violations = e.constraintViolations();
-            assertThat( violations.size(), equalTo( 2 ) );
+            assertThat(violations.size(), equalTo(2));
 //            assertThat( e.mixinTypeName() , equalTo( MyOne.class.getName()));
         }
     }
@@ -97,29 +93,29 @@ public class ConstraintsTest
     @Test
     public void givenConstrainedGenericWildcardParameterWhenInvokedThenUseConstraint()
     {
-        MyOne myOne = transientBuilderFactory.newTransient( MyOneComposite.class );
+        MyOne myOne = transientBuilderFactory.newTransient(MyOneComposite.class);
         ArrayList<String> list = new ArrayList<String>();
-        list.add( "Foo" );
-        myOne.doSomething2( list );
+        list.add("Foo");
+        myOne.doSomething2(list);
     }
 
     @Test
     public void givenCompositeConstraintWhenInvokedThenUseAllConstraints()
     {
-        MyOne myOne = transientBuilderFactory.newTransient( MyOneComposite.class );
+        MyOne myOne = transientBuilderFactory.newTransient(MyOneComposite.class);
         ArrayList<String> list = new ArrayList<String>();
-        list.add( "Foo" );
-        myOne.doSomething3( list );
+        list.add("Foo");
+        myOne.doSomething3(list);
     }
 
-    @Constraints( TestConstraintImpl.class )
-    @Mixins( MyOneMixin.class )
+    @Constraints(TestConstraintImpl.class)
+    @Mixins(MyOneMixin.class)
     public interface MyOneComposite
         extends MyOne, TransientComposite
     {
     }
 
-    @Mixins( MyOneMixin.class )
+    @Mixins(MyOneMixin.class)
     public interface MyOneComposite2
         extends MyOne, TransientComposite
     {
@@ -127,35 +123,35 @@ public class ConstraintsTest
 
     public interface MyOne
     {
-        void doSomething( @Optional @TestConstraint String abc, @TestConstraint List<String> collection );
+        void doSomething(@Optional @TestConstraint String abc, @TestConstraint List<String> collection);
 
-        void doSomething2( @TestConstraint @NonEmptyCollection List<?> collection );
+        void doSomething2(@TestConstraint @NonEmptyCollection List<?> collection);
 
-        void doSomething3( @CompositeConstraint @Name( "somecollection" ) List<?> collection );
+        void doSomething3(@CompositeConstraint @Name("somecollection") List<?> collection);
     }
 
     public abstract static class MyOneMixin
         implements MyOne
     {
-        public void doSomething( String abc, List<String> collection )
+        public void doSomething(String abc, List<String> collection)
         {
-            if( abc == null || collection == null )
+            if(abc == null || collection == null)
             {
                 throw new NullPointerException();
             }
         }
 
-        public void doSomething2( List<?> collection )
+        public void doSomething2(List<?> collection)
         {
-            if( collection == null )
+            if(collection == null)
             {
                 throw new NullPointerException();
             }
         }
 
-        public void doSomething3( List<?> collection )
+        public void doSomething3(List<?> collection)
         {
-            if( collection == null )
+            if(collection == null)
             {
                 throw new NullPointerException();
             }
@@ -163,8 +159,8 @@ public class ConstraintsTest
     }
 
     @ConstraintDeclaration
-    @Retention( RUNTIME )
-    @Constraints( TestConstraintImpl.class )
+    @Retention(RUNTIME)
+    @Constraints(TestConstraintImpl.class)
     public @interface TestConstraint
     {
     }
@@ -172,20 +168,20 @@ public class ConstraintsTest
     public static class TestConstraintImpl
         implements Constraint<TestConstraint, Object>
     {
-        public boolean isValid( TestConstraint annotation, Object value )
+        public boolean isValid(TestConstraint annotation, Object value)
             throws NullPointerException
         {
-            if( value instanceof String )
+            if(value instanceof String)
             {
-                return ( (String) value ).startsWith( "habba" );
+                return ((String) value).startsWith("habba");
             }
-            return value instanceof Collection && ( (Collection) value ).size() > 0;
+            return value instanceof Collection && ((Collection) value).size() > 0;
         }
     }
 
     @ConstraintDeclaration
-    @Retention( RUNTIME )
-    @Constraints( { NonEmptyCollectionConstraint.class } )
+    @Retention(RUNTIME)
+    @Constraints({NonEmptyCollectionConstraint.class})
     public @interface NonEmptyCollection
     {
     }
@@ -193,7 +189,7 @@ public class ConstraintsTest
     public static class NonEmptyCollectionConstraint
         implements Constraint<NonEmptyCollection, Collection<?>>
     {
-        public boolean isValid( NonEmptyCollection annotation, Collection<?> value )
+        public boolean isValid(NonEmptyCollection annotation, Collection<?> value)
             throws NullPointerException
         {
             return value.size() > 0;
@@ -201,7 +197,7 @@ public class ConstraintsTest
     }
 
     @ConstraintDeclaration
-    @Retention( RUNTIME )
+    @Retention(RUNTIME)
     @TestConstraint
     @NonEmptyCollection
     public @interface CompositeConstraint

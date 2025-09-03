@@ -19,15 +19,6 @@
  */
 package org.qi4j.runtime.property;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.property.Property;
@@ -37,6 +28,8 @@ import org.qi4j.api.type.CollectionType;
 import org.qi4j.api.type.MapType;
 import org.qi4j.api.type.ValueCompositeType;
 import org.qi4j.runtime.value.ValueInstance;
+
+import java.util.*;
 
 import static org.qi4j.api.composite.CompositeInstance.compositeInstanceOf;
 
@@ -55,7 +48,7 @@ public class PropertyInstance<T>
      * @param model  The property model. This argument must not be {@code null}.
      * @param aValue The property value.
      */
-    public PropertyInstance( PropertyInfo model, T aValue )
+    public PropertyInstance(PropertyInfo model, T aValue)
     {
         this.model = model;
         value = aValue;
@@ -69,7 +62,7 @@ public class PropertyInstance<T>
     /**
      * @param model The property model. This argument must not be {@code null}.
      */
-    public void setPropertyInfo( PropertyInfo model )
+    public void setPropertyInfo(PropertyInfo model)
     {
         this.model = model;
     }
@@ -91,20 +84,20 @@ public class PropertyInstance<T>
      * @param aNewValue The new value.
      */
     @Override
-    public void set( T aNewValue )
+    public void set(T aNewValue)
     {
-        if( model.isImmutable() )
+        if(model.isImmutable())
         {
-            throw new IllegalStateException( "Property [" + model.qualifiedName() + "] is immutable." );
+            throw new IllegalStateException("Property [" + model.qualifiedName() + "] is immutable.");
         }
 
         try
         {
-            model.checkConstraints( aNewValue );
+            model.checkConstraints(aNewValue);
         }
-        catch( ConstraintViolationException e )
+        catch(ConstraintViolationException e)
         {
-            e.setInstanceString( model.qualifiedName().toString() );
+            e.setInstanceString(model.qualifiedName().toString());
             throw e;
         }
 
@@ -114,88 +107,88 @@ public class PropertyInstance<T>
     /**
      * Perform equals with {@code o} argument.
      * <p>
-     *     The definition of equals() for the Property is that if both the state and descriptor are equal,
-     *     then the properties are equal.
+     * The definition of equals() for the Property is that if both the state and descriptor are equal,
+     * then the properties are equal.
      * </p>
      *
      * @param o The other object to compare.
      * @return Returns a {@code boolean} indicator whether this object is equals the other.
      */
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
 
         Property<?> that = (Property<?>) o;
         // Unwrap if needed
-        while( that instanceof PropertyWrapper )
+        while(that instanceof PropertyWrapper)
         {
-            that = ( (PropertyWrapper) that ).next();
+            that = ((PropertyWrapper) that).next();
         }
         // Descriptor equality
-        PropertyDescriptor thatDescriptor = (PropertyDescriptor) ( (PropertyInstance) that ).propertyInfo();
-        if( !model.equals( thatDescriptor ) )
+        PropertyDescriptor thatDescriptor = (PropertyDescriptor) ((PropertyInstance) that).propertyInfo();
+        if(!model.equals(thatDescriptor))
         {
             return false;
         }
         // State equality
         T value = get();
-        if( value == null )
+        if(value == null)
         {
             return that.get() == null;
         }
         Class<?> valueClass = value.getClass();
         // Handling arrays
-        if( valueClass.isArray() )
+        if(valueClass.isArray())
         {
             Object thatValue = that.get();
-            if( !thatValue.getClass().isArray() )
+            if(!thatValue.getClass().isArray())
             {
                 return false;
             }
             Class<?> componentType = valueClass.getComponentType();
-            if( boolean.class.equals( componentType ) )
+            if(boolean.class.equals(componentType))
             {
-                return Arrays.equals( (boolean[]) value, (boolean[]) thatValue );
+                return Arrays.equals((boolean[]) value, (boolean[]) thatValue);
             }
-            if( char.class.equals( componentType ) )
+            if(char.class.equals(componentType))
             {
-                return Arrays.equals( (char[]) value, (char[]) thatValue );
+                return Arrays.equals((char[]) value, (char[]) thatValue);
             }
-            if( short.class.equals( componentType ) )
+            if(short.class.equals(componentType))
             {
-                return Arrays.equals( (short[]) value, (short[]) thatValue );
+                return Arrays.equals((short[]) value, (short[]) thatValue);
             }
-            if( int.class.equals( componentType ) )
+            if(int.class.equals(componentType))
             {
-                return Arrays.equals( (int[]) value, (int[]) thatValue );
+                return Arrays.equals((int[]) value, (int[]) thatValue);
             }
-            if( byte.class.equals( componentType ) )
+            if(byte.class.equals(componentType))
             {
-                return Arrays.equals( (byte[]) value, (byte[]) thatValue );
+                return Arrays.equals((byte[]) value, (byte[]) thatValue);
             }
-            if( long.class.equals( componentType ) )
+            if(long.class.equals(componentType))
             {
-                return Arrays.equals( (long[]) value, (long[]) thatValue );
+                return Arrays.equals((long[]) value, (long[]) thatValue);
             }
-            if( float.class.equals( componentType ) )
+            if(float.class.equals(componentType))
             {
-                return Arrays.equals( (float[]) value, (float[]) thatValue );
+                return Arrays.equals((float[]) value, (float[]) thatValue);
             }
-            if( double.class.equals( componentType ) )
+            if(double.class.equals(componentType))
             {
-                return Arrays.equals( (double[]) value, (double[]) thatValue );
+                return Arrays.equals((double[]) value, (double[]) thatValue);
             }
-            return Arrays.deepEquals( (Object[]) value, (Object[]) thatValue );
+            return Arrays.deepEquals((Object[]) value, (Object[]) thatValue);
         }
-        return value.equals( that.get() );
+        return value.equals(that.get());
     }
 
     /**
@@ -208,7 +201,7 @@ public class PropertyInstance<T>
     {
         int hash = model.hashCode() * 19; // Descriptor
         T value = get();
-        if( value != null )
+        if(value != null)
         {
             hash += value.hashCode() * 13; // State
         }
@@ -227,136 +220,136 @@ public class PropertyInstance<T>
         return value == null ? "" : value.toString();
     }
 
-    @SuppressWarnings( {"raw", "unchecked"} )
-    public void prepareToBuild( PropertyModel propertyDescriptor )
+    @SuppressWarnings({"raw", "unchecked"})
+    public void prepareToBuild(PropertyModel propertyDescriptor)
     {
         // Check if state has to be modified
         model = propertyDescriptor.getBuilderInfo();
-        if( propertyDescriptor.valueType() instanceof ValueCompositeType )
+        if(propertyDescriptor.valueType() instanceof ValueCompositeType)
         {
             Object value = get();
-            if( value != null )
+            if(value != null)
             {
-                prepareToBuild( value );
+                prepareToBuild(value);
             }
         }
-        else if( propertyDescriptor.valueType() instanceof CollectionType )
+        else if(propertyDescriptor.valueType() instanceof CollectionType)
         {
             Object value = get();
 
-            if( value != null )
+            if(value != null)
             {
-                if( value instanceof List )
+                if(value instanceof List)
                 {
-                    value = new ArrayList( (Collection) value );
+                    value = new ArrayList((Collection) value);
                 }
-                else if( value instanceof Set )
+                else if(value instanceof Set)
                 {
-                    value = new LinkedHashSet( (Collection) value );
+                    value = new LinkedHashSet((Collection) value);
                 }
 
                 // Check if items are Values
                 CollectionType collection = (CollectionType) propertyDescriptor.valueType();
-                if( collection.collectedType() instanceof ValueCompositeType )
+                if(collection.collectedType() instanceof ValueCompositeType)
                 {
                     Collection coll = (Collection) value;
-                    coll.forEach( this::prepareToBuild );
+                    coll.forEach(this::prepareToBuild);
                 }
 
-                set( (T) value );
+                set((T) value);
             }
         }
-        else if( propertyDescriptor.valueType() instanceof MapType )
+        else if(propertyDescriptor.valueType() instanceof MapType)
         {
             Object value = get();
 
-            if( value != null )
+            if(value != null)
             {
-                Map map = new LinkedHashMap( (Map) value );
+                Map map = new LinkedHashMap((Map) value);
 
                 // Check if keys/values are Values
                 MapType mapType = (MapType) propertyDescriptor.valueType();
-                if( mapType.keyType() instanceof ValueCompositeType )
+                if(mapType.keyType() instanceof ValueCompositeType)
                 {
-                    map.keySet().forEach( this::prepareToBuild );
+                    map.keySet().forEach(this::prepareToBuild);
                 }
-                if( mapType.valueType() instanceof ValueCompositeType )
+                if(mapType.valueType() instanceof ValueCompositeType)
                 {
-                    map.values().forEach( this::prepareToBuild );
+                    map.values().forEach(this::prepareToBuild);
                 }
-                set( (T) value );
+                set((T) value);
             }
         }
     }
 
-    private void prepareToBuild( Object instance )
+    private void prepareToBuild(Object instance)
     {
-        ( (ValueInstance) compositeInstanceOf( (Composite) instance ) ).prepareToBuild();
+        ((ValueInstance) compositeInstanceOf((Composite) instance)).prepareToBuild();
     }
 
-    @SuppressWarnings( {"raw", "unchecked"} )
-    public void prepareBuilderState( PropertyModel propertyDescriptor )
+    @SuppressWarnings({"raw", "unchecked"})
+    public void prepareBuilderState(PropertyModel propertyDescriptor)
     {
         // Check if state has to be modified
-        if( propertyDescriptor.valueType() instanceof ValueCompositeType )
+        if(propertyDescriptor.valueType() instanceof ValueCompositeType)
         {
             Object value = get();
-            if( value != null )
+            if(value != null)
             {
-                prepareBuilderState( value );
+                prepareBuilderState(value);
             }
         }
-        else if( propertyDescriptor.valueType() instanceof CollectionType )
+        else if(propertyDescriptor.valueType() instanceof CollectionType)
         {
             T value = get();
-            if( value != null )
+            if(value != null)
             {
-                if( propertyDescriptor.isImmutable() )
+                if(propertyDescriptor.isImmutable())
                 {
-                    if( value instanceof List )
+                    if(value instanceof List)
                     {
-                        value = (T) Collections.unmodifiableList( (List<?>) value );
+                        value = (T) Collections.unmodifiableList((List<?>) value);
                     }
-                    else if( value instanceof Set )
+                    else if(value instanceof Set)
                     {
-                        value = (T) Collections.unmodifiableSet( (Set<?>) value );
+                        value = (T) Collections.unmodifiableSet((Set<?>) value);
                     }
                     else
                     {
-                        value = (T) Collections.unmodifiableCollection( (Collection<?>) value );
+                        value = (T) Collections.unmodifiableCollection((Collection<?>) value);
                     }
 
                     this.value = value;
                 }
 
                 CollectionType collection = (CollectionType) propertyDescriptor.valueType();
-                if( collection.collectedType() instanceof ValueCompositeType )
+                if(collection.collectedType() instanceof ValueCompositeType)
                 {
                     Collection coll = (Collection) value;
-                    coll.forEach( this::prepareBuilderState );
+                    coll.forEach(this::prepareBuilderState);
                 }
             }
         }
-        else if( propertyDescriptor.valueType() instanceof MapType )
+        else if(propertyDescriptor.valueType() instanceof MapType)
         {
             T value = get();
 
-            if( value != null )
+            if(value != null)
             {
                 MapType mapType = (MapType) propertyDescriptor.valueType();
-                if( mapType.keyType() instanceof ValueCompositeType )
+                if(mapType.keyType() instanceof ValueCompositeType)
                 {
                     Map map = (Map) value;
-                    map.keySet().forEach( this::prepareBuilderState );
+                    map.keySet().forEach(this::prepareBuilderState);
                 }
-                if( mapType.valueType() instanceof ValueCompositeType )
+                if(mapType.valueType() instanceof ValueCompositeType)
                 {
                     Map map = (Map) value;
-                    map.values().forEach( this::prepareBuilderState );
+                    map.values().forEach(this::prepareBuilderState);
                 }
-                if( propertyDescriptor.isImmutable() )
+                if(propertyDescriptor.isImmutable())
                 {
-                    value = (T) Collections.unmodifiableMap( (Map<?, ?>) value );
+                    value = (T) Collections.unmodifiableMap((Map<?, ?>) value);
                 }
 
                 this.value = value;
@@ -366,8 +359,8 @@ public class PropertyInstance<T>
         model = propertyDescriptor;
     }
 
-    private void prepareBuilderState( Object value )
+    private void prepareBuilderState(Object value)
     {
-        ( (ValueInstance) compositeInstanceOf( (Composite) value ) ).prepareBuilderState();
+        ((ValueInstance) compositeInstanceOf((Composite) value)).prepareBuilderState();
     }
 }

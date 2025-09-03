@@ -20,8 +20,8 @@
 
 package org.qi4j.runtime.query;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.property.Property;
@@ -30,16 +30,13 @@ import org.qi4j.api.query.QueryBuilder;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
-import static org.qi4j.api.query.QueryExpressions.and;
-import static org.qi4j.api.query.QueryExpressions.ge;
-import static org.qi4j.api.query.QueryExpressions.lt;
-import static org.qi4j.api.query.QueryExpressions.orderBy;
-import static org.qi4j.api.query.QueryExpressions.templateFor;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.qi4j.api.query.QueryExpressions.*;
 
 /**
  * JAVADOC
@@ -49,10 +46,10 @@ public class QueryBuilderFactoryImplTest
 {
     private List<TestComposite> composites;
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestComposite.class );
+        module.transients(TestComposite.class);
     }
 
     @Override
@@ -62,98 +59,98 @@ public class QueryBuilderFactoryImplTest
     {
         super.setUp();
         composites = new ArrayList<>();
-        composites.add( newInstance( "A", 6 ) );
-        composites.add( newInstance( "B", 2 ) );
-        composites.add( newInstance( "C", 3 ) );
-        composites.add( newInstance( "C", 4 ) );
-        composites.add( newInstance( "E", 5 ) );
-        composites.add( newInstance( "A", 1 ) );
+        composites.add(newInstance("A", 6));
+        composites.add(newInstance("B", 2));
+        composites.add(newInstance("C", 3));
+        composites.add(newInstance("C", 4));
+        composites.add(newInstance("E", 5));
+        composites.add(newInstance("A", 1));
     }
 
     @Test
     public void givenPlainQueryWhenFindEntityExpectFirstEntityReturned()
     {
-        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder( TestComposite.class ).newQuery( composites );
-        assertThat( query.find().a().get(), equalTo( "A" ) );
-        assertThat( query.count(), equalTo( 6L ) );
+        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder(TestComposite.class).newQuery(composites);
+        assertThat(query.find().a().get(), equalTo("A"));
+        assertThat(query.count(), equalTo(6L));
     }
 
     @Test
     public void givenPlainQueryWhenOrderByFirstPropertyExpectOrderedResult()
     {
-        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder( TestComposite.class ).newQuery( composites );
-        TestComposite template = templateFor( TestComposite.class );
-        query.orderBy( orderBy( template.a() ) );
-        verifyOrder( query, "612345" );
+        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder(TestComposite.class).newQuery(composites);
+        TestComposite template = templateFor(TestComposite.class);
+        query.orderBy(orderBy(template.a()));
+        verifyOrder(query, "612345");
     }
 
     @Test
     public void givenPlainQueryWhenOrderBySecondPropertyExpectOrderedResult()
     {
-        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder( TestComposite.class ).newQuery( composites );
-        TestComposite template = templateFor( TestComposite.class );
-        query.orderBy( orderBy( template.b() ) );
-        verifyOrder( query, "123456" );
+        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder(TestComposite.class).newQuery(composites);
+        TestComposite template = templateFor(TestComposite.class);
+        query.orderBy(orderBy(template.b()));
+        verifyOrder(query, "123456");
     }
 
     @Test
     public void givenPlainQueryWhenOrderByTwoPropertiesExpectOrderedResult()
     {
-        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder( TestComposite.class ).newQuery( composites );
-        TestComposite template = templateFor( TestComposite.class );
-        query.orderBy( orderBy( template.a() ), orderBy( template.b() ) );
-        verifyOrder( query, "162345" );
+        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder(TestComposite.class).newQuery(composites);
+        TestComposite template = templateFor(TestComposite.class);
+        query.orderBy(orderBy(template.a()), orderBy(template.b()));
+        verifyOrder(query, "162345");
     }
 
     @Test
     public void givenPlainQueryWhenMaxedResultExpectLimitedResult()
     {
-        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder( TestComposite.class ).newQuery( composites );
-        query.maxResults( 5 );
-        verifyOrder( query, "62345" );
+        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder(TestComposite.class).newQuery(composites);
+        query.maxResults(5);
+        verifyOrder(query, "62345");
     }
 
     @Test
     public void givenPlainQueryWhenFirstResultIsBeyondFirstElementExpectLimitedResult()
     {
-        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder( TestComposite.class ).newQuery( composites );
-        query.firstResult( 2 );
-        verifyOrder( query, "3451" );
+        Query<TestComposite> query = queryBuilderFactory.newQueryBuilder(TestComposite.class).newQuery(composites);
+        query.firstResult(2);
+        verifyOrder(query, "3451");
     }
 
     @Test
     public void givenWhereQueryWhenWhereClauseLimitsToRangeExpectLimitedResult()
     {
-        final QueryBuilder<TestComposite> qb = queryBuilderFactory.newQueryBuilder( TestComposite.class );
-        TestComposite template = templateFor( TestComposite.class );
+        final QueryBuilder<TestComposite> qb = queryBuilderFactory.newQueryBuilder(TestComposite.class);
+        TestComposite template = templateFor(TestComposite.class);
         Query<TestComposite> query = qb.where(
             and(
-                ge( template.b(), 3 ),
-                lt( template.b(), 5 )
+                ge(template.b(), 3),
+                lt(template.b(), 5)
             )
-        ).newQuery( composites );
-        verifyOrder( query, "34" );
+        ).newQuery(composites);
+        verifyOrder(query, "34");
     }
 
-    private void verifyOrder( Query<TestComposite> query, String expected )
+    private void verifyOrder(Query<TestComposite> query, String expected)
     {
         StringBuilder actual = new StringBuilder();
-        for( TestComposite testComposite : query )
+        for(TestComposite testComposite : query)
         {
-            actual.append( testComposite.b().get() );
+            actual.append(testComposite.b().get());
         }
 
-        assertThat( "Query is correct", actual.toString(), equalTo( expected ) );
-        assertThat( "Count is correct", query.count(), equalTo( (long) expected.length() ) );
+        assertThat("Query is correct", actual.toString(), equalTo(expected));
+        assertThat("Count is correct", query.count(), equalTo((long) expected.length()));
     }
 
-    private TestComposite newInstance( String a, int b )
+    private TestComposite newInstance(String a, int b)
     {
         TransientBuilder<TestComposite> builder =
-            transientBuilderFactory.newTransientBuilder( TestComposite.class );
+            transientBuilderFactory.newTransientBuilder(TestComposite.class);
         TestComposite instance = builder.prototype();
-        instance.a().set( a );
-        instance.b().set( b );
+        instance.a().set(a);
+        instance.b().set(b);
         return builder.newInstance();
     }
 

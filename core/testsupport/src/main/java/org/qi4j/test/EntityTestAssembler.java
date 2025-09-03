@@ -33,28 +33,28 @@ public class EntityTestAssembler
 {
     private Visibility defaultServicesVisibility;
 
-    public EntityTestAssembler defaultServicesVisibleIn( Visibility visibility )
+    public EntityTestAssembler defaultServicesVisibleIn(Visibility visibility)
     {
         defaultServicesVisibility = visibility;
         return this;
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        super.assemble( module );
-        ServiceDeclaration service = module.services( MemoryEntityStoreService.class ).visibleIn( visibility() );
-        if( hasIdentity() )
+        super.assemble(module);
+        ServiceDeclaration service = module.services(MemoryEntityStoreService.class).visibleIn(visibility());
+        if(hasIdentity())
         {
-            service.identifiedBy( identity() );
+            service.identifiedBy(identity());
         }
-        module.defaultServices().visibleIn( defaultServicesVisibility() );
+        module.defaultServices().visibleIn(defaultServicesVisibility());
     }
 
     private Visibility defaultServicesVisibility()
     {
         return defaultServicesVisibility != null
-               ? defaultServicesVisibility
-               : visibility();
+            ? defaultServicesVisibility
+            : visibility();
     }
 }

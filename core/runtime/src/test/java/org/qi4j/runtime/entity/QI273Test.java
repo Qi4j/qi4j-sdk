@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.entity;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
@@ -28,7 +29,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -47,7 +47,7 @@ public class QI273Test
         public Property<String> theProperty();
     }
 
-    @Mixins( SomeDomainEntityMixin.class )
+    @Mixins(SomeDomainEntityMixin.class)
     public static interface SomeDomainEntity
         extends EntityComposite
     {
@@ -75,11 +75,11 @@ public class QI273Test
         }
     }
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( SomeDomainEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(SomeDomainEntity.class);
     }
 
     @Test

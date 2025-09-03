@@ -20,10 +20,11 @@
 
 package org.qi4j.runtime.composite;
 
-import java.util.Collections;
-import java.util.List;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
+
+import java.util.Collections;
+import java.util.List;
 
 public final class ValueConstraintsModel
     implements VisitableHierarchy<Object, Object>
@@ -32,7 +33,7 @@ public final class ValueConstraintsModel
     private String name;
     private boolean optional;
 
-    public ValueConstraintsModel( List<AbstractConstraintModel> constraintModels, String name, boolean optional )
+    public ValueConstraintsModel(List<AbstractConstraintModel> constraintModels, String name, boolean optional)
     {
         this.constraintModels = constraintModels;
         this.name = name;
@@ -42,7 +43,7 @@ public final class ValueConstraintsModel
     public ValueConstraintsInstance newInstance()
     {
         List<AbstractConstraintModel> models = isConstrained() ? this.constraintModels : Collections.emptyList();
-        return new ValueConstraintsInstance( models, name, optional );
+        return new ValueConstraintsInstance(models, name, optional);
     }
 
     public boolean isConstrained()
@@ -51,12 +52,12 @@ public final class ValueConstraintsModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        for( AbstractConstraintModel constraintModel : constraintModels )
+        for(AbstractConstraintModel constraintModel : constraintModels)
         {
-            if( constraintModel.accept( modelVisitor ) )
+            if(constraintModel.accept(modelVisitor))
             {
                 return false;
             }

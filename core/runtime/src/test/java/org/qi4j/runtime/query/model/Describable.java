@@ -27,12 +27,12 @@ import org.qi4j.api.property.Property;
 /**
  * TODO
  */
-@Mixins( Describable.Mixin.class )
+@Mixins(Describable.Mixin.class)
 public interface Describable
 {
     String getDescription();
 
-    void updateDescription( String newDescription );
+    void updateDescription(String newDescription);
 
     class Mixin
         implements Describable
@@ -48,9 +48,9 @@ public interface Describable
         }
 
         @Override
-        public void updateDescription( String newDescription )
+        public void updateDescription(String newDescription)
         {
-            description.set( newDescription );
+            description.set(newDescription);
         }
     }
 }

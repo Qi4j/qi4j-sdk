@@ -20,15 +20,13 @@
 
 package org.qi4j.api.metrics;
 
+import org.qi4j.api.injection.scope.Service;
+import org.qi4j.bootstrap.Assembler;
+import org.qi4j.bootstrap.ModuleAssembly;
+
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import org.qi4j.api.injection.scope.Service;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.ModuleAssembly;
 
 public class DocumentationSupport
 {
@@ -40,48 +38,50 @@ public class DocumentationSupport
     public void forDocumentationOnly()
     {
         // START SNIPPET: gauge
-        final BlockingQueue queue = new LinkedBlockingQueue( 20 );
+        final BlockingQueue queue = new LinkedBlockingQueue(20);
         // END SNIPPET: gauge
         // START SNIPPET: gauge
-        MetricsGaugeFactory gaugeFactory = provider.createFactory( MetricsGaugeFactory.class );
-        MetricsGauge<Integer> gauge = gaugeFactory.registerGauge( "Sample Gauge", () -> queue.size() );
+        MetricsGaugeFactory gaugeFactory = provider.createFactory(MetricsGaugeFactory.class);
+        MetricsGauge<Integer> gauge = gaugeFactory.registerGauge("Sample Gauge", () -> queue.size());
         // END SNIPPET: gauge
 
         // START SNIPPET: counter
-        MetricsCounterFactory counterFactory = provider.createFactory( MetricsCounterFactory.class );
-        MetricsCounter counter = counterFactory.createCounter( "Sample Counter" );
+        MetricsCounterFactory counterFactory = provider.createFactory(MetricsCounterFactory.class);
+        MetricsCounter counter = counterFactory.createCounter("Sample Counter");
         // END SNIPPET: counter
 
         // START SNIPPET: histogram
-        MetricsHistogramFactory histoFactory = provider.createFactory( MetricsHistogramFactory.class );
-        MetricsHistogram histogram = histoFactory.createHistogram( "Sample Histogram" );
+        MetricsHistogramFactory histoFactory = provider.createFactory(MetricsHistogramFactory.class);
+        MetricsHistogram histogram = histoFactory.createHistogram("Sample Histogram");
         // END SNIPPET: histogram
 
         // START SNIPPET: meter
-        MetricsMeterFactory meterFactory = provider.createFactory( MetricsMeterFactory.class );
-        MetricsMeter meter = meterFactory.createMeter( "Sample Meter" );
+        MetricsMeterFactory meterFactory = provider.createFactory(MetricsMeterFactory.class);
+        MetricsMeter meter = meterFactory.createMeter("Sample Meter");
         // END SNIPPET: meter
 
         // START SNIPPET: timer
-        MetricsTimerFactory timerFactory = provider.createFactory( MetricsTimerFactory.class );
-        MetricsTimer timer = timerFactory.createTimer( "Sample Timer" );
+        MetricsTimerFactory timerFactory = provider.createFactory(MetricsTimerFactory.class);
+        MetricsTimer timer = timerFactory.createTimer("Sample Timer");
         // END SNIPPET: timer
 
         // START SNIPPET: healthcheck
-        MetricsHealthCheckFactory healthFactory = provider.createFactory( MetricsHealthCheckFactory.class );
-        MetricsHealthCheck healthCheck = healthFactory.registerHealthCheck( "Sample Healthcheck", () ->
+        MetricsHealthCheckFactory healthFactory = provider.createFactory(MetricsHealthCheckFactory.class);
+        MetricsHealthCheck healthCheck = healthFactory.registerHealthCheck("Sample Healthcheck", () ->
         {
             ServiceStatus status = pingMyService();
-            if( status.isOk() )
+            if(status.isOk())
+            {
                 return MetricsHealthCheck.Result.healthOk();
+            }
             String message = status.getErrorMessage();
             Exception error = status.getException();
-            if( error != null )
+            if(error != null)
             {
                 return MetricsHealthCheck.Result.exception(message, error);
             }
             return MetricsHealthCheck.Result.unhealthy(message);
-        } );
+        });
         // END SNIPPET: healthcheck
 
     }
@@ -108,7 +108,7 @@ public class DocumentationSupport
 
         public boolean isOk()
         {
-            return errorMessage.equals( "OK" );
+            return errorMessage.equals("OK");
         }
     }
 
@@ -117,14 +117,14 @@ public class DocumentationSupport
     public interface Router
     {
         @TimingCapture
-        List<Coordinate> route( String source, String destination );
+        List<Coordinate> route(String source, String destination);
     }
 
     public class RouterAlgorithm1
         implements Router
     {
         @Override
-        public List<Coordinate> route( String source, String destination )
+        public List<Coordinate> route(String source, String destination)
         {
 // END SNIPPET: capture
             return null;
@@ -136,7 +136,7 @@ public class DocumentationSupport
         implements Router
     {
         @Override
-        public List<Coordinate> route( String source, String destination )
+        public List<Coordinate> route(String source, String destination)
         {
 // END SNIPPET: capture
             return null;
@@ -148,10 +148,10 @@ public class DocumentationSupport
         {
             // START SNIPPET: capture
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
             {
-                module.addServices( Router.class ).identifiedBy( "router1" ).withMixins( RouterAlgorithm1.class );
-                module.addServices( Router.class ).identifiedBy( "router2" ).withMixins( RouterAlgorithm2.class );
+                module.addServices(Router.class).identifiedBy("router1").withMixins(RouterAlgorithm1.class);
+                module.addServices(Router.class).identifiedBy("router2").withMixins(RouterAlgorithm2.class);
 // END SNIPPET: capture
 // START SNIPPET: capture
             }

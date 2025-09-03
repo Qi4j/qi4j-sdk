@@ -17,18 +17,7 @@
  */
 package org.qi4j.serialization.jakartajson;
 
-import java.util.Arrays;
-import java.util.List;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonBuilderFactory;
-import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonReaderFactory;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
-import jakarta.json.JsonWriterFactory;
+import jakarta.json.*;
 import jakarta.json.spi.JsonProvider;
 import jakarta.json.stream.JsonGeneratorFactory;
 import jakarta.json.stream.JsonParserFactory;
@@ -37,7 +26,10 @@ import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceDescriptor;
 
-@Mixins( JakartaJsonFactories.Mixin.class )
+import java.util.Arrays;
+import java.util.List;
+
+@Mixins(JakartaJsonFactories.Mixin.class)
 public interface JakartaJsonFactories
 {
     JsonParserFactory parserFactory();
@@ -56,7 +48,7 @@ public interface JakartaJsonFactories
      * @param object the object
      * @return the JsonString
      */
-    JsonString toJsonString( Object object );
+    JsonString toJsonString(Object object);
 
     /**
      * Creates a {@link JsonObjectBuilder} populated with the state of a {@link JsonObject}.
@@ -64,25 +56,25 @@ public interface JakartaJsonFactories
      * @param jsonObject the JsonObject
      * @return the builder
      */
-    JsonObjectBuilder cloneBuilder( JsonObject jsonObject );
+    JsonObjectBuilder cloneBuilder(JsonObject jsonObject);
 
     /**
      * Creates a {@link JsonObjectBuilder} populated with the state of a {@link JsonObject}, including only some keys.
      *
      * @param jsonObject the JsonObject
-     * @param keys the keys to include
+     * @param keys       the keys to include
      * @return the builder
      */
-    JsonObjectBuilder cloneBuilderInclude( JsonObject jsonObject, String... keys );
+    JsonObjectBuilder cloneBuilderInclude(JsonObject jsonObject, String... keys);
 
     /**
      * Creates a {@link JsonObjectBuilder} populated with the state of a {@link JsonObject}, excluding some keys.
      *
      * @param jsonObject the JsonObject
-     * @param keys the keys to exclude
+     * @param keys       the keys to exclude
      * @return the builder
      */
-    JsonObjectBuilder cloneBuilderExclude( JsonObject jsonObject, String... keys );
+    JsonObjectBuilder cloneBuilderExclude(JsonObject jsonObject, String... keys);
 
     /**
      * Creates a {@link JsonArrayBuilder} populated with the state of a {@link JsonArray}.
@@ -90,16 +82,16 @@ public interface JakartaJsonFactories
      * @param jsonArray the JsonArray
      * @return the builder
      */
-    JsonArrayBuilder cloneBuilder( JsonArray jsonArray );
+    JsonArrayBuilder cloneBuilder(JsonArray jsonArray);
 
     /**
      * Creates a {@link JsonArrayBuilder} populated with the state of a {@link JsonArray}, excluding some values.
      *
      * @param jsonArray the JsonArray
-     * @param values the values to exclude
+     * @param values    the values to exclude
      * @return the builder
      */
-    JsonArrayBuilder cloneBuilderExclude( JsonArray jsonArray, JsonValue... values );
+    JsonArrayBuilder cloneBuilderExclude(JsonArray jsonArray, JsonValue... values);
 
     class Mixin implements JakartaJsonFactories, Initializable
     {
@@ -113,13 +105,14 @@ public interface JakartaJsonFactories
         private JsonWriterFactory writerFactory;
 
         @Override
-        public void initialize() throws Exception
+        public void initialize()
+            throws Exception
         {
-            JakartaJsonSettings settings = JakartaJsonSettings.orDefault( descriptor.metaInfo( JakartaJsonSettings.class ) );
+            JakartaJsonSettings settings = JakartaJsonSettings.orDefault(descriptor.metaInfo(JakartaJsonSettings.class));
 
             String jsonProviderClassName = settings.getJsonProviderClassName();
             JsonProvider jsonProvider;
-            if( jsonProviderClassName == null )
+            if(jsonProviderClassName == null)
             {
                 jsonProvider = JsonProvider.provider();
             }
@@ -127,25 +120,25 @@ public interface JakartaJsonFactories
             {
                 try
                 {
-                    Class<?> clazz = Class.forName( jsonProviderClassName );
+                    Class<?> clazz = Class.forName(jsonProviderClassName);
                     jsonProvider = (JsonProvider) clazz.getConstructor().newInstance();
                 }
-                catch( ClassNotFoundException ex )
+                catch(ClassNotFoundException ex)
                 {
-                    throw new JsonException( "Provider " + jsonProviderClassName + " not found", ex );
+                    throw new JsonException("Provider " + jsonProviderClassName + " not found", ex);
                 }
-                catch( Exception ex )
+                catch(Exception ex)
                 {
-                    throw new JsonException( "Provider " + jsonProviderClassName + " could not be instantiated", ex );
+                    throw new JsonException("Provider " + jsonProviderClassName + " could not be instantiated", ex);
                 }
             }
 
-            parserFactory = jsonProvider.createParserFactory( settings.getJsonParserProperties() );
-            readerFactory = jsonProvider.createReaderFactory( settings.getJsonParserProperties() );
+            parserFactory = jsonProvider.createParserFactory(settings.getJsonParserProperties());
+            readerFactory = jsonProvider.createReaderFactory(settings.getJsonParserProperties());
 
-            generatorFactory = jsonProvider.createGeneratorFactory( settings.getJsonGeneratorProperties() );
-            builderFactory = jsonProvider.createBuilderFactory( settings.getJsonGeneratorProperties() );
-            writerFactory = jsonProvider.createWriterFactory( settings.getJsonGeneratorProperties() );
+            generatorFactory = jsonProvider.createGeneratorFactory(settings.getJsonGeneratorProperties());
+            builderFactory = jsonProvider.createBuilderFactory(settings.getJsonGeneratorProperties());
+            writerFactory = jsonProvider.createWriterFactory(settings.getJsonGeneratorProperties());
         }
 
         @Override
@@ -179,74 +172,74 @@ public interface JakartaJsonFactories
         }
 
         @Override
-        public JsonString toJsonString( Object object )
+        public JsonString toJsonString(Object object)
         {
-            return builderFactory.createObjectBuilder().add( "value", object.toString() ).build()
-                                 .getJsonString( "value" );
+            return builderFactory.createObjectBuilder().add("value", object.toString()).build()
+                .getJsonString("value");
         }
 
         @Override
-        public JsonObjectBuilder cloneBuilder( JsonObject jsonObject )
+        public JsonObjectBuilder cloneBuilder(JsonObject jsonObject)
         {
             JsonObjectBuilder builder = builderFactory.createObjectBuilder();
-            for( String key : jsonObject.keySet() )
+            for(String key : jsonObject.keySet())
             {
-                builder.add( key, jsonObject.get( key ) );
+                builder.add(key, jsonObject.get(key));
             }
             return builder;
         }
 
         @Override
-        public JsonObjectBuilder cloneBuilderInclude( JsonObject jsonObject, String... keys )
+        public JsonObjectBuilder cloneBuilderInclude(JsonObject jsonObject, String... keys)
         {
-            List<String> includes = Arrays.asList( keys );
+            List<String> includes = Arrays.asList(keys);
             JsonObjectBuilder builder = builderFactory.createObjectBuilder();
-            for( String include : includes )
+            for(String include : includes)
             {
-                if( jsonObject.containsKey( include ) )
+                if(jsonObject.containsKey(include))
                 {
-                    builder.add( include, jsonObject.get( include ) );
+                    builder.add(include, jsonObject.get(include));
                 }
             }
             return builder;
         }
 
         @Override
-        public JsonObjectBuilder cloneBuilderExclude( JsonObject jsonObject, String... keys )
+        public JsonObjectBuilder cloneBuilderExclude(JsonObject jsonObject, String... keys)
         {
-            List<String> excludes = Arrays.asList( keys );
+            List<String> excludes = Arrays.asList(keys);
             JsonObjectBuilder builder = builderFactory.createObjectBuilder();
-            for( String key : jsonObject.keySet() )
+            for(String key : jsonObject.keySet())
             {
-                if( !excludes.contains( key ) )
+                if(!excludes.contains(key))
                 {
-                    builder.add( key, jsonObject.get( key ) );
+                    builder.add(key, jsonObject.get(key));
                 }
             }
             return builder;
         }
 
         @Override
-        public JsonArrayBuilder cloneBuilder( JsonArray jsonArray )
+        public JsonArrayBuilder cloneBuilder(JsonArray jsonArray)
         {
             JsonArrayBuilder builder = builderFactory.createArrayBuilder();
-            for( JsonValue entry : jsonArray )
+            for(JsonValue entry : jsonArray)
             {
-                builder.add( entry );
+                builder.add(entry);
             }
             return builder;
         }
 
         @Override
-        public JsonArrayBuilder cloneBuilderExclude( JsonArray jsonArray, JsonValue... values )
+        public JsonArrayBuilder cloneBuilderExclude(JsonArray jsonArray, JsonValue... values)
         {
-            List<JsonValue> excludes = Arrays.asList( values );
+            List<JsonValue> excludes = Arrays.asList(values);
             JsonArrayBuilder job = builderFactory.createArrayBuilder();
-            for( JsonValue entry : jsonArray )
+            for(JsonValue entry : jsonArray)
             {
-                if( !excludes.contains( entry ) )
+                if(!excludes.contains(entry))
                 {
-                    job.add( entry );
+                    job.add(entry);
                 }
             }
             return job;

@@ -20,11 +20,6 @@
 
 package org.qi4j.spi.entitystore;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
@@ -32,17 +27,23 @@ import org.qi4j.api.usecase.Usecase;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 /**
  * Entity versions state.
  */
-@Mixins( EntityStateVersions.EntityStateVersionsMixin.class )
+@Mixins(EntityStateVersions.EntityStateVersionsMixin.class)
 public interface EntityStateVersions
 {
-    void forgetVersions( Iterable<EntityState> states );
+    void forgetVersions(Iterable<EntityState> states);
 
-    void rememberVersion( EntityReference reference, String version );
+    void rememberVersion(EntityReference reference, String version);
 
-    void checkForConcurrentModification( Iterable<EntityState> loaded, Instant currentTime )
+    void checkForConcurrentModification(Iterable<EntityState> loaded, Instant currentTime)
         throws ConcurrentEntityStateModificationException;
 
     /**
@@ -57,55 +58,55 @@ public interface EntityStateVersions
         private final Map<EntityReference, String> versions = new WeakHashMap<>();
 
         @Override
-        public synchronized void forgetVersions( Iterable<EntityState> states )
+        public synchronized void forgetVersions(Iterable<EntityState> states)
         {
-            for( EntityState state : states )
+            for(EntityState state : states)
             {
-                versions.remove( state.entityReference() );
+                versions.remove(state.entityReference());
             }
         }
 
         @Override
-        public synchronized void rememberVersion( EntityReference reference, String version )
+        public synchronized void rememberVersion(EntityReference reference, String version)
         {
-            versions.put( reference, version );
+            versions.put(reference, version);
         }
 
         @Override
-        public synchronized void checkForConcurrentModification( Iterable<EntityState> loaded,
-                                                                 Instant currentTime
+        public synchronized void checkForConcurrentModification(Iterable<EntityState> loaded,
+                                                                Instant currentTime
         )
             throws ConcurrentEntityStateModificationException
         {
             List<EntityReference> changed = null;
-            for( EntityState entityState : loaded )
+            for(EntityState entityState : loaded)
             {
-                if( entityState.status().equals( EntityStatus.NEW ) )
+                if(entityState.status().equals(EntityStatus.NEW))
                 {
                     continue;
                 }
 
-                String storeVersion = versions.get( entityState.entityReference() );
-                if( storeVersion == null )
+                String storeVersion = versions.get(entityState.entityReference());
+                if(storeVersion == null)
                 {
-                    EntityStoreUnitOfWork unitOfWork = store.newUnitOfWork( entityState.entityDescriptor().module(), Usecase.DEFAULT, currentTime );
-                    storeVersion = unitOfWork.versionOf( entityState.entityReference() );
+                    EntityStoreUnitOfWork unitOfWork = store.newUnitOfWork(entityState.entityDescriptor().module(), Usecase.DEFAULT, currentTime);
+                    storeVersion = unitOfWork.versionOf(entityState.entityReference());
                     unitOfWork.discard();
                 }
 
-                if( !entityState.version().equals( storeVersion ) )
+                if(!entityState.version().equals(storeVersion))
                 {
-                    if( changed == null )
+                    if(changed == null)
                     {
                         changed = new ArrayList<>();
                     }
-                    changed.add( entityState.entityReference() );
+                    changed.add(entityState.entityReference());
                 }
             }
 
-            if( changed != null )
+            if(changed != null)
             {
-                throw new ConcurrentEntityStateModificationException( changed );
+                throw new ConcurrentEntityStateModificationException(changed);
             }
         }
     }

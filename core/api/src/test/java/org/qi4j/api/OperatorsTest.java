@@ -19,8 +19,7 @@
  */
 package org.qi4j.api;
 
-import java.util.Collections;
-import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.entity.EntityBuilder;
@@ -35,9 +34,9 @@ import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.SingletonAssembler;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.qi4j.test.EntityTestAssembler;
+
+import java.util.Collections;
+import java.util.function.Predicate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -53,12 +52,12 @@ public class OperatorsTest
     {
         SingletonAssembler assembler = new SingletonAssembler(
             module -> {
-                new EntityTestAssembler().assemble( module );
+                new EntityTestAssembler().assemble(module);
 
-                module.entities( TestEntity.class );
-                module.values( TestValue.class );
-                module.forMixin( TestEntity.class ).declareDefaults().foo().set( "Bar" );
-                module.forMixin( TestValue.class ).declareDefaults().bar().set( "Xyz" );
+                module.entities(TestEntity.class);
+                module.values(TestValue.class);
+                module.forMixin(TestEntity.class).declareDefaults().foo().set("Bar");
+                module.forMixin(TestValue.class).declareDefaults().bar().set("Xyz");
             }
         );
 
@@ -67,32 +66,32 @@ public class OperatorsTest
 
         try
         {
-            EntityBuilder<TestEntity> entityBuilder = uow.newEntityBuilder( TestEntity.class, StringIdentity.identityOf( "123" ) );
-            entityBuilder.instance().value().set( assembler.module().newValue( TestValue.class ) );
+            EntityBuilder<TestEntity> entityBuilder = uow.newEntityBuilder(TestEntity.class, StringIdentity.identityOf("123"));
+            entityBuilder.instance().value().set(assembler.module().newValue(TestValue.class));
             TestEntity testEntity = entityBuilder.newInstance();
 
             uow.complete();
             uow = uowf.newUnitOfWork();
 
-            Iterable<TestEntity> entities = Collections.singleton( testEntity = uow.get( testEntity ) );
+            Iterable<TestEntity> entities = Collections.singleton(testEntity = uow.get(testEntity));
 
-            QueryBuilder<TestEntity> builder = assembler.module().newQueryBuilder( TestEntity.class );
+            QueryBuilder<TestEntity> builder = assembler.module().newQueryBuilder(TestEntity.class);
 
             {
-                Predicate<Composite> where = QueryExpressions.eq( QueryExpressions.templateFor( TestEntity.class )
-                                                                          .foo(), "Bar" );
-                assertThat( where.test( testEntity ), is( true ) );
-                System.out.println( where );
+                Predicate<Composite> where = QueryExpressions.eq(QueryExpressions.templateFor(TestEntity.class)
+                    .foo(), "Bar");
+                assertThat(where.test(testEntity), is(true));
+                System.out.println(where);
             }
             {
-                Predicate<Composite> where = QueryExpressions.eq( QueryExpressions.templateFor( TestEntity.class )
-                                                                          .value()
-                                                                          .get()
-                                                                          .bar(), "Xyz" );
-                assertThat( where.test( testEntity ), is( true ) );
-                System.out.println( where );
+                Predicate<Composite> where = QueryExpressions.eq(QueryExpressions.templateFor(TestEntity.class)
+                    .value()
+                    .get()
+                    .bar(), "Xyz");
+                assertThat(where.test(testEntity), is(true));
+                System.out.println(where);
 
-                assertThat( builder.where( where ).newQuery( entities ).find().equals( testEntity ), is( true ) );
+                assertThat(builder.where(where).newQuery(entities).find().equals(testEntity), is(true));
             }
         }
         finally

@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.value;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.association.ManyAssociation;
@@ -38,7 +39,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -46,15 +46,15 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class ValueWithAssociationTest extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( SimpleName.class );
-        module.entities( DualFaced.class );
-        module.values( SimpleName.class );
-        module.values( DualFaced.class );
+        module.entities(SimpleName.class);
+        module.entities(DualFaced.class);
+        module.values(SimpleName.class);
+        module.values(DualFaced.class);
 
-        new EntityTestAssembler().assemble( module );
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
@@ -64,47 +64,47 @@ public class ValueWithAssociationTest extends AbstractQi4jTest
         Identity identity1;
         Identity identity2;
         DualFaced value;
-        try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            EntityBuilder<SimpleName> builder1 = uow.newEntityBuilder( SimpleName.class );
-            builder1.instance().name().set( "Niclas" );
+            EntityBuilder<SimpleName> builder1 = uow.newEntityBuilder(SimpleName.class);
+            builder1.instance().name().set("Niclas");
             SimpleName simpleEntity = builder1.newInstance();
             identity1 = simpleEntity.identity().get();
 
-            EntityBuilder<DualFaced> builder2 = uow.newEntityBuilder( DualFaced.class );
+            EntityBuilder<DualFaced> builder2 = uow.newEntityBuilder(DualFaced.class);
             DualFaced proto = builder2.instance();
-            proto.name().set( "Hedhman" );
-            proto.simple().set( simpleEntity );
-            proto.simples().add( simpleEntity );
-            proto.namedSimples().put( "niclas", simpleEntity );
+            proto.name().set("Hedhman");
+            proto.simple().set(simpleEntity);
+            proto.simples().add(simpleEntity);
+            proto.namedSimples().put("niclas", simpleEntity);
             DualFaced faced = builder2.newInstance();
             identity2 = faced.identity().get();
-            value = uow.toValue( DualFaced.class, faced );
-            assertThat( value.identity().get(), equalTo( identity2 ) );
+            value = uow.toValue(DualFaced.class, faced);
+            assertThat(value.identity().get(), equalTo(identity2));
             uow.complete();
         }
 
-        try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            DualFaced entity = uow.get( DualFaced.class, identity2 );
-            AssociationStateHolder holder = spi.stateOf( (EntityComposite) entity );
+            DualFaced entity = uow.get(DualFaced.class, identity2);
+            AssociationStateHolder holder = spi.stateOf((EntityComposite) entity);
             Association<?> simple = holder.allAssociations().iterator().next();
             ManyAssociation<?> simples = holder.allManyAssociations().iterator().next();
             NamedAssociation<?> namedSimples = holder.allNamedAssociations().iterator().next();
 
-            assertThat( spi.entityReferenceOf( simple ), equalTo( EntityReference.create( identity1 ) ) );
-            assertThat( spi.entityReferencesOf( simples )
-                            .iterator()
-                            .next(), equalTo( EntityReference.create( identity1 ) ) );
-            assertThat( spi.entityReferencesOf( namedSimples )
-                            .iterator()
-                            .next()
-                            .getValue(), equalTo( EntityReference.create( identity1 ) ) );
+            assertThat(spi.entityReferenceOf(simple), equalTo(EntityReference.create(identity1)));
+            assertThat(spi.entityReferencesOf(simples)
+                .iterator()
+                .next(), equalTo(EntityReference.create(identity1)));
+            assertThat(spi.entityReferencesOf(namedSimples)
+                .iterator()
+                .next()
+                .getValue(), equalTo(EntityReference.create(identity1)));
 
-            DualFaced resurrected = uow.toEntity( DualFaced.class, value );
-            assertThat( resurrected.simple(), equalTo( entity.simple() ) );
-            assertThat( resurrected.simples(), equalTo( entity.simples() ) );
-            assertThat( resurrected.namedSimples(), equalTo( entity.namedSimples() ) );
+            DualFaced resurrected = uow.toEntity(DualFaced.class, value);
+            assertThat(resurrected.simple(), equalTo(entity.simple()));
+            assertThat(resurrected.simples(), equalTo(entity.simples()));
+            assertThat(resurrected.namedSimples(), equalTo(entity.namedSimples()));
         }
     }
 
@@ -112,22 +112,22 @@ public class ValueWithAssociationTest extends AbstractQi4jTest
     public void givenNewValueWhenConvertingToEntityExpectNewEntityInStore()
         throws UnitOfWorkCompletionException
     {
-        ValueBuilder<DualFaced> builder = valueBuilderFactory.newValueBuilder( DualFaced.class );
-        builder.prototype().identity().set( StringIdentity.identityOf( "1234" ) );
-        builder.prototype().name().set( "Hedhman" );
+        ValueBuilder<DualFaced> builder = valueBuilderFactory.newValueBuilder(DualFaced.class);
+        builder.prototype().identity().set(StringIdentity.identityOf("1234"));
+        builder.prototype().name().set("Hedhman");
         DualFaced value = builder.newInstance();
 
-        try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            uow.toEntity( DualFaced.class, value );
+            uow.toEntity(DualFaced.class, value);
             uow.complete();
         }
 
-        try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            DualFaced entity = uow.get( DualFaced.class, StringIdentity.identityOf( "1234" ) );
-            assertThat( entity.identity().get(), equalTo( StringIdentity.identityOf( "1234" ) ) );
-            assertThat( entity.name().get(), equalTo( "Hedhman" ) );
+            DualFaced entity = uow.get(DualFaced.class, StringIdentity.identityOf("1234"));
+            assertThat(entity.identity().get(), equalTo(StringIdentity.identityOf("1234")));
+            assertThat(entity.name().get(), equalTo("Hedhman"));
             uow.complete();
         }
     }
@@ -138,47 +138,47 @@ public class ValueWithAssociationTest extends AbstractQi4jTest
     {
         Identity identity1;
         Identity identity2;
-        try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            EntityBuilder<SimpleName> builder1 = uow.newEntityBuilder( SimpleName.class );
-            builder1.instance().name().set( "Niclas" );
+            EntityBuilder<SimpleName> builder1 = uow.newEntityBuilder(SimpleName.class);
+            builder1.instance().name().set("Niclas");
             SimpleName simpleEntity = builder1.newInstance();
             identity1 = simpleEntity.identity().get();
 
-            EntityBuilder<DualFaced> builder2 = uow.newEntityBuilder( DualFaced.class );
+            EntityBuilder<DualFaced> builder2 = uow.newEntityBuilder(DualFaced.class);
             DualFaced proto = builder2.instance();
-            proto.name().set( "Hedhman" );
-            proto.simple().set( simpleEntity );
-            proto.simples().add( simpleEntity );
-            proto.namedSimples().put( "niclas", simpleEntity );
+            proto.name().set("Hedhman");
+            proto.simple().set(simpleEntity);
+            proto.simples().add(simpleEntity);
+            proto.namedSimples().put("niclas", simpleEntity);
             DualFaced faced = builder2.newInstance();
             identity2 = faced.identity().get();
             uow.complete();
         }
-        ValueBuilder<SimpleName> vb1 = valueBuilderFactory.newValueBuilder( SimpleName.class );
-        vb1.prototype().identity().set( identity1 );
-        vb1.prototype().name().set( "Paul" );
+        ValueBuilder<SimpleName> vb1 = valueBuilderFactory.newValueBuilder(SimpleName.class);
+        vb1.prototype().identity().set(identity1);
+        vb1.prototype().name().set("Paul");
         SimpleName simpleValue = vb1.newInstance();
 
-        ValueBuilder<DualFaced> vb2 = valueBuilderFactory.newValueBuilder( DualFaced.class );
-        vb2.prototype().identity().set( identity2 );
-        vb2.prototype().name().set( "Merlin" );
-        vb2.prototype().simple().set( simpleValue );
-        vb2.prototype().simples().add( simpleValue );
-        vb2.prototype().namedSimples().put( "paul", simpleValue );
+        ValueBuilder<DualFaced> vb2 = valueBuilderFactory.newValueBuilder(DualFaced.class);
+        vb2.prototype().identity().set(identity2);
+        vb2.prototype().name().set("Merlin");
+        vb2.prototype().simple().set(simpleValue);
+        vb2.prototype().simples().add(simpleValue);
+        vb2.prototype().namedSimples().put("paul", simpleValue);
         DualFaced dualValue = vb2.newInstance();
 
-        try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            DualFaced dualEntity = uow.toEntity( DualFaced.class, dualValue );
+            DualFaced dualEntity = uow.toEntity(DualFaced.class, dualValue);
             // The root entity is expected to have changed value,
-            assertThat( dualEntity.name().get(), equalTo( "Merlin" ) );
+            assertThat(dualEntity.name().get(), equalTo("Merlin"));
             // But the referenced entity is not updated, only using the EntityReference, which still points to "Niclas",
             // even though the value contains "Paul" for that entity. That entity needds to be updated separately
-            assertThat( dualEntity.simple().get().name().get(), equalTo( "Niclas" ) );
-            assertThat( dualEntity.simples().get(0).name().get(), equalTo( "Niclas" ) );
-            assertThat( dualEntity.namedSimples().get("paul").name().get(), equalTo( "Niclas" ) );
-            assertThat( dualEntity.namedSimples().get("niclas"), equalTo( null ) );
+            assertThat(dualEntity.simple().get().name().get(), equalTo("Niclas"));
+            assertThat(dualEntity.simples().get(0).name().get(), equalTo("Niclas"));
+            assertThat(dualEntity.namedSimples().get("paul").name().get(), equalTo("Niclas"));
+            assertThat(dualEntity.namedSimples().get("niclas"), equalTo(null));
         }
     }
 

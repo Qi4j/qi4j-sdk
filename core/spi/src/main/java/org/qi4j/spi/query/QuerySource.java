@@ -19,39 +19,40 @@
  */
 package org.qi4j.spi.query;
 
+import org.qi4j.api.composite.Composite;
+import org.qi4j.api.query.grammar.OrderBy;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.query.grammar.OrderBy;
 
 /**
  * Query Source, used in QueryBuilder SPI.
  */
 public interface QuerySource
 {
-    <T> T find( Class<T> resultType,
-                Predicate<Composite> whereClause,
-                List<OrderBy> orderBySegments,
-                Integer firstResult,
-                Integer maxResults,
-                Map<String, Object> variables
+    <T> T find(Class<T> resultType,
+               Predicate<Composite> whereClause,
+               List<OrderBy> orderBySegments,
+               Integer firstResult,
+               Integer maxResults,
+               Map<String, Object> variables
     );
 
-    <T> long count( Class<T> resultType,
-                    Predicate<Composite> whereClause,
-                    List<OrderBy> orderBySegments,
-                    Integer firstResult,
-                    Integer maxResults,
-                    Map<String, Object> variables
+    <T> long count(Class<T> resultType,
+                   Predicate<Composite> whereClause,
+                   List<OrderBy> orderBySegments,
+                   Integer firstResult,
+                   Integer maxResults,
+                   Map<String, Object> variables
     );
 
-    <T> Stream<T> stream( Class<T> resultType,
-                          Predicate<Composite> whereClause,
-                          List<OrderBy> orderBySegments,
-                          Integer firstResult,
-                          Integer maxResults,
-                          Map<String, Object> variables
+    <T> Stream<T> stream(Class<T> resultType,
+                         Predicate<Composite> whereClause,
+                         List<OrderBy> orderBySegments,
+                         Integer firstResult,
+                         Integer maxResults,
+                         Map<String, Object> variables
     );
 }

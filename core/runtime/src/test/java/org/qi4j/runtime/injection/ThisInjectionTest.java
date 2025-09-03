@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.concern.ConcernOf;
@@ -32,7 +33,6 @@ import org.qi4j.api.sideeffect.SideEffects;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -42,14 +42,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test the @This annotation
  */
 public class ThisInjectionTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
     public static boolean sideEffectInjected;
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestComposite.class );
+        module.transients(TestComposite.class);
     }
 
     /**
@@ -61,9 +61,9 @@ public class ThisInjectionTest
     public void givenCompositeWithThisInjectionsWhenInstantiatedThenCompositeIsInjected()
         throws Exception
     {
-        TestComposite testComposite = transientBuilderFactory.newTransient( TestComposite.class );
+        TestComposite testComposite = transientBuilderFactory.newTransient(TestComposite.class);
 
-        assertThat( "Injection worked", testComposite.isInjected() && sideEffectInjected, is( equalTo( true ) ) );
+        assertThat("Injection worked", testComposite.isInjected() && sideEffectInjected, is(equalTo(true)));
     }
 
     public interface TestType
@@ -79,9 +79,9 @@ public class ThisInjectionTest
         Property<Boolean> testPrivate();
     }
 
-    @SideEffects( TestSideEffect.class )
-    @Concerns( TestConcern.class )
-    @Mixins( TestMixin.class )
+    @SideEffects(TestSideEffect.class)
+    @Concerns(TestConcern.class)
+    @Mixins(TestMixin.class)
     public interface TestComposite
         extends TransientComposite, TestType
     {
@@ -119,9 +119,9 @@ public class ThisInjectionTest
 
         public boolean isInjected()
         {
-            return test != null && test.test().equals( "Foo" ) &&
-                   !testPrivate.testPrivate().get() &&
-                   next.isInjected();
+            return test != null && test.test().equals("Foo") &&
+                !testPrivate.testPrivate().get() &&
+                next.isInjected();
         }
     }
 

@@ -32,9 +32,9 @@ public class EntityCompositeAlreadyExistsException
 
     private final EntityReference reference;
 
-    public EntityCompositeAlreadyExistsException( EntityReference reference)
+    public EntityCompositeAlreadyExistsException(EntityReference reference)
     {
-        super( "EntityComposite (" + reference + ") already exists." );
+        super("EntityComposite (" + reference + ") already exists.");
         this.reference = reference;
     }
 

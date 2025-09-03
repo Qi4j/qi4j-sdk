@@ -26,11 +26,11 @@ import org.qi4j.bootstrap.layered.LayeredLayerAssembler;
 class DomainLayer extends LayeredLayerAssembler
 {
     @Override
-    public LayerAssembly assemble( LayerAssembly layer )
+    public LayerAssembly assemble(LayerAssembly layer)
     {
-        createModule( layer, PetShopModule.class );
-        createModule( layer, FamilyModule.class );
-        createModule( layer, AccountModule.class );
+        createModule(layer, PetShopModule.class);
+        createModule(layer, FamilyModule.class);
+        createModule(layer, AccountModule.class);
         return layer;
     }
 }

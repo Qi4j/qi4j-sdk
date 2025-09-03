@@ -20,12 +20,9 @@
 
 package org.qi4j.api.sideeffect.internal;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import org.qi4j.api.injection.InjectionScope;
+
+import java.lang.annotation.*;
 
 /**
  * This annotation is required once in each SideEffect, to mark the
@@ -61,7 +58,7 @@ import org.qi4j.api.injection.InjectionScope;
  * </code></pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Documented
 @InjectionScope
 public @interface SideEffectFor

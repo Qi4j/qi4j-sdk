@@ -31,18 +31,18 @@ public class UnitOfWorkException
     {
     }
 
-    public UnitOfWorkException( String message )
+    public UnitOfWorkException(String message)
     {
-        super( message );
+        super(message);
     }
 
-    public UnitOfWorkException( String message, Throwable cause )
+    public UnitOfWorkException(String message, Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 
-    public UnitOfWorkException( Throwable cause )
+    public UnitOfWorkException(Throwable cause)
     {
-        super( cause );
+        super(cause);
     }
 }

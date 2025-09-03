@@ -20,6 +20,8 @@
 
 package org.qi4j.test;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ApplicationDescriptor;
@@ -31,8 +33,6 @@ import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.spi.Qi4jSPI;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 
 /**
  * Base class for Qi4j scenario tests. This will create one Qi4j application per class instead of per test.
@@ -58,18 +58,18 @@ public abstract class AbstractQi4jScenarioTest
     {
         qi4j = new Energy4Java();
         applicationModel = newApplication();
-        if( applicationModel == null )
+        if(applicationModel == null)
         {
             // An AssemblyException has occurred that the Test wants to check for.
             return;
         }
-        application = applicationModel.newInstance( qi4j.spi() );
-        initApplication( application );
+        application = applicationModel.newInstance(qi4j.spi());
+        initApplication(application);
         api = spi = qi4j.spi();
         application.activate();
 
         // Assume only one module
-        module = application.findModule( "Layer 1", "Module 1" );
+        module = application.findModule("Layer 1", "Module 1");
         uowf = module.unitOfWorkFactory();
     }
 
@@ -78,14 +78,14 @@ public abstract class AbstractQi4jScenarioTest
     {
         final Assembler asm = assembler;
 
-        ApplicationAssembler assembler = applicationFactory -> applicationFactory.newApplicationAssembly( asm );
+        ApplicationAssembler assembler = applicationFactory -> applicationFactory.newApplicationAssembly(asm);
         try
         {
-            return qi4j.newApplicationModel( assembler );
+            return qi4j.newApplicationModel(assembler);
         }
-        catch( AssemblyException e )
+        catch(AssemblyException e)
         {
-            assemblyException( e );
+            assemblyException(e);
             return null;
         }
     }
@@ -97,16 +97,15 @@ public abstract class AbstractQi4jScenarioTest
      * </p>
      *
      * @param exception the exception thrown.
-     *
      * @throws AssemblyException The default implementation of this method will simply re-throw the exception.
      */
-    static protected void assemblyException( AssemblyException exception )
+    static protected void assemblyException(AssemblyException exception)
         throws AssemblyException
     {
         throw exception;
     }
 
-    static protected void initApplication( Application app )
+    static protected void initApplication(Application app)
         throws Exception
     {
     }
@@ -115,26 +114,26 @@ public abstract class AbstractQi4jScenarioTest
     public void tearDown()
         throws Exception
     {
-        if( uowf != null && uowf.isUnitOfWorkActive() )
+        if(uowf != null && uowf.isUnitOfWorkActive())
         {
-            while( uowf.isUnitOfWorkActive() )
+            while(uowf.isUnitOfWorkActive())
             {
                 UnitOfWork uow = uowf.currentUnitOfWork();
-                if( uow.isOpen() )
+                if(uow.isOpen())
                 {
                     uow.discard();
                 }
                 else
                 {
-                    throw new InternalError( "I have seen a case where a UoW is on the stack, but not opened. First is" + uow
+                    throw new InternalError("I have seen a case where a UoW is on the stack, but not opened. First is" + uow
                         .usecase()
-                        .name() );
+                        .name());
                 }
             }
-            new Exception( "UnitOfWork not properly cleaned up" ).printStackTrace();
+            new Exception("UnitOfWork not properly cleaned up").printStackTrace();
         }
 
-        if( application != null )
+        if(application != null)
         {
             application.passivate();
         }

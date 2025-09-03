@@ -19,15 +19,16 @@
  */
 package org.qi4j.test.cache;
 
-import java.util.Collection;
-import java.util.Random;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.constraint.ValueConstraintViolation;
 import org.qi4j.spi.cache.Cache;
 import org.qi4j.spi.cache.CachePool;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import java.util.Collection;
+import java.util.Random;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.AnyOf.anyOf;
@@ -50,8 +51,8 @@ public abstract class AbstractCachePoolTest
         throws Exception
     {
         super.setUp();
-        cachePool = module.instance().findService( CachePool.class ).get();
-        cache = cachePool.fetchCache( "1", String.class );
+        cachePool = module.instance().findService(CachePool.class).get();
+        cache = cachePool.fetchCache("1", String.class);
     }
 
     @Test
@@ -59,10 +60,10 @@ public abstract class AbstractCachePoolTest
     {
         try
         {
-            cache = cachePool.fetchCache( "", String.class );
-            fail( "Expected " + IllegalArgumentException.class.getSimpleName() );
+            cache = cachePool.fetchCache("", String.class);
+            fail("Expected " + IllegalArgumentException.class.getSimpleName());
         }
-        catch( IllegalArgumentException e )
+        catch(IllegalArgumentException e)
         {
             // expected
         }
@@ -73,17 +74,17 @@ public abstract class AbstractCachePoolTest
     {
         try
         {
-            cache = cachePool.fetchCache( null, String.class );
-            fail( "Expected " + ConstraintViolationException.class.getSimpleName() );
+            cache = cachePool.fetchCache(null, String.class);
+            fail("Expected " + ConstraintViolationException.class.getSimpleName());
         }
-        catch( ConstraintViolationException e )
+        catch(ConstraintViolationException e)
         {
             // expected
             Collection<ValueConstraintViolation> violations = e.constraintViolations();
-            assertThat( violations.size(), equalTo( 1 ) );
+            assertThat(violations.size(), equalTo(1));
             ValueConstraintViolation violation = violations.iterator().next();
-            assertThat( violation.constraint().toString(), equalTo( "not optional" ) );
-            assertThat( violation.name(), anyOf( equalTo( "cacheId" ), equalTo( "arg0" ) ) );  // depends on whether -parameters was given at compile time.
+            assertThat(violation.constraint().toString(), equalTo("not optional"));
+            assertThat(violation.name(), anyOf(equalTo("cacheId"), equalTo("arg0")));  // depends on whether -parameters was given at compile time.
         }
     }
 
@@ -92,42 +93,42 @@ public abstract class AbstractCachePoolTest
     {
         Random random = new Random();
         StringBuilder longName = new StringBuilder();
-        for( int i = 0; i < 10000; i++ )
+        for(int i = 0; i < 10000; i++)
         {
-            longName.append( (char) ( random.nextInt( 26 ) + 65 ) );
+            longName.append((char) (random.nextInt(26) + 65));
         }
-        cache = cachePool.fetchCache( longName.toString(), String.class );
+        cache = cachePool.fetchCache(longName.toString(), String.class);
     }
 
     @Test
     public void givenEmptyCacheWhenFetchingValueExpectNull()
     {
-        assertThat( cache.get( "1" ), nullValue() );
+        assertThat(cache.get("1"), nullValue());
     }
 
     @Test
     public void givenCacheWithAValueWhenRequestingThatValueExpectItBack()
     {
-        cache.put( "Habba", "Zout" );
-        assertThat( cache.get( "Habba" ), equalTo( "Zout" ) );
+        cache.put("Habba", "Zout");
+        assertThat(cache.get("Habba"), equalTo("Zout"));
     }
 
     @Test
     public void givenCacheWithAValueWhenReplacingValueExpectNewValue()
     {
-        cache.put( "Habba", "Zout" );
-        assertThat( cache.get( "Habba" ), equalTo( "Zout" ) );
-        cache.put( "Habba", "Zout2" );
-        assertThat( cache.get( "Habba" ), equalTo( "Zout2" ) );
+        cache.put("Habba", "Zout");
+        assertThat(cache.get("Habba"), equalTo("Zout"));
+        cache.put("Habba", "Zout2");
+        assertThat(cache.get("Habba"), equalTo("Zout2"));
     }
 
     @Test
     public void givenCacheWithValueWhenDroppingReferenceAndRequestNewCacheAndItsValueExpectItToBeGone()
     {
-        cache.put( "Habba", "Zout" );
-        assertThat( cache.get( "Habba" ), equalTo( "Zout" ) );
-        cachePool.returnCache( cache );
-        cache = cachePool.fetchCache( "1", String.class );
-        assertThat( "Value not missing", cache.get( "Habba" ), nullValue() );
+        cache.put("Habba", "Zout");
+        assertThat(cache.get("Habba"), equalTo("Zout"));
+        cachePool.returnCache(cache);
+        cache = cachePool.fetchCache("1", String.class);
+        assertThat("Value not missing", cache.get("Habba"), nullValue());
     }
 }

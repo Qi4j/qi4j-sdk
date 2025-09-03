@@ -20,11 +20,12 @@
 
 package org.qi4j.api.unitofwork;
 
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.type.HasTypes;
 import org.qi4j.api.usecase.Usecase;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This exception is thrown by UnitOfWork.complete() if any entities that are being committed
@@ -34,28 +35,28 @@ public class ConcurrentEntityModificationException
     extends UnitOfWorkCompletionException
 {
     private static final long serialVersionUID = 3872723845064767689L;
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
 
     private final Map<EntityComposite, HasTypes> concurrentlyModifiedEntities;
 
-    public ConcurrentEntityModificationException( Map<EntityComposite, HasTypes> concurrentlyModifiedEntities,
-                                                  Usecase usecase
+    public ConcurrentEntityModificationException(Map<EntityComposite, HasTypes> concurrentlyModifiedEntities,
+                                                 Usecase usecase
     )
     {
-        super( "Entities changed concurrently, and detected in usecase '" + usecase + "'" + NL + "Modified entities : " + format( concurrentlyModifiedEntities ) );
+        super("Entities changed concurrently, and detected in usecase '" + usecase + "'" + NL + "Modified entities : " + format(concurrentlyModifiedEntities));
         this.concurrentlyModifiedEntities = concurrentlyModifiedEntities;
     }
 
-    private static String format( Map<EntityComposite, HasTypes> concurrentlyModifiedEntities )
+    private static String format(Map<EntityComposite, HasTypes> concurrentlyModifiedEntities)
     {
         return concurrentlyModifiedEntities.entrySet().stream()
-            .map( entry ->
-                      entry.getKey()
-                      + " : "
-                      + entry.getValue().types().map( Class::getSimpleName )
-                          .collect( Collectors.joining( "," ) )
+            .map(entry ->
+                entry.getKey()
+                    + " : "
+                    + entry.getValue().types().map(Class::getSimpleName)
+                    .collect(Collectors.joining(","))
             )
-            .collect( Collectors.joining( NL ) );
+            .collect(Collectors.joining(NL));
     }
 
     public Map<EntityComposite, HasTypes> concurrentlyModifiedEntities()

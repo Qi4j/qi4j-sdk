@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.query;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.Queryable;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.QueryBuilder;
@@ -27,16 +28,15 @@ import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.qi4j.api.query.QueryExpressions.eq;
 import static org.qi4j.api.query.QueryExpressions.templateFor;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class NonQueryableTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
         module.defaultServices();
@@ -48,12 +48,12 @@ public class NonQueryableTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            QueryBuilder<Abc> builder = queryBuilderFactory.newQueryBuilder( Abc.class );
-            Abc proto = templateFor( Abc.class );
-            builder.where( eq( proto.isValid(), Boolean.TRUE ) );
-            fail( "Exception was expected." );
+            QueryBuilder<Abc> builder = queryBuilderFactory.newQueryBuilder(Abc.class);
+            Abc proto = templateFor(Abc.class);
+            builder.where(eq(proto.isValid(), Boolean.TRUE));
+            fail("Exception was expected.");
         }
-        catch( QueryException e )
+        catch(QueryException e)
         {
             // expected!!
         }
@@ -69,10 +69,10 @@ public class NonQueryableTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            queryBuilderFactory.newQueryBuilder( Abc2.class );
-            fail( "Exception was expected." );
+            queryBuilderFactory.newQueryBuilder(Abc2.class);
+            fail("Exception was expected.");
         }
-        catch( QueryException e )
+        catch(QueryException e)
         {
             // expected!!
         }
@@ -84,11 +84,11 @@ public class NonQueryableTest
 
     interface Abc
     {
-        @Queryable( false )
+        @Queryable(false)
         Property<Boolean> isValid();
     }
 
-    @Queryable( false )
+    @Queryable(false)
     public interface Abc2
     {
         Property<Boolean> isValid();

@@ -25,8 +25,6 @@ import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.runtime.bootstrap.AssemblyHelper;
 import org.qi4j.runtime.composite.FragmentClassLoader;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.Energy4Java;
 
 public class DocumentationSupport
 {
@@ -35,19 +33,19 @@ public class DocumentationSupport
 
     private static Application application;
 
-    public static void main( String[] args )
+    public static void main(String[] args)
         throws Exception
     {
         // Create a Qi4j Runtime
         qi4j = new Energy4Java();
         // Create the application
-        application = qi4j.newApplication( factory -> {
+        application = qi4j.newApplication(factory -> {
             ApplicationAssembly assembly = factory.newApplicationAssembly();
-            assembly.setMetaInfo( new DalvikAssemblyHelper() );
+            assembly.setMetaInfo(new DalvikAssemblyHelper());
             // END SNIPPET: customAssemblyHelper
             // START SNIPPET: customAssemblyHelper
             return assembly;
-        } );
+        });
         // Activate the application
         application.activate();
     }
@@ -55,18 +53,18 @@ public class DocumentationSupport
     public static class DalvikAssemblyHelper extends AssemblyHelper
     {
         @Override
-        protected FragmentClassLoader instantiateFragmentClassLoader( ClassLoader parent )
+        protected FragmentClassLoader instantiateFragmentClassLoader(ClassLoader parent)
         {
-            return new DalvikFragmentClassLoader( parent );
+            return new DalvikFragmentClassLoader(parent);
         }
     }
 
     public static class DalvikFragmentClassLoader extends FragmentClassLoader
     {
 
-        public DalvikFragmentClassLoader( ClassLoader parent )
+        public DalvikFragmentClassLoader(ClassLoader parent)
         {
-            super( parent );
+            super(parent);
         }
     }
     // END SNIPPET: customAssemblyHelper

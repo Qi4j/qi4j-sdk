@@ -19,14 +19,6 @@
  */
 package org.qi4j.entitystore.memory;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
@@ -38,7 +30,11 @@ import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.entitystore.helpers.JSONKeys;
 import org.qi4j.spi.entitystore.helpers.MapEntityStore;
 import org.qi4j.spi.entitystore.helpers.MapEntityStoreActivation;
-import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * In-memory implementation of MapEntityStore.
@@ -57,35 +53,40 @@ public class MemoryMapEntityStoreMixin
     }
 
     @Override
-    public void activateMapEntityStore() {}
-
-    public boolean contains( EntityReference entityReference, EntityDescriptor descriptor ) throws EntityStoreException
+    public void activateMapEntityStore()
     {
-        return store.containsKey( entityReference );
+    }
+
+    public boolean contains(EntityReference entityReference, EntityDescriptor descriptor)
+        throws EntityStoreException
+    {
+        return store.containsKey(entityReference);
     }
 
     @Override
-    public Reader get( EntityReference entityReference ) throws EntityStoreException
+    public Reader get(EntityReference entityReference)
+        throws EntityStoreException
     {
-        String state = store.get( entityReference );
-        if( state == null )
+        String state = store.get(entityReference);
+        if(state == null)
         {
-            throw new EntityNotFoundException( entityReference );
+            throw new EntityNotFoundException(entityReference);
         }
 
-        return new StringReader( state );
+        return new StringReader(state);
     }
 
     @Override
-    public void applyChanges( MapEntityStore.MapChanges changes ) throws Exception
+    public void applyChanges(MapEntityStore.MapChanges changes)
+        throws Exception
     {
-        changes.visitMap( new MemoryMapChanger() );
+        changes.visitMap(new MemoryMapChanger());
     }
 
     @Override
     public Stream<Reader> entityStates()
     {
-        return store.values().stream().map( StringReader::new );
+        return store.values().stream().map(StringReader::new);
     }
 
     @Override
@@ -95,46 +96,46 @@ public class MemoryMapEntityStoreMixin
     }
 
     @Override
-    public void restore( Stream<String> stream )
+    public void restore(Stream<String> stream)
     {
         store.clear();
         stream.forEach(
             item ->
             {
-                String id = jsonFactories.readerFactory().createReader( new StringReader( item ) )
-                                         .readObject().getString( JSONKeys.IDENTITY );
-                store.put( EntityReference.parseEntityReference( id ), item );
-            } );
+                String id = jsonFactories.readerFactory().createReader(new StringReader(item))
+                    .readObject().getString(JSONKeys.IDENTITY);
+                store.put(EntityReference.parseEntityReference(id), item);
+            });
     }
 
     private class MemoryMapChanger
         implements MapChanger
     {
         @Override
-        public Writer newEntity( EntityReference ref, EntityDescriptor descriptor )
+        public Writer newEntity(EntityReference ref, EntityDescriptor descriptor)
         {
-            return new StringWriter( 1000 )
+            return new StringWriter(1000)
             {
                 @Override
                 public void close()
                     throws IOException
                 {
                     super.close();
-                    String old = store.put( ref, toString() );
-                    if( old != null )
+                    String old = store.put(ref, toString());
+                    if(old != null)
                     {
-                        store.put( ref, old );
-                        throw new EntityAlreadyExistsException( ref );
+                        store.put(ref, old);
+                        throw new EntityAlreadyExistsException(ref);
                     }
                 }
             };
         }
 
         @Override
-        public Writer updateEntity( MapChange mapChange )
+        public Writer updateEntity(MapChange mapChange)
             throws IOException
         {
-            return new StringWriter( 1000 )
+            return new StringWriter(1000)
             {
                 @Override
                 public void close()
@@ -142,21 +143,21 @@ public class MemoryMapEntityStoreMixin
                 {
                     super.close();
                     EntityReference reference = mapChange.reference();
-                    String old = store.put( reference, toString() );
-                    if( old == null )
+                    String old = store.put(reference, toString());
+                    if(old == null)
                     {
-                        store.remove( reference );
-                        throw new EntityNotFoundException( reference );
+                        store.remove(reference);
+                        throw new EntityNotFoundException(reference);
                     }
                 }
             };
         }
 
         @Override
-        public void removeEntity( EntityReference ref, EntityDescriptor descriptor )
+        public void removeEntity(EntityReference ref, EntityDescriptor descriptor)
             throws EntityNotFoundException
         {
-            String state = store.remove( ref );
+            String state = store.remove(ref);
             // Ignore if the entity didn't already exist, as that can happen if it is both created and removed
             // within the same UnitOfWork.
 //            if( state == null )

@@ -30,15 +30,15 @@ public class TestExecutionModule
 {
     private final Class<?> testClass;
 
-    public TestExecutionModule( Class<?> testClass)
+    public TestExecutionModule(Class<?> testClass)
     {
         this.testClass = testClass;
     }
 
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
     {
-        module.objects( testClass ).visibleIn( Visibility.layer );
+        module.objects(testClass).visibleIn(Visibility.layer);
         return module;
     }
 }

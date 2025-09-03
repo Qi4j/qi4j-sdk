@@ -25,9 +25,9 @@ package org.qi4j.api.query;
 public class QueryExpressionException
     extends QueryException
 {
-    public QueryExpressionException( String message )
+    public QueryExpressionException(String message)
     {
-        super( message );
+        super(message);
     }
 
 }

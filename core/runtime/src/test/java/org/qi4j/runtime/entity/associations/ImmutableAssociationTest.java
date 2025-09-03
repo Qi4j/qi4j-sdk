@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.entity.associations;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.Optional;
@@ -31,7 +32,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -41,11 +41,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ImmutableAssociationTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( PersonEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(PersonEntity.class);
     }
 
     @Test
@@ -55,11 +55,11 @@ public class ImmutableAssociationTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            PersonEntity father = unitOfWork.newEntity( PersonEntity.class );
+            PersonEntity father = unitOfWork.newEntity(PersonEntity.class);
 
-            EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+            EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder(PersonEntity.class);
             PersonEntity instance = builder.instance();
-            instance.father().set( father );
+            instance.father().set(father);
             PersonEntity child = builder.newInstance();
         }
         finally
@@ -72,19 +72,19 @@ public class ImmutableAssociationTest
     public void givenEntityWithImmutableAssociationWhenChangingValueThenThrowException()
         throws Exception
     {
-        assertThrows( IllegalStateException.class, () -> {
+        assertThrows(IllegalStateException.class, () -> {
             UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
             try
             {
-                EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+                EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder(PersonEntity.class);
                 PersonEntity father = builder.instance();
                 father = builder.newInstance();
 
-                builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+                builder = unitOfWork.newEntityBuilder(PersonEntity.class);
                 PersonEntity child = builder.instance();
                 child = builder.newInstance();
 
-                child.father().set( father );
+                child.father().set(father);
 
                 unitOfWork.complete();
             }
@@ -92,7 +92,7 @@ public class ImmutableAssociationTest
             {
                 unitOfWork.discard();
             }
-        } );
+        });
     }
 
     @Test
@@ -102,13 +102,13 @@ public class ImmutableAssociationTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+            EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder(PersonEntity.class);
             PersonEntity person1 = builder.instance();
             person1 = builder.newInstance();
 
-            builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+            builder = unitOfWork.newEntityBuilder(PersonEntity.class);
             PersonEntity person2 = builder.instance();
-            person2.colleagues().add( 0, person1 );
+            person2.colleagues().add(0, person1);
             person2 = builder.newInstance();
         }
         finally
@@ -121,19 +121,19 @@ public class ImmutableAssociationTest
     public void givenEntityWithImmutableManyAssociationWhenChangingValueThenThrowException()
         throws Exception
     {
-        assertThrows( IllegalStateException.class, () -> {
+        assertThrows(IllegalStateException.class, () -> {
             UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
             try
             {
-                EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+                EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder(PersonEntity.class);
                 PersonEntity person1 = builder.instance();
                 person1 = builder.newInstance();
 
-                builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+                builder = unitOfWork.newEntityBuilder(PersonEntity.class);
                 PersonEntity person2 = builder.instance();
                 person2 = builder.newInstance();
 
-                person1.colleagues().add( 0, person2 );
+                person1.colleagues().add(0, person2);
 
                 unitOfWork.complete();
             }
@@ -141,7 +141,7 @@ public class ImmutableAssociationTest
             {
                 unitOfWork.discard();
             }
-        } );
+        });
     }
 
     interface PersonEntity

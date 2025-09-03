@@ -23,14 +23,13 @@ package org.qi4j.test.model.assembly;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.layered.LayeredLayerAssembler;
 import org.qi4j.test.indexing.layered.AbstractMultiLayeredIndexingTest;
-import org.qi4j.test.indexing.layered.AbstractMultiLayeredIndexingTest;
 
 class IndexingLayer extends LayeredLayerAssembler
 {
     @Override
-    public LayerAssembly assemble( LayerAssembly layer )
+    public LayerAssembly assemble(LayerAssembly layer)
     {
-        createModule( layer, AbstractMultiLayeredIndexingTest.indexingAssembler );
+        createModule(layer, AbstractMultiLayeredIndexingTest.indexingAssembler);
         return layer;
     }
 }

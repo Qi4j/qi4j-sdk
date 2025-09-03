@@ -20,10 +20,8 @@
 
 package org.qi4j.runtime.value;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiFunction;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.identity.HasIdentity;
@@ -39,8 +37,11 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
@@ -53,61 +54,61 @@ public class AssociationToValueTest extends AbstractQi4jTest
     @Test
     public void givenAdamWhenRequestingChildrenListExpectAbelAndKain()
     {
-        Person adam = repo.findPersonByName( "Adam" );
-        Person abel = repo.findPersonByName( "Abel" );
-        Person kain = repo.findPersonByName( "Kain" );
-        List<Person> children = repo.transact( adam, ( p, uow ) -> uow.toValueList( p.children() ) );
-        assertThat( children, containsInAnyOrder( kain, abel ) );
+        Person adam = repo.findPersonByName("Adam");
+        Person abel = repo.findPersonByName("Abel");
+        Person kain = repo.findPersonByName("Kain");
+        List<Person> children = repo.transact(adam, (p, uow) -> uow.toValueList(p.children()));
+        assertThat(children, containsInAnyOrder(kain, abel));
     }
 
     @Test
     public void givenAbelWhenRequestingChildrenSetExpectAdamAndEve()
     {
-        Person abel = repo.findPersonByName( "Abel" );
-        Person adam = repo.findPersonByName( "Adam" );
-        Person eve = repo.findPersonByName( "Eve" );
-        Set<Person> children = repo.transact( abel, ( p, uow ) -> uow.toValueSet( p.children() ) );
-        assertThat( children, containsInAnyOrder( adam, eve ) );
+        Person abel = repo.findPersonByName("Abel");
+        Person adam = repo.findPersonByName("Adam");
+        Person eve = repo.findPersonByName("Eve");
+        Set<Person> children = repo.transact(abel, (p, uow) -> uow.toValueSet(p.children()));
+        assertThat(children, containsInAnyOrder(adam, eve));
     }
 
     @Test
     public void givenBobWhenRequestingRolesExpectAllRolesWithCorrectPerson()
     {
-        Person bob = repo.findPersonByName( "Bob" );
-        Person alice = repo.findPersonByName( "Alice" );
-        Person john = repo.findPersonByName( "John" );
-        Person jane = repo.findPersonByName( "Jane" );
-        Person kim = repo.findPersonByName( "Kim" );
-        Person robin = repo.findPersonByName( "Robin" );
-        Map<String, Person> roles = repo.transact( bob, ( p, uow ) -> uow.toValueMap( p.roles() ) );
-        assertThat( roles.keySet(), containsInAnyOrder( "spouse", "mechanic", "maid", "plumber", "electrician" ) );
-        assertThat( roles.values(), containsInAnyOrder( alice, john, jane, kim, robin ) );
+        Person bob = repo.findPersonByName("Bob");
+        Person alice = repo.findPersonByName("Alice");
+        Person john = repo.findPersonByName("John");
+        Person jane = repo.findPersonByName("Jane");
+        Person kim = repo.findPersonByName("Kim");
+        Person robin = repo.findPersonByName("Robin");
+        Map<String, Person> roles = repo.transact(bob, (p, uow) -> uow.toValueMap(p.roles()));
+        assertThat(roles.keySet(), containsInAnyOrder("spouse", "mechanic", "maid", "plumber", "electrician"));
+        assertThat(roles.values(), containsInAnyOrder(alice, john, jane, kim, robin));
     }
 
     @Test
     public void givenLouisWhenRequestingRolesExpectAllRolesOfMarie()
     {
-        Person louis = repo.findPersonByName( "Louis" );
-        Person marie = repo.findPersonByName( "Marie" );
-        Map<String, Person> roles = repo.transact( louis, ( p, uow ) -> uow.toValueMap( p.roles() ) );
-        assertThat( roles.keySet(), containsInAnyOrder( "spouse", "lover", "death-mate" ) );
-        assertThat( roles.values(), containsInAnyOrder( marie, marie, marie ) );
+        Person louis = repo.findPersonByName("Louis");
+        Person marie = repo.findPersonByName("Marie");
+        Map<String, Person> roles = repo.transact(louis, (p, uow) -> uow.toValueMap(p.roles()));
+        assertThat(roles.keySet(), containsInAnyOrder("spouse", "lover", "death-mate"));
+        assertThat(roles.values(), containsInAnyOrder(marie, marie, marie));
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( Person.class );
-        module.values( Person.class );
-        module.services( PersonRepository.class ).withConcerns( UnitOfWorkConcern.class );
+        module.entities(Person.class);
+        module.values(Person.class);
+        module.services(PersonRepository.class).withConcerns(UnitOfWorkConcern.class);
 
-        module.services( Runnable.class )
-            .withMixins( LoadData.class )
-            .withConcerns( UnitOfWorkConcern.class )
+        module.services(Runnable.class)
+            .withMixins(LoadData.class)
+            .withConcerns(UnitOfWorkConcern.class)
             .instantiateOnStartup();
 
-        new EntityTestAssembler().assemble( module );
+        new EntityTestAssembler().assemble(module);
     }
 
     @Override
@@ -116,7 +117,7 @@ public class AssociationToValueTest extends AbstractQi4jTest
         throws Exception
     {
         super.setUp();
-        serviceFinder.findService( Runnable.class ).get().run();
+        serviceFinder.findService(Runnable.class).get().run();
     }
 
     public interface Person extends HasIdentity
@@ -126,14 +127,14 @@ public class AssociationToValueTest extends AbstractQi4jTest
         NamedAssociation<Person> roles();
     }
 
-    @Mixins( PersonRepositoryMixin.class )
+    @Mixins(PersonRepositoryMixin.class)
     public interface PersonRepository
     {
         @UnitOfWorkPropagation
-        <T, R> R transact( T arg, BiFunction<T, UnitOfWork, R> closure );
+        <T, R> R transact(T arg, BiFunction<T, UnitOfWork, R> closure);
 
         @UnitOfWorkPropagation
-        Person findPersonByName( String name );
+        Person findPersonByName(String name);
     }
 
     protected static class PersonRepositoryMixin
@@ -143,17 +144,17 @@ public class AssociationToValueTest extends AbstractQi4jTest
         UnitOfWorkFactory unitOfWorkFactory;
 
         @Override
-        public <T, R> R transact( T arg, BiFunction<T, UnitOfWork, R> closure )
+        public <T, R> R transact(T arg, BiFunction<T, UnitOfWork, R> closure)
         {
             UnitOfWork uow = unitOfWorkFactory.currentUnitOfWork();
-            return closure.apply( arg, uow );
+            return closure.apply(arg, uow);
         }
 
         @Override
-        public Person findPersonByName( String name )
+        public Person findPersonByName(String name)
         {
             UnitOfWork uow = unitOfWorkFactory.currentUnitOfWork();
-            return uow.toValue( Person.class, uow.get( Person.class, StringIdentity.identityOf( name ) ) );
+            return uow.toValue(Person.class, uow.get(Person.class, StringIdentity.identityOf(name)));
         }
     }
 
@@ -167,48 +168,48 @@ public class AssociationToValueTest extends AbstractQi4jTest
         @UnitOfWorkPropagation
         public void run()
         {
-            Person bob = createPerson( "Bob" );
-            Person alice = createPerson( "Alice" );
-            Person john = createPerson( "John" );
-            Person jane = createPerson( "Jane" );
-            Person kim = createPerson( "Kim" );
-            Person robin = createPerson( "Robin" );
-            Person william = createPerson( "William" );
-            Person adam = createPerson( "Adam" );
-            Person eve = createPerson( "Eve" );
-            Person abel = createPerson( "Abel" );
-            Person kain = createPerson( "Kain" );
-            Person louis = createPerson( "Louis" );
-            Person marie = createPerson( "Marie" );
-            Person romeo = createPerson( "Romeo" );
-            Person juliette = createPerson( "Juliette" );
-            adam.children().add( abel );
-            adam.children().add( kain );
-            eve.children().add( abel );
-            eve.children().add( kain );
-            abel.children().add( adam );
-            abel.children().add( eve );
-            abel.children().add( adam );
-            abel.children().add( eve );
-            abel.children().add( eve );
-            bob.roles().put( "spouse", alice );
-            bob.roles().put( "mechanic", john );
-            bob.roles().put( "maid", jane );
-            bob.roles().put( "plumber", kim );
-            bob.roles().put( "electrician", robin );
-            louis.roles().put( "spouse", marie );
-            louis.roles().put( "lover", marie );
-            louis.roles().put( "death-mate", marie );
-            juliette.roles().put( "lover", romeo );
-            juliette.roles().put( "author", william );
-            romeo.roles().put( "lover", juliette );
-            romeo.roles().put( "author", william );
+            Person bob = createPerson("Bob");
+            Person alice = createPerson("Alice");
+            Person john = createPerson("John");
+            Person jane = createPerson("Jane");
+            Person kim = createPerson("Kim");
+            Person robin = createPerson("Robin");
+            Person william = createPerson("William");
+            Person adam = createPerson("Adam");
+            Person eve = createPerson("Eve");
+            Person abel = createPerson("Abel");
+            Person kain = createPerson("Kain");
+            Person louis = createPerson("Louis");
+            Person marie = createPerson("Marie");
+            Person romeo = createPerson("Romeo");
+            Person juliette = createPerson("Juliette");
+            adam.children().add(abel);
+            adam.children().add(kain);
+            eve.children().add(abel);
+            eve.children().add(kain);
+            abel.children().add(adam);
+            abel.children().add(eve);
+            abel.children().add(adam);
+            abel.children().add(eve);
+            abel.children().add(eve);
+            bob.roles().put("spouse", alice);
+            bob.roles().put("mechanic", john);
+            bob.roles().put("maid", jane);
+            bob.roles().put("plumber", kim);
+            bob.roles().put("electrician", robin);
+            louis.roles().put("spouse", marie);
+            louis.roles().put("lover", marie);
+            louis.roles().put("death-mate", marie);
+            juliette.roles().put("lover", romeo);
+            juliette.roles().put("author", william);
+            romeo.roles().put("lover", juliette);
+            romeo.roles().put("author", william);
         }
 
-        private Person createPerson( String name )
+        private Person createPerson(String name)
         {
             UnitOfWork uow = uowf.currentUnitOfWork();
-            return uow.newEntity( Person.class, StringIdentity.identityOf( name ) );
+            return uow.newEntity(Person.class, StringIdentity.identityOf(name));
         }
     }
 }

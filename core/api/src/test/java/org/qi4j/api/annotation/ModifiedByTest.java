@@ -19,9 +19,10 @@
  */
 package org.qi4j.api.annotation;
 
-import java.lang.annotation.Annotation;
-import org.qi4j.api.concern.Concerns;
 import org.junit.jupiter.api.Test;
+import org.qi4j.api.concern.Concerns;
+
+import java.lang.annotation.Annotation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -38,12 +39,12 @@ public class ModifiedByTest
     public void retention()
     {
         Annotation[] annotations = Annotated.class.getDeclaredAnnotations();
-        assertThat( "annotations should not be null", annotations, notNullValue() );
-        assertThat( "number of annotations", annotations.length, equalTo( 1 ) );
-        assertThat( "annotation type", annotations[ 0 ].annotationType(), equalTo( Concerns.class ) );
+        assertThat("annotations should not be null", annotations, notNullValue());
+        assertThat("number of annotations", annotations.length, equalTo(1));
+        assertThat("annotation type", annotations[0].annotationType(), equalTo(Concerns.class));
     }
 
-    @Concerns( Object.class )
+    @Concerns(Object.class)
     private static class Annotated
     {
 

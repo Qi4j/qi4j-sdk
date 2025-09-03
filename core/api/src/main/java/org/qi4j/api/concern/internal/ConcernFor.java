@@ -19,13 +19,9 @@
  */
 package org.qi4j.api.concern.internal;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import org.qi4j.api.injection.InjectionScope;
-import org.qi4j.api.injection.InjectionScope;
+
+import java.lang.annotation.*;
 
 /**
  * This annotation is required once in each Concern, to mark the
@@ -59,8 +55,8 @@ import org.qi4j.api.injection.InjectionScope;
  * }
  * </code></pre>
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.FIELD, ElementType.PARAMETER } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Documented
 @InjectionScope
 public @interface ConcernFor

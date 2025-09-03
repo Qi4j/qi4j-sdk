@@ -19,11 +19,10 @@
  */
 package org.qi4j.runtime.activation;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Layer;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.SingletonAssembler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,22 +39,22 @@ public class LayerActivationTest
         implements Activator<Layer>
     {
 
-        public void beforeActivation( Layer activating )
+        public void beforeActivation(Layer activating)
         {
             activationLevel++;
         }
 
-        public void afterActivation( Layer activated )
+        public void afterActivation(Layer activated)
         {
             activationLevel++;
         }
 
-        public void beforePassivation( Layer passivating )
+        public void beforePassivation(Layer passivating)
         {
             passivationLevel++;
         }
 
-        public void afterPassivation( Layer passivated )
+        public void afterPassivation(Layer passivated)
         {
             passivationLevel++;
         }
@@ -66,18 +65,18 @@ public class LayerActivationTest
         throws Exception
     {
         SingletonAssembler assembly = new SingletonAssembler(
-            module -> module.layer().withActivators( TestedActivator.class )
+            module -> module.layer().withActivators(TestedActivator.class)
         );
         // Activate
         Application application = assembly.application();
 
         // Assert activated
-        assertThat( "Activation Level", activationLevel, equalTo( 2 ) );
+        assertThat("Activation Level", activationLevel, equalTo(2));
 
         // Passivate
         application.passivate();
 
         // Assert passivated
-        assertThat( "Passivation Level", passivationLevel, equalTo( 2 ) );
+        assertThat("Passivation Level", passivationLevel, equalTo(2));
     }
 }

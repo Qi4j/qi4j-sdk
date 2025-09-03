@@ -22,8 +22,6 @@ package org.qi4j.api.service;
 
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.identity.HasIdentity;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.identity.HasIdentity;
 
 /**
  * All Composites being used to implement Services

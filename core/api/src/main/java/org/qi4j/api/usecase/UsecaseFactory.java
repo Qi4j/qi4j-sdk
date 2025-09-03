@@ -19,18 +19,15 @@
  */
 package org.qi4j.api.usecase;
 
-import org.qi4j.api.unitofwork.UnitOfWork;
-import org.qi4j.api.unitofwork.concern.UnitOfWorkConcern;
-import org.qi4j.api.unitofwork.concern.UnitOfWorkPropagation;
-import org.qi4j.api.usecase.Usecase;
 import org.qi4j.api.unitofwork.concern.UnitOfWorkConcern;
 import org.qi4j.api.unitofwork.concern.UnitOfWorkPropagation;
 
-/** An optional service that if implemented and available to the {@link UnitOfWorkConcern}
+/**
+ * An optional service that if implemented and available to the {@link UnitOfWorkConcern}
  * will use to create the named {@link Usecase} of the {@link UnitOfWorkPropagation} annotation.
  *
  */
 public interface UsecaseFactory
 {
-    Usecase createUsecase( String name );
+    Usecase createUsecase(String name);
 }

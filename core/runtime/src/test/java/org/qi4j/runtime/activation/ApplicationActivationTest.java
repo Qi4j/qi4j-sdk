@@ -19,10 +19,9 @@
  */
 package org.qi4j.runtime.activation;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.structure.Application;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.SingletonAssembler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,22 +38,22 @@ public class ApplicationActivationTest
         implements Activator<Application>
     {
 
-        public void beforeActivation( Application activating )
+        public void beforeActivation(Application activating)
         {
             activationLevel++;
         }
 
-        public void afterActivation( Application activated )
+        public void afterActivation(Application activated)
         {
             activationLevel++;
         }
 
-        public void beforePassivation( Application passivating )
+        public void beforePassivation(Application passivating)
         {
             passivationLevel++;
         }
 
-        public void afterPassivation( Application passivated )
+        public void afterPassivation(Application passivated)
         {
             passivationLevel++;
         }
@@ -65,19 +64,19 @@ public class ApplicationActivationTest
         throws Exception
     {
         SingletonAssembler assembly = new SingletonAssembler(
-            module -> module.layer().application().withActivators( TestedActivator.class )
+            module -> module.layer().application().withActivators(TestedActivator.class)
         );
 
         // Activate
         Application application = assembly.application();
 
         // Assert activated
-        assertThat( "Activation Level", activationLevel, equalTo( 2 ) );
+        assertThat("Activation Level", activationLevel, equalTo(2));
 
         // Passivate
         application.passivate();
 
         // Assert passivated
-        assertThat( "Passivation Level", passivationLevel, equalTo( 2 ) );
+        assertThat("Passivation Level", passivationLevel, equalTo(2));
     }
 }

@@ -22,7 +22,6 @@ package org.qi4j.api.usecase;
 
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.structure.MetaInfoHolder;
-import org.qi4j.api.structure.MetaInfoHolder;
 
 /**
  * A Usecase. A Usecase is used as a model for UnitOfWork, and helps
@@ -31,12 +30,12 @@ import org.qi4j.api.structure.MetaInfoHolder;
 public final class Usecase
     implements MetaInfoHolder
 {
-    public static final Usecase DEFAULT = new Usecase( "Default", new MetaInfo() );
+    public static final Usecase DEFAULT = new Usecase("Default", new MetaInfo());
 
     private final String name;
     private final MetaInfo metaInfo;
 
-    Usecase( String name, MetaInfo metaInfo )
+    Usecase(String name, MetaInfo metaInfo)
     {
         this.name = name;
         this.metaInfo = metaInfo;
@@ -57,13 +56,12 @@ public final class Usecase
      * and read during the execution of the usecase.
      *
      * @param infoType the MetaInfo type to retrieve.
-     *
      * @return the previously stored metaInfo of the given type for the usecase.
      */
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return metaInfo.get( infoType );
+        return metaInfo.get(infoType);
     }
 
     @Override

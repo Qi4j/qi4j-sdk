@@ -20,15 +20,7 @@
 
 package org.qi4j.spi.metrics;
 
-import org.qi4j.api.metrics.MetricsCounterFactory;
-import org.qi4j.api.metrics.MetricsFactory;
-import org.qi4j.api.metrics.MetricsGaugeFactory;
-import org.qi4j.api.metrics.MetricsHealthCheckFactory;
-import org.qi4j.api.metrics.MetricsHistogramFactory;
-import org.qi4j.api.metrics.MetricsMeterFactory;
-import org.qi4j.api.metrics.MetricsNotSupportedException;
-import org.qi4j.api.metrics.MetricsProvider;
-import org.qi4j.api.metrics.MetricsTimerFactory;
+import org.qi4j.api.metrics.*;
 
 /**
  * Adapter to ease MetricsProvider implementation.
@@ -43,35 +35,35 @@ public class MetricsProviderAdapter
     private static final MetricsTimerFactory NULL_TIMER_FACTORY = new NullMetricsFactory.NullTimerFactory();
     private static final MetricsHealthCheckFactory NULL_HEALTHCHECK_FACTORY = new NullMetricsFactory.NullHealthCheckFactory();
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     @Override
-    public <T extends MetricsFactory> T createFactory( Class<T> factoryType )
+    public <T extends MetricsFactory> T createFactory(Class<T> factoryType)
     {
-        if( factoryType.equals( MetricsCounterFactory.class ) )
+        if(factoryType.equals(MetricsCounterFactory.class))
         {
             return (T) createMetricsCounterFactory();
         }
-        else if( factoryType.equals( MetricsGaugeFactory.class ) )
+        else if(factoryType.equals(MetricsGaugeFactory.class))
         {
             return (T) createMetricsGaugeFactory();
         }
-        else if( factoryType.equals( MetricsHealthCheckFactory.class ) )
+        else if(factoryType.equals(MetricsHealthCheckFactory.class))
         {
             return (T) createMetricsHealthCheckFactory();
         }
-        else if( factoryType.equals( MetricsHistogramFactory.class ) )
+        else if(factoryType.equals(MetricsHistogramFactory.class))
         {
             return (T) createMetricsHistogramFactory();
         }
-        else if( factoryType.equals( MetricsMeterFactory.class ) )
+        else if(factoryType.equals(MetricsMeterFactory.class))
         {
             return (T) createMetricsMeterFactory();
         }
-        else if( factoryType.equals( MetricsTimerFactory.class ) )
+        else if(factoryType.equals(MetricsTimerFactory.class))
         {
             return (T) createMetricsTimerFactory();
         }
-        throw new MetricsNotSupportedException( factoryType, getClass() );
+        throw new MetricsNotSupportedException(factoryType, getClass());
     }
 
     protected MetricsTimerFactory createMetricsTimerFactory()

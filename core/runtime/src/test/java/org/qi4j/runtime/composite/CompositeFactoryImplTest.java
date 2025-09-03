@@ -19,9 +19,7 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.Properties;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.AppliesToFilter;
 import org.qi4j.api.composite.NoSuchTransientTypeException;
@@ -31,7 +29,10 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -39,23 +40,23 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class CompositeFactoryImplTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
         // This is required to instantiate [SecondComposite] composite in [testNewComposition9]
-        module.transients( SecondComposite.class );
+        module.transients(SecondComposite.class);
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     @Test
     public void testNewInstanceNotExtendingComposite()
         throws Exception
     {
-        assertThrows( NoSuchTransientTypeException.class, () -> {
+        assertThrows(NoSuchTransientTypeException.class, () -> {
             Class aClass = FirstComposite.class;
-            TransientBuilder builder = transientBuilderFactory.newTransientBuilder( aClass );
+            TransientBuilder builder = transientBuilderFactory.newTransientBuilder(aClass);
             builder.newInstance();
-        } );
+        });
     }
 
     @Test
@@ -65,24 +66,24 @@ public class CompositeFactoryImplTest
         try
         {
             TransientBuilder<SecondComposite> builder = transientBuilderFactory.newTransientBuilder(
-                SecondComposite.class );
+                SecondComposite.class);
             SecondComposite composition9 = builder.newInstance();
-            composition9.setValue( "satisfiedBy value" );
+            composition9.setValue("satisfiedBy value");
         }
-        catch( Exception e )
+        catch(Exception e)
         {
             e.printStackTrace();
-            fail( "Fail to instantiate composite: " + SecondComposite.class );
+            fail("Fail to instantiate composite: " + SecondComposite.class);
         }
     }
 
-    @Mixins( PropertiesMixin.class )
+    @Mixins(PropertiesMixin.class)
     public interface FirstComposite
         extends Mixin3
     {
     }
 
-    @Mixins( PropertiesMixin.class )
+    @Mixins(PropertiesMixin.class)
     public interface SecondComposite
         extends Mixin3, TransientComposite
     {
@@ -90,7 +91,7 @@ public class CompositeFactoryImplTest
 
     public interface Mixin3
     {
-        void setValue( String value );
+        void setValue(String value);
 
         String getValue();
     }
@@ -104,7 +105,7 @@ public class CompositeFactoryImplTest
      * removeFoo = remove object from list named foo
      * fooIterator - return an iterator over the list of Foos
      */
-    @AppliesTo( { Getters.class, Setters.class } )
+    @AppliesTo({Getters.class, Setters.class})
     public static class PropertiesMixin
         implements InvocationHandler
     {
@@ -115,19 +116,19 @@ public class CompositeFactoryImplTest
             properties = new Properties();
         }
 
-        @SuppressWarnings( "unchecked" )
-        public Object invoke( Object proxy, Method method, Object[] args )
+        @SuppressWarnings("unchecked")
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
             String methodName = method.getName();
-            String property = methodName.substring( 3 );
-            if( methodName.startsWith( "get" ) )
+            String property = methodName.substring(3);
+            if(methodName.startsWith("get"))
             {
-                return properties.get( property );
+                return properties.get(property);
             }
             else
             {
-                properties.put( property, args[ 0 ] );
+                properties.put(property, args[0]);
                 return null;
             }
         }
@@ -139,11 +140,11 @@ public class CompositeFactoryImplTest
     public static class Getters
         implements AppliesToFilter
     {
-        public boolean appliesTo( Method method, Class mixin, Class compositeType, Class modelClass )
+        public boolean appliesTo(Method method, Class mixin, Class compositeType, Class modelClass)
         {
             final String name = method.getName();
-            return !method.getReturnType().equals( Void.TYPE ) && name.startsWith( "get" ) && name.length() > 4 &&
-                   method.getParameterTypes().length == 0;
+            return !method.getReturnType().equals(Void.TYPE) && name.startsWith("get") && name.length() > 4 &&
+                method.getParameterTypes().length == 0;
         }
     }
 
@@ -153,11 +154,11 @@ public class CompositeFactoryImplTest
     public static class Setters
         implements AppliesToFilter
     {
-        public boolean appliesTo( Method method, Class mixin, Class compositeType, Class modelClass )
+        public boolean appliesTo(Method method, Class mixin, Class compositeType, Class modelClass)
         {
             final String name = method.getName();
-            return method.getReturnType().equals( Void.TYPE ) && name.startsWith( "set" ) && name.length() > 4 &&
-                   method.getParameterTypes().length == 1;
+            return method.getReturnType().equals(Void.TYPE) && name.startsWith("set") && name.length() > 4 &&
+                method.getParameterTypes().length == 1;
         }
     }
 }

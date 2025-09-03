@@ -17,13 +17,14 @@
  */
 package org.qi4j.test.util;
 
-import java.lang.management.ManagementFactory;
-import java.util.List;
+import org.hamcrest.Matcher;
+
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import org.hamcrest.Matcher;
+import java.lang.management.ManagementFactory;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,82 +40,85 @@ public class JmxFixture
 
     public JmxFixture()
     {
-        this( ManagementFactory.getPlatformMBeanServer(), "" );
+        this(ManagementFactory.getPlatformMBeanServer(), "");
     }
 
-    public JmxFixture( String prefix )
+    public JmxFixture(String prefix)
     {
-        this( ManagementFactory.getPlatformMBeanServer(), prefix );
+        this(ManagementFactory.getPlatformMBeanServer(), prefix);
     }
 
-    public JmxFixture( MBeanServer server )
+    public JmxFixture(MBeanServer server)
     {
-        this( server, "" );
+        this(server, "");
     }
 
-    public JmxFixture( MBeanServer server, String prefix )
+    public JmxFixture(MBeanServer server, String prefix)
     {
         this.server = server;
         this.prefix = prefix;
     }
 
-    public String prefix() {
+    public String prefix()
+    {
         return prefix;
     }
 
-    public boolean objectExists( String objName ) {
-        try
-        {
-            ObjectName objectName = new ObjectName( prefix + objName );
-            return server.isRegistered( objectName );
-        }
-        catch( MalformedObjectNameException ex )
-        {
-            throw new IllegalArgumentException( ex.getMessage(), ex );
-        }
-    }
-
-
-    public void assertObjectPresent( String objName )
-    {
-        if( !objectExists( objName ) )
-        {
-            fail( objName + " is absent" );
-        }
-    }
-
-    public void assertObjectAbsent( String objName )
-    {
-        if( objectExists( objName ) ) {
-            fail( objName + " is present" );
-        }
-    }
-
-    public <T> void assertAttributeValue( String objName, String attribute, Class<? extends T> type, Matcher<? super T> matcher )
-    {
-        assertThat( attributeValue( objName, attribute, type ), matcher );
-    }
-
-    public <T> T attributeValue( String objName, String attribute, Class<? extends T> type )
+    public boolean objectExists(String objName)
     {
         try
         {
-            ObjectName objectName = new ObjectName( prefix + objName );
-            Object value = server.getAttribute( objectName, attribute );
-            return type.cast( value );
+            ObjectName objectName = new ObjectName(prefix + objName);
+            return server.isRegistered(objectName);
         }
-        catch( MalformedObjectNameException ex )
+        catch(MalformedObjectNameException ex)
         {
-            throw new IllegalArgumentException( ex.getMessage(), ex );
+            throw new IllegalArgumentException(ex.getMessage(), ex);
         }
-        catch( JMException ex )
+    }
+
+
+    public void assertObjectPresent(String objName)
+    {
+        if(!objectExists(objName))
         {
-            throw new RuntimeException( ex.getMessage(), ex );
+            fail(objName + " is absent");
+        }
+    }
+
+    public void assertObjectAbsent(String objName)
+    {
+        if(objectExists(objName))
+        {
+            fail(objName + " is present");
+        }
+    }
+
+    public <T> void assertAttributeValue(String objName, String attribute, Class<? extends T> type, Matcher<? super T> matcher)
+    {
+        assertThat(attributeValue(objName, attribute, type), matcher);
+    }
+
+    public <T> T attributeValue(String objName, String attribute, Class<? extends T> type)
+    {
+        try
+        {
+            ObjectName objectName = new ObjectName(prefix + objName);
+            Object value = server.getAttribute(objectName, attribute);
+            return type.cast(value);
+        }
+        catch(MalformedObjectNameException ex)
+        {
+            throw new IllegalArgumentException(ex.getMessage(), ex);
+        }
+        catch(JMException ex)
+        {
+            throw new RuntimeException(ex.getMessage(), ex);
         }
     }
 
     public List<String> allObjectNames()
     {
-        return server.queryNames( null, null ).stream().map( ObjectName::toString ).collect( toList() );
+        return server.queryNames(null, null).stream().map(ObjectName::toString).collect(toList());
     }
 }

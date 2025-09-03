@@ -20,12 +20,12 @@
 
 package org.qi4j.spi.service.importer;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ImportedServiceDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -36,14 +36,14 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class NewObjectImporterTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.importedServices( TestService.class ).
-            identifiedBy( "test" ).
-            importedBy( ImportedServiceDeclaration.NEW_OBJECT );
+        module.importedServices(TestService.class).
+            identifiedBy("test").
+            importedBy(ImportedServiceDeclaration.NEW_OBJECT);
 
-        module.objects( TestService.class, NewObjectImporterTest.class );
+        module.objects(TestService.class, NewObjectImporterTest.class);
     }
 
     @Service
@@ -52,7 +52,7 @@ public class NewObjectImporterTest
     @Test
     public void testImportServiceFromService()
     {
-        assertThat( service.helloWorld(), equalTo( "Hello World" ) );
+        assertThat(service.helloWorld(), equalTo("Hello World"));
     }
 
     public static class TestService

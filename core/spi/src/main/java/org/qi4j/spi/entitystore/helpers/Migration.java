@@ -22,12 +22,13 @@ package org.qi4j.spi.entitystore.helpers;
 
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
+import org.qi4j.api.structure.ModuleDescriptor;
 
 /**
  * State Migration SPI.
  */
 public interface Migration
 {
-    JsonObject migrate( JsonObject state, String toVersion, StateStore stateStore )
+    JsonObject migrate(ModuleDescriptor module, JsonObject state, String toVersion, StateStore stateStore)
         throws JsonException;
 }

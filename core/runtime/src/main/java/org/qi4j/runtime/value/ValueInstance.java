@@ -19,17 +19,16 @@
  */
 package org.qi4j.runtime.value;
 
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
 import org.qi4j.api.composite.CompositeInstance;
+import org.qi4j.api.serialization.Serialization;
 import org.qi4j.api.serialization.Serializer;
 import org.qi4j.runtime.composite.MixinsInstance;
 import org.qi4j.runtime.composite.TransientInstance;
 import org.qi4j.runtime.property.PropertyInstance;
 import org.qi4j.spi.module.ModuleSpi;
-import org.qi4j.runtime.composite.MixinsInstance;
-import org.qi4j.runtime.composite.TransientInstance;
-import org.qi4j.runtime.property.PropertyInstance;
+
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 /**
  * ValueComposite instance
@@ -37,9 +36,9 @@ import org.qi4j.runtime.property.PropertyInstance;
 public final class ValueInstance extends TransientInstance
     implements CompositeInstance, MixinsInstance
 {
-    public ValueInstance( ValueModel compositeModel, Object[] mixins, ValueStateInstance state )
+    public ValueInstance(ValueModel compositeModel, Object[] mixins, ValueStateInstance state)
     {
-        super( compositeModel, mixins, state );
+        super(compositeModel, mixins, state);
     }
 
     /**
@@ -50,33 +49,32 @@ public final class ValueInstance extends TransientInstance
      * </p>
      *
      * @param o The other object to compare.
-     *
      * @return Returns a {@code boolean} indicator whether this object is equals the other.
      */
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || !Proxy.isProxyClass( o.getClass() ) )
+        if(o == null || !Proxy.isProxyClass(o.getClass()))
         {
             return false;
         }
 
         try
         {
-            ValueInstance that = (ValueInstance) Proxy.getInvocationHandler( o );
+            ValueInstance that = (ValueInstance) Proxy.getInvocationHandler(o);
             // Descriptor equality
-            if( !descriptor().equals( that.descriptor() ) )
+            if(!descriptor().equals(that.descriptor()))
             {
                 return false;
             }
             // State equality
-            return state.equals( that.state );
+            return state.equals(that.state);
         }
-        catch( ClassCastException e )
+        catch(ClassCastException e)
         {
             return false;
         }
@@ -100,20 +98,20 @@ public final class ValueInstance extends TransientInstance
     public void prepareToBuild()
     {
         descriptor().state().properties().forEach(
-            descriptor -> ( (PropertyInstance<Object>) state.propertyFor( descriptor.accessor() ) )
-                .prepareToBuild( descriptor ) );
+            descriptor -> ((PropertyInstance<Object>) state.propertyFor(descriptor.accessor()))
+                .prepareToBuild(descriptor));
 
         descriptor().state().associations().forEach(
-            descriptor -> state().associationFor( descriptor.accessor() )
-                                 .setAssociationInfo( descriptor.builderInfo() ) );
+            descriptor -> state().associationFor(descriptor.accessor())
+                .setAssociationInfo(descriptor.builderInfo()));
 
         descriptor().state().manyAssociations().forEach(
-            descriptor -> state().manyAssociationFor( descriptor.accessor() )
-                                 .setAssociationInfo( descriptor.builderInfo() ) );
+            descriptor -> state().manyAssociationFor(descriptor.accessor())
+                .setAssociationInfo(descriptor.builderInfo()));
 
         descriptor().state().namedAssociations().forEach(
-            descriptor -> state().namedAssociationFor( descriptor.accessor() )
-                                 .setAssociationInfo( descriptor.builderInfo() ) );
+            descriptor -> state().namedAssociationFor(descriptor.accessor())
+                .setAssociationInfo(descriptor.builderInfo()));
     }
 
     /**
@@ -123,17 +121,17 @@ public final class ValueInstance extends TransientInstance
     public void prepareBuilderState()
     {
         descriptor().state().properties().forEach(
-            descriptor -> ( (PropertyInstance<Object>) state.propertyFor( descriptor.accessor() ) )
-                .prepareBuilderState( descriptor ) );
+            descriptor -> ((PropertyInstance<Object>) state.propertyFor(descriptor.accessor()))
+                .prepareBuilderState(descriptor));
 
         descriptor().state().associations().forEach(
-            descriptor -> state().associationFor( descriptor.accessor() ).setAssociationInfo( descriptor ) );
+            descriptor -> state().associationFor(descriptor.accessor()).setAssociationInfo(descriptor));
 
         descriptor().state().manyAssociations().forEach(
-            descriptor -> state().manyAssociationFor( descriptor.accessor() ).setAssociationInfo( descriptor ) );
+            descriptor -> state().manyAssociationFor(descriptor.accessor()).setAssociationInfo(descriptor));
 
         descriptor().state().namedAssociations().forEach(
-            descriptor -> state().namedAssociationFor( descriptor.accessor() ).setAssociationInfo( descriptor ) );
+            descriptor -> state().namedAssociationFor(descriptor.accessor()).setAssociationInfo(descriptor));
     }
 
     /**
@@ -150,10 +148,10 @@ public final class ValueInstance extends TransientInstance
 
     public String toJsonString()
     {
-        Serializer serialization = ( (ModuleSpi) module().instance() ).serialization();
-        if( serialization != null )
+        Serializer serialization = ((ModuleSpi) module().instance()).serialization();
+        if(serialization != null)
         {
-            return serialization.serialize( Serializer.Options.NO_TYPE_INFO, proxy() );
+            return serialization.serialize(module(), Serialization.Options.NO_TYPE_INFO, proxy());
         }
         return null;
     }
@@ -162,14 +160,14 @@ public final class ValueInstance extends TransientInstance
     public String toString()
     {
         String json = toJsonString();
-        if( json != null )
+        if(json != null)
         {
             return json;
         }
         return "ValueInstance{" +
-               "mixins=" + Arrays.toString( mixins ) +
-               ", state=" + state +
-               ", compositeModel=" + compositeModel +
-               '}';
+            "mixins=" + Arrays.toString(mixins) +
+            ", state=" + state +
+            ", compositeModel=" + compositeModel +
+            '}';
     }
 }

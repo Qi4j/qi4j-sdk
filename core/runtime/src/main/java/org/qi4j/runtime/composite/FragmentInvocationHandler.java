@@ -34,25 +34,25 @@ abstract class FragmentInvocationHandler
 
     static
     {
-        compactLevel = CompactLevel.valueOf( System.getProperty( COMPACT_TRACE, "proxy" ) );
+        compactLevel = CompactLevel.valueOf(System.getProperty(COMPACT_TRACE, "proxy"));
     }
 
     protected Object fragment;
     protected Method method;
 
-    void setFragment( Object fragment )
+    void setFragment(Object fragment)
     {
         this.fragment = fragment;
     }
 
-    public void setMethod( Method method )
+    public void setMethod(Method method)
     {
         this.method = method;
     }
 
-    Throwable cleanStackTrace( Throwable throwable, Object proxy, Method method )
+    Throwable cleanStackTrace(Throwable throwable, Object proxy, Method method)
     {
-        if( compactLevel == CompactLevel.off )
+        if(compactLevel == CompactLevel.off)
         {
             return throwable;
         }
@@ -60,31 +60,31 @@ abstract class FragmentInvocationHandler
         StackTraceElement[] trace = throwable.getStackTrace();
 
         // Check if exception originated within Qi4j or JDK - if so then skip compaction
-        if( trace.length == 0 || !isApplicationClass( trace[ 0 ].getClassName() ) )
+        if(trace.length == 0 || !isApplicationClass(trace[0].getClassName()))
         {
             return throwable;
         }
 
         int count = 0;
-        for( int i = 0; i < trace.length; i++ )
+        for(int i = 0; i < trace.length; i++)
         {
-            StackTraceElement stackTraceElement = trace[ i ];
-            if( !isApplicationClass( stackTraceElement.getClassName() ) )
+            StackTraceElement stackTraceElement = trace[i];
+            if(!isApplicationClass(stackTraceElement.getClassName()))
             {
                 // TODO: Should find stack entry outside Runtime, and compact beyond that
-                trace[ i ] = null;
+                trace[i] = null;
                 count++;
             }
             else
             {
-                boolean classOrigin = stackTraceElement.getClassName().equals( proxy.getClass().getSimpleName() );
-                boolean methodOrigin = stackTraceElement.getMethodName().equals( method.getName() );
-                if( classOrigin && methodOrigin && compactLevel == CompactLevel.proxy )
+                boolean classOrigin = stackTraceElement.getClassName().equals(proxy.getClass().getSimpleName());
+                boolean methodOrigin = stackTraceElement.getMethodName().equals(method.getName());
+                if(classOrigin && methodOrigin && compactLevel == CompactLevel.proxy)
                 {
                     // Stop removing if the originating method call has been located in the stack.
                     // For 'semi' and 'extensive' compaction, we don't and do the entire stack instead.
-                    trace[ i ] = new StackTraceElement( proxy.getClass()
-                                                             .getInterfaces()[ 0 ].getName(), method.getName(), null, -1 );
+                    trace[i] = new StackTraceElement(proxy.getClass()
+                        .getInterfaces()[0].getName(), method.getName(), null, -1);
                     break; // Stop compacting this trace
                 }
             }
@@ -92,49 +92,49 @@ abstract class FragmentInvocationHandler
 
         // Create new trace array
         int idx = 0;
-        StackTraceElement[] newTrace = new StackTraceElement[ trace.length - count ];
-        for( StackTraceElement stackTraceElement : trace )
+        StackTraceElement[] newTrace = new StackTraceElement[trace.length - count];
+        for(StackTraceElement stackTraceElement : trace)
         {
-            if( stackTraceElement != null )
+            if(stackTraceElement != null)
             {
-                newTrace[ idx++ ] = stackTraceElement;
+                newTrace[idx++] = stackTraceElement;
             }
         }
-        throwable.setStackTrace( newTrace );
+        throwable.setStackTrace(newTrace);
 
         Throwable nested = throwable.getCause();
-        if( nested != null )
+        if(nested != null)
         {
             //noinspection ThrowableResultOfMethodCallIgnored
-            cleanStackTrace( nested, proxy, method );
+            cleanStackTrace(nested, proxy, method);
         }
-        for( Throwable suppressed : throwable.getSuppressed() )
+        for(Throwable suppressed : throwable.getSuppressed())
         {
             //noinspection ThrowableResultOfMethodCallIgnored
-            cleanStackTrace( suppressed, proxy, method );
+            cleanStackTrace(suppressed, proxy, method);
         }
         return throwable;
     }
 
-    private boolean isApplicationClass( String className )
+    private boolean isApplicationClass(String className)
     {
-        boolean jdkInternals = isJdkInternals( className );
-        if( compactLevel == CompactLevel.semi )
+        boolean jdkInternals = isJdkInternals(className);
+        if(compactLevel == CompactLevel.semi)
         {
             return !jdkInternals;
         }
-        boolean qi4jRuntime = className.startsWith( "org.qi4j.runtime" );
-        boolean stubClass = className.endsWith( FragmentClassLoader.GENERATED_POSTFIX );
-        return !( stubClass ||
-                  qi4jRuntime ||
-                  jdkInternals );
+        boolean qi4jRuntime = className.startsWith("org.qi4j.runtime");
+        boolean stubClass = className.endsWith(FragmentClassLoader.GENERATED_POSTFIX);
+        return !(stubClass ||
+            qi4jRuntime ||
+            jdkInternals);
     }
 
-    private boolean isJdkInternals( String className )
+    private boolean isJdkInternals(String className)
     {
-        return className.startsWith( "java.lang.reflect" )
-               || className.startsWith( "reflect" )
-               || className.startsWith( "com.sun.proxy" )
-               || className.startsWith( "sun.reflect" );
+        return className.startsWith("java.lang.reflect")
+            || className.startsWith("reflect")
+            || className.startsWith("com.sun.proxy")
+            || className.startsWith("sun.reflect");
     }
 }

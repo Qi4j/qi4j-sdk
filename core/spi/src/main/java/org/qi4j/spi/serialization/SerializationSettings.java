@@ -17,15 +17,16 @@
  */
 package org.qi4j.spi.serialization;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.qi4j.api.serialization.Converter;
 import org.qi4j.api.type.ValueType;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Serialization Settings.
- *
+ * <p>
  * Serialization implementations might extend this with additional specialized settings.
  *
  * @param <SettingsType> Specialization type of SerializationSettings for a fluent usage
@@ -34,7 +35,7 @@ public class SerializationSettings<SettingsType extends SerializationSettings>
 {
     public static final SerializationSettings DEFAULT = new SerializationSettings();
 
-    public static SerializationSettings orDefault( SerializationSettings settings )
+    public static SerializationSettings orDefault(SerializationSettings settings)
     {
         return settings != null ? settings : DEFAULT;
     }
@@ -43,18 +44,18 @@ public class SerializationSettings<SettingsType extends SerializationSettings>
 
     public final Map<ValueType, Converter<?>> getConverters()
     {
-        return Collections.unmodifiableMap( converters );
+        return Collections.unmodifiableMap(converters);
     }
 
-    @SuppressWarnings( "unchecked" )
-    public final SettingsType withConverter( ValueType valueType, Converter<Object> adapter )
+    @SuppressWarnings("unchecked")
+    public final SettingsType withConverter(ValueType valueType, Converter<Object> adapter)
     {
-        converters.put( valueType, adapter );
+        converters.put(valueType, adapter);
         return (SettingsType) this;
     }
 
-    public final SettingsType withConverter( Converter<Object> adapter )
+    public final SettingsType withConverter(Converter<Object> adapter)
     {
-        return withConverter( ValueType.of( adapter.type() ), adapter );
+        return withConverter(ValueType.of(adapter.type()), adapter);
     }
 }

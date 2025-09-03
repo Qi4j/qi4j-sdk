@@ -23,9 +23,9 @@ apply plugin: 'qi4j-core'
 //jar { manifest { name = "Qi4j Core Bootstrap" } }
 
 dependencies {
-  api qi4j.core.spi
+    api qi4j.core.spi
 
-  testRuntimeOnly qi4j.core.runtime
+    testRuntimeOnly qi4j.core.runtime
 
-  testRuntimeOnly libraries.kotlin
+    testRuntimeOnly libraries.kotlin
 }

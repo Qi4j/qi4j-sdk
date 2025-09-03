@@ -19,6 +19,9 @@
  */
 package org.qi4j.runtime.entity;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
@@ -28,9 +31,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -51,7 +51,7 @@ public class EntityCompositeEqualityTest
     {
         super.setUp();
         unitOfWork = this.unitOfWorkFactory.newUnitOfWork();
-        myCompositeBuilder = unitOfWork.newEntityBuilder( MyComposite.class );
+        myCompositeBuilder = unitOfWork.newEntityBuilder(MyComposite.class);
     }
 
     @AfterEach
@@ -67,22 +67,22 @@ public class EntityCompositeEqualityTest
         throws UnitOfWorkCompletionException
     {
         MyComposite simpleComposite = myCompositeBuilder.newInstance();
-        assertThat( "simpleComposite is not equal to null", simpleComposite.equals( null ), equalTo( false ) );
+        assertThat("simpleComposite is not equal to null", simpleComposite.equals(null), equalTo(false));
     }
 
     @Test
     public void shouldBeEqualToItself()
     {
         MyComposite simpleComposite = myCompositeBuilder.newInstance();
-        assertThat( "simple composite is equal to itself", simpleComposite.equals( simpleComposite ), equalTo( true ) );
+        assertThat("simple composite is equal to itself", simpleComposite.equals(simpleComposite), equalTo(true));
     }
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().visibleIn( Visibility.layer ).assemble( module );
-        module.objects( EntityCompositeEqualityTest.class );
-        module.entities( MyComposite.class );
+        new EntityTestAssembler().visibleIn(Visibility.layer).assemble(module);
+        module.objects(EntityCompositeEqualityTest.class);
+        module.entities(MyComposite.class);
     }
 
     private static interface MyComposite

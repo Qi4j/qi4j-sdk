@@ -22,14 +22,7 @@ package org.qi4j.api.service.importer;
 
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.service.ImportedServiceDescriptor;
-import org.qi4j.api.service.ServiceFinder;
-import org.qi4j.api.service.ServiceImporter;
-import org.qi4j.api.service.ServiceImporterException;
-import org.qi4j.api.service.ServiceReference;
-import org.qi4j.api.identity.Identity;
-import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.service.ServiceReference;
+import org.qi4j.api.service.*;
 
 /**
  * Use a registered service that implements ServiceImporter to do the actual
@@ -51,30 +44,30 @@ public class ServiceInstanceImporter<T>
     private Identity serviceId;
 
     @Override
-    public T importService( ImportedServiceDescriptor importedServiceDescriptor )
+    public T importService(ImportedServiceDescriptor importedServiceDescriptor)
         throws ServiceImporterException
     {
-        serviceId = importedServiceDescriptor.metaInfo( Identity.class );
-        return serviceImporter().importService( importedServiceDescriptor );
+        serviceId = importedServiceDescriptor.metaInfo(Identity.class);
+        return serviceImporter().importService(importedServiceDescriptor);
     }
 
     @Override
-    public boolean isAvailable( T instance )
+    public boolean isAvailable(T instance)
     {
-        return serviceImporter().isAvailable( instance );
+        return serviceImporter().isAvailable(instance);
     }
 
-    @SuppressWarnings( {"raw", "unchecked"} )
+    @SuppressWarnings({"raw", "unchecked"})
     private ServiceImporter<T> serviceImporter()
     {
-        if( service == null )
+        if(service == null)
         {
-            service = finder.findServices( ServiceImporter.class )
-                            .filter( ref -> ref.identity().equals( serviceId ) )
-                            .findFirst().map( ServiceReference::get )
-                            .orElseThrow( () -> new ServiceImporterException(
-                                "No service importer with id '" + serviceId + "' was found" )
-                            );
+            service = finder.findServices(ServiceImporter.class)
+                .filter(ref -> ref.identity().equals(serviceId))
+                .findFirst().map(ServiceReference::get)
+                .orElseThrow(() -> new ServiceImporterException(
+                    "No service importer with id '" + serviceId + "' was found")
+                );
         }
         return service;
     }

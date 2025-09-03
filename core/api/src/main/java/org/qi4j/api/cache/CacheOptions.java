@@ -33,8 +33,8 @@ import org.qi4j.api.usecase.UsecaseBuilder;
  */
 public final class CacheOptions
 {
-    public static final CacheOptions ALWAYS = new CacheOptions( true, true, true );
-    public static final CacheOptions NEVER = new CacheOptions( false, false, false );
+    public static final CacheOptions ALWAYS = new CacheOptions(true, true, true);
+    public static final CacheOptions NEVER = new CacheOptions(false, false, false);
 
     private final boolean cacheOnRead;
     private final boolean cacheOnWrite;
@@ -55,7 +55,7 @@ public final class CacheOptions
      *                     created Entity, as it is not likely to be read in the near future. This is useful when
      *                     batch inserts are being made.
      */
-    public CacheOptions( boolean cacheOnRead, boolean cacheOnWrite, boolean cacheOnNew )
+    public CacheOptions(boolean cacheOnRead, boolean cacheOnWrite, boolean cacheOnNew)
     {
         this.cacheOnRead = cacheOnRead;
         this.cacheOnWrite = cacheOnWrite;
@@ -64,8 +64,8 @@ public final class CacheOptions
 
     /**
      * @return if true, give the hint to the Cache system that it may not be a good idea to cache the
-     *         read values. This is useful when it is known that the read will be over a large set and
-     *         shouldn't affect the existing cached entities. For instance, when traversing the EntityStore
+     * read values. This is useful when it is known that the read will be over a large set and
+     * shouldn't affect the existing cached entities. For instance, when traversing the EntityStore
      */
     public boolean cacheOnRead()
     {
@@ -74,9 +74,9 @@ public final class CacheOptions
 
     /**
      * @return if true, give the hint to the Cache system that it may not be a good idea to cache the
-     *         entity when the value is updated. If this is false, the cache should be emptied from any
-     *         cached entity instead of updated. There are few cases when this is useful, and if this is
-     *         false, it makes sense that the <i>cacheOnRead</i> is also false.
+     * entity when the value is updated. If this is false, the cache should be emptied from any
+     * cached entity instead of updated. There are few cases when this is useful, and if this is
+     * false, it makes sense that the <i>cacheOnRead</i> is also false.
      */
     public boolean cacheOnWrite()
     {
@@ -85,8 +85,8 @@ public final class CacheOptions
 
     /**
      * @return if true, give the hint to the Cache system that it may not be a good idea to cache a newly
-     *         created Entity, as it is not likely to be read in the near future. This is useful when
-     *         batch inserts are being made.
+     * created Entity, as it is not likely to be read in the near future. This is useful when
+     * batch inserts are being made.
      */
     public boolean cacheOnNew()
     {

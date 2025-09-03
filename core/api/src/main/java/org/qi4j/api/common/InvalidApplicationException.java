@@ -27,13 +27,13 @@ package org.qi4j.api.common;
  */
 public class InvalidApplicationException extends RuntimeException
 {
-    public InvalidApplicationException( String string )
+    public InvalidApplicationException(String string)
     {
-        super( string );
+        super(string);
     }
 
-    public InvalidApplicationException( String string, Throwable cause )
+    public InvalidApplicationException(String string, Throwable cause)
     {
-        super( string, cause );
+        super(string, cause);
     }
 }

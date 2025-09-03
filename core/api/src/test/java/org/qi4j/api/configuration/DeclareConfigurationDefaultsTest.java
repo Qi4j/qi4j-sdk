@@ -19,6 +19,7 @@
  */
 package org.qi4j.api.configuration;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
@@ -26,7 +27,6 @@ import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,7 +35,7 @@ public class DeclareConfigurationDefaultsTest
     extends AbstractQi4jTest
 {
 
-    @Mixins( FooServiceMixin.class )
+    @Mixins(FooServiceMixin.class)
     public static interface FooServiceComposite
         extends ServiceComposite
     {
@@ -63,19 +63,19 @@ public class DeclareConfigurationDefaultsTest
         Property<String> foo();
     }
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.services( FooServiceComposite.class ).identifiedBy( "bazar" );
-        module.entities( FooConfigurationComposite.class );
-        new EntityTestAssembler().assemble( module );
-        FooConfigurationComposite config = module.forMixin( FooConfigurationComposite.class ).declareDefaults();
-        config.foo().set( "bar" );
+        module.services(FooServiceComposite.class).identifiedBy("bazar");
+        module.entities(FooConfigurationComposite.class);
+        new EntityTestAssembler().assemble(module);
+        FooConfigurationComposite config = module.forMixin(FooConfigurationComposite.class).declareDefaults();
+        config.foo().set("bar");
     }
 
     @Test
     public void testConfigurationDefaults()
     {
-        FooServiceComposite fooService = serviceFinder.findService( FooServiceComposite.class ).get();
-        assertThat( fooService.configuredFoo(), equalTo( "bar" ) );
+        FooServiceComposite fooService = serviceFinder.findService(FooServiceComposite.class).get();
+        assertThat(fooService.configuredFoo(), equalTo("bar"));
     }
 }

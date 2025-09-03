@@ -19,19 +19,18 @@
  */
 package org.qi4j.api.activation;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Layer;
 import org.qi4j.api.structure.Module;
-import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.builder.ApplicationBuilder;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.builder.ApplicationBuilder;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Arrays;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -42,102 +41,102 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class PassivationExceptionTest
 {
-    private static String stack( Exception ex )
+    private static String stack(Exception ex)
     {
         StringWriter writer = new StringWriter();
-        ex.printStackTrace( new PrintWriter( writer ) );
+        ex.printStackTrace(new PrintWriter(writer));
         return writer.toString();
     }
 
     @Test
     public void testEmptyPassivationException()
     {
-        PassivationException empty = new PassivationException( emptyList() );
-        assertThat( empty.getMessage(), containsString( "has 0 cause" ) );
+        PassivationException empty = new PassivationException(emptyList());
+        assertThat(empty.getMessage(), containsString("has 0 cause"));
     }
 
     @Test
     public void testSinglePassivationException()
     {
-        PassivationException single = new PassivationException( singletonList( new Exception( "single" ) ) );
-        String stack = stack( single );
-        assertThat( single.getMessage(), containsString( "has 1 cause" ) );
-        assertThat( stack, containsString( "Suppressed: java.lang.Exception: single" ) );
+        PassivationException single = new PassivationException(singletonList(new Exception("single")));
+        String stack = stack(single);
+        assertThat(single.getMessage(), containsString("has 1 cause"));
+        assertThat(stack, containsString("Suppressed: java.lang.Exception: single"));
     }
 
     @Test
     public void testMultiplePassivationException()
     {
-        PassivationException multi = new PassivationException( Arrays.asList( new Exception( "one" ),
-                                                                              new Exception( "two" ),
-                                                                              new Exception( "three" ) ) );
-        String stack = stack( multi );
-        assertThat( multi.getMessage(), containsString( "has 3 cause(s)" ) );
-        assertThat( stack, containsString( "Suppressed: java.lang.Exception: one" ) );
-        assertThat( stack, containsString( "Suppressed: java.lang.Exception: two" ) );
-        assertThat( stack, containsString( "Suppressed: java.lang.Exception: three" ) );
+        PassivationException multi = new PassivationException(Arrays.asList(new Exception("one"),
+            new Exception("two"),
+            new Exception("three")));
+        String stack = stack(multi);
+        assertThat(multi.getMessage(), containsString("has 3 cause(s)"));
+        assertThat(stack, containsString("Suppressed: java.lang.Exception: one"));
+        assertThat(stack, containsString("Suppressed: java.lang.Exception: two"));
+        assertThat(stack, containsString("Suppressed: java.lang.Exception: three"));
     }
 
     @Test
     public void testPassivationExceptionsAccrossStructure()
         throws ActivationException
     {
-        ApplicationBuilder appBuilder = new ApplicationBuilder( "TestApplication" );
-        appBuilder.withLayer( "Layer 1" ).withModule( "Module A" ).withAssembler(
-            module -> module.services( TestService.class )
-                            .identifiedBy( "TestService_Module.A" )
-                            .withActivators( FailBeforePassivationServiceActivator.class )
-                            .instantiateOnStartup() );
-        appBuilder.withLayer( "Layer 2" ).withModule( "Module B" ).withAssembler(
-            module -> module.services( TestService.class )
-                            .identifiedBy( "TestService_Module.B" )
-                            .withActivators( FailAfterPassivationServiceActivator.class )
-                            .instantiateOnStartup() );
-        appBuilder.registerActivationEventListener( new TestActivationEventListener() );
+        ApplicationBuilder appBuilder = new ApplicationBuilder("TestApplication");
+        appBuilder.withLayer("Layer 1").withModule("Module A").withAssembler(
+            module -> module.services(TestService.class)
+                .identifiedBy("TestService_Module.A")
+                .withActivators(FailBeforePassivationServiceActivator.class)
+                .instantiateOnStartup());
+        appBuilder.withLayer("Layer 2").withModule("Module B").withAssembler(
+            module -> module.services(TestService.class)
+                .identifiedBy("TestService_Module.B")
+                .withActivators(FailAfterPassivationServiceActivator.class)
+                .instantiateOnStartup());
+        appBuilder.registerActivationEventListener(new TestActivationEventListener());
 
         Application app = appBuilder.newApplication();
 
         try
         {
-            Module moduleA = app.findModule( "Layer 1", "Module A" );
-            TestService service = moduleA.findService( TestService.class ).get();
-            assertThat( service.hello(), equalTo( "Hello Qi4j!" ) );
+            Module moduleA = app.findModule("Layer 1", "Module A");
+            TestService service = moduleA.findService(TestService.class).get();
+            assertThat(service.hello(), equalTo("Hello Qi4j!"));
         }
         finally
         {
             try
             {
                 app.passivate();
-                fail( "No PassivationException" );
+                fail("No PassivationException");
             }
-            catch( PassivationException ex )
+            catch(PassivationException ex)
             {
                 ex.printStackTrace();
-                String stack = stack( ex );
-                assertThat( ex.getMessage(), containsString( "has 12 cause(s)" ) );
-                assertThat( stack, containsString( "EVENT: FAIL BEFORE PASSIVATION for TestApplication" ) );
-                assertThat( stack, containsString( "EVENT: FAIL BEFORE PASSIVATION for Layer 2" ) );
-                assertThat( stack, containsString( "EVENT: FAIL BEFORE PASSIVATION for Module B" ) );
+                String stack = stack(ex);
+                assertThat(ex.getMessage(), containsString("has 12 cause(s)"));
+                assertThat(stack, containsString("EVENT: FAIL BEFORE PASSIVATION for TestApplication"));
+                assertThat(stack, containsString("EVENT: FAIL BEFORE PASSIVATION for Layer 2"));
+                assertThat(stack, containsString("EVENT: FAIL BEFORE PASSIVATION for Module B"));
                 assertThat(
                     stack,
                     containsString(
-                        "ACTIVATOR: FAIL AFTER PASSIVATION for TestService_Module.B(active=false,module='Module B')" ) );
-                assertThat( stack, containsString( "EVENT: FAIL AFTER PASSIVATION for Module B" ) );
-                assertThat( stack, containsString( "EVENT: FAIL AFTER PASSIVATION for Layer 2" ) );
-                assertThat( stack, containsString( "EVENT: FAIL BEFORE PASSIVATION for Layer 1" ) );
-                assertThat( stack, containsString( "EVENT: FAIL BEFORE PASSIVATION for Module A" ) );
+                        "ACTIVATOR: FAIL AFTER PASSIVATION for TestService_Module.B(active=false,module='Module B')"));
+                assertThat(stack, containsString("EVENT: FAIL AFTER PASSIVATION for Module B"));
+                assertThat(stack, containsString("EVENT: FAIL AFTER PASSIVATION for Layer 2"));
+                assertThat(stack, containsString("EVENT: FAIL BEFORE PASSIVATION for Layer 1"));
+                assertThat(stack, containsString("EVENT: FAIL BEFORE PASSIVATION for Module A"));
                 assertThat(
                     stack,
                     containsString(
-                        "ACTIVATOR: FAIL BEFORE PASSIVATION for TestService_Module.A(active=true,module='Module A')" ) );
-                assertThat( stack, containsString( "EVENT: FAIL AFTER PASSIVATION for Module A" ) );
-                assertThat( stack, containsString( "EVENT: FAIL AFTER PASSIVATION for Layer 1" ) );
-                assertThat( stack, containsString( "EVENT: FAIL AFTER PASSIVATION for TestApplication" ) );
+                        "ACTIVATOR: FAIL BEFORE PASSIVATION for TestService_Module.A(active=true,module='Module A')"));
+                assertThat(stack, containsString("EVENT: FAIL AFTER PASSIVATION for Module A"));
+                assertThat(stack, containsString("EVENT: FAIL AFTER PASSIVATION for Layer 1"));
+                assertThat(stack, containsString("EVENT: FAIL AFTER PASSIVATION for TestApplication"));
             }
         }
     }
 
-    @Mixins( TestService.Mixin.class )
+    @Mixins(TestService.Mixin.class)
     public interface TestService
     {
         String hello();
@@ -161,10 +160,10 @@ public class PassivationExceptionTest
         extends ActivatorAdapter<ServiceReference<TestService>>
     {
         @Override
-        public void beforePassivation( ServiceReference<TestService> passivated )
+        public void beforePassivation(ServiceReference<TestService> passivated)
             throws Exception
         {
-            throw new Exception( "ACTIVATOR: FAIL BEFORE PASSIVATION for " + passivated );
+            throw new Exception("ACTIVATOR: FAIL BEFORE PASSIVATION for " + passivated);
         }
     }
 
@@ -172,10 +171,10 @@ public class PassivationExceptionTest
         extends ActivatorAdapter<ServiceReference<TestService>>
     {
         @Override
-        public void afterPassivation( ServiceReference<TestService> passivated )
+        public void afterPassivation(ServiceReference<TestService> passivated)
             throws Exception
         {
-            throw new Exception( "ACTIVATOR: FAIL AFTER PASSIVATION for " + passivated );
+            throw new Exception("ACTIVATOR: FAIL AFTER PASSIVATION for " + passivated);
         }
     }
 
@@ -183,21 +182,21 @@ public class PassivationExceptionTest
         implements ActivationEventListener
     {
         @Override
-        public void onEvent( ActivationEvent event )
+        public void onEvent(ActivationEvent event)
             throws Exception
         {
-            if( !( event.source() instanceof Application )
-                && !( event.source() instanceof Layer )
-                && !( event.source() instanceof Module ) )
+            if(!(event.source() instanceof Application)
+                && !(event.source() instanceof Layer)
+                && !(event.source() instanceof Module))
             {
                 return;
             }
-            switch( event.type() )
+            switch(event.type())
             {
                 case PASSIVATING:
-                    throw new Exception( "EVENT: FAIL BEFORE PASSIVATION for " + event.source() );
+                    throw new Exception("EVENT: FAIL BEFORE PASSIVATION for " + event.source());
                 case PASSIVATED:
-                    throw new Exception( "EVENT: FAIL AFTER PASSIVATION for " + event.source() );
+                    throw new Exception("EVENT: FAIL AFTER PASSIVATION for " + event.source());
             }
         }
     }

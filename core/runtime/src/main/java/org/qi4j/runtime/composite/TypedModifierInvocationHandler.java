@@ -30,34 +30,34 @@ public final class TypedModifierInvocationHandler
     extends FragmentInvocationHandler
 {
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
         try
         {
-            return this.method.invoke( fragment, args );
+            return this.method.invoke(fragment, args);
         }
-        catch( InvocationTargetException e )
+        catch(InvocationTargetException e)
         {
             Throwable targetException = e.getTargetException();
-            if( targetException instanceof IllegalAccessError )
+            if(targetException instanceof IllegalAccessError)
             {
                 // We get here if any of the return types or parameters are not public. This is probably due to
                 // the _Stub class ends up in a different classpace than the original mixin. We intend to fix this in
                 // 3.1 or 3.2
-                if( !Modifier.isPublic( method.getReturnType().getModifiers() ) )
+                if(!Modifier.isPublic(method.getReturnType().getModifiers()))
                 {
                     String message = "Return types must be public: " + method.getReturnType().getName();
-                    IllegalAccessException illegalAccessException = new IllegalAccessException( message );
-                    illegalAccessException.initCause( e.getTargetException() );
-                    throw cleanStackTrace( illegalAccessException, proxy, method );
+                    IllegalAccessException illegalAccessException = new IllegalAccessException(message);
+                    illegalAccessException.initCause(e.getTargetException());
+                    throw cleanStackTrace(illegalAccessException, proxy, method);
                 }
             }
-            throw cleanStackTrace( targetException, proxy, method );
+            throw cleanStackTrace(targetException, proxy, method);
         }
-        catch( Throwable e )
+        catch(Throwable e)
         {
-            throw cleanStackTrace( e, proxy, method );
+            throw cleanStackTrace(e, proxy, method);
         }
     }
 }

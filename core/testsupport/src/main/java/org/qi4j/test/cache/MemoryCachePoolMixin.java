@@ -19,9 +19,10 @@
  */
 package org.qi4j.test.cache;
 
+import org.qi4j.spi.cache.Cache;
+
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import org.qi4j.spi.cache.Cache;
 
 import static org.qi4j.api.util.Collectors.single;
 
@@ -34,32 +35,32 @@ public abstract class MemoryCachePoolMixin
     private final ConcurrentHashMap<String, MemoryCacheImpl<?>> caches = new ConcurrentHashMap<>();
 
     @Override
-    public <T> Cache<T> fetchCache( String cacheId, Class<T> valueType )
+    public <T> Cache<T> fetchCache(String cacheId, Class<T> valueType)
     {
-        Objects.requireNonNull( cacheId, "cacheId" );
-        if( cacheId.isEmpty() )
+        Objects.requireNonNull(cacheId, "cacheId");
+        if(cacheId.isEmpty())
         {
-            throw new IllegalArgumentException( "cacheId was empty string" );
+            throw new IllegalArgumentException("cacheId was empty string");
         }
-        @SuppressWarnings( "unchecked" )
-        MemoryCacheImpl<T> cache = (MemoryCacheImpl<T>) caches.computeIfAbsent( cacheId, k -> createNewCache( cacheId, valueType ) );
+        @SuppressWarnings("unchecked")
+        MemoryCacheImpl<T> cache = (MemoryCacheImpl<T>) caches.computeIfAbsent(cacheId, k -> createNewCache(cacheId, valueType));
         cache.incRefCount();
         return cache;
     }
 
-    private <T> MemoryCacheImpl<T> createNewCache( String cacheId, Class<T> valueType )
+    private <T> MemoryCacheImpl<T> createNewCache(String cacheId, Class<T> valueType)
     {
-        return new MemoryCacheImpl<>( cacheId, new ConcurrentHashMap<>(), valueType );
+        return new MemoryCacheImpl<>(cacheId, new ConcurrentHashMap<>(), valueType);
     }
 
     @Override
-    public void returnCache( Cache<?> cache )
+    public void returnCache(Cache<?> cache)
     {
         MemoryCacheImpl<?> memory = (MemoryCacheImpl<?>) cache;
         memory.decRefCount();
-        if( memory.isNotUsed() )
+        if(memory.isNotUsed())
         {
-            caches.remove( memory.cacheId() );
+            caches.remove(memory.cacheId());
         }
     }
 
@@ -80,6 +81,6 @@ public abstract class MemoryCachePoolMixin
     @Override
     public MemoryCacheImpl<?> singleCache()
     {
-        return caches.values().stream().collect( single() );
+        return caches.values().stream().collect(single());
     }
 }

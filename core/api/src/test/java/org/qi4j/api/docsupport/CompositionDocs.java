@@ -21,12 +21,11 @@ package org.qi4j.api.docsupport;
 
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.ModuleAssembly;
 
 public class CompositionDocs
 {
-// START SNIPPET: comp1
-    @Mixins( { BalanceCheckMixin.class } )
+    // START SNIPPET: comp1
+    @Mixins({BalanceCheckMixin.class})
     public interface BankAccount
     {
         Money checkBalance();
@@ -35,10 +34,10 @@ public class CompositionDocs
     }
 // END SNIPPET: comp1
 
-// START SNIPPET: comp2
-    public void assemble( ModuleAssembly module )
+    // START SNIPPET: comp2
+    public void assemble(ModuleAssembly module)
     {
-        module.entities( BankAccount.class );
+        module.entities(BankAccount.class);
     }
 // END SNIPPET: comp2
 

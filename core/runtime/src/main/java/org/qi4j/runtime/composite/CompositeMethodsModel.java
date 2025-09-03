@@ -19,12 +19,6 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.composite.MissingMethodException;
 import org.qi4j.api.structure.ModuleDescriptor;
@@ -32,8 +26,13 @@ import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.injection.Dependencies;
 import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.Dependencies;
-import org.qi4j.runtime.injection.DependencyModel;
+
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Model for Composite methods. This includes both private and public methods.
@@ -41,12 +40,12 @@ import org.qi4j.runtime.injection.DependencyModel;
 public final class CompositeMethodsModel
     implements VisitableHierarchy<Object, Object>, Dependencies
 {
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
 
     private final LinkedHashMap<Method, CompositeMethodModel> methods;
     private final MixinsModel mixinsModel;
 
-    public CompositeMethodsModel( MixinsModel mixinsModel )
+    public CompositeMethodsModel(MixinsModel mixinsModel)
     {
         methods = new LinkedHashMap<>();
         this.mixinsModel = mixinsModel;
@@ -55,84 +54,84 @@ public final class CompositeMethodsModel
     public Stream<DependencyModel> dependencies()
     {
         Collection<CompositeMethodModel> compositeMethods = methods.values();
-        return compositeMethods.stream().flatMap( Dependencies.DEPENDENCIES_FUNCTION );
+        return compositeMethods.stream().flatMap(Dependencies.DEPENDENCIES_FUNCTION);
     }
 
     // Context
-    public Object invoke( MixinsInstance mixins,
-                          Object proxy,
-                          Method method,
-                          Object[] args,
-                          ModuleDescriptor moduleInstance
-                        )
+    public Object invoke(MixinsInstance mixins,
+                         Object proxy,
+                         Method method,
+                         Object[] args,
+                         ModuleDescriptor moduleInstance
+    )
         throws Throwable
     {
-        CompositeMethodModel compositeMethod = methods.get( method );
+        CompositeMethodModel compositeMethod = methods.get(method);
 
-        if( compositeMethod == null )
+        if(compositeMethod == null)
         {
             Class<?> declaringClass = method.getDeclaringClass();
-            if( declaringClass.equals( Object.class ) )
+            if(declaringClass.equals(Object.class))
             {
-                return mixins.invokeObject( proxy, args, method );
+                return mixins.invokeObject(proxy, args, method);
             }
 
             // TODO: Figure out what was the intention of this code block, added by Rickard in 2009. It doesn't do anything useful.
             // Update (niclas): My guess is that this is preparation for mixins in Objects.
-            if( !declaringClass.isInterface() )
+            if(!declaringClass.isInterface())
             {
-                compositeMethod = mixinsModel.mixinTypes().map( aClass ->
-                                                                {
-                                                                    try
-                                                                    {
-                                                                        Method realMethod = aClass.getMethod( method.getName(), method.getParameterTypes() );
-                                                                        return methods.get( realMethod );
-                                                                    }
-                                                                    catch( NoSuchMethodException | SecurityException e )
-                                                                    {
-
-                                                                    }
-                                                                    return null;
-                                                                } ).filter( Objects::nonNull ).findFirst().orElse( null );
-                return compositeMethod.invoke( proxy, args, mixins, moduleInstance );
-            }
-            if( method.isDefault() )
-            {
-                if( proxy instanceof Composite )
+                compositeMethod = mixinsModel.mixinTypes().map(aClass ->
                 {
-                    throw new InternalError( "This shouldn't happen!" );
+                    try
+                    {
+                        Method realMethod = aClass.getMethod(method.getName(), method.getParameterTypes());
+                        return methods.get(realMethod);
+                    }
+                    catch(NoSuchMethodException | SecurityException e)
+                    {
+
+                    }
+                    return null;
+                }).filter(Objects::nonNull).findFirst().orElse(null);
+                return compositeMethod.invoke(proxy, args, mixins, moduleInstance);
+            }
+            if(method.isDefault())
+            {
+                if(proxy instanceof Composite)
+                {
+                    throw new InternalError("This shouldn't happen!");
                 }
                 // Does this next line actually make any sense? Can we have a default method on an interface where the instance is not a Composite? Maybe... Let's try to trap a usecase by disallowing it.
 //                return method.invoke( proxy, args );
                 String message = "We have detected a default method on an interface that is not backed by a Composite. "
-                                 + "Please report this to qi4j-dev@googlegroups.com together with the information below, "
-                                 + "that/those class(es) and the relevant assembly information. Thank you"
-                                 + NL + "Method:"
-                                 + method.toGenericString()
-                                 + NL + "Declaring Class:"
-                                 + method.getDeclaringClass().toGenericString()
-                                 + NL + "Types:"
-                                 + mixinsModel.mixinTypes()
-                                              .map( Class::toGenericString )
-                                              .collect( Collectors.joining( NL ) );
-                throw new UnsupportedOperationException( message );
+                    + "Please report this to qi4j-dev@googlegroups.com together with the information below, "
+                    + "that/those class(es) and the relevant assembly information. Thank you"
+                    + NL + "Method:"
+                    + method.toGenericString()
+                    + NL + "Declaring Class:"
+                    + method.getDeclaringClass().toGenericString()
+                    + NL + "Types:"
+                    + mixinsModel.mixinTypes()
+                    .map(Class::toGenericString)
+                    .collect(Collectors.joining(NL));
+                throw new UnsupportedOperationException(message);
             }
-            throw new MissingMethodException( "Method '" + method + "' is not implemented" );
+            throw new MissingMethodException("Method '" + method + "' is not implemented");
         }
         else
         {
-            return compositeMethod.invoke( proxy, args, mixins, moduleInstance );
+            return compositeMethod.invoke(proxy, args, mixins, moduleInstance);
         }
     }
 
-    public void addMethod( CompositeMethodModel methodModel )
+    public void addMethod(CompositeMethodModel methodModel)
     {
-        methods.put( methodModel.method(), methodModel );
+        methods.put(methodModel.method(), methodModel);
     }
 
-    public boolean isImplemented( Method method )
+    public boolean isImplemented(Method method)
     {
-        return methods.containsKey( method );
+        return methods.containsKey(method);
     }
 
     public Iterable<Method> methods()
@@ -141,20 +140,20 @@ public final class CompositeMethodsModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            for( CompositeMethodModel compositeMethodModel : methods.values() )
+            for(CompositeMethodModel compositeMethodModel : methods.values())
             {
-                if( !compositeMethodModel.accept( modelVisitor ) )
+                if(!compositeMethodModel.accept(modelVisitor))
                 {
                     break;
                 }
             }
         }
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
 
     @Override

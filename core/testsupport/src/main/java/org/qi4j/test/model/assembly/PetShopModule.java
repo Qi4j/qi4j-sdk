@@ -23,26 +23,21 @@ package org.qi4j.test.model.assembly;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.layered.ModuleAssembler;
-import org.qi4j.test.model.Address;
-import org.qi4j.test.model.Cat;
-import org.qi4j.test.model.City;
-import org.qi4j.test.model.Dog;
-import org.qi4j.test.model.Owner;
-import org.qi4j.test.model.Staff;
+import org.qi4j.test.model.*;
 
 class PetShopModule
     implements ModuleAssembler
 {
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
     {
-        module.entities( Owner.class,
-                         Staff.class );
-        module.entities( City.class,
-                         Cat.class,
-                         Dog.class );
+        module.entities(Owner.class,
+            Staff.class);
+        module.entities(City.class,
+            Cat.class,
+            Dog.class);
 
-        module.values( Address.class );
+        module.values(Address.class);
         return module;
     }
 }

@@ -20,6 +20,14 @@
 
 package org.qi4j.runtime.composite;
 
+import org.qi4j.api.common.ConstructionException;
+import org.qi4j.api.composite.MethodDescriptor;
+import org.qi4j.api.structure.ModuleDescriptor;
+import org.qi4j.api.util.HierarchicalVisitor;
+import org.qi4j.api.util.VisitableHierarchy;
+import org.qi4j.runtime.injection.Dependencies;
+import org.qi4j.runtime.injection.DependencyModel;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Array;
@@ -32,15 +40,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.composite.MethodDescriptor;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.util.HierarchicalVisitor;
-import org.qi4j.api.util.VisitableHierarchy;
-import org.qi4j.runtime.injection.Dependencies;
-import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.Dependencies;
-import org.qi4j.runtime.injection.DependencyModel;
 
 /**
  * JAVADOC
@@ -61,11 +60,11 @@ public final class CompositeMethodModel
     private final ConcurrentLinkedQueue<CompositeMethodInstance> instancePool = new ConcurrentLinkedQueue<>();
     private final ConstraintsInstance constraintsInstance;
 
-    public CompositeMethodModel( Method method,
-                                 ConstraintsModel constraintsModel,
-                                 ConcernsModel concernsModel,
-                                 SideEffectsModel sideEffectsModel,
-                                 MixinsModel mixinsModel
+    public CompositeMethodModel(Method method,
+                                ConstraintsModel constraintsModel,
+                                ConcernsModel concernsModel,
+                                SideEffectsModel sideEffectsModel,
+                                MixinsModel mixinsModel
     )
     {
         this.method = method;
@@ -87,73 +86,73 @@ public final class CompositeMethodModel
 
     public MixinModel mixin()
     {
-        return mixins.mixinFor( method );
+        return mixins.mixinFor(method);
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public Stream<DependencyModel> dependencies()
     {
-        Stream<? extends Dependencies> concerns = Stream.of( this.concerns, sideEffects );
-        Stream<? extends Dependencies> filteredNonNull = concerns.filter( Objects::nonNull );
-        return filteredNonNull.flatMap( Dependencies::dependencies );
+        Stream<? extends Dependencies> concerns = Stream.of(this.concerns, sideEffects);
+        Stream<? extends Dependencies> filteredNonNull = concerns.filter(Objects::nonNull);
+        return filteredNonNull.flatMap(Dependencies::dependencies);
     }
 
     // Context
-    public Object invoke( Object composite, Object[] params, MixinsInstance mixins, ModuleDescriptor module )
+    public Object invoke(Object composite, Object[] params, MixinsInstance mixins, ModuleDescriptor module)
         throws Throwable
     {
-        constraintsInstance.checkValid( composite, method, params );
+        constraintsInstance.checkValid(composite, method, params);
 
-        CompositeMethodInstance methodInstance = getInstance( module );
+        CompositeMethodInstance methodInstance = getInstance(module);
         try
         {
-            return mixins.invoke( composite, params, methodInstance );
+            return mixins.invoke(composite, params, methodInstance);
         }
         finally
         {
-            instancePool.offer( methodInstance );
+            instancePool.offer(methodInstance);
         }
     }
 
-    private CompositeMethodInstance getInstance( ModuleDescriptor module )
+    private CompositeMethodInstance getInstance(ModuleDescriptor module)
     {
         CompositeMethodInstance methodInstance = instancePool.poll();
-        if( methodInstance == null )
+        if(methodInstance == null)
         {
-            methodInstance = newCompositeMethodInstance( module );
+            methodInstance = newCompositeMethodInstance(module);
         }
 
         return methodInstance;
     }
 
-    private CompositeMethodInstance newCompositeMethodInstance( ModuleDescriptor module )
+    private CompositeMethodInstance newCompositeMethodInstance(ModuleDescriptor module)
         throws ConstructionException
     {
-        FragmentInvocationHandler mixinInvocationHandler = mixins.newInvocationHandler( method );
+        FragmentInvocationHandler mixinInvocationHandler = mixins.newInvocationHandler(method);
         InvocationHandler invoker = mixinInvocationHandler;
-        if( concerns != ConcernsModel.EMPTY_CONCERNS )
+        if(concerns != ConcernsModel.EMPTY_CONCERNS)
         {
-            ConcernsInstance concernsInstance = concerns.newInstance( method, module, mixinInvocationHandler );
+            ConcernsInstance concernsInstance = concerns.newInstance(method, module, mixinInvocationHandler);
             invoker = concernsInstance;
         }
-        if( sideEffects != SideEffectsModel.EMPTY_SIDEEFFECTS )
+        if(sideEffects != SideEffectsModel.EMPTY_SIDEEFFECTS)
         {
-            SideEffectsInstance sideEffectsInstance = sideEffects.newInstance( method, module, invoker );
+            SideEffectsInstance sideEffectsInstance = sideEffects.newInstance(method, module, invoker);
             invoker = sideEffectsInstance;
         }
 
-        if( invocationMethod == null )
+        if(invocationMethod == null)
         {
-            MixinModel model = mixins.mixinFor( method );
-            if( !InvocationHandler.class.isAssignableFrom( model.mixinClass() ) )
+            MixinModel model = mixins.mixinFor(method);
+            if(!InvocationHandler.class.isAssignableFrom(model.mixinClass()))
             {
                 try
                 {
                     invocationMethod = model.instantiationClass()
-                        .getMethod( "_" + method.getName(), method.getParameterTypes() );
+                        .getMethod("_" + method.getName(), method.getParameterTypes());
                 }
-                catch( NoSuchMethodException e )
+                catch(NoSuchMethodException e)
                 {
                     invocationMethod = method;
 //                    throw new ConstructionException( "Could not find the subclass method", e );
@@ -165,9 +164,9 @@ public final class CompositeMethodModel
             }
         }
 
-        mixinInvocationHandler.setMethod( invocationMethod );
+        mixinInvocationHandler.setMethod(invocationMethod);
 
-        return new CompositeMethodInstance( invoker, mixinInvocationHandler, method, mixins.methodIndex.get( method ) );
+        return new CompositeMethodInstance(invoker, mixinInvocationHandler, method, mixins.methodIndex.get(method));
     }
 
     public AnnotatedElement annotatedElement()
@@ -176,16 +175,16 @@ public final class CompositeMethodModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            constraints.accept( modelVisitor );
-            concerns.accept( modelVisitor );
-            sideEffects.accept( modelVisitor );
+            constraints.accept(modelVisitor);
+            concerns.accept(modelVisitor);
+            sideEffects.accept(modelVisitor);
         }
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
 
     @Override
@@ -194,19 +193,19 @@ public final class CompositeMethodModel
         return method.toGenericString();
     }
 
-    public Iterable<Method> invocationsFor( Class<?> mixinClass )
+    public Iterable<Method> invocationsFor(Class<?> mixinClass)
     {
-        return mixins.invocationsFor( mixinClass ).collect( Collectors.toList() );
+        return mixins.invocationsFor(mixinClass).collect(Collectors.toList());
     }
 
     public class CompositeMethodAnnotatedElement
         implements AnnotatedElement
     {
         @Override
-        public boolean isAnnotationPresent( Class<? extends Annotation> annotationClass )
+        public boolean isAnnotationPresent(Class<? extends Annotation> annotationClass)
         {
             // Check method
-            if( method.isAnnotationPresent( annotationClass ) )
+            if(method.isAnnotationPresent(annotationClass))
             {
                 return true;
             }
@@ -214,42 +213,42 @@ public final class CompositeMethodModel
             // Check mixin
             try
             {
-                MixinModel model = mixins.mixinFor( method );
-                return !GenericPredicate.INSTANCE.test( model.mixinClass() )
-                       && ( model.mixinClass().getMethod( method.getName(), method.getParameterTypes() )
-                                 .isAnnotationPresent( annotationClass ) );
+                MixinModel model = mixins.mixinFor(method);
+                return !GenericPredicate.INSTANCE.test(model.mixinClass())
+                    && (model.mixinClass().getMethod(method.getName(), method.getParameterTypes())
+                    .isAnnotationPresent(annotationClass));
             }
-            catch( NoSuchMethodException e )
+            catch(NoSuchMethodException e)
             {
                 return false;
             }
         }
 
         @Override
-        public <T extends Annotation> T getAnnotation( Class<T> annotationClass )
+        public <T extends Annotation> T getAnnotation(Class<T> annotationClass)
         {
             // Check mixin
             try
             {
-                MixinModel model = mixins.mixinFor( method );
-                if( !GenericPredicate.INSTANCE.test( model.mixinClass() ) )
+                MixinModel model = mixins.mixinFor(method);
+                if(!GenericPredicate.INSTANCE.test(model.mixinClass()))
                 {
-                    T annotation = annotationClass.cast( model.mixinClass()
-                                                             .getMethod( method.getName(), method.getParameterTypes() )
-                                                             .getAnnotation( annotationClass ) );
-                    if( annotation != null )
+                    T annotation = annotationClass.cast(model.mixinClass()
+                        .getMethod(method.getName(), method.getParameterTypes())
+                        .getAnnotation(annotationClass));
+                    if(annotation != null)
                     {
                         return annotation;
                     }
                 }
             }
-            catch( NoSuchMethodException e )
+            catch(NoSuchMethodException e)
             {
                 // Ignore
             }
 
             // Check method
-            return method.getAnnotation( annotationClass );
+            return method.getAnnotation(annotationClass);
         }
 
         @Override
@@ -257,60 +256,60 @@ public final class CompositeMethodModel
         {
             // Add mixin annotations
             List<Annotation> annotations = new ArrayList<>();
-            MixinModel model = mixins.mixinFor( method );
-            Annotation[] mixinAnnotations = new Annotation[ 0 ];
-            if( !GenericPredicate.INSTANCE.test( model.mixinClass() ) )
+            MixinModel model = mixins.mixinFor(method);
+            Annotation[] mixinAnnotations = new Annotation[0];
+            if(!GenericPredicate.INSTANCE.test(model.mixinClass()))
             {
                 mixinAnnotations = model.mixinClass().getAnnotations();
-                annotations.addAll( Arrays.asList( mixinAnnotations ) );
+                annotations.addAll(Arrays.asList(mixinAnnotations));
             }
 
             // Add method annotations, but don't include duplicates
             Annotation[] methodAnnotations = method.getAnnotations();
             next:
-            for( Annotation methodAnnotation : methodAnnotations )
+            for(Annotation methodAnnotation : methodAnnotations)
             {
-                for( int i = 0; i < mixinAnnotations.length; i++ )
+                for(int i = 0; i < mixinAnnotations.length; i++)
                 {
-                    if( annotations.get( i ).annotationType().equals( methodAnnotation.annotationType() ) )
+                    if(annotations.get(i).annotationType().equals(methodAnnotation.annotationType()))
                     {
                         continue next;
                     }
                 }
 
-                annotations.add( methodAnnotation );
+                annotations.add(methodAnnotation);
             }
 
-            return annotations.toArray( new Annotation[ annotations.size() ] );
+            return annotations.toArray(new Annotation[annotations.size()]);
         }
 
         @Override
         public Annotation[] getDeclaredAnnotations()
         {
-            return new Annotation[ 0 ];
+            return new Annotation[0];
         }
 
         // @Override (Since JDK 8)
-        @SuppressWarnings( "unchecked" )
-        public <T extends Annotation> T[] getAnnotationsByType( Class<T> annotationClass )
+        @SuppressWarnings("unchecked")
+        public <T extends Annotation> T[] getAnnotationsByType(Class<T> annotationClass)
         {
-            Objects.requireNonNull( annotationClass, "annotationClass" );
-            return (T[]) Array.newInstance( annotationClass, 0 );
+            Objects.requireNonNull(annotationClass, "annotationClass");
+            return (T[]) Array.newInstance(annotationClass, 0);
         }
 
         // @Override (Since JDK 8)
-        public <T extends Annotation> T getDeclaredAnnotation( Class<T> annotationClass )
+        public <T extends Annotation> T getDeclaredAnnotation(Class<T> annotationClass)
         {
-            Objects.requireNonNull( annotationClass, "annotationClass" );
+            Objects.requireNonNull(annotationClass, "annotationClass");
             return null;
         }
 
         // @Override (Since JDK 8)
-        @SuppressWarnings( "unchecked" )
-        public <T extends Annotation> T[] getDeclaredAnnotationsByType( Class<T> annotationClass )
+        @SuppressWarnings("unchecked")
+        public <T extends Annotation> T[] getDeclaredAnnotationsByType(Class<T> annotationClass)
         {
-            Objects.requireNonNull( annotationClass, "annotationClass" );
-            return (T[]) Array.newInstance( annotationClass, 0 );
+            Objects.requireNonNull(annotationClass, "annotationClass");
+            return (T[]) Array.newInstance(annotationClass, 0);
         }
     }
 }

@@ -16,7 +16,8 @@
  *  limitations under the License.
  *
  *
- */package org.qi4j.test.metrics;
+ */
+package org.qi4j.test.metrics;
 
 import java.util.Collection;
 
@@ -41,5 +42,5 @@ public interface MetricValuesProvider
      * @param name Timer name
      * @return Timer count
      */
-    long timerCount( String name );
+    long timerCount(String name);
 }

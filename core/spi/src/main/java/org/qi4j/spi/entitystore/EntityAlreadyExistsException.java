@@ -29,7 +29,7 @@ public class EntityAlreadyExistsException
 {
     private EntityReference reference;
 
-    public EntityAlreadyExistsException( EntityReference reference)
+    public EntityAlreadyExistsException(EntityReference reference)
     {
         super("Entity " + reference + " already exists.");
         this.reference = reference;

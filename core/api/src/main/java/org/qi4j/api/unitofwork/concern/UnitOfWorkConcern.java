@@ -19,8 +19,6 @@
  */
 package org.qi4j.api.unitofwork.concern;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.UndeclaredThrowableException;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.GenericConcern;
@@ -33,7 +31,9 @@ import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.api.usecase.UsecaseBuilder;
 import org.qi4j.api.usecase.UsecaseFactory;
-import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.UndeclaredThrowableException;
 
 /**
  * {@code UnitOfWorkConcern} manages the unit of work complete, discard and retry policy.
@@ -41,11 +41,11 @@ import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
  * @see UnitOfWorkPropagation
  * @see UnitOfWorkDiscardOn
  */
-@AppliesTo( UnitOfWorkPropagation.class )
+@AppliesTo(UnitOfWorkPropagation.class)
 public class UnitOfWorkConcern
     extends GenericConcern
 {
-    private static final Class<?>[] DEFAULT_DISCARD_CLASSES = new Class[]{ Throwable.class };
+    private static final Class<?>[] DEFAULT_DISCARD_CLASSES = new Class[]{Throwable.class};
 
     @Structure
     private UnitOfWorkFactory uowf;
@@ -67,93 +67,93 @@ public class UnitOfWorkConcern
      * @throws Throwable Thrown if the method invocation throw exception.
      */
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
         UnitOfWorkPropagation.Propagation propagationPolicy = propagation.value();
-        if( propagationPolicy == UnitOfWorkPropagation.Propagation.REQUIRED )
+        if(propagationPolicy == UnitOfWorkPropagation.Propagation.REQUIRED)
         {
-            if( uowf.isUnitOfWorkActive() )
+            if(uowf.isUnitOfWorkActive())
             {
                 //noinspection ConstantConditions
-                return next.invoke( proxy, method, args );
+                return next.invoke(proxy, method, args);
             }
             else
             {
                 Usecase usecase = usecase();
-                return invokeWithCommit( proxy, method, args, uowf.newUnitOfWork( usecase ) );
+                return invokeWithCommit(proxy, method, args, uowf.newUnitOfWork(usecase));
             }
         }
-        else if( propagationPolicy == UnitOfWorkPropagation.Propagation.MANDATORY )
+        else if(propagationPolicy == UnitOfWorkPropagation.Propagation.MANDATORY)
         {
-            if( !uowf.isUnitOfWorkActive() )
+            if(!uowf.isUnitOfWorkActive())
             {
-                throw new IllegalStateException( "UnitOfWork was required but there is no available unit of work." );
+                throw new IllegalStateException("UnitOfWork was required but there is no available unit of work.");
             }
         }
-        else if( propagationPolicy == UnitOfWorkPropagation.Propagation.REQUIRES_NEW )
+        else if(propagationPolicy == UnitOfWorkPropagation.Propagation.REQUIRES_NEW)
         {
             Usecase usecase = usecase();
-            return invokeWithCommit( proxy, method, args, uowf.newUnitOfWork( usecase ) );
+            return invokeWithCommit(proxy, method, args, uowf.newUnitOfWork(usecase));
         }
         //noinspection ConstantConditions
-        return next.invoke( proxy, method, args );
+        return next.invoke(proxy, method, args);
     }
 
     private Usecase usecase()
     {
         String usecaseName = propagation.usecase();
         Usecase usecase;
-        if( usecaseFactory == null )
+        if(usecaseFactory == null)
         {
-            if( usecaseName.length() == 0 )
+            if(usecaseName.length() == 0)
             {
                 usecase = Usecase.DEFAULT;
             }
             else
             {
-                usecase = UsecaseBuilder.newUsecase( usecaseName );
+                usecase = UsecaseBuilder.newUsecase(usecaseName);
             }
         }
         else
         {
-            usecase = usecaseFactory.createUsecase( usecaseName );
+            usecase = usecaseFactory.createUsecase(usecaseName);
         }
         return usecase;
     }
 
-    protected Object invokeWithCommit( Object proxy, Method method, Object[] args, UnitOfWork currentUnitOfWork )
+    protected Object invokeWithCommit(Object proxy, Method method, Object[] args, UnitOfWork currentUnitOfWork)
         throws Throwable
     {
         try
         {
-            UnitOfWorkRetry retryAnnot = method.getAnnotation( UnitOfWorkRetry.class );
+            UnitOfWorkRetry retryAnnot = method.getAnnotation(UnitOfWorkRetry.class);
             int maxTries = 0;
             long delayFactor = 0;
             long initialDelay = 0;
-            if( retryAnnot != null )
+            if(retryAnnot != null)
             {
                 maxTries = retryAnnot.retries();
                 initialDelay = retryAnnot.initialDelay();
                 delayFactor = retryAnnot.delayFactor();
             }
             int retry = 0;
-            while( true )
+            while(true)
             {
                 //noinspection ConstantConditions
-                Object result = next.invoke( proxy, method, args );
+                Object result = next.invoke(proxy, method, args);
                 try
                 {
                     currentUnitOfWork.complete();
                     return result;
                 }
-                catch( UndeclaredThrowableException e )
+                catch(UndeclaredThrowableException e)
                 {
                     Throwable undeclared = e.getUndeclaredThrowable();
-                    if( undeclared instanceof ConcurrentEntityModificationException)
+                    if(undeclared instanceof ConcurrentEntityModificationException)
                     {
                         ConcurrentEntityModificationException ceme = (ConcurrentEntityModificationException) undeclared;
-                        currentUnitOfWork = checkRetry( maxTries, delayFactor, initialDelay, retry, ceme );
+                        currentUnitOfWork = checkRetry(maxTries, delayFactor, initialDelay, retry, ceme);
                         retry++;
                     }
                     else
@@ -161,36 +161,36 @@ public class UnitOfWorkConcern
                         throw e;
                     }
                 }
-                catch( ConcurrentEntityModificationException e )
+                catch(ConcurrentEntityModificationException e)
                 {
-                    currentUnitOfWork = checkRetry( maxTries, delayFactor, initialDelay, retry, e );
+                    currentUnitOfWork = checkRetry(maxTries, delayFactor, initialDelay, retry, e);
                     retry++;
                 }
             }
         }
-        catch( Throwable throwable )
+        catch(Throwable throwable)
         {
             // Discard only if this concern create a unit of work
-            discardIfRequired( method, currentUnitOfWork, throwable );
+            discardIfRequired(method, currentUnitOfWork, throwable);
             throw throwable;
         }
     }
 
-    private UnitOfWork checkRetry( int maxTries,
-                                   long delayFactor,
-                                   long initialDelay,
-                                   int retry,
-                                   ConcurrentEntityModificationException e
-                                 )
+    private UnitOfWork checkRetry(int maxTries,
+                                  long delayFactor,
+                                  long initialDelay,
+                                  int retry,
+                                  ConcurrentEntityModificationException e
+    )
         throws ConcurrentEntityModificationException, InterruptedException
     {
-        if( retry >= maxTries )
+        if(retry >= maxTries)
         {
             throw e;
         }
         uowf.currentUnitOfWork().discard();
-        Thread.sleep( initialDelay + retry * delayFactor );
-        return uowf.newUnitOfWork( usecase() );
+        Thread.sleep(initialDelay + retry * delayFactor);
+        return uowf.newUnitOfWork(usecase());
     }
 
     /**
@@ -200,11 +200,11 @@ public class UnitOfWorkConcern
      * @param aUnitOfWork The current unit of work. This argument must not be {@code null}.
      * @param aThrowable  The exception thrown. This argument must not be {@code null}.
      */
-    protected void discardIfRequired( Method aMethod, UnitOfWork aUnitOfWork, Throwable aThrowable )
+    protected void discardIfRequired(Method aMethod, UnitOfWork aUnitOfWork, Throwable aThrowable)
     {
-        UnitOfWorkDiscardOn discardPolicy = aMethod.getAnnotation( UnitOfWorkDiscardOn.class );
+        UnitOfWorkDiscardOn discardPolicy = aMethod.getAnnotation(UnitOfWorkDiscardOn.class);
         Class<?>[] discardClasses;
-        if( discardPolicy != null )
+        if(discardPolicy != null)
         {
             discardClasses = discardPolicy.value();
         }
@@ -214,9 +214,9 @@ public class UnitOfWorkConcern
         }
 
         Class<? extends Throwable> aThrowableClass = aThrowable.getClass();
-        for( Class<?> discardClass : discardClasses )
+        for(Class<?> discardClass : discardClasses)
         {
-            if( discardClass.isAssignableFrom( aThrowableClass ) )
+            if(discardClass.isAssignableFrom(aThrowableClass))
             {
                 aUnitOfWork.discard();
             }

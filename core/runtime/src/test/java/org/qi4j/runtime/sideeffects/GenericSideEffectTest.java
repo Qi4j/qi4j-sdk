@@ -20,7 +20,7 @@
 
 package org.qi4j.runtime.sideeffects;
 
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.AppliesToFilter;
 import org.qi4j.api.common.UseDefaults;
@@ -33,7 +33,8 @@ import org.qi4j.api.sideeffect.SideEffects;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -43,27 +44,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * JAVADOC
  */
 public class GenericSideEffectTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( SomeComposite.class );
+        module.transients(SomeComposite.class);
     }
 
     @Test
     public void testGenericSideEffect()
     {
-        SomeComposite some = transientBuilderFactory.newTransient( SomeComposite.class );
+        SomeComposite some = transientBuilderFactory.newTransient(SomeComposite.class);
         Property<Integer> count = some.count();
-        assertThat( "count is zero", count.get(), equalTo( 0 ) );
+        assertThat("count is zero", count.get(), equalTo(0));
         some.doStuff();
-        assertThat( "count is not zero", count.get(), not( equalTo( 0 ) ) );
+        assertThat("count is not zero", count.get(), not(equalTo(0)));
     }
 
-    @SideEffects( CounterSideEffect.class )
-    @Mixins( SomeMixin.class )
+    @SideEffects(CounterSideEffect.class)
+    @Mixins(SomeMixin.class)
     public interface SomeComposite
         extends Some, Counter, TransientComposite
     {
@@ -89,25 +90,25 @@ public class GenericSideEffectTest
         Property<Integer> count();
     }
 
-    @AppliesTo( NotCounterFilter.class )
+    @AppliesTo(NotCounterFilter.class)
     public static class CounterSideEffect
         extends GenericSideEffect
     {
         @This
         Counter counter;
 
-        public void invoke( Method method, Object[] objects )
+        public void invoke(Method method, Object[] objects)
         {
-            counter.count().set( counter.count().get() + 1 );
+            counter.count().set(counter.count().get() + 1);
         }
     }
 
     public static class NotCounterFilter
         implements AppliesToFilter
     {
-        public boolean appliesTo( Method method, Class mixin, Class compositeType, Class modifierClass )
+        public boolean appliesTo(Method method, Class mixin, Class compositeType, Class modifierClass)
         {
-            return !method.getDeclaringClass().equals( Counter.class );
+            return !method.getDeclaringClass().equals(Counter.class);
         }
     }
 }

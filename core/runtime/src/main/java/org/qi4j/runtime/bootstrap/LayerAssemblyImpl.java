@@ -20,37 +20,15 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.service.ServiceImporter;
 import org.qi4j.api.structure.Layer;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.AssemblyVisitor;
-import org.qi4j.bootstrap.EntityAssembly;
-import org.qi4j.bootstrap.EntityDeclaration;
-import org.qi4j.bootstrap.ImportedServiceAssembly;
-import org.qi4j.bootstrap.ImportedServiceDeclaration;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.ObjectAssembly;
-import org.qi4j.bootstrap.ObjectDeclaration;
-import org.qi4j.bootstrap.ServiceAssembly;
-import org.qi4j.bootstrap.ServiceDeclaration;
-import org.qi4j.bootstrap.TransientAssembly;
-import org.qi4j.bootstrap.TransientDeclaration;
-import org.qi4j.bootstrap.ValueAssembly;
-import org.qi4j.bootstrap.ValueDeclaration;
 import org.qi4j.bootstrap.*;
+
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Assembly of a Layer. From here you can create more ModuleAssemblies for
@@ -68,7 +46,7 @@ public final class LayerAssemblyImpl
     private final MetaInfo metaInfo = new MetaInfo();
     private final List<Class<? extends Activator<Layer>>> activators = new ArrayList<>();
 
-    public LayerAssemblyImpl( ApplicationAssembly applicationAssembly, String name )
+    public LayerAssemblyImpl(ApplicationAssembly applicationAssembly, String name)
     {
         this.applicationAssembly = applicationAssembly;
         this.name = name;
@@ -78,18 +56,18 @@ public final class LayerAssemblyImpl
     }
 
     @Override
-    public ModuleAssembly module(String name )
+    public ModuleAssembly module(String name)
     {
-        if( name != null )
+        if(name != null)
         {
-            ModuleAssemblyImpl existing = moduleAssemblies.get( name );
-            if( existing != null )
+            ModuleAssemblyImpl existing = moduleAssemblies.get(name);
+            if(existing != null)
             {
                 return existing;
             }
         }
-        ModuleAssemblyImpl moduleAssembly = new ModuleAssemblyImpl( this, name );
-        moduleAssemblies.put( name, moduleAssembly );
+        ModuleAssemblyImpl moduleAssembly = new ModuleAssemblyImpl(this, name);
+        moduleAssemblies.put(name, moduleAssembly);
         return moduleAssembly;
     }
 
@@ -100,114 +78,120 @@ public final class LayerAssemblyImpl
     }
 
     @Override
-    public LayerAssembly setName( String name )
+    public LayerAssembly setName(String name)
     {
         this.name = name;
         return this;
     }
 
     @Override
-    public LayerAssembly setMetaInfo( Object info )
+    public LayerAssembly setMetaInfo(Object info)
     {
-        metaInfo.set( info );
+        metaInfo.set(info);
         return this;
     }
 
     @Override
-    public LayerAssembly uses( LayerAssembly... layerAssembly )
+    public <T> T metaInfo(Class<T> metaInfoType)
+    {
+        return metaInfo.get(metaInfoType);
+    }
+
+    @Override
+    public LayerAssembly uses(LayerAssembly... layerAssembly)
         throws IllegalArgumentException
     {
-        uses.addAll( Arrays.asList( layerAssembly ) );
+        uses.addAll(Arrays.asList(layerAssembly));
         return this;
     }
 
     @Override
     @SafeVarargs
-    public final LayerAssembly withActivators( Class<? extends Activator<Layer>>... activators )
+    public final LayerAssembly withActivators(Class<? extends Activator<Layer>>... activators)
     {
-        this.activators.addAll( Arrays.asList( activators ) );
+        this.activators.addAll(Arrays.asList(activators));
         return this;
     }
 
     @Override
-    public <ThrowableType extends Throwable> void visit( AssemblyVisitor<ThrowableType> visitor )
+    public <ThrowableType extends Throwable> void visit(AssemblyVisitor<ThrowableType> visitor)
         throws ThrowableType
     {
-        visitor.visitLayer( this );
-        for( ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values() )
+        visitor.visitLayer(this);
+        for(ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values())
         {
-            moduleAssembly.visit( visitor );
+            moduleAssembly.visit(visitor);
         }
     }
 
     @Override
-    public EntityDeclaration entities(Predicate<? super EntityAssembly> specification )
+    public EntityDeclaration entities(Predicate<? super EntityAssembly> specification)
     {
         final List<EntityDeclaration> declarations = new ArrayList<>();
 
-        for( ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values() )
+        for(ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values())
         {
-            declarations.add( moduleAssembly.entities( specification ) );
+            declarations.add(moduleAssembly.entities(specification));
         }
 
         return new EntityDeclaration()
         {
             @Override
-            public EntityDeclaration setMetaInfo( Object info )
+            public EntityDeclaration setMetaInfo(Object info)
             {
-                for( EntityDeclaration declaration : declarations )
+                for(EntityDeclaration declaration : declarations)
                 {
-                    declaration.setMetaInfo( info );
+                    declaration.setMetaInfo(info);
                 }
                 return this;
             }
 
             @Override
-            public EntityDeclaration visibleIn( Visibility visibility )
+            public EntityDeclaration visibleIn(Visibility visibility)
             {
-                for( EntityDeclaration declaration : declarations )
+                for(EntityDeclaration declaration : declarations)
                 {
-                    declaration.visibleIn( visibility );
+                    declaration.visibleIn(visibility);
                 }
                 return this;
             }
 
             @Override
-            public EntityDeclaration withConcerns( Class<?>... concerns )
+            public EntityDeclaration withConcerns(Class<?>... concerns)
             {
-                for( EntityDeclaration declaration : declarations )
+                for(EntityDeclaration declaration : declarations)
                 {
-                    declaration.withConcerns( concerns );
+                    declaration.withConcerns(concerns);
                 }
                 return this;
             }
 
             @Override
-            public EntityDeclaration withSideEffects( Class<?>... sideEffects )
+            public EntityDeclaration withSideEffects(Class<?>... sideEffects)
             {
-                for( EntityDeclaration declaration : declarations )
+                for(EntityDeclaration declaration : declarations)
                 {
-                    declaration.withSideEffects( sideEffects );
+                    declaration.withSideEffects(sideEffects);
                 }
                 return this;
             }
 
             @Override
-            public EntityDeclaration withMixins( Class<?>... mixins )
+            public EntityDeclaration withMixins(Class<?>... mixins)
             {
-                for( EntityDeclaration declaration : declarations )
+                for(EntityDeclaration declaration : declarations)
                 {
-                    declaration.withMixins( mixins );
+                    declaration.withMixins(mixins);
                 }
                 return this;
             }
 
             @Override
-            public EntityDeclaration withTypes( Class<?>... types )
+            public EntityDeclaration withTypes(Class<?>... types)
             {
-                for( EntityDeclaration declaration : declarations )
+                for(EntityDeclaration declaration : declarations)
                 {
-                    declaration.withTypes( types );
+                    declaration.withTypes(types);
                 }
                 return this;
             }
@@ -215,104 +199,104 @@ public final class LayerAssemblyImpl
     }
 
     @Override
-    public ServiceDeclaration services( Predicate<? super ServiceAssembly> specification )
+    public ServiceDeclaration services(Predicate<? super ServiceAssembly> specification)
     {
         final List<ServiceDeclaration> declarations = new ArrayList<>();
 
-        for( ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values() )
+        for(ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values())
         {
-            declarations.add( moduleAssembly.services( specification ) );
+            declarations.add(moduleAssembly.services(specification));
         }
 
         return new ServiceDeclaration()
         {
             @Override
-            public ServiceDeclaration setMetaInfo( Object serviceAttribute )
+            public ServiceDeclaration setMetaInfo(Object serviceAttribute)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.setMetaInfo( serviceAttribute );
+                    declaration.setMetaInfo(serviceAttribute);
                 }
                 return this;
             }
 
             @Override
-            public ServiceDeclaration visibleIn( Visibility visibility )
+            public ServiceDeclaration visibleIn(Visibility visibility)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.visibleIn( visibility );
+                    declaration.visibleIn(visibility);
                 }
                 return this;
             }
 
             @Override
-            public ServiceDeclaration withConcerns( Class<?>... concerns )
+            public ServiceDeclaration withConcerns(Class<?>... concerns)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.withConcerns( concerns );
+                    declaration.withConcerns(concerns);
                 }
                 return this;
             }
 
             @Override
-            public ServiceDeclaration withSideEffects( Class<?>... sideEffects )
+            public ServiceDeclaration withSideEffects(Class<?>... sideEffects)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.withSideEffects( sideEffects );
+                    declaration.withSideEffects(sideEffects);
                 }
                 return this;
             }
 
             @Override
-            public ServiceDeclaration withMixins( Class<?>... mixins )
+            public ServiceDeclaration withMixins(Class<?>... mixins)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.withMixins( mixins );
+                    declaration.withMixins(mixins);
                 }
                 return this;
             }
 
             @Override
-            public ServiceDeclaration withTypes( Class<?>... types )
+            public ServiceDeclaration withTypes(Class<?>... types)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.withTypes( types );
+                    declaration.withTypes(types);
                 }
                 return this;
             }
 
             @Override
             @SafeVarargs
-            public final ServiceDeclaration withActivators( Class<? extends Activator<?>>... activators )
+            public final ServiceDeclaration withActivators(Class<? extends Activator<?>>... activators)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.withActivators( activators );
+                    declaration.withActivators(activators);
                 }
                 return this;
             }
 
             @Override
-            public ServiceDeclaration identifiedBy( String identity )
+            public ServiceDeclaration identifiedBy(String identity)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.identifiedBy( identity );
+                    declaration.identifiedBy(identity);
                 }
                 return this;
             }
 
             @Override
-            public ServiceDeclaration taggedWith( String... tags )
+            public ServiceDeclaration taggedWith(String... tags)
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
-                    declaration.taggedWith( tags );
+                    declaration.taggedWith(tags);
                 }
                 return this;
             }
@@ -320,7 +304,7 @@ public final class LayerAssemblyImpl
             @Override
             public ServiceDeclaration instantiateOnStartup()
             {
-                for( ServiceDeclaration declaration : declarations )
+                for(ServiceDeclaration declaration : declarations)
                 {
                     declaration.instantiateOnStartup();
                 }
@@ -331,73 +315,73 @@ public final class LayerAssemblyImpl
     }
 
     @Override
-    public TransientDeclaration transients( Predicate<? super TransientAssembly> specification )
+    public TransientDeclaration transients(Predicate<? super TransientAssembly> specification)
     {
         final List<TransientDeclaration> declarations = new ArrayList<>();
 
-        for( ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values() )
+        for(ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values())
         {
-            declarations.add( moduleAssembly.transients( specification ) );
+            declarations.add(moduleAssembly.transients(specification));
         }
 
         return new TransientDeclaration()
         {
             @Override
-            public TransientDeclaration setMetaInfo( Object info )
+            public TransientDeclaration setMetaInfo(Object info)
             {
-                for( TransientDeclaration declaration : declarations )
+                for(TransientDeclaration declaration : declarations)
                 {
-                    declaration.setMetaInfo( info );
+                    declaration.setMetaInfo(info);
                 }
                 return this;
             }
 
             @Override
-            public TransientDeclaration visibleIn( Visibility visibility )
+            public TransientDeclaration visibleIn(Visibility visibility)
             {
-                for( TransientDeclaration declaration : declarations )
+                for(TransientDeclaration declaration : declarations)
                 {
-                    declaration.visibleIn( visibility );
+                    declaration.visibleIn(visibility);
                 }
                 return this;
             }
 
             @Override
-            public TransientDeclaration withConcerns( Class<?>... concerns )
+            public TransientDeclaration withConcerns(Class<?>... concerns)
             {
-                for( TransientDeclaration declaration : declarations )
+                for(TransientDeclaration declaration : declarations)
                 {
-                    declaration.withConcerns( concerns );
+                    declaration.withConcerns(concerns);
                 }
                 return this;
             }
 
             @Override
-            public TransientDeclaration withSideEffects( Class<?>... sideEffects )
+            public TransientDeclaration withSideEffects(Class<?>... sideEffects)
             {
-                for( TransientDeclaration declaration : declarations )
+                for(TransientDeclaration declaration : declarations)
                 {
-                    declaration.withSideEffects( sideEffects );
+                    declaration.withSideEffects(sideEffects);
                 }
                 return this;
             }
 
             @Override
-            public TransientDeclaration withMixins( Class<?>... mixins )
+            public TransientDeclaration withMixins(Class<?>... mixins)
             {
-                for( TransientDeclaration declaration : declarations )
+                for(TransientDeclaration declaration : declarations)
                 {
-                    declaration.withMixins( mixins );
+                    declaration.withMixins(mixins);
                 }
                 return this;
             }
 
             @Override
-            public TransientDeclaration withTypes( Class<?>... types )
+            public TransientDeclaration withTypes(Class<?>... types)
             {
-                for( TransientDeclaration declaration : declarations )
+                for(TransientDeclaration declaration : declarations)
                 {
-                    declaration.withTypes( types );
+                    declaration.withTypes(types);
                 }
                 return this;
             }
@@ -405,72 +389,72 @@ public final class LayerAssemblyImpl
     }
 
     @Override
-    public ValueDeclaration values( Predicate<? super ValueAssembly> specification )
+    public ValueDeclaration values(Predicate<? super ValueAssembly> specification)
     {
         final List<ValueDeclaration> declarations = new ArrayList<>();
 
-        for( ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values() )
+        for(ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values())
         {
-            declarations.add( moduleAssembly.values( specification ) );
+            declarations.add(moduleAssembly.values(specification));
         }
         return new ValueDeclaration()
         {
             @Override
-            public ValueDeclaration setMetaInfo( Object info )
+            public ValueDeclaration setMetaInfo(Object info)
             {
-                for( ValueDeclaration declaration : declarations )
+                for(ValueDeclaration declaration : declarations)
                 {
-                    declaration.setMetaInfo( info );
+                    declaration.setMetaInfo(info);
                 }
                 return this;
             }
 
             @Override
-            public ValueDeclaration visibleIn( Visibility visibility )
+            public ValueDeclaration visibleIn(Visibility visibility)
             {
-                for( ValueDeclaration declaration : declarations )
+                for(ValueDeclaration declaration : declarations)
                 {
-                    declaration.visibleIn( visibility );
+                    declaration.visibleIn(visibility);
                 }
                 return this;
             }
 
             @Override
-            public ValueDeclaration withConcerns( Class<?>... concerns )
+            public ValueDeclaration withConcerns(Class<?>... concerns)
             {
-                for( ValueDeclaration declaration : declarations )
+                for(ValueDeclaration declaration : declarations)
                 {
-                    declaration.withConcerns( concerns );
+                    declaration.withConcerns(concerns);
                 }
                 return this;
             }
 
             @Override
-            public ValueDeclaration withSideEffects( Class<?>... sideEffects )
+            public ValueDeclaration withSideEffects(Class<?>... sideEffects)
             {
-                for( ValueDeclaration declaration : declarations )
+                for(ValueDeclaration declaration : declarations)
                 {
-                    declaration.withSideEffects( sideEffects );
+                    declaration.withSideEffects(sideEffects);
                 }
                 return this;
             }
 
             @Override
-            public ValueDeclaration withMixins( Class<?>... mixins )
+            public ValueDeclaration withMixins(Class<?>... mixins)
             {
-                for( ValueDeclaration declaration : declarations )
+                for(ValueDeclaration declaration : declarations)
                 {
-                    declaration.withMixins( mixins );
+                    declaration.withMixins(mixins);
                 }
                 return this;
             }
 
             @Override
-            public ValueDeclaration withTypes( Class<?>... types )
+            public ValueDeclaration withTypes(Class<?>... types)
             {
-                for( ValueDeclaration declaration : declarations )
+                for(ValueDeclaration declaration : declarations)
                 {
-                    declaration.withTypes( types );
+                    declaration.withTypes(types);
                 }
                 return this;
             }
@@ -478,33 +462,33 @@ public final class LayerAssemblyImpl
     }
 
     @Override
-    public ObjectDeclaration objects( Predicate<? super ObjectAssembly> specification )
+    public ObjectDeclaration objects(Predicate<? super ObjectAssembly> specification)
     {
         final List<ObjectDeclaration> declarations = new ArrayList<>();
 
-        for( ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values() )
+        for(ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values())
         {
-            declarations.add( moduleAssembly.objects( specification ) );
+            declarations.add(moduleAssembly.objects(specification));
         }
         return new ObjectDeclaration()
         {
             @Override
-            public ObjectDeclaration setMetaInfo( Object info )
+            public ObjectDeclaration setMetaInfo(Object info)
             {
-                for( ObjectDeclaration declaration : declarations )
+                for(ObjectDeclaration declaration : declarations)
                 {
-                    declaration.setMetaInfo( info );
+                    declaration.setMetaInfo(info);
                 }
                 return this;
             }
 
             @Override
-            public ObjectDeclaration visibleIn( Visibility visibility )
+            public ObjectDeclaration visibleIn(Visibility visibility)
                 throws IllegalStateException
             {
-                for( ObjectDeclaration declaration : declarations )
+                for(ObjectDeclaration declaration : declarations)
                 {
-                    declaration.visibleIn( visibility );
+                    declaration.visibleIn(visibility);
                 }
                 return this;
             }
@@ -512,13 +496,13 @@ public final class LayerAssemblyImpl
     }
 
     @Override
-    public ImportedServiceDeclaration importedServices( Predicate<? super ImportedServiceAssembly> specification )
+    public ImportedServiceDeclaration importedServices(Predicate<? super ImportedServiceAssembly> specification)
     {
         final List<ImportedServiceDeclaration> declarations = new ArrayList<>();
 
-        for( ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values() )
+        for(ModuleAssemblyImpl moduleAssembly : moduleAssemblies.values())
         {
-            declarations.add( moduleAssembly.importedServices( specification ) );
+            declarations.add(moduleAssembly.importedServices(specification));
         }
         return new ImportedServiceDeclaration()
         {
@@ -526,7 +510,7 @@ public final class LayerAssemblyImpl
             @Override
             public ImportedServiceDeclaration importOnStartup()
             {
-                for( ImportedServiceDeclaration declaration : declarations )
+                for(ImportedServiceDeclaration declaration : declarations)
                 {
                     declaration.importOnStartup();
                 }
@@ -534,62 +518,62 @@ public final class LayerAssemblyImpl
             }
 
             @Override
-            public ImportedServiceDeclaration visibleIn( Visibility visibility )
+            public ImportedServiceDeclaration visibleIn(Visibility visibility)
             {
-                for( ImportedServiceDeclaration declaration : declarations )
+                for(ImportedServiceDeclaration declaration : declarations)
                 {
-                    declaration.visibleIn( visibility );
+                    declaration.visibleIn(visibility);
                 }
                 return this;
             }
 
             @Override
-            public ImportedServiceDeclaration importedBy( Class<? extends ServiceImporter> serviceImporterClass )
+            public ImportedServiceDeclaration importedBy(Class<? extends ServiceImporter> serviceImporterClass)
             {
-                for( ImportedServiceDeclaration declaration : declarations )
+                for(ImportedServiceDeclaration declaration : declarations)
                 {
-                    declaration.importedBy( serviceImporterClass );
+                    declaration.importedBy(serviceImporterClass);
                 }
                 return this;
             }
 
             @Override
-            public ImportedServiceDeclaration identifiedBy( String identity )
+            public ImportedServiceDeclaration identifiedBy(String identity)
             {
-                for( ImportedServiceDeclaration declaration : declarations )
+                for(ImportedServiceDeclaration declaration : declarations)
                 {
-                    declaration.identifiedBy( identity );
+                    declaration.identifiedBy(identity);
                 }
                 return this;
             }
 
             @Override
-            public ImportedServiceDeclaration taggedWith( String... tags )
+            public ImportedServiceDeclaration taggedWith(String... tags)
             {
-                for( ImportedServiceDeclaration declaration : declarations )
+                for(ImportedServiceDeclaration declaration : declarations)
                 {
-                    declaration.taggedWith( tags );
+                    declaration.taggedWith(tags);
                 }
                 return this;
             }
 
             @Override
-            public ImportedServiceDeclaration setMetaInfo( Object serviceAttribute )
+            public ImportedServiceDeclaration setMetaInfo(Object serviceAttribute)
             {
-                for( ImportedServiceDeclaration declaration : declarations )
+                for(ImportedServiceDeclaration declaration : declarations)
                 {
-                    declaration.setMetaInfo( serviceAttribute );
+                    declaration.setMetaInfo(serviceAttribute);
                 }
                 return this;
             }
 
             @Override
             @SafeVarargs
-            public final ImportedServiceDeclaration withActivators( Class<? extends Activator<?>>... activators )
+            public final ImportedServiceDeclaration withActivators(Class<? extends Activator<?>>... activators)
             {
-                for( ImportedServiceDeclaration declaration : declarations )
+                for(ImportedServiceDeclaration declaration : declarations)
                 {
-                    declaration.withActivators( activators );
+                    declaration.withActivators(activators);
                 }
                 return this;
             }

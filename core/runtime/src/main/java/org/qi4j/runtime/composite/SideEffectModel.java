@@ -29,8 +29,8 @@ public final class SideEffectModel
     extends AbstractModifierModel
     implements SideEffectDescriptor
 {
-    public SideEffectModel( Class<?> sideEffectClass, Class<?> instantiationClass )
+    public SideEffectModel(Class<?> sideEffectClass, Class<?> instantiationClass)
     {
-        super( sideEffectClass, instantiationClass );
+        super(sideEffectClass, instantiationClass);
     }
 }

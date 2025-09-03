@@ -20,8 +20,6 @@
 
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.Type;
-import java.util.function.BiFunction;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationWrapper;
@@ -29,6 +27,9 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.identity.HasIdentity;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.property.Property;
+
+import java.lang.reflect.Type;
+import java.util.function.BiFunction;
 
 /**
  * Implementation of Association to a single Entity.
@@ -39,12 +40,12 @@ public final class AssociationInstance<T>
 {
     private Property<EntityReference> associationState;
 
-    public AssociationInstance( AssociationInfo associationInfo,
-                                BiFunction<EntityReference, Type, Object> entityFunction,
-                                Property<EntityReference> associationState
+    public AssociationInstance(AssociationInfo associationInfo,
+                               BiFunction<EntityReference, Type, Object> entityFunction,
+                               Property<EntityReference> associationState
     )
     {
-        super( associationInfo, entityFunction );
+        super(associationInfo, entityFunction);
         this.associationState = associationState;
     }
 
@@ -52,23 +53,23 @@ public final class AssociationInstance<T>
     @Override
     public T get()
     {
-        return getEntity( associationState.get() );
+        return getEntity(associationState.get());
     }
 
     @Override
-    public void set( T newValue )
+    public void set(T newValue)
         throws IllegalArgumentException
     {
         checkImmutable();
-        checkType( newValue );
+        checkType(newValue);
 
-        associationInfo.checkConstraints( newValue );
+        associationInfo.checkConstraints(newValue);
 
         // Change association
         Identity identity = newValue != null
-                            ? ( (HasIdentity) newValue ).identity().get()
-                            : null;
-        associationState.set( EntityReference.create( identity ) );
+            ? ((HasIdentity) newValue).identity().get()
+            : null;
+        associationState.set(EntityReference.create(identity));
     }
 
     @Override
@@ -85,7 +86,7 @@ public final class AssociationInstance<T>
     @Override
     public String toString()
     {
-        if( associationState.get() == null )
+        if(associationState.get() == null)
         {
             return "";
         }
@@ -99,7 +100,7 @@ public final class AssociationInstance<T>
     public int hashCode()
     {
         int hash = associationInfo.hashCode() * 39; // Descriptor
-        if( associationState.get() != null )
+        if(associationState.get() != null)
         {
             hash = hash * 997 + associationState.get().hashCode(); // State
         }
@@ -107,33 +108,33 @@ public final class AssociationInstance<T>
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
         Association<?> that = (Association) o;
         // Unwrap if needed
-        while( that instanceof AssociationWrapper )
+        while(that instanceof AssociationWrapper)
         {
-            that = ( (AssociationWrapper) that ).next();
+            that = ((AssociationWrapper) that).next();
         }
         // Descriptor equality
         AssociationInstance<?> thatInstance = (AssociationInstance) that;
         AssociationDescriptor thatDescriptor = (AssociationDescriptor) thatInstance.associationInfo();
-        if( !associationInfo.equals( thatDescriptor ) )
+        if(!associationInfo.equals(thatDescriptor))
         {
             return false;
         }
         // State equality
-        if( associationState.get() != null
-            ? !associationState.get().equals( thatInstance.associationState.get() )
-            : thatInstance.associationState.get() != null )
+        if(associationState.get() != null
+            ? !associationState.get().equals(thatInstance.associationState.get())
+            : thatInstance.associationState.get() != null)
         {
             return false;
         }

@@ -20,13 +20,6 @@
 
 package org.qi4j.runtime.injection.provider;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import org.qi4j.api.service.NoSuchServiceTypeException;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.service.qualifier.Qualifier;
@@ -37,7 +30,14 @@ import org.qi4j.runtime.injection.InjectionContext;
 import org.qi4j.runtime.injection.InjectionProvider;
 import org.qi4j.runtime.injection.InjectionProviderFactory;
 import org.qi4j.runtime.model.Resolution;
-import org.qi4j.bootstrap.InvalidInjectionException;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toCollection;
 import static org.qi4j.api.util.Annotations.typeHasAnnotation;
@@ -46,70 +46,70 @@ public final class ServiceInjectionProviderFactory
     implements InjectionProviderFactory
 {
     @Override
-    @SuppressWarnings( "unchecked" )
-    public InjectionProvider newInjectionProvider( Resolution resolution, DependencyModel dependencyModel )
+    @SuppressWarnings("unchecked")
+    public InjectionProvider newInjectionProvider(Resolution resolution, DependencyModel dependencyModel)
         throws InvalidInjectionException
     {
         // TODO This could be changed to allow multiple @Qualifier annotations
-        Annotation qualifierAnnotation = Stream.of( dependencyModel.annotations() )
-                                               .filter( typeHasAnnotation( Qualifier.class ) )
-                                               .findFirst().orElse( null );
+        Annotation qualifierAnnotation = Stream.of(dependencyModel.annotations())
+            .filter(typeHasAnnotation(Qualifier.class))
+            .findFirst().orElse(null);
         Predicate<ServiceReference<?>> serviceQualifier = null;
-        if( qualifierAnnotation != null )
+        if(qualifierAnnotation != null)
         {
-            Qualifier qualifier = qualifierAnnotation.annotationType().getAnnotation( Qualifier.class );
+            Qualifier qualifier = qualifierAnnotation.annotationType().getAnnotation(Qualifier.class);
             try
             {
-                serviceQualifier = qualifier.value().newInstance().qualifier( qualifierAnnotation );
+                serviceQualifier = qualifier.value().getDeclaredConstructor().newInstance().qualifier(qualifierAnnotation);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
-                throw new InvalidInjectionException( "Could not instantiate qualifier serviceQualifier", e );
+                throw new InvalidInjectionException("Could not instantiate qualifier serviceQualifier", e);
             }
         }
 
-        if( dependencyModel.rawInjectionType().equals( Iterable.class ) )
+        if(dependencyModel.rawInjectionType().equals(Iterable.class))
         {
-            Type iterableType = ( (ParameterizedType) dependencyModel.injectionType() ).getActualTypeArguments()[ 0 ];
-            if( Classes.RAW_CLASS.apply( iterableType ).equals( ServiceReference.class ) )
+            Type iterableType = ((ParameterizedType) dependencyModel.injectionType()).getActualTypeArguments()[0];
+            if(Classes.RAW_CLASS.apply(iterableType).equals(ServiceReference.class))
             {
                 // @Service Iterable<ServiceReference<MyService<Foo>> serviceRefs
-                Type serviceType = ( (ParameterizedType) iterableType ).getActualTypeArguments()[ 0 ];
+                Type serviceType = ((ParameterizedType) iterableType).getActualTypeArguments()[0];
 
-                return new IterableServiceReferenceProvider( serviceType, serviceQualifier );
+                return new IterableServiceReferenceProvider(serviceType, serviceQualifier);
             }
             else
             {
                 // @Service Iterable<MyService<Foo>> services
-                return new IterableServiceProvider( iterableType, serviceQualifier );
+                return new IterableServiceProvider(iterableType, serviceQualifier);
             }
         }
-        else if( dependencyModel.rawInjectionType().equals( ServiceReference.class ) )
+        else if(dependencyModel.rawInjectionType().equals(ServiceReference.class))
         {
             // @Service ServiceReference<MyService<Foo>> serviceRef
-            Type referencedType = ( (ParameterizedType) dependencyModel.injectionType() ).getActualTypeArguments()[ 0 ];
-            return new ServiceReferenceProvider( referencedType, serviceQualifier );
+            Type referencedType = ((ParameterizedType) dependencyModel.injectionType()).getActualTypeArguments()[0];
+            return new ServiceReferenceProvider(referencedType, serviceQualifier);
         }
         else
         {
             // @Service MyService<Foo> service
-            return new ServiceProvider( dependencyModel.injectionType(), serviceQualifier );
+            return new ServiceProvider(dependencyModel.injectionType(), serviceQualifier);
         }
     }
 
     private static class IterableServiceReferenceProvider
         extends ServiceInjectionProvider
     {
-        private IterableServiceReferenceProvider( Type serviceType, Predicate<ServiceReference<?>> serviceQualifier )
+        private IterableServiceReferenceProvider(Type serviceType, Predicate<ServiceReference<?>> serviceQualifier)
         {
-            super( serviceType, serviceQualifier );
+            super(serviceType, serviceQualifier);
         }
 
         @Override
-        public synchronized Object provideInjection( InjectionContext context )
+        public synchronized Object provideInjection(InjectionContext context)
             throws InjectionProviderException
         {
-            return getServiceReferences( context ).collect( toCollection( ArrayList::new ) );
+            return getServiceReferences(context).collect(toCollection(ArrayList::new));
         }
     }
 
@@ -117,21 +117,21 @@ public final class ServiceInjectionProviderFactory
         extends ServiceInjectionProvider
         implements Function<ServiceReference<?>, Object>
     {
-        private IterableServiceProvider( Type serviceType, Predicate<ServiceReference<?>> serviceQualifier )
+        private IterableServiceProvider(Type serviceType, Predicate<ServiceReference<?>> serviceQualifier)
         {
-            super( serviceType, serviceQualifier );
+            super(serviceType, serviceQualifier);
         }
 
         @Override
-        public synchronized Object provideInjection( final InjectionContext context )
+        public synchronized Object provideInjection(final InjectionContext context)
             throws InjectionProviderException
         {
-            return getServiceReferences( context ).map( ServiceReference::get )
-                                                  .collect( toCollection( ArrayList::new ) );
+            return getServiceReferences(context).map(ServiceReference::get)
+                .collect(toCollection(ArrayList::new));
         }
 
         @Override
-        public Object apply( ServiceReference<?> objectServiceReference )
+        public Object apply(ServiceReference<?> objectServiceReference)
         {
             return objectServiceReference.get();
         }
@@ -140,34 +140,34 @@ public final class ServiceInjectionProviderFactory
     private static class ServiceReferenceProvider
         extends ServiceInjectionProvider
     {
-        ServiceReferenceProvider( Type serviceType, Predicate<ServiceReference<?>> qualifier )
+        ServiceReferenceProvider(Type serviceType, Predicate<ServiceReference<?>> qualifier)
         {
-            super( serviceType, qualifier );
+            super(serviceType, qualifier);
         }
 
         @Override
-        public synchronized Object provideInjection( InjectionContext context )
+        public synchronized Object provideInjection(InjectionContext context)
             throws InjectionProviderException
         {
-            return getServiceReference( context );
+            return getServiceReference(context);
         }
     }
 
     private static class ServiceProvider
         extends ServiceInjectionProvider
     {
-        ServiceProvider( Type serviceType, Predicate<ServiceReference<?>> qualifier )
+        ServiceProvider(Type serviceType, Predicate<ServiceReference<?>> qualifier)
         {
-            super( serviceType, qualifier );
+            super(serviceType, qualifier);
         }
 
         @Override
-        public synchronized Object provideInjection( InjectionContext context )
+        public synchronized Object provideInjection(InjectionContext context)
             throws InjectionProviderException
         {
-            ServiceReference<?> ref = getServiceReference( context );
+            ServiceReference<?> ref = getServiceReference(context);
 
-            if( ref != null )
+            if(ref != null)
             {
                 return ref.get();
             }
@@ -184,41 +184,41 @@ public final class ServiceInjectionProviderFactory
         private final Type serviceType;
         private final Predicate<ServiceReference<?>> serviceQualifier;
 
-        private ServiceInjectionProvider( Type serviceType, Predicate<ServiceReference<?>> serviceQualifier )
+        private ServiceInjectionProvider(Type serviceType, Predicate<ServiceReference<?>> serviceQualifier)
         {
             this.serviceType = serviceType;
             this.serviceQualifier = serviceQualifier;
         }
 
-        protected ServiceReference<Object> getServiceReference( InjectionContext context )
+        protected ServiceReference<Object> getServiceReference(InjectionContext context)
         {
             try
             {
-                if( serviceQualifier == null )
+                if(serviceQualifier == null)
                 {
-                    return context.module().instance().findService( serviceType );
+                    return context.module().instance().findService(serviceType);
                 }
                 else
                 {
-                    return context.module().instance().findServices( serviceType )
-                                  .filter( serviceQualifier ).findFirst().orElse( null );
+                    return context.module().instance().findServices(serviceType)
+                        .filter(serviceQualifier).findFirst().orElse(null);
                 }
             }
-            catch( NoSuchServiceTypeException e )
+            catch(NoSuchServiceTypeException e)
             {
                 return null;
             }
         }
 
-        protected Stream<ServiceReference<Object>> getServiceReferences( final InjectionContext context )
+        protected Stream<ServiceReference<Object>> getServiceReferences(final InjectionContext context)
         {
-            if( serviceQualifier == null )
+            if(serviceQualifier == null)
             {
-                return context.module().instance().findServices( serviceType );
+                return context.module().instance().findServices(serviceType);
             }
             else
             {
-                return context.module().instance().findServices( serviceType ).filter( serviceQualifier );
+                return context.module().instance().findServices(serviceType).filter(serviceQualifier);
             }
         }
     }

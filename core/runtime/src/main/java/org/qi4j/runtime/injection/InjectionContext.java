@@ -41,7 +41,7 @@ public final class InjectionContext
 
     // For mixins
 
-    public InjectionContext( CompositeInstance compositeInstance, UsesInstance uses, StateHolder state )
+    public InjectionContext(CompositeInstance compositeInstance, UsesInstance uses, StateHolder state)
     {
         this.module = compositeInstance.module();
         this.compositeInstance = compositeInstance;
@@ -50,21 +50,21 @@ public final class InjectionContext
     }
 
     // For concerns and side-effects
-    public InjectionContext( ModuleDescriptor module, Object next, ProxyReferenceInvocationHandler proxyHandler )
+    public InjectionContext(ModuleDescriptor module, Object next, ProxyReferenceInvocationHandler proxyHandler)
     {
         this.module = module;
         this.next = next;
         this.proxyHandler = proxyHandler;
     }
 
-    public InjectionContext( ModuleDescriptor module, UsesInstance uses )
+    public InjectionContext(ModuleDescriptor module, UsesInstance uses)
     {
         this.module = module;
         this.uses = uses;
     }
 
     // For inner classes
-    public InjectionContext( ModuleDescriptor module, UsesInstance uses, Object instance )
+    public InjectionContext(ModuleDescriptor module, UsesInstance uses, Object instance)
     {
         this.module = module;
         this.uses = uses;
@@ -106,7 +106,7 @@ public final class InjectionContext
         return proxyHandler;
     }
 
-    public void setUses( UsesInstance uses )
+    public void setUses(UsesInstance uses)
     {
         this.uses = uses;
     }
@@ -115,12 +115,12 @@ public final class InjectionContext
     public String toString()
     {
         return "InjectionContext{" +
-               "compositeInstance=" + compositeInstance +
-               ", module=" + module +
-               ", uses=" + uses +
-               ", state=" + state +
-               ", next=" + next +
-               ", proxyHandler=" + proxyHandler +
-               '}';
+            "compositeInstance=" + compositeInstance +
+            ", module=" + module +
+            ", uses=" + uses +
+            ", state=" + state +
+            ", next=" + next +
+            ", proxyHandler=" + proxyHandler +
+            '}';
     }
 }

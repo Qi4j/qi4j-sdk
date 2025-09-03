@@ -29,5 +29,5 @@ public interface MixinDeclaration<T>
 {
     T declareDefaults();
 
-    MixinDeclaration<T> setMetaInfo( Object info );
+    MixinDeclaration<T> setMetaInfo(Object info);
 }

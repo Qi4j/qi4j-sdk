@@ -21,7 +21,6 @@
 package org.qi4j.api.constraint;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
 
 /**
  * When a constraint violation has occurred (ie Constraint.isValid has returned false) it
@@ -35,7 +34,7 @@ public final class ValueConstraintViolation
     private Class<?> mixinType;
     private String methodName;
 
-    public ValueConstraintViolation( String name, Annotation constraint, Object value )
+    public ValueConstraintViolation(String name, Annotation constraint, Object value)
     {
         this.name = name;
         this.constraint = constraint;
@@ -57,12 +56,12 @@ public final class ValueConstraintViolation
         return value;
     }
 
-    public void setMixinType( Class<?> mixinType )
+    public void setMixinType(Class<?> mixinType)
     {
         this.mixinType = mixinType;
     }
 
-    public void setMethodName( String methodName )
+    public void setMethodName(String methodName)
     {
         this.methodName = methodName;
     }

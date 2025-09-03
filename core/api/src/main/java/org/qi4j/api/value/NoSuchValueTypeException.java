@@ -19,30 +19,25 @@
  */
 package org.qi4j.api.value;
 
-import java.util.stream.Stream;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.composite.NoSuchCompositeTypeException;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.structure.TypeLookup;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.NoSuchCompositeTypeException;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.structure.TypeLookup;
 
-import static java.util.stream.Collectors.joining;
+import java.util.stream.Stream;
 
 /**
  * Thrown when no visible value of the requested type is found.
  */
 public class NoSuchValueTypeException extends NoSuchCompositeTypeException
 {
-    public NoSuchValueTypeException( String valueType, ModuleDescriptor module )
+    public NoSuchValueTypeException(String valueType, ModuleDescriptor module)
     {
-        super( "ValueComposite", valueType, module );
+        super("ValueComposite", valueType, module);
     }
 
     @Override
-    protected Stream<? extends CompositeDescriptor> descriptors(TypeLookup typeLookup )
+    protected Stream<? extends CompositeDescriptor> descriptors(TypeLookup typeLookup)
     {
         return typeLookup.allValues();
     }

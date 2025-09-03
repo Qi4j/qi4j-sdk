@@ -19,48 +19,55 @@
  */
 package org.qi4j.api.type;
 
+import org.qi4j.api.util.Classes;
+import org.qi4j.api.value.ValueComposite;
+import org.qi4j.api.value.ValueDescriptor;
+
 import java.lang.reflect.Type;
 import java.util.Objects;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.value.ValueComposite;
-import org.qi4j.api.value.ValueDescriptor;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.value.ValueComposite;
-import org.qi4j.api.value.ValueDescriptor;
 
 /**
  * ValueComposite ValueType.
  */
 public final class ValueCompositeType extends StatefulAssociationValueType<ValueDescriptor>
 {
-    public static ValueCompositeType of( ValueDescriptor model )
+    public static ValueCompositeType of(ValueDescriptor model)
     {
-        return new ValueCompositeType( model );
+        return new ValueCompositeType(model);
     }
 
-    public static boolean isValueComposite( Type type )
+    public static boolean isValueComposite(Type type)
     {
-        return ValueComposite.class.isAssignableFrom( Classes.RAW_CLASS.apply( type ) );
+        return ValueComposite.class.isAssignableFrom(Classes.RAW_CLASS.apply(type));
     }
 
-    public ValueCompositeType( ValueDescriptor model )
+    public ValueCompositeType(ValueDescriptor model)
     {
-        super( model );
+        super(model);
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o ) { return true; }
-        if( o == null || getClass() != o.getClass() ) { return false; }
-        if( !super.equals( o ) ) { return false; }
+        if(this == o)
+        {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
         ValueCompositeType that = (ValueCompositeType) o;
-        return Objects.equals( model, that.model );
+        return Objects.equals(model, that.model);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( super.hashCode(), model );
+        return Objects.hash(super.hashCode(), model);
     }
 }

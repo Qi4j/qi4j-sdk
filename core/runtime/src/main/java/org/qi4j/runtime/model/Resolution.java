@@ -20,16 +20,13 @@
 
 package org.qi4j.runtime.model;
 
-import java.lang.reflect.Field;
 import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.runtime.composite.CompositeMethodModel;
 import org.qi4j.runtime.structure.ApplicationModel;
 import org.qi4j.runtime.structure.LayerModel;
 import org.qi4j.runtime.structure.ModuleModel;
-import org.qi4j.runtime.composite.CompositeMethodModel;
-import org.qi4j.runtime.structure.ApplicationModel;
-import org.qi4j.runtime.structure.LayerModel;
-import org.qi4j.runtime.structure.ModuleModel;
+
+import java.lang.reflect.Field;
 
 /**
  * JAVADOC
@@ -43,12 +40,12 @@ public final class Resolution
     private final CompositeMethodModel method;
     private final Field field;
 
-    public Resolution( ApplicationModel application,
-                       LayerModel layer,
-                       ModuleModel module,
-                       ModelDescriptor modelDescriptor,
-                       CompositeMethodModel method,
-                       Field field
+    public Resolution(ApplicationModel application,
+                      LayerModel layer,
+                      ModuleModel module,
+                      ModelDescriptor modelDescriptor,
+                      CompositeMethodModel method,
+                      Field field
     )
     {
         this.application = application;
@@ -89,8 +86,8 @@ public final class Resolution
         return field;
     }
 
-    public Resolution forField( final Field injectedField )
+    public Resolution forField(final Field injectedField)
     {
-        return new Resolution( application, layer, module, modelDescriptor, method, injectedField );
+        return new Resolution(application, layer, module, modelDescriptor, method, injectedField);
     }
 }

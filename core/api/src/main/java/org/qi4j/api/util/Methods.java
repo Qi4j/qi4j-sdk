@@ -33,18 +33,18 @@ import java.util.stream.Stream;
 public class Methods
 {
     public static final Predicate<Type> HAS_METHODS =
-        item -> Classes.RAW_CLASS.apply( item ).getDeclaredMethods().length > 0;
+        item -> Classes.RAW_CLASS.apply(item).getDeclaredMethods().length > 0;
 
-    public static final Function<Type, Stream<Method>> METHODS_OF = Classes.forTypes( type ->
-        Stream.of( type ).map( Classes.RAW_CLASS ).flatMap( clazz -> Arrays.stream( clazz.getDeclaredMethods() ) )
+    public static final Function<Type, Stream<Method>> METHODS_OF = Classes.forTypes(type ->
+        Stream.of(type).map(Classes.RAW_CLASS).flatMap(clazz -> Arrays.stream(clazz.getDeclaredMethods()))
     );
 
-    public static final BiFunction<Class<?>, String, Method> METHOD_NAMED = ( clazz, name ) ->
-        METHODS_OF.apply( clazz ).filter( Classes.memberNamed( name ) ).findFirst().orElse( null );
+    public static final BiFunction<Class<?>, String, Method> METHOD_NAMED = (clazz, name) ->
+        METHODS_OF.apply(clazz).filter(Classes.memberNamed(name)).findFirst().orElse(null);
 
 
-    public static Stream<Method> methodsOf( Type type )
+    public static Stream<Method> methodsOf(Type type)
     {
-        return Stream.of(type).flatMap( METHODS_OF );
+        return Stream.of(type).flatMap(METHODS_OF);
     }
 }

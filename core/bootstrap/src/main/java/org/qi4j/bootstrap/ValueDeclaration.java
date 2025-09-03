@@ -27,15 +27,15 @@ import org.qi4j.api.common.Visibility;
  */
 public interface ValueDeclaration
 {
-    ValueDeclaration setMetaInfo( Object info );
+    ValueDeclaration setMetaInfo(Object info);
 
-    ValueDeclaration visibleIn( Visibility visibility );
+    ValueDeclaration visibleIn(Visibility visibility);
 
-    ValueDeclaration withConcerns( Class<?>... concerns );
+    ValueDeclaration withConcerns(Class<?>... concerns);
 
-    ValueDeclaration withSideEffects( Class<?>... sideEffects );
+    ValueDeclaration withSideEffects(Class<?>... sideEffects);
 
-    ValueDeclaration withMixins( Class<?>... mixins );
+    ValueDeclaration withMixins(Class<?>... mixins);
 
-    ValueDeclaration withTypes( Class<?>... roles );
+    ValueDeclaration withTypes(Class<?>... roles);
 }

@@ -19,9 +19,10 @@
  */
 package org.qi4j.runtime.property;
 
-import java.lang.reflect.Type;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.runtime.composite.ConstraintsCheck;
+
+import java.lang.reflect.Type;
 
 /**
  * TODO

@@ -22,13 +22,13 @@ package org.qi4j.api.serialization;
  */
 public class SerializationException extends RuntimeException
 {
-    public SerializationException( String message )
+    public SerializationException(String message)
     {
-        super( message );
+        super(message);
     }
 
-    public SerializationException( String message, Throwable cause )
+    public SerializationException(String message, Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 }

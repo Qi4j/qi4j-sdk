@@ -19,6 +19,7 @@
  */
 package org.qi4j.regression.qi382;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
@@ -35,7 +36,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -44,38 +44,38 @@ import static org.hamcrest.core.IsNull.notNullValue;
 public class Qi382Test extends AbstractQi4jTest
 {
 
-    public static final Identity FERRARI = StringIdentity.identityOf( "Ferrari" );
-    public static final Identity NICLAS = StringIdentity.identityOf( "Niclas" );
+    public static final Identity FERRARI = StringIdentity.identityOf("Ferrari");
+    public static final Identity NICLAS = StringIdentity.identityOf("Niclas");
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( Car.class, Person.class );
+        module.entities(Car.class, Person.class);
 
-        new EntityTestAssembler().assemble( module );
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
     public void givenCreationOfTwoEntitiesWhenAssigningOneToOtherExpectCompletionToSucceed()
         throws UnitOfWorkCompletionException
     {
-        try( UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork())
         {
-            Car car = unitOfWork.newEntity( Car.class, FERRARI);
+            Car car = unitOfWork.newEntity(Car.class, FERRARI);
             unitOfWork.complete();
         }
-        try( UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork())
         {
-            Car car = unitOfWork.get( Car.class, FERRARI);
-            assertThat( car, notNullValue() );
-            Person p = unitOfWork.get( Person.class, NICLAS);
-            assertThat( p, notNullValue() );
-            assertThat( p.car().get(), equalTo( car ) );
+            Car car = unitOfWork.get(Car.class, FERRARI);
+            assertThat(car, notNullValue());
+            Person p = unitOfWork.get(Person.class, NICLAS);
+            assertThat(p, notNullValue());
+            assertThat(p.car().get(), equalTo(car));
         }
     }
 
-    @Mixins( Car.CarMixin.class )
+    @Mixins(Car.CarMixin.class)
     public interface Car extends EntityComposite, Lifecycle
     {
 
@@ -91,8 +91,8 @@ public class Qi382Test extends AbstractQi4jTest
             public void create()
             {
                 UnitOfWork unitOfWork = uowf.currentUnitOfWork();
-                EntityBuilder<Person> builder = unitOfWork.newEntityBuilder( Person.class, NICLAS);
-                builder.instance().car().set( me );
+                EntityBuilder<Person> builder = unitOfWork.newEntityBuilder(Person.class, NICLAS);
+                builder.instance().car().set(me);
                 builder.newInstance();
             }
 

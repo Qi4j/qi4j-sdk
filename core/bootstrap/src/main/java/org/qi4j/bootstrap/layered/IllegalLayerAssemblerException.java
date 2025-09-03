@@ -24,8 +24,8 @@ import org.qi4j.bootstrap.AssemblyException;
 
 public class IllegalLayerAssemblerException extends AssemblyException
 {
-    public IllegalLayerAssemblerException( String message )
+    public IllegalLayerAssemblerException(String message)
     {
-        super( message );
+        super(message);
     }
 }

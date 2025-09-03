@@ -20,7 +20,7 @@
 
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.concern.ConcernOf;
@@ -33,7 +33,8 @@ import org.qi4j.api.structure.Module;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -44,19 +45,19 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class AbstractMixinTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        System.setProperty( "qi4j.compacttrace", "off" );
-        module.transients( TestComposite.class );
+        System.setProperty("qi4j.compacttrace", "off");
+        module.transients(TestComposite.class);
     }
 
     @Test
     public void testAbstractMixin()
     {
-        TestComposite instance = transientBuilderFactory.newTransient( TestComposite.class );
+        TestComposite instance = transientBuilderFactory.newTransient(TestComposite.class);
 
-        assertThat( instance.test( "Hello World" ), equalTo( "Hello WorldHello World" ) );
+        assertThat(instance.test("Hello World"), equalTo("Hello WorldHello World"));
     }
 
     public interface TestComposite
@@ -64,41 +65,41 @@ public class AbstractMixinTest
     {
     }
 
-    @Mixins( TestComposite.TestMixin.class )
-    @Concerns( { TestInterface.TestConcern.class, TestInterface.TestAbstractConcern.class } )
+    @Mixins(TestComposite.TestMixin.class)
+    @Concerns({TestInterface.TestConcern.class, TestInterface.TestAbstractConcern.class})
     public interface TestInterface
     {
-        String test( String newValue );
+        String test(String newValue);
 
         interface TestState
         {
             @Optional
             Property<String> bar();
 
-            void barChanged( String newValue );
+            void barChanged(String newValue);
         }
 
         abstract class TestMixin
             implements TestInterface, TestState
         {
-            public void init( @Structure Module module )
+            public void init(@Structure Module module)
             {
-                System.out.println( module );
+                System.out.println(module);
             }
 
-            public String test( String newValue )
+            public String test(String newValue)
             {
-                newValue = duplicate( newValue );
-                barChanged( newValue );
+                newValue = duplicate(newValue);
+                barChanged(newValue);
                 return bar().get();
             }
 
-            public void barChanged( String newValue )
+            public void barChanged(String newValue)
             {
-                bar().set( newValue );
+                bar().set(newValue);
             }
 
-            public String duplicate( String newValue )
+            public String duplicate(String newValue)
             {
                 return newValue + newValue;
             }
@@ -107,11 +108,11 @@ public class AbstractMixinTest
         public class TestConcern
             extends GenericConcern
         {
-            public Object invoke( Object proxy, Method method, Object[] args )
+            public Object invoke(Object proxy, Method method, Object[] args)
                 throws Throwable
             {
-                System.out.println( method.toGenericString() );
-                return next.invoke( proxy, method, args );
+                System.out.println(method.toGenericString());
+                return next.invoke(proxy, method, args);
             }
         }
 
@@ -119,10 +120,10 @@ public class AbstractMixinTest
             extends ConcernOf<TestState>
             implements TestState
         {
-            public void barChanged( String newValue )
+            public void barChanged(String newValue)
             {
-                next.barChanged( newValue );
-                System.out.println( "Concern:" + bar().get() );
+                next.barChanged(newValue);
+                System.out.println("Concern:" + bar().get());
             }
         }
     }

@@ -20,16 +20,12 @@
 
 package org.qi4j.api.metrics;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import org.qi4j.api.injection.InjectionScope;
 import org.qi4j.api.injection.InjectionScope;
 
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.METHOD } )
+import java.lang.annotation.*;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.METHOD})
 @Documented
 @InjectionScope
 public @interface TimingCapture

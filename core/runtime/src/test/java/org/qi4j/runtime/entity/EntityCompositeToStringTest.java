@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.entity;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.identity.HasIdentity;
 import org.qi4j.api.property.Property;
@@ -26,29 +27,26 @@ import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 public class EntityCompositeToStringTest extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.entities( Some.class );
-        new EntityTestAssembler().assemble( module );
+        module.entities(Some.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
     public void givenEntityWhenToStringExpectStringIdentity()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Some some = createSome( uow );
-            assertThat( some.toString(), equalTo( some.identity().get().toString() ) );
+            Some some = createSome(uow);
+            assertThat(some.toString(), equalTo(some.identity().get().toString()));
         }
     }
 
@@ -56,30 +54,30 @@ public class EntityCompositeToStringTest extends AbstractQi4jTest
     public void givenEntityWhenPrintStateSystemPropertyAndToStringExpectState()
     {
         String propertyName = "qi4j.entity.print.state";
-        String previous = System.getProperty( propertyName, null );
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        String previous = System.getProperty(propertyName, null);
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            System.setProperty( propertyName, "true" );
-            Some some = createSome( uow );
-            assertThat( some.toString(), allOf( containsString( "someString" ), containsString( "foo" ) ) );
+            System.setProperty(propertyName, "true");
+            Some some = createSome(uow);
+            assertThat(some.toString(), allOf(containsString("someString"), containsString("foo")));
         }
         finally
         {
-            if( previous != null )
+            if(previous != null)
             {
-                System.setProperty( propertyName, previous );
+                System.setProperty(propertyName, previous);
             }
             else
             {
-                System.clearProperty( propertyName );
+                System.clearProperty(propertyName);
             }
         }
     }
 
-    private Some createSome( UnitOfWork uow )
+    private Some createSome(UnitOfWork uow)
     {
-        EntityBuilder<Some> builder = uow.newEntityBuilder( Some.class );
-        builder.instance().someString().set( "foo" );
+        EntityBuilder<Some> builder = uow.newEntityBuilder(Some.class);
+        builder.instance().someString().set("foo");
         return builder.newInstance();
     }
 

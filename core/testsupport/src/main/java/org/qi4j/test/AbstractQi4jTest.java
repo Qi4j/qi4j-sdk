@@ -20,6 +20,8 @@
 
 package org.qi4j.test;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.qi4j.api.composite.TransientBuilderFactory;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.object.ObjectFactory;
@@ -34,8 +36,6 @@ import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Base class for Composite tests.
@@ -70,49 +70,49 @@ public abstract class AbstractQi4jTest extends AbstractQi4jBaseTest
         throws Exception
     {
         super.setUp();
-        if( application == null )
+        if(application == null)
         {
             return; // failure in Assembly.
         }
-        Module module = application.findModule( "Layer 1", "Module 1" );
-        module.injectTo( this );
+        Module module = application.findModule("Layer 1", "Module 1");
+        module.injectTo(this);
     }
 
     @Override
-    protected void defineApplication( ApplicationAssembly applicationAssembly )
+    protected void defineApplication(ApplicationAssembly applicationAssembly)
         throws Exception
     {
-        LayerAssembly layer = applicationAssembly.layer( "Layer 1" );
-        ModuleAssembly module = layer.module( "Module 1" );
-        module.objects( AbstractQi4jTest.this.getClass() );
-        assemble( module );
+        LayerAssembly layer = applicationAssembly.layer("Layer 1");
+        ModuleAssembly module = layer.module("Module 1");
+        module.objects(AbstractQi4jTest.this.getClass());
+        assemble(module);
     }
 
     @Override
     @AfterEach
     public void tearDown()
     {
-        if( unitOfWorkFactory != null && unitOfWorkFactory.isUnitOfWorkActive() )
+        if(unitOfWorkFactory != null && unitOfWorkFactory.isUnitOfWorkActive())
         {
-            while( unitOfWorkFactory.isUnitOfWorkActive() )
+            while(unitOfWorkFactory.isUnitOfWorkActive())
             {
                 UnitOfWork uow = unitOfWorkFactory.currentUnitOfWork();
-                if( uow.isOpen() )
+                if(uow.isOpen())
                 {
-                    System.err.println( "UnitOfWork not cleaned up:" + uow.usecase().name() );
+                    System.err.println("UnitOfWork not cleaned up:" + uow.usecase().name());
                     uow.discard();
                 }
                 else
                 {
-                    System.err.println( "UnitOfWork Active but not Open:" + uow.usecase().name() );
+                    System.err.println("UnitOfWork Active but not Open:" + uow.usecase().name());
                     uow.discard();
 
-                    throw new InternalError( "I have seen a case where a UoW is on the stack, but not opened. First is: " + uow
+                    throw new InternalError("I have seen a case where a UoW is on the stack, but not opened. First is: " + uow
                         .usecase()
-                        .name() );
+                        .name());
                 }
             }
-            new Exception( "UnitOfWork not properly cleaned up" ).printStackTrace();
+//            new Exception( "UnitOfWork not properly cleaned up" ).printStackTrace();
         }
         super.tearDown();
     }

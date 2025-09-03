@@ -23,7 +23,7 @@ import org.qi4j.api.common.ConstructionException;
 
 /**
  * This factory creates TransientComposites and the TransientBuilders.
- *
+ * <p>
  * TransientComposite instances are very flexible in what it can reference, but are restricted in where they
  * can be used. So, TransientComposites are mainly recommended where Values, Entities and Services can not be used,
  * but they can also not be used to store state, be serialized across a network or have automatic equals/hashCode
@@ -34,29 +34,24 @@ public interface TransientBuilderFactory
     /**
      * Create a builder for creating new TransientComposites that implements the given TransientComposite type.
      *
-     * @param <T> Transient type
+     * @param <T>       Transient type
      * @param mixinType an interface that describes the TransientComposite to be instantiated
-     *
      * @return a TransientBuilder for creation of TransientComposites implementing the interface
-     *
      * @throws NoSuchTransientTypeException if no composite extending the mixinType has been registered
      */
-    <T> TransientBuilder<T> newTransientBuilder( Class<T> mixinType )
+    <T> TransientBuilder<T> newTransientBuilder(Class<T> mixinType)
         throws NoSuchTransientTypeException;
 
     /**
      * Instantiate a TransientComposite of the given type.
      *
-     * @param <T> Transient type
+     * @param <T>       Transient type
      * @param mixinType the TransientComposite type to instantiate
-     * @param uses The objects that can be injected into mixins
-     *
+     * @param uses      The objects that can be injected into mixins
      * @return a new TransientComposite instance
-     *
      * @throws NoSuchTransientTypeException if no composite extending the mixinType has been registered
-     * @throws ConstructionException
-     *                                  if the composite could not be instantiated
+     * @throws ConstructionException        if the composite could not be instantiated
      */
-    <T> T newTransient( Class<T> mixinType, Object... uses )
+    <T> T newTransient(Class<T> mixinType, Object... uses)
         throws NoSuchTransientTypeException, ConstructionException;
 }

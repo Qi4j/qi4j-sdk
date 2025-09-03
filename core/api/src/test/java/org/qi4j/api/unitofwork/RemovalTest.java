@@ -20,6 +20,7 @@
 
 package org.qi4j.api.unitofwork;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
@@ -28,16 +29,15 @@ import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 public class RemovalTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.entities( TestEntity.class );
-        module.entities( PidRegulator.class );
-        new EntityTestAssembler().assemble( module );
+        module.entities(TestEntity.class);
+        module.entities(PidRegulator.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
@@ -46,10 +46,10 @@ public class RemovalTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<TestEntity> builder = uow.newEntityBuilder( TestEntity.class, StringIdentity.identityOf( "123" ) );
-            builder.instance().test().set( "habba" );
+            EntityBuilder<TestEntity> builder = uow.newEntityBuilder(TestEntity.class, StringIdentity.identityOf("123"));
+            builder.instance().test().set("habba");
             TestEntity test = builder.newInstance();
-            uow.remove( test );
+            uow.remove(test);
             uow.complete();
         }
         finally
@@ -65,13 +65,13 @@ public class RemovalTest
         PidRegulator regulator = null;
         try
         {
-            regulator = createPidRegulator( uow );
+            regulator = createPidRegulator(uow);
         }
         finally
         {
-            if( regulator != null )
+            if(regulator != null)
             {
-                uow.remove( regulator );
+                uow.remove(regulator);
             }
             // TODO: This problem is related to that uow.remove() has a bug.
             // If the Entity is both created and removed in the same session, then the remove() should simply remove
@@ -90,17 +90,17 @@ public class RemovalTest
         Property<String> test();
     }
 
-    private PidRegulator createPidRegulator( UnitOfWork uow )
+    private PidRegulator createPidRegulator(UnitOfWork uow)
         throws UnitOfWorkCompletionException
     {
-        EntityBuilder<PidRegulator> builder = uow.newEntityBuilder( PidRegulator.class );
+        EntityBuilder<PidRegulator> builder = uow.newEntityBuilder(PidRegulator.class);
         PidRegulator prototype = builder.instance();
-        prototype.p().set( 1.0f );
-        prototype.i().set( 10f );
-        prototype.d().set( 0.1f );
-        prototype.maxD().set( 10f );
-        prototype.maximum().set( 100f );
-        prototype.minimum().set( 0f );
+        prototype.p().set(1.0f);
+        prototype.i().set(10f);
+        prototype.d().set(0.1f);
+        prototype.maxD().set(10f);
+        prototype.maximum().set(100f);
+        prototype.minimum().set(0f);
         PidRegulator regulator = builder.newInstance();
 
         return regulator;

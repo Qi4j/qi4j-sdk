@@ -20,8 +20,9 @@
 
 package org.qi4j.runtime.composite;
 
-import java.lang.annotation.Annotation;
 import org.qi4j.api.constraint.Constraint;
+
+import java.lang.annotation.Annotation;
 
 /**
  * JAVADOC
@@ -31,7 +32,7 @@ public final class ConstraintInstance<A extends Annotation, T>
     private final Constraint<A, T> constraint;
     private final A annotation;
 
-    public ConstraintInstance( Constraint<A, T> constraint, A annotation )
+    public ConstraintInstance(Constraint<A, T> constraint, A annotation)
     {
         this.constraint = constraint;
         this.annotation = annotation;
@@ -42,8 +43,8 @@ public final class ConstraintInstance<A extends Annotation, T>
         return annotation;
     }
 
-    public boolean isValid( T value )
+    public boolean isValid(T value)
     {
-        return constraint.isValid( annotation, value );
+        return constraint.isValid(annotation, value);
     }
 }

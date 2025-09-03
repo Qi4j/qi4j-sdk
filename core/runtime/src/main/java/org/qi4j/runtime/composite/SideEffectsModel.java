@@ -19,20 +19,19 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.sideeffect.SideEffectsDescriptor;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.injection.Dependencies;
 import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.Dependencies;
-import org.qi4j.runtime.injection.DependencyModel;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -40,11 +39,11 @@ import org.qi4j.runtime.injection.DependencyModel;
 public final class SideEffectsModel
     implements SideEffectsDescriptor, Dependencies, VisitableHierarchy<Object, Object>
 {
-    public static final SideEffectsModel EMPTY_SIDEEFFECTS = new SideEffectsModel( Collections.emptyList() );
+    public static final SideEffectsModel EMPTY_SIDEEFFECTS = new SideEffectsModel(Collections.emptyList());
 
     private List<SideEffectModel> sideEffectModels = null;
 
-    public SideEffectsModel( List<SideEffectModel> sideEffectModels )
+    public SideEffectsModel(List<SideEffectModel> sideEffectModels)
     {
         this.sideEffectModels = sideEffectModels;
     }
@@ -52,38 +51,38 @@ public final class SideEffectsModel
     @Override
     public Stream<DependencyModel> dependencies()
     {
-        return sideEffectModels.stream().flatMap( Dependencies::dependencies );
+        return sideEffectModels.stream().flatMap(Dependencies::dependencies);
     }
 
     // Context
-    public SideEffectsInstance newInstance( Method method, ModuleDescriptor module,
-                                            InvocationHandler invoker )
+    public SideEffectsInstance newInstance(Method method, ModuleDescriptor module,
+                                           InvocationHandler invoker)
     {
         ProxyReferenceInvocationHandler proxyHandler = new ProxyReferenceInvocationHandler();
         SideEffectInvocationHandlerResult result = new SideEffectInvocationHandlerResult();
-        List<InvocationHandler> sideEffects = new ArrayList<>( sideEffectModels.size() );
-        for( SideEffectModel sideEffectModel : sideEffectModels )
+        List<InvocationHandler> sideEffects = new ArrayList<>(sideEffectModels.size());
+        for(SideEffectModel sideEffectModel : sideEffectModels)
         {
-            InvocationHandler sideEffect = sideEffectModel.newInstance( module, result, proxyHandler, method );
-            sideEffects.add( sideEffect );
+            InvocationHandler sideEffect = sideEffectModel.newInstance(module, result, proxyHandler, method);
+            sideEffects.add(sideEffect);
         }
-        return new SideEffectsInstance( sideEffects, result, proxyHandler, invoker );
+        return new SideEffectsInstance(sideEffects, result, proxyHandler, invoker);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            for( SideEffectModel sideEffectModel : sideEffectModels )
+            for(SideEffectModel sideEffectModel : sideEffectModels)
             {
-                if( !sideEffectModel.accept( modelVisitor ) )
+                if(!sideEffectModel.accept(modelVisitor))
                 {
                     break;
                 }
             }
         }
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
 }

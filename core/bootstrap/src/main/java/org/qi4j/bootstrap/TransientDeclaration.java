@@ -28,15 +28,15 @@ import org.qi4j.api.common.Visibility;
  */
 public interface TransientDeclaration
 {
-    TransientDeclaration setMetaInfo( Object info );
+    TransientDeclaration setMetaInfo(Object info);
 
-    TransientDeclaration visibleIn( Visibility visibility );
+    TransientDeclaration visibleIn(Visibility visibility);
 
-    TransientDeclaration withConcerns( Class<?>... concerns );
+    TransientDeclaration withConcerns(Class<?>... concerns);
 
-    TransientDeclaration withSideEffects( Class<?>... sideEffects );
+    TransientDeclaration withSideEffects(Class<?>... sideEffects);
 
-    TransientDeclaration withMixins( Class<?>... mixins );
+    TransientDeclaration withMixins(Class<?>... mixins);
 
-    TransientDeclaration withTypes( Class<?>... roles );
+    TransientDeclaration withTypes(Class<?>... roles);
 }

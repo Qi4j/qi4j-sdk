@@ -28,8 +28,8 @@ import org.qi4j.api.common.InvalidApplicationException;
 public class DuplicateServiceIdentityException
     extends InvalidApplicationException
 {
-    public DuplicateServiceIdentityException( String string )
+    public DuplicateServiceIdentityException(String string)
     {
-        super( string );
+        super(string);
     }
 }

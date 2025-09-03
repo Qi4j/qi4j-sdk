@@ -19,8 +19,8 @@
  */
 package org.qi4j.runtime.structure;
 
-import java.util.stream.Stream;
 import org.qi4j.api.activation.ActivationException;
+import org.qi4j.api.activation.ActivatorDescriptor;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.ModelDescriptor;
@@ -44,13 +44,12 @@ import org.qi4j.runtime.object.ObjectsModel;
 import org.qi4j.runtime.service.ImportedServicesModel;
 import org.qi4j.runtime.service.ServicesModel;
 import org.qi4j.runtime.value.ValuesModel;
-import org.qi4j.runtime.activation.ActivatorsInstance;
-import org.qi4j.runtime.activation.ActivatorsModel;
+
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static java.util.stream.Stream.concat;
-import static org.qi4j.api.common.Visibility.application;
-import static org.qi4j.api.common.Visibility.layer;
-import static org.qi4j.api.common.Visibility.module;
+import static org.qi4j.api.common.Visibility.*;
 
 /**
  * JAVADOC
@@ -73,16 +72,16 @@ public class ModuleModel
     private final MetaInfo metaInfo;
     private ModuleInstance moduleInstance;
 
-    public ModuleModel( String name,
-                        MetaInfo metaInfo,
-                        LayerDescriptor layerModel,
-                        ActivatorsModel<Module> activatorsModel,
-                        TransientsModel transientsModel,
-                        EntitiesModel entitiesModel,
-                        ObjectsModel objectsModel,
-                        ValuesModel valuesModel,
-                        ServicesModel servicesModel,
-                        ImportedServicesModel importedServicesModel
+    public ModuleModel(String name,
+                       MetaInfo metaInfo,
+                       LayerDescriptor layerModel,
+                       ActivatorsModel<Module> activatorsModel,
+                       TransientsModel transientsModel,
+                       EntitiesModel entitiesModel,
+                       ObjectsModel objectsModel,
+                       ValuesModel valuesModel,
+                       ServicesModel servicesModel,
+                       ImportedServicesModel importedServicesModel
     )
     {
         this.name = name;
@@ -95,8 +94,8 @@ public class ModuleModel
         this.valuesModel = valuesModel;
         this.servicesModel = servicesModel;
         this.importedServicesModel = importedServicesModel;
-        typeLookup = new TypeLookupImpl( this );
-        classLoader = new ModuleClassLoader( this, Thread.currentThread().getContextClassLoader() );
+        typeLookup = new TypeLookupImpl(this);
+        classLoader = new ModuleClassLoader(this, Thread.currentThread().getContextClassLoader());
     }
 
     @Override
@@ -105,9 +104,9 @@ public class ModuleModel
         return name;
     }
 
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return metaInfo.get( infoType );
+        return metaInfo.get(infoType);
     }
 
     @Override
@@ -125,80 +124,80 @@ public class ModuleModel
     public ActivatorsInstance<Module> newActivatorsInstance()
         throws ActivationException
     {
-        return new ActivatorsInstance<>( activatorsModel.newInstances() );
+        return new ActivatorsInstance<>(activatorsModel.newInstances());
     }
 
     @Override
-    public EntityDescriptor entityDescriptor( String name )
+    public EntityDescriptor entityDescriptor(String name)
     {
         try
         {
-            Class<?> type = classLoader().loadClass( name );
-            EntityDescriptor entityModel = typeLookup.lookupEntityModel( type );
-            if( entityModel == null )
+            Class<?> type = classLoader().loadClass(name);
+            EntityDescriptor entityModel = typeLookup.lookupEntityModel(type);
+            if(entityModel == null)
             {
                 return null;
             }
             return entityModel;
         }
-        catch( ClassNotFoundException e )
+        catch(ClassNotFoundException e)
         {
             return null;
         }
     }
 
     @Override
-    public ObjectDescriptor objectDescriptor( String typeName )
+    public ObjectDescriptor objectDescriptor(String typeName)
     {
         try
         {
-            Class<?> type = classLoader().loadClass( typeName );
-            ObjectDescriptor objectModel = typeLookup.lookupObjectModel( type );
-            if( objectModel == null )
+            Class<?> type = classLoader().loadClass(typeName);
+            ObjectDescriptor objectModel = typeLookup.lookupObjectModel(type);
+            if(objectModel == null)
             {
                 return null;
             }
             return objectModel;
         }
-        catch( ClassNotFoundException e )
+        catch(ClassNotFoundException e)
         {
             return null;
         }
     }
 
     @Override
-    public TransientDescriptor transientDescriptor( String name )
+    public TransientDescriptor transientDescriptor(String name)
     {
         try
         {
-            Class<?> type = classLoader().loadClass( name );
-            TransientDescriptor transientModel = typeLookup.lookupTransientModel( type );
-            if( transientModel == null )
+            Class<?> type = classLoader().loadClass(name);
+            TransientDescriptor transientModel = typeLookup.lookupTransientModel(type);
+            if(transientModel == null)
             {
                 return null;
             }
             return transientModel;
         }
-        catch( ClassNotFoundException e )
+        catch(ClassNotFoundException e)
         {
             return null;
         }
     }
 
     @Override
-    public ValueDescriptor valueDescriptor( String name )
+    public ValueDescriptor valueDescriptor(String name)
     {
         try
         {
-            Class<?> type = classLoader().loadClass( name );
-            ValueDescriptor valueModel = typeLookup.lookupValueModel( type );
-            if( valueModel == null )
+            Class<?> type = classLoader().loadClass(name);
+            ValueDescriptor valueModel = typeLookup.lookupValueModel(type);
+            if(valueModel == null)
             {
                 return null;
             }
             return valueModel;
         }
-        catch( ClassNotFoundException e )
+        catch(ClassNotFoundException e)
         {
             return null;
         }
@@ -216,9 +215,9 @@ public class ModuleModel
         return typeLookup;
     }
 
-    public ModuleInstance newInstance( LayerDescriptor layerInstance )
+    public ModuleInstance newInstance(LayerDescriptor layerInstance)
     {
-        moduleInstance = new ModuleInstance( this, layerInstance, typeLookup, servicesModel, importedServicesModel );
+        moduleInstance = new ModuleInstance(this, layerInstance, typeLookup, servicesModel, importedServicesModel);
         return moduleInstance;
     }
 
@@ -261,14 +260,14 @@ public class ModuleModel
     @Override
     public Stream<? extends ValueDescriptor> findVisibleValueTypes()
     {
-        return concat( visibleValues( module ),
-                       concat(
-                           layer().visibleValues( layer ),
-                           concat(
-                               layer().visibleValues( application ),
-                               layer().usedLayers().layers().flatMap( layer1 -> layer1.visibleValues( application ) )
-                           )
-                       )
+        return concat(visibleValues(module),
+            concat(
+                layer().visibleValues(layer),
+                concat(
+                    layer().visibleValues(application),
+                    layer().usedLayers().layers().flatMap(layer1 -> layer1.visibleValues(application))
+                )
+            )
         );
     }
 
@@ -290,59 +289,59 @@ public class ModuleModel
         return typeLookup.allObjects();
     }
 
-    public Stream<? extends ObjectDescriptor> visibleObjects( Visibility visibility )
+    public Stream<? extends ObjectDescriptor> visibleObjects(Visibility visibility)
     {
         return objectsModel.stream()
-            .filter( new VisibilityPredicate( visibility ) );
+            .filter(new VisibilityPredicate(visibility));
     }
 
-    public Stream<? extends TransientDescriptor> visibleTransients( Visibility visibility )
+    public Stream<? extends TransientDescriptor> visibleTransients(Visibility visibility)
     {
         return transientsModel.stream()
-            .filter( new VisibilityPredicate( visibility ) );
+            .filter(new VisibilityPredicate(visibility));
     }
 
-    public Stream<? extends EntityDescriptor> visibleEntities( Visibility visibility )
+    public Stream<? extends EntityDescriptor> visibleEntities(Visibility visibility)
     {
         return entitiesModel.stream()
-            .filter( new VisibilityPredicate( visibility ) );
+            .filter(new VisibilityPredicate(visibility));
     }
 
-    public Stream<? extends ValueDescriptor> visibleValues( Visibility visibility )
+    public Stream<? extends ValueDescriptor> visibleValues(Visibility visibility)
     {
         return valuesModel.stream()
-            .filter( new VisibilityPredicate( visibility ) );
+            .filter(new VisibilityPredicate(visibility));
     }
 
-    public Stream<? extends ModelDescriptor> visibleServices( Visibility visibility )
+    public Stream<? extends ModelDescriptor> visibleServices(Visibility visibility)
     {
         return concat(
             servicesModel.stream()
-                .filter( new VisibilityPredicate( visibility ) ),
+                .filter(new VisibilityPredicate(visibility)),
             importedServicesModel.stream()
-                .filter( new VisibilityPredicate( visibility ) )
+                .filter(new VisibilityPredicate(visibility))
         );
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            if( activatorsModel.accept( modelVisitor ) )
+            if(activatorsModel.accept(modelVisitor))
             {
-                if( transientsModel.accept( modelVisitor ) )
+                if(transientsModel.accept(modelVisitor))
                 {
-                    if( entitiesModel.accept( modelVisitor ) )
+                    if(entitiesModel.accept(modelVisitor))
                     {
-                        if( servicesModel.accept( modelVisitor ) )
+                        if(servicesModel.accept(modelVisitor))
                         {
-                            if( importedServicesModel.accept( modelVisitor ) )
+                            if(importedServicesModel.accept(modelVisitor))
                             {
-                                if( objectsModel.accept( modelVisitor ) )
+                                if(objectsModel.accept(modelVisitor))
                                 {
-                                    valuesModel.accept( modelVisitor );
+                                    valuesModel.accept(modelVisitor);
                                 }
                             }
                         }
@@ -350,8 +349,15 @@ public class ModuleModel
                 }
             }
         }
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
+
+    @Override
+    public Stream<? extends ActivatorDescriptor> activators()
+    {
+        return StreamSupport.stream(activatorsModel.models().spliterator(), false);
+    }
+
 
     @Override
     public String toString()

@@ -20,26 +20,13 @@
 
 package org.qi4j.runtime.property;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.QualifiedName;
-import org.qi4j.api.constraint.ValueConstraintViolation;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.entity.Queryable;
-import org.qi4j.api.property.DefaultValues;
-import org.qi4j.api.property.GenericPropertyInfo;
-import org.qi4j.api.property.InvalidPropertyTypeException;
-import org.qi4j.api.property.Property;
-import org.qi4j.api.property.PropertyDescriptor;
+import org.qi4j.api.property.*;
 import org.qi4j.api.serialization.Deserializer;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.service.ServiceFinder;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.structure.ModuleDescriptor;
@@ -53,8 +40,9 @@ import org.qi4j.runtime.composite.ValueConstraintsInstance;
 import org.qi4j.runtime.model.Binder;
 import org.qi4j.runtime.model.Resolution;
 import org.qi4j.runtime.type.ValueTypeFactoryInstance;
-import org.qi4j.bootstrap.BindingException;
-import org.qi4j.runtime.composite.ValueConstraintsInstance;
+
+import java.lang.reflect.*;
+import java.util.function.BiFunction;
 
 /**
  * Model for a Property.
@@ -84,62 +72,62 @@ public class PropertyModel
 
     private final boolean queryable;
 
-    public PropertyModel( AccessibleObject accessor,
-                          boolean immutable,
-                          boolean useDefaults,
-                          ValueConstraintsInstance constraints,
-                          MetaInfo metaInfo,
-                          Object initialValue
-                        )
+    public PropertyModel(AccessibleObject accessor,
+                         boolean immutable,
+                         boolean useDefaults,
+                         ValueConstraintsInstance constraints,
+                         MetaInfo metaInfo,
+                         Object initialValue
+    )
     {
-        if( accessor instanceof Method )
+        if(accessor instanceof Method)
         {
             Method m = (Method) accessor;
-            if( !m.getReturnType().equals( Property.class ) )
+            if(!m.getReturnType().equals(Property.class))
             {
-                throw new InvalidPropertyTypeException( accessor );
+                throw new InvalidPropertyTypeException(accessor);
             }
         }
         this.immutable = immutable;
         this.metaInfo = metaInfo;
         this.accessor = accessor;
-        type = GenericPropertyInfo.propertyTypeOf( accessor );
-        checkTypeValidity( type );
-        qualifiedName = QualifiedName.fromAccessor( accessor );
-        initialValueProvider = new DefaultInitialValueProvider( useDefaults, initialValue );
+        type = GenericPropertyInfo.propertyTypeOf(accessor);
+        checkTypeValidity(type);
+        qualifiedName = QualifiedName.fromAccessor(accessor);
+        initialValueProvider = new DefaultInitialValueProvider(useDefaults, initialValue);
         this.constraints = constraints;
-        final Queryable queryable = accessor.getAnnotation( Queryable.class );
+        final Queryable queryable = accessor.getAnnotation(Queryable.class);
         this.queryable = queryable == null || queryable.value();
     }
 
-    private void checkTypeValidity( Type type )
+    private void checkTypeValidity(Type type)
     {
         // Make sure certain data types doesn't take hold in Qi4j applications.
         String typeName = type.getTypeName();
-        if( typeName.contains( "java.util.Date" )
-            || typeName.contains( "java.util.Calendar" )
-            || typeName.contains( "java.util.GregorianCalendar" )
-            || typeName.contains( "java.sql.Date" )
-            || typeName.contains( "java.sql.Time" )
-            || typeName.contains( "java.sql.Timestamp" )
-            || typeName.contains( "org.joda.time" )
-            )
+        if(typeName.contains("java.util.Date")
+            || typeName.contains("java.util.Calendar")
+            || typeName.contains("java.util.GregorianCalendar")
+            || typeName.contains("java.sql.Date")
+            || typeName.contains("java.sql.Time")
+            || typeName.contains("java.sql.Timestamp")
+            || typeName.contains("org.joda.time")
+        )
         {
-            throw new InvalidPropertyTypeException( type + " is not allowed in Qi4j. Please use Java Time API instead." );
+            throw new InvalidPropertyTypeException(type + " is not allowed in Qi4j. Please use Java Time API instead.");
         }
-        if( typeName.contains( "java.util.Dictionary" )
-            || typeName.contains( "java.util.Hashtable" )
-            || typeName.contains( "java.util.Vector" )
-            )
+        if(typeName.contains("java.util.Dictionary")
+            || typeName.contains("java.util.Hashtable")
+            || typeName.contains("java.util.Vector")
+        )
         {
-            throw new InvalidPropertyTypeException( type + " is not allowed in Qi4j. Please use the modern Java Collection API instead." );
+            throw new InvalidPropertyTypeException(type + " is not allowed in Qi4j. Please use the modern Java Collection API instead.");
         }
     }
 
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return metaInfo.get( infoType );
+        return metaInfo.get(infoType);
     }
 
     public String name()
@@ -189,58 +177,58 @@ public class PropertyModel
     }
 
     @Override
-    public Object resolveInitialValue( ModuleDescriptor moduleDescriptor )
+    public Object resolveInitialValue(ModuleDescriptor moduleDescriptor)
     {
-        return initialValueProvider.apply( moduleDescriptor.instance(), this );
+        return initialValueProvider.apply(moduleDescriptor.instance(), this);
     }
 
     @Override
-    public void bind( Resolution resolution )
+    public void bind(Resolution resolution)
         throws BindingException
     {
         ValueTypeFactoryInstance factory = ValueTypeFactoryInstance.instance();
-        Class<?> declaringClass = ( (Member) accessor() ).getDeclaringClass();
-        Class<?> mainType = resolution.model().types().findFirst().orElse( null );
-        valueType = factory.newValueType( type(), declaringClass, mainType, resolution.module() );
+        Class<?> declaringClass = ((Member) accessor()).getDeclaringClass();
+        Class<?> mainType = resolution.model().types().findFirst().orElse(null);
+        valueType = factory.newValueType(type(), declaringClass, mainType, resolution.module());
         builderInfo = new BuilderPropertyInfo();
-        if( type instanceof TypeVariable )
+        if(type instanceof TypeVariable)
         {
-            type = Classes.resolveTypeVariable( (TypeVariable) type, declaringClass, mainType );
+            type = Classes.resolveTypeVariable((TypeVariable) type, declaringClass, mainType);
         }
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( Visitor<? super PropertyModel, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(Visitor<? super PropertyModel, ThrowableType> visitor)
         throws ThrowableType
     {
-        return visitor.visit( this );
+        return visitor.visit(this);
     }
 
     @Override
-    public void checkConstraints( Object value )
+    public void checkConstraints(Object value)
         throws ConstraintViolationException
     {
-        if( constraints == null )
+        if(constraints == null)
         {
             return;
         }
-        constraints.checkConstraints( value, accessor );
+        constraints.checkConstraints(value, accessor);
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
 
         PropertyModel that = (PropertyModel) o;
-        return accessor.equals( that.accessor );
+        return accessor.equals(that.accessor);
     }
 
     @Override
@@ -252,13 +240,13 @@ public class PropertyModel
     @Override
     public String toString()
     {
-        if( accessor instanceof Field )
+        if(accessor instanceof Field)
         {
-            return ( (Field) accessor ).toGenericString();
+            return ((Field) accessor).toGenericString();
         }
         else
         {
-            return ( (Method) accessor ).toGenericString();
+            return ((Method) accessor).toGenericString();
         }
     }
 
@@ -283,12 +271,12 @@ public class PropertyModel
         }
 
         @Override
-        public void checkConstraints( Object value )
+        public void checkConstraints(Object value)
             throws ConstraintViolationException
         {
-            if( constraints != null )
+            if(constraints != null)
             {
-                constraints.checkConstraints( value, accessor );
+                constraints.checkConstraints(value, accessor);
             }
         }
     }
@@ -303,47 +291,47 @@ public class PropertyModel
         private final boolean useDefaults;
         private final Object initialValue;
 
-        private DefaultInitialValueProvider( boolean useDefaults, Object initialValue )
+        private DefaultInitialValueProvider(boolean useDefaults, Object initialValue)
         {
             this.useDefaults = useDefaults;
             this.initialValue = initialValue;
         }
 
         @Override
-        public Object apply( Module module, PropertyDescriptor property )
+        public Object apply(Module module, PropertyDescriptor property)
         {
-            return initialValue( module.descriptor(), initialValue, useDefaults );
+            return initialValue(module.descriptor(), initialValue, useDefaults);
         }
 
-        private Object initialValue( ModuleDescriptor module, Object initialValue, boolean useDefaults )
+        private Object initialValue(ModuleDescriptor module, Object initialValue, boolean useDefaults)
         {
             // Use supplied value from assembly
             Object value = initialValue;
 
             // Check for @UseDefaults annotation
-            if( useDefaults )
+            if(useDefaults)
             {
-                if( value == null || ( ( value instanceof String ) && ( (String) value ).length() == 0 ) )
+                if(value == null || ((value instanceof String) && ((String) value).length() == 0))
                 {
-                    if( valueType instanceof ValueCompositeType )
+                    if(valueType instanceof ValueCompositeType)
                     {
-                        value = module.instance().newValue( valueType.primaryType() );
+                        value = module.instance().newValue(valueType.primaryType());
                     }
                     else
                     {
-                        value = DefaultValues.getDefaultValueOf( type );
+                        value = DefaultValues.getDefaultValueOf(type);
                     }
                 }
                 else
                 {
-                    Class<?> propertyType = valueType().types().findFirst().orElse( null );
-                    if( value instanceof String && !propertyType.equals( String.class ) )
+                    Class<?> propertyType = valueType().types().findFirst().orElse(null);
+                    if(value instanceof String && !propertyType.equals(String.class))
                     {
                         ServiceFinder serviceFinder = module.instance().serviceFinder();
-                        Deserializer deserializer = serviceFinder.findService( Deserializer.class ).get();
-                        if( deserializer != null )
+                        Deserializer deserializer = serviceFinder.findService(Deserializer.class).get();
+                        if(deserializer != null)
                         {
-                            value = deserializer.deserialize( module, valueType, (String) value );
+                            value = deserializer.deserialize(module, Options.DEFAULT, valueType, (String) value);
                         }
                     }
                 }

@@ -20,13 +20,14 @@
 
 package org.qi4j.api.composite;
 
+import org.qi4j.api.Qi4jAPI;
+import org.qi4j.api.structure.ModuleDescriptor;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.stream.Stream;
-import org.qi4j.api.Qi4jAPI;
-import org.qi4j.api.structure.ModuleDescriptor;
 
 /**
  * Thread-associated composites. This is basically a ThreadLocal which maintains a reference
@@ -42,14 +43,14 @@ public class CompositeContext<T extends TransientComposite>
     private final Class<T> type;
     private final Object[] uses;
 
-    public CompositeContext( ModuleDescriptor module, Class<T> type )
+    public CompositeContext(ModuleDescriptor module, Class<T> type)
     {
         this.module = module;
         this.type = type;
         uses = EMPTY;
     }
 
-    public CompositeContext( ModuleDescriptor module, Class<T> type, Object... uses )
+    public CompositeContext(ModuleDescriptor module, Class<T> type, Object... uses)
     {
         this.module = module;
         this.type = type;
@@ -59,19 +60,19 @@ public class CompositeContext<T extends TransientComposite>
     @Override
     protected T initialValue()
     {
-        return module.instance().newTransient( type, uses );
+        return module.instance().newTransient(type, uses);
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public T proxy()
     {
         TransientComposite composite = get();
 
-        Stream<Class<?>> types = Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply( composite ).types();
+        Stream<Class<?>> types = Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply(composite).types();
         return (T) Proxy.newProxyInstance(
             composite.getClass().getClassLoader(),
-            types.toArray( Class[]::new ),
-            new ContextInvocationhandler() );
+            types.toArray(Class[]::new),
+            new ContextInvocationhandler());
     }
 
     private class ContextInvocationhandler
@@ -79,14 +80,14 @@ public class CompositeContext<T extends TransientComposite>
     {
 
         @Override
-        public Object invoke( Object object, Method method, Object[] objects )
+        public Object invoke(Object object, Method method, Object[] objects)
             throws Throwable
         {
             try
             {
-                return method.invoke( get(), objects );
+                return method.invoke(get(), objects);
             }
-            catch( InvocationTargetException e )
+            catch(InvocationTargetException e)
             {
                 throw e.getTargetException();
             }

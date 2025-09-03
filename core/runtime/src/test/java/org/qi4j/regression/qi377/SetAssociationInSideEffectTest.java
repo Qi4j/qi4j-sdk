@@ -19,9 +19,7 @@
  */
 package org.qi4j.regression.qi377;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.Optional;
@@ -37,7 +35,10 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -48,32 +49,32 @@ public class SetAssociationInSideEffectTest
     extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
+        new EntityTestAssembler().assemble(module);
 
-        module.entities( Pianist.class, Steinway.class );
+        module.entities(Pianist.class, Steinway.class);
     }
 
     @Test
     public void whenSettingAnAssociationInASideEffectExpectItToWork()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "Purchase Steinway" ) ) )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(UsecaseBuilder.newUsecase("Purchase Steinway")))
         {
-            Pianist chris = uow.newEntity( Pianist.class, StringIdentity.identityOf( "Chris" ) );
-            Steinway modelD = uow.newEntity( Steinway.class, StringIdentity.identityOf( "ModelD-274" ) );
+            Pianist chris = uow.newEntity(Pianist.class, StringIdentity.identityOf("Chris"));
+            Steinway modelD = uow.newEntity(Steinway.class, StringIdentity.identityOf("ModelD-274"));
 
-            assertThat( modelD.owner().get(), is( nullValue() ) );
+            assertThat(modelD.owner().get(), is(nullValue()));
 
-            chris.purchase( modelD );
+            chris.purchase(modelD);
 
-            assertThat( modelD.owner().get(), is( theInstance( chris ) ) );
+            assertThat(modelD.owner().get(), is(theInstance(chris)));
         }
     }
 
-    @Mixins( PianistMixin.class )
-    @SideEffects( ChangeOwnerSideEffect.class )
+    @Mixins(PianistMixin.class)
+    @SideEffects(ChangeOwnerSideEffect.class)
     public interface Pianist
         extends Owner, EntityComposite
     {
@@ -81,16 +82,16 @@ public class SetAssociationInSideEffectTest
         Association<Steinway> steinway();
 
         @ChangesOwner
-        void purchase( Steinway piano );
+        void purchase(Steinway piano);
     }
 
     public static abstract class PianistMixin
         implements Pianist
     {
         @Override
-        public void purchase( Steinway piano )
+        public void purchase(Steinway piano)
         {
-            steinway().set( piano );
+            steinway().set(piano);
         }
     }
 
@@ -109,7 +110,7 @@ public class SetAssociationInSideEffectTest
         Association<Owner> owner();
     }
 
-    @AppliesTo( ChangesOwner.class )
+    @AppliesTo(ChangesOwner.class)
     public static class ChangeOwnerSideEffect
         extends GenericSideEffect
     {
@@ -117,15 +118,15 @@ public class SetAssociationInSideEffectTest
         Owner owner;
 
         @Override
-        protected void invoke( Method method, Object[] args )
+        protected void invoke(Method method, Object[] args)
             throws Throwable
         {
-            Ownable ownable = (Ownable) args[ 0];
-            ownable.owner().set( owner );
+            Ownable ownable = (Ownable) args[0];
+            ownable.owner().set(owner);
         }
     }
 
-    @Retention( RetentionPolicy.RUNTIME )
+    @Retention(RetentionPolicy.RUNTIME)
     public @interface ChangesOwner
     {
     }

@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.sideeffects;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.This;
@@ -30,7 +31,6 @@ import org.qi4j.api.sideeffect.SideEffects;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,27 +39,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test for adding side-effects to methods specified by domain interfaces
  */
 public class SpecificSideEffectTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( SomeComposite.class );
+        module.transients(SomeComposite.class);
     }
 
     @Test
     public void specificSideEffect()
     {
-        SomeComposite some = transientBuilderFactory.newTransient( SomeComposite.class );
+        SomeComposite some = transientBuilderFactory.newTransient(SomeComposite.class);
         Property<Integer> count = some.count();
-        assertThat( "count is zero", count.get(), equalTo( 0 ) );
+        assertThat("count is zero", count.get(), equalTo(0));
         some.doStuff();
-        assertThat( "count is not zero", count.get(), equalTo( 1 ) );
+        assertThat("count is not zero", count.get(), equalTo(1));
     }
 
-    @SideEffects( CounterSideEffect.class )
-    @Mixins( SomeMixin.class )
+    @SideEffects(CounterSideEffect.class)
+    @Mixins(SomeMixin.class)
     public interface SomeComposite
         extends Some, Counter, TransientComposite
     {
@@ -94,7 +94,7 @@ public class SpecificSideEffectTest
 
         public String doStuff()
         {
-            counter.count().set( counter.count().get() + 1 );
+            counter.count().set(counter.count().get() + 1);
             return null;
         }
     }

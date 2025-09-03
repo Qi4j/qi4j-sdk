@@ -17,21 +17,7 @@
  */
 package org.qi4j.serialization.jakartajson;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.io.Writer;
-import java.util.Base64;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
+import jakarta.json.*;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.common.Optional;
@@ -43,8 +29,10 @@ import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.serialization.Converter;
 import org.qi4j.api.serialization.Converters;
+import org.qi4j.api.serialization.Serialization;
 import org.qi4j.api.serialization.SerializationException;
 import org.qi4j.api.service.ServiceDescriptor;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ArrayType;
 import org.qi4j.api.type.MapType;
 import org.qi4j.api.type.StatefulAssociationValueType;
@@ -52,6 +40,16 @@ import org.qi4j.api.type.ValueType;
 import org.qi4j.spi.serialization.AbstractTextSerializer;
 import org.qi4j.spi.serialization.JsonSerializer;
 import org.qi4j.spi.util.ArrayIterable;
+
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.io.Writer;
+import java.util.Base64;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
@@ -75,16 +73,17 @@ public class JakartaJsonSerializer extends AbstractTextSerializer
     private JakartaJsonSettings settings;
 
     @Override
-    public void initialize() throws Exception
+    public void initialize()
+        throws Exception
     {
-        settings = JakartaJsonSettings.orDefault( descriptor.metaInfo( JakartaJsonSettings.class ) );
+        settings = JakartaJsonSettings.orDefault(descriptor.metaInfo(JakartaJsonSettings.class));
     }
 
     @Override
-    public void serialize( Options options, Writer writer, @Optional Object object )
+    public void serialize(ModuleDescriptor module, Serialization.Options options, Writer writer, @Optional Object object)
     {
-        JsonValue jsonValue = toJson( options, object );
-        if( jsonValue == null )
+        JsonValue jsonValue = toJson(module, options, object);
+        if(jsonValue == null)
         {
             return;
         }
@@ -92,71 +91,71 @@ public class JakartaJsonSerializer extends AbstractTextSerializer
         {
             // We want plain Strings to be serialized without quotes which is non JSON compliant
             // See https://java.net/jira/browse/JSON_PROCESSING_SPEC-65
-            if( jsonValue.getValueType() == JsonValue.ValueType.STRING )
+            if(jsonValue.getValueType() == JsonValue.ValueType.STRING)
             {
-                writer.write( ( (JsonString) jsonValue ).getString() );
+                writer.write(((JsonString) jsonValue).getString());
             }
             else
             {
-                writer.write( jsonValue.toString() );
+                writer.write(jsonValue.toString());
             }
         }
-        catch( IOException ex )
+        catch(IOException ex)
         {
-            throw new UncheckedIOException( ex );
+            throw new UncheckedIOException(ex);
         }
     }
 
     @Override
-    public <T> Function<T, JsonValue> toJsonFunction( Options options )
+    public <T> Function<T, JsonValue> toJsonFunction(ModuleDescriptor module, Serialization.Options options)
     {
-        return object -> doSerialize( options, object, true );
+        return object -> doSerialize(module, options, object, true);
     }
 
-    @SuppressWarnings( "unchecked" )
-    private <T> JsonValue doSerialize( Options options, T object, boolean root )
+    @SuppressWarnings("unchecked")
+    private <T> JsonValue doSerialize(ModuleDescriptor module, Serialization.Options options, T object, boolean root)
     {
-        if( object == null )
+        if(object == null)
         {
             return JsonValue.NULL;
         }
         Class<?> objectClass = object.getClass();
-        Converter<Object> converter = converters.converterFor( objectClass );
-        if( converter != null )
+        Converter<Object> converter = converters.converterFor(objectClass);
+        if(converter != null)
         {
-            return doSerialize( options, converter.toString( object ), false );
+            return doSerialize(module, options, converter.toString(object), false);
         }
-        JakartaJsonAdapter<T> adapter = adapters.adapterFor( (Class<T>) objectClass );
-        if( adapter != null )
+        JakartaJsonAdapter<T> adapter = adapters.adapterFor((Class<T>) objectClass);
+        if(adapter != null)
         {
-            return adapter.serialize( jsonFactories, object, obj -> doSerialize( options, obj, false ) );
+            return adapter.serialize(module, options, jsonFactories, object, obj -> doSerialize(module, options, obj, false));
         }
-        if( StatefulAssociationValueType.isStatefulAssociationValue( objectClass ) )
+        if(StatefulAssociationValueType.isStatefulAssociationValue(objectClass))
         {
-            return serializeStatefulAssociationValue( options, object, root );
+            return serializeStatefulAssociationValue(module, options, object, root);
         }
-        if( MapType.isMap( objectClass ) )
+        if(MapType.isMap(objectClass))
         {
-            return serializeMap( options, (Map<?, ?>) object );
+            return serializeMap(module, options, (Map<?, ?>) object);
         }
-        if( ArrayType.isArray( objectClass ) )
+        if(ArrayType.isArray(objectClass))
         {
-            return serializeArray( options, object );
+            return serializeArray(module, options, object);
         }
-        if( Iterable.class.isAssignableFrom( objectClass ) )
+        if(Iterable.class.isAssignableFrom(objectClass))
         {
-            return serializeIterable( options, (Iterable<?>) object );
+            return serializeIterable(module, options, (Iterable<?>) object);
         }
-        if( Stream.class.isAssignableFrom( objectClass ) )
+        if(Stream.class.isAssignableFrom(objectClass))
         {
-            return serializeStream( options, (Stream<?>) object );
+            return serializeStream(module, options, (Stream<?>) object);
         }
-        throw new SerializationException( "Don't know how to serialize " + object );
+        throw new SerializationException("Don't know how to serialize " + object);
     }
 
-    private JsonObject serializeStatefulAssociationValue( Options options, Object composite, boolean root )
+    private JsonObject serializeStatefulAssociationValue(ModuleDescriptor module, Serialization.Options options, Object composite, boolean root)
     {
-        CompositeInstance instance = Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply( (Composite) composite );
+        CompositeInstance instance = Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply((Composite) composite);
         StatefulAssociationCompositeDescriptor descriptor =
             (StatefulAssociationCompositeDescriptor) instance.descriptor();
         AssociationStateHolder state = (AssociationStateHolder) instance.state();
@@ -166,102 +165,101 @@ public class JakartaJsonSerializer extends AbstractTextSerializer
         valueType.properties().forEach(
             property ->
             {
-                Object value = state.propertyFor( property.accessor() ).get();
-                Converter converter = converters.converterFor( property );
-                if( converter != null )
+                Object value = state.propertyFor(property.accessor()).get();
+                Converter converter = converters.converterFor(property);
+                if(converter != null)
                 {
-                    value = converter.toString( value );
+                    value = converter.toString(value);
                 }
-                builder.add( property.qualifiedName().name(), doSerialize( options, value, false ) );
-            } );
+                builder.add(property.qualifiedName().name(), doSerialize(module, options, value, false));
+            });
         valueType.associations().forEach(
             association -> builder.add(
                 association.qualifiedName().name(),
-                doSerialize( options, state.associationFor( association.accessor() ).reference(), false ) ) );
+                doSerialize(module, options, state.associationFor(association.accessor()).reference(), false)));
         valueType.manyAssociations().forEach(
             association -> builder.add(
                 association.qualifiedName().name(),
-                doSerialize( options, state.manyAssociationFor( association.accessor() ).references()
-                                           .collect( toList() ),
-                             false ) ) );
+                doSerialize(module, options, state.manyAssociationFor(association.accessor()).references()
+                        .collect(toList()),
+                    false)));
         valueType.namedAssociations().forEach(
             association -> builder.add(
                 association.qualifiedName().name(),
-                doSerialize( options,
-                             state.namedAssociationFor( association.accessor() ).references()
-                                  .collect( toMap() ),
-                             false ) ) );
-        if( ( root && options.rootTypeInfo() ) || ( !root && options.nestedTypeInfo() ) )
+                doSerialize(module, options,
+                    state.namedAssociationFor(association.accessor()).references()
+                        .collect(toMap()),
+                    false)));
+        if((root && options.rootTypeInfo()) || (!root && options.nestedTypeInfo()))
         {
-            withTypeInfo( builder, valueType );
+            withTypeInfo(builder, valueType);
         }
         return builder.build();
     }
 
-    private void withTypeInfo( JsonObjectBuilder builder, ValueType valueType )
+    private void withTypeInfo(JsonObjectBuilder builder, ValueType valueType)
     {
-        builder.add( settings.getTypeInfoPropertyName(), valueType.primaryType().getName() );
+        builder.add(settings.getTypeInfoPropertyName(), valueType.primaryType().getName());
     }
 
     /**
      * Map serialization.
-     *
+     * <p>
      * {@literal Map<String, ?>} are serialized to a {@literal JsonObject}.
      * {@literal Map<?, ?>} are serialized to a {@literal JsonArray} or key/value {@literal JsonObject}s.
      * Empty maps are serialized to an empty {@literal JsonObject}.
      */
-    private JsonValue serializeMap( Options options, Map<?, ?> map )
+    private JsonValue serializeMap(ModuleDescriptor module, Serialization.Options options, Map<?, ?> map)
     {
-        if( map.isEmpty() )
+        if(map.isEmpty())
         {
             // Defaults to {}
             return jsonFactories.builderFactory().createObjectBuilder().build();
         }
-        Predicate<Object> characterKeyPredicate = key ->
-            key != null && ( key instanceof CharSequence || key instanceof Character );
-        if( map.keySet().stream().allMatch( characterKeyPredicate ) )
+        Predicate<Object> characterKeyPredicate = key -> (key instanceof CharSequence || key instanceof Character);
+        if(map.keySet().stream().allMatch(characterKeyPredicate))
         {
             JsonObjectBuilder builder = jsonFactories.builderFactory().createObjectBuilder();
-            map.forEach( ( key, value ) -> builder.add( key.toString(),
-                                                        doSerialize( options, value, false ) ) );
+            map.forEach((key, value) -> builder.add(key.toString(),
+                doSerialize(module, options, value, false)));
             return builder.build();
         }
         else
         {
             JsonArrayBuilder builder = jsonFactories.builderFactory().createArrayBuilder();
-            map.forEach( ( key, value ) -> builder.add(
+            map.forEach((key, value) -> builder.add(
                 jsonFactories.builderFactory().createObjectBuilder()
-                             .add( "key", doSerialize( options, key, false ) )
-                             .add( "value", doSerialize( options, value, false ) )
-                             .build() ) );
+                    .add("key", doSerialize(module, options, key, false))
+                    .add("value", doSerialize(module, options, value, false))
+                    .build()));
             return builder.build();
         }
     }
 
-    private JsonValue serializeArray( Options options, Object object )
+    private JsonValue serializeArray(ModuleDescriptor module, Serialization.Options options, Object object)
     {
-        ArrayType valueType = ArrayType.of( object.getClass() );
-        if( valueType.isArrayOfPrimitiveBytes() )
+        ArrayType valueType = ArrayType.of(object.getClass());
+        if(valueType.isArrayOfPrimitiveBytes())
         {
-            byte[] base64 = Base64.getEncoder().encode( (byte[]) object );
-            return jsonFactories.toJsonString( new String( base64, UTF_8 ) );
+            byte[] base64 = Base64.getEncoder().encode((byte[]) object);
+            return jsonFactories.toJsonString(new String(base64, UTF_8));
         }
-        if( valueType.isArrayOfPrimitives() )
+        if(valueType.isArrayOfPrimitives())
         {
-            return serializeIterable( options, new ArrayIterable( object ) );
+            return serializeIterable(module, options, new ArrayIterable(object));
         }
-        return serializeStream( options, Stream.of( (Object[]) object ) );
+        return serializeStream(module, options, Stream.of((Object[]) object));
     }
 
-    private JsonArray serializeIterable( Options options, Iterable<?> iterable )
+    private JsonArray serializeIterable(ModuleDescriptor module, Serialization.Options options, Iterable<?> iterable)
     {
-        return serializeStream( options, StreamSupport.stream( iterable.spliterator(), false ) );
+        return serializeStream(module, options, StreamSupport.stream(iterable.spliterator(), false));
     }
 
-    private <T> JsonArray serializeStream( Options options, Stream<?> stream )
+    private <T> JsonArray serializeStream(ModuleDescriptor module, Serialization.Options options, Stream<?> stream)
     {
         JsonArrayBuilder builder = jsonFactories.builderFactory().createArrayBuilder();
-        stream.forEach( element -> builder.add( doSerialize( options, element, false ) ) );
+        stream.forEach(element -> builder.add(doSerialize(module, options, element, false)));
         return builder.build();
     }
 }

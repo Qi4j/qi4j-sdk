@@ -19,10 +19,10 @@
  */
 package org.qi4j.api.type;
 
+import org.qi4j.api.util.Classes;
+
 import java.lang.reflect.Type;
 import java.util.stream.Stream;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.util.Classes;
 
 /**
  * Has types.
@@ -31,9 +31,9 @@ public interface HasTypes
 {
     Stream<Class<?>> types();
 
-    default boolean hasType( Type type )
+    default boolean hasType(Type type)
     {
-        Class<?> rawType = Classes.RAW_CLASS.apply( type );
-        return types().map( Classes.RAW_CLASS ).anyMatch( rawType::isAssignableFrom );
+        Class<?> rawType = Classes.RAW_CLASS.apply(type);
+        return types().map(Classes.RAW_CLASS).anyMatch(rawType::isAssignableFrom);
     }
 }

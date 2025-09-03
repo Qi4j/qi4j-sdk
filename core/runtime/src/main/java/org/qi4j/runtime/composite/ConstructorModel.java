@@ -20,10 +20,6 @@
 
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.stream.Stream;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.composite.ConstructorDescriptor;
 import org.qi4j.api.composite.InvalidCompositeException;
@@ -32,9 +28,11 @@ import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.injection.DependencyModel;
 import org.qi4j.runtime.injection.InjectedParametersModel;
 import org.qi4j.runtime.injection.InjectionContext;
-import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.InjectedParametersModel;
-import org.qi4j.runtime.injection.InjectionContext;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 import static org.qi4j.api.util.AccessibleObjects.accessible;
 
@@ -44,15 +42,15 @@ import static org.qi4j.api.util.AccessibleObjects.accessible;
 public final class ConstructorModel
     implements ConstructorDescriptor, VisitableHierarchy<Object, Object>
 {
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
 
     private Constructor<?> constructor;
 
     private InjectedParametersModel parameters;
 
-    public ConstructorModel( Constructor<?> constructor, InjectedParametersModel parameters )
+    public ConstructorModel(Constructor<?> constructor, InjectedParametersModel parameters)
     {
-        this.constructor = accessible( constructor );
+        this.constructor = accessible(constructor);
         this.parameters = parameters;
     }
 
@@ -68,49 +66,49 @@ public final class ConstructorModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            parameters.accept( modelVisitor );
+            parameters.accept(modelVisitor);
         }
 
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
 
     // Context
 
-    public Object newInstance( InjectionContext context )
+    public Object newInstance(InjectionContext context)
         throws ConstructionException
     {
         // Create parameters
-        Object[] parametersInstance = parameters.newParametersInstance( context );
+        Object[] parametersInstance = parameters.newParametersInstance(context);
         // Invoke constructor
         try
         {
-            return constructor.newInstance( parametersInstance );
+            return constructor.newInstance(parametersInstance);
         }
-        catch( InvocationTargetException e )
+        catch(InvocationTargetException e)
         {
             Throwable targetException = e.getTargetException();
-            if( targetException instanceof InvalidCompositeException )
+            if(targetException instanceof InvalidCompositeException)
             {
                 throw (InvalidCompositeException) targetException;
             }
-            throw new ConstructionException( createExceptionMessage( parametersInstance ), targetException );
+            throw new ConstructionException(createExceptionMessage(parametersInstance), targetException);
         }
-        catch( Throwable e )
+        catch(Throwable e)
         {
-            throw new ConstructionException( createExceptionMessage( parametersInstance ), e );
+            throw new ConstructionException(createExceptionMessage(parametersInstance), e);
         }
     }
 
-    private String createExceptionMessage( Object[] parametersInstance )
+    private String createExceptionMessage(Object[] parametersInstance)
     {
         return "Could not instantiate " + NL + "    " + constructor.getDeclaringClass()
-               + NL + "using constructor:" + NL + "    " + constructor.toGenericString()
-               + NL + "parameter types:" + NL + "    " + Arrays.toString( parametersInstance );
+            + NL + "using constructor:" + NL + "    " + constructor.toGenericString()
+            + NL + "parameter types:" + NL + "    " + Arrays.toString(parametersInstance);
     }
 
     @Override

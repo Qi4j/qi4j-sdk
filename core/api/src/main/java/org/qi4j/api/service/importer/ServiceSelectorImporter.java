@@ -20,23 +20,18 @@
 
 package org.qi4j.api.service.importer;
 
+import org.qi4j.api.injection.scope.Structure;
+import org.qi4j.api.service.*;
+
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.service.Availability;
-import org.qi4j.api.service.ImportedServiceDescriptor;
-import org.qi4j.api.service.ServiceFinder;
-import org.qi4j.api.service.ServiceImporter;
-import org.qi4j.api.service.ServiceImporterException;
-import org.qi4j.api.service.ServiceReference;
-import org.qi4j.api.injection.scope.Structure;
 
 /**
  * If several services are available with a given type, and you want to constrain
  * the current module to use a specific one, then use this importer. Specify a
  * Specification&lt;ServiceReference&lt;T&gt;&gt; criteria as meta-info for the service, which will be applied
  * to the list of available services, and the first match will be chosen.
- *
+ * <p>
  * This importer will avoid selecting itself, as could be possible if the ServiceQualifier.first()
  * filter is used.
  */
@@ -47,30 +42,30 @@ public final class ServiceSelectorImporter<T>
     private ServiceFinder locator;
 
     @Override
-    @SuppressWarnings( { "raw", "unchecked" } )
-    public T importService( ImportedServiceDescriptor serviceDescriptor )
+    @SuppressWarnings({"raw", "unchecked"})
+    public T importService(ImportedServiceDescriptor serviceDescriptor)
         throws ServiceImporterException
     {
-        Predicate<ServiceReference<?>> selector = serviceDescriptor.metaInfo( Predicate.class );
-        Class serviceType = serviceDescriptor.types().findFirst().orElse( null );
+        Predicate<ServiceReference<?>> selector = serviceDescriptor.metaInfo(Predicate.class);
+        Class serviceType = serviceDescriptor.types().findFirst().orElse(null);
 
-        Stream<ServiceReference<T>> services = locator.findServices( serviceType );
+        Stream<ServiceReference<T>> services = locator.findServices(serviceType);
         Predicate<ServiceReference<T>> filter = ref ->
         {
-            Predicate selector1 = ref.metaInfo( Predicate.class );
+            Predicate selector1 = ref.metaInfo(Predicate.class);
             return selector1 == null || selector == selector1;
         };
-        return services.filter( filter.and( selector ) )
-                       .findFirst().map( ServiceReference::get )
-                       .orElseThrow(
-                           () -> new ServiceImporterException(
-                               "Could not find any service to import that matches the given specification for "
-                               + serviceDescriptor.identity() ) );
+        return services.filter(filter.and(selector))
+            .findFirst().map(ServiceReference::get)
+            .orElseThrow(
+                () -> new ServiceImporterException(
+                    "Could not find any service to import that matches the given specification for "
+                        + serviceDescriptor.identity()));
     }
 
     @Override
-    public boolean isAvailable( T instance )
+    public boolean isAvailable(T instance)
     {
-        return !( instance instanceof Availability ) || ( (Availability) instance ).isAvailable();
+        return !(instance instanceof Availability) || ((Availability) instance).isAvailable();
     }
 }

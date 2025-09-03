@@ -22,7 +22,6 @@ package org.qi4j.runtime.bootstrap;
 
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.ObjectDeclaration;
-import org.qi4j.bootstrap.ObjectDeclaration;
 
 /**
  * Declaration of an Object. Created by {@link ModuleAssemblyImpl#objects(Class[])}.
@@ -32,26 +31,26 @@ public final class ObjectDeclarationImpl
 {
     private final Iterable<ObjectAssemblyImpl> assemblies;
 
-    public ObjectDeclarationImpl( Iterable<ObjectAssemblyImpl> assemblies )
+    public ObjectDeclarationImpl(Iterable<ObjectAssemblyImpl> assemblies)
     {
         this.assemblies = assemblies;
     }
 
     @Override
-    public ObjectDeclaration setMetaInfo( Object info )
+    public ObjectDeclaration setMetaInfo(Object info)
     {
-        for( ObjectAssemblyImpl assembly : assemblies )
+        for(ObjectAssemblyImpl assembly : assemblies)
         {
-            assembly.metaInfo.set( info );
+            assembly.metaInfo.set(info);
         }
         return this;
     }
 
     @Override
-    public ObjectDeclaration visibleIn( Visibility visibility )
+    public ObjectDeclaration visibleIn(Visibility visibility)
         throws IllegalStateException
     {
-        for( ObjectAssemblyImpl assembly : assemblies )
+        for(ObjectAssemblyImpl assembly : assemblies)
         {
             assembly.visibility = visibility;
         }

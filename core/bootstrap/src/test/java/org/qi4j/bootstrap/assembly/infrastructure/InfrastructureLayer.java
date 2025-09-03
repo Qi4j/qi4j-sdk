@@ -31,18 +31,18 @@ public class InfrastructureLayer extends LayeredLayerAssembler
     public static final String NAME = "Infrastructure Layer";
     private final ModuleAssembly configModule;
 
-    public InfrastructureLayer( ModuleAssembly configModule )
+    public InfrastructureLayer(ModuleAssembly configModule)
     {
         this.configModule = configModule;
     }
 
     @Override
-    public LayerAssembly assemble( LayerAssembly layer )
+    public LayerAssembly assemble(LayerAssembly layer)
         throws AssemblyException
     {
-        new StorageModule( configModule ).assemble( layer, layer.module( StorageModule.NAME ) );
-        new IndexingModule( configModule ).assemble( layer, layer.module( IndexingModule.NAME ) );
-        createModule( layer, SerializationModule.class );
+        new StorageModule(configModule).assemble(layer, layer.module(StorageModule.NAME));
+        new IndexingModule(configModule).assemble(layer, layer.module(IndexingModule.NAME));
+        createModule(layer, SerializationModule.class);
         return layer;
     }
 }

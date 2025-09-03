@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.instantiation;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
@@ -28,33 +29,32 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 public class ServiceInstantiationTests
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( MyConfiguration.class );
-        module.services( My.class );
-        new EntityTestAssembler().assemble( module );
+        module.entities(MyConfiguration.class);
+        module.services(My.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
     public void whenCreatingServiceCompositeGivenAServiceCompositeThenSucceed()
         throws Exception
     {
-        ServiceReference<My> service = serviceFinder.findService( My.class );
-        assertThat( service.get().doSomething(), equalTo( "HabbaZout" ) );
+        ServiceReference<My> service = serviceFinder.findService(My.class);
+        assertThat(service.get().doSomething(), equalTo("HabbaZout"));
     }
 
-    @Mixins( MyMixin.class )
+    @Mixins(MyMixin.class)
     public interface My
     {
         String doSomething();

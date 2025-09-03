@@ -19,19 +19,18 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.concern.ConcernsDescriptor;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.injection.Dependencies;
 import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.Dependencies;
-import org.qi4j.runtime.injection.DependencyModel;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -39,11 +38,11 @@ import org.qi4j.runtime.injection.DependencyModel;
 public final class ConcernsModel
     implements ConcernsDescriptor, Dependencies, VisitableHierarchy<Object, Object>
 {
-    public static final ConcernsModel EMPTY_CONCERNS = new ConcernsModel( Collections.emptyList() );
+    public static final ConcernsModel EMPTY_CONCERNS = new ConcernsModel(Collections.emptyList());
 
     private List<ConcernModel> concernsFor;
 
-    public ConcernsModel( List<ConcernModel> concernsFor )
+    public ConcernsModel(List<ConcernModel> concernsFor)
     {
         this.concernsFor = concernsFor;
     }
@@ -51,37 +50,37 @@ public final class ConcernsModel
     @Override
     public Stream<DependencyModel> dependencies()
     {
-        return concernsFor.stream().flatMap( ConcernModel::dependencies );
+        return concernsFor.stream().flatMap(ConcernModel::dependencies);
     }
 
     // Context
-    public ConcernsInstance newInstance( Method method, ModuleDescriptor module,
-                                         FragmentInvocationHandler mixinInvocationHandler )
+    public ConcernsInstance newInstance(Method method, ModuleDescriptor module,
+                                        FragmentInvocationHandler mixinInvocationHandler)
     {
         ProxyReferenceInvocationHandler proxyHandler = new ProxyReferenceInvocationHandler();
         InvocationHandler nextConcern = mixinInvocationHandler;
-        for( int i = concernsFor.size() - 1; i >= 0; i-- )
+        for(int i = concernsFor.size() - 1; i >= 0; i--)
         {
-            ConcernModel concernModel = concernsFor.get( i );
-            nextConcern = concernModel.newInstance( module, nextConcern, proxyHandler, method );
+            ConcernModel concernModel = concernsFor.get(i);
+            nextConcern = concernModel.newInstance(module, nextConcern, proxyHandler, method);
         }
-        return new ConcernsInstance( nextConcern, mixinInvocationHandler, proxyHandler );
+        return new ConcernsInstance(nextConcern, mixinInvocationHandler, proxyHandler);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            for( ConcernModel concernModel : concernsFor )
+            for(ConcernModel concernModel : concernsFor)
             {
-                if( !concernModel.accept( modelVisitor ) )
+                if(!concernModel.accept(modelVisitor))
                 {
                     break;
                 }
             }
         }
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
 }

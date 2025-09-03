@@ -27,6 +27,6 @@ import org.qi4j.api.property.Property;
  */
 public interface Port
 {
-    @Queryable( false )
+    @Queryable(false)
     Property<Integer> value();
 }

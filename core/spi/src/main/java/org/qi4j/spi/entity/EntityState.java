@@ -19,11 +19,12 @@
  */
 package org.qi4j.spi.entity;
 
-import java.time.Instant;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.time.SystemTime;
+
+import java.time.Instant;
 
 /**
  * State holder for Entities.
@@ -43,6 +44,7 @@ public interface EntityState
      * If the underlying EntityStore does not support versioning, then version
      * must always be set to 0.
      * </p>
+     *
      * @return version of the entity
      */
     String version();
@@ -53,6 +55,7 @@ public interface EntityState
      * If the underlying EntityStore does not support timestamping, then last modified
      * must always be set to the current time.
      * </p>
+     *
      * @return last modified timestamp of the entity, as defined by {@link SystemTime#now()}
      */
     Instant lastModified();
@@ -69,19 +72,19 @@ public interface EntityState
      */
     EntityStatus status();
 
-    boolean isAssignableTo( Class<?> type );
+    boolean isAssignableTo(Class<?> type);
 
     EntityDescriptor entityDescriptor();
 
-    Object propertyValueOf( QualifiedName stateName );
+    Object propertyValueOf(QualifiedName stateName);
 
-    void setPropertyValue( QualifiedName stateName, Object json );
+    void setPropertyValue(QualifiedName stateName, Object json);
 
-    EntityReference associationValueOf( QualifiedName stateName );
+    EntityReference associationValueOf(QualifiedName stateName);
 
-    void setAssociationValue( QualifiedName stateName, EntityReference newEntity );
+    void setAssociationValue(QualifiedName stateName, EntityReference newEntity);
 
-    ManyAssociationState manyAssociationValueOf( QualifiedName stateName );
-    
-    NamedAssociationState namedAssociationValueOf( QualifiedName stateName );
+    ManyAssociationState manyAssociationValueOf(QualifiedName stateName);
+
+    NamedAssociationState namedAssociationValueOf(QualifiedName stateName);
 }

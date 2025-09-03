@@ -17,67 +17,38 @@
  */
 package org.qi4j.spi.serialization;
 
-import java.util.function.Function;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.serialization.Deserializer;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.spi.module.ModuleSpi;
 import org.w3c.dom.Node;
+
+import java.util.function.Function;
 
 /**
  * {@literal javax.xml} deserializer.
  */
 public interface XmlDeserializer extends Deserializer
 {
-    <T> T fromXml( ModuleDescriptor module, ValueType valueType, @Optional Node state );
+    <T> T fromXml(ModuleDescriptor module, Options options, ValueType valueType, @Optional Node state);
 
-    default <T> Function<Node, T> fromXmlFunction( ModuleDescriptor module, ValueType valueType )
+    default <T> Function<Node, T> fromXmlFunction(ModuleDescriptor module, Options options, ValueType valueType)
     {
-        return state -> fromXml( module, valueType, state );
+        return state -> fromXml(module, options, valueType, state);
     }
 
-    default <T> Stream<T> fromXmlEach( ModuleDescriptor module, ValueType valueType, Stream<Node> states )
-    {
-        return states.map( fromXmlFunction( module, valueType ) );
-    }
-
-    default <T> Stream<T> fromXmlEach( ModuleDescriptor module, ValueType valueType, Iterable<Node> states )
-    {
-        return fromXmlEach( module, valueType, StreamSupport.stream( states.spliterator(), false ) );
-    }
-
-    default <T> Stream<T> fromXmlEach( ModuleDescriptor module, ValueType valueType, Node... states )
-    {
-        return fromXmlEach( module, valueType, Stream.of( states ) );
-    }
-
-    default <T> T fromXml( ModuleDescriptor module, Class<T> type, @Optional Node state )
+    default <T> T fromXml(ModuleDescriptor module, Options options, Class<T> type, @Optional Node state)
     {
         // TODO Remove (ModuleSpi) cast
-        ValueType valueType = ( (ModuleSpi) module.instance() ).valueTypeFactory().valueTypeOf( module, type );
-        return fromXml( module, valueType, state );
+        ValueType valueType = ((ModuleSpi) module.instance()).valueTypeFactory().valueTypeOf(module, type);
+        return fromXml(module, options, valueType, state);
     }
 
-    default <T> Function<Node, T> fromXml( ModuleDescriptor module, Class<T> type )
+    default <T> Function<Node, T> fromXml(ModuleDescriptor module, Options options, Class<T> type)
     {
-        return state -> fromXml( module, type, state );
+        return state -> fromXml(module, options, type, state);
     }
 
-    default <T> Stream<T> fromXmlEach( ModuleDescriptor module, Class<T> valueType, Stream<Node> states )
-    {
-        return states.map( fromXml( module, valueType ) );
-    }
-
-    default <T> Stream<T> fromXmlEach( ModuleDescriptor module, Class<T> valueType, Iterable<Node> states )
-    {
-        return fromXmlEach( module, valueType, StreamSupport.stream( states.spliterator(), false ) );
-    }
-
-    default <T> Stream<T> fromXmlEach( ModuleDescriptor module, Class<T> valueType, Node... states )
-    {
-        return fromXmlEach( module, valueType, Stream.of( states ) );
-    }
 }

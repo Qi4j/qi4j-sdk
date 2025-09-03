@@ -19,13 +19,12 @@
  */
 package org.qi4j.api.unitofwork;
 
-import java.util.stream.Stream;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.NoSuchCompositeTypeException;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.structure.TypeLookup;
 
-import static java.util.stream.Collectors.joining;
+import java.util.stream.Stream;
 
 /**
  * Qi4j exception to be thrown in case that an entity composite
@@ -33,13 +32,13 @@ import static java.util.stream.Collectors.joining;
  */
 public class NoSuchEntityTypeException extends NoSuchCompositeTypeException
 {
-    public NoSuchEntityTypeException( String typeName, ModuleDescriptor module )
+    public NoSuchEntityTypeException(String typeName, ModuleDescriptor module)
     {
-        super( "EntityComposite", typeName, module );
+        super("EntityComposite", typeName, module);
     }
 
     @Override
-    protected Stream<? extends CompositeDescriptor> descriptors( TypeLookup typeLookup )
+    protected Stream<? extends CompositeDescriptor> descriptors(TypeLookup typeLookup)
     {
         return typeLookup.allEntities();
     }

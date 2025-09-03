@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.instantiation;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceComposite;
@@ -27,7 +28,6 @@ import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -37,20 +37,20 @@ public class EagerServiceInstantiationTest
 {
     private TestInfo testInfo;
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
         testInfo = new TestInfo();
-        module.services( MyService.class ).setMetaInfo( testInfo ).instantiateOnStartup();
+        module.services(MyService.class).setMetaInfo(testInfo).instantiateOnStartup();
     }
 
     @Test
     public void givenServiceInstantiatedOnStartUpWhenTestIsRunExpectServiceToHaveRun()
     {
-        assertThat( testInfo.test, equalTo( "123" ) );
+        assertThat(testInfo.test, equalTo("123"));
     }
 
-    @Mixins( MyMixin.class )
+    @Mixins(MyMixin.class)
     public interface MyService
         extends My, ServiceComposite
     {
@@ -64,19 +64,19 @@ public class EagerServiceInstantiationTest
     public static class MyMixin
         implements My
     {
-        public MyMixin( @Uses ServiceDescriptor descriptor )
+        public MyMixin(@Uses ServiceDescriptor descriptor)
         {
-            descriptor.metaInfo( TestInfo.class ).test = "123";
+            descriptor.metaInfo(TestInfo.class).test = "123";
         }
 
         public MyMixin()
         {
-            System.out.println( "Constructor" );
+            System.out.println("Constructor");
         }
 
         public void doSomething()
         {
-            System.out.println( "Execute" );
+            System.out.println("Execute");
         }
     }
 

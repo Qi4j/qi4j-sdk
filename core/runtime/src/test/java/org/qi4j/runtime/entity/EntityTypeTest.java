@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.entity;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.identity.StringIdentity;
@@ -28,7 +29,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 public class EntityTypeTest
     extends AbstractQi4jTest
@@ -40,9 +40,9 @@ public class EntityTypeTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<Rst> builder3 = uow.newEntityBuilder( Rst.class, StringIdentity.identityOf( "123" ) );
-            EntityBuilder<Def> builder2 = uow.newEntityBuilder( Def.class, StringIdentity.identityOf( "456" ) );
-            EntityBuilder<Abc> builder1 = uow.newEntityBuilder( Abc.class, StringIdentity.identityOf( "789" ) );
+            EntityBuilder<Rst> builder3 = uow.newEntityBuilder(Rst.class, StringIdentity.identityOf("123"));
+            EntityBuilder<Def> builder2 = uow.newEntityBuilder(Def.class, StringIdentity.identityOf("456"));
+            EntityBuilder<Abc> builder1 = uow.newEntityBuilder(Abc.class, StringIdentity.identityOf("789"));
         }
         finally
         {
@@ -50,11 +50,11 @@ public class EntityTypeTest
         }
     }
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( Rst.class );
-        new EntityTestAssembler().assemble( module );
+        module.entities(Rst.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     public interface Abc

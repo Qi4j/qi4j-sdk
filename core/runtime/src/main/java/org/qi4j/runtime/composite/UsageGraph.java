@@ -19,12 +19,12 @@
  */
 package org.qi4j.runtime.composite;
 
+import org.qi4j.bootstrap.BindingException;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import org.qi4j.bootstrap.BindingException;
-import org.qi4j.bootstrap.BindingException;
 
 /**
  * This class is NOT thread-safe.
@@ -38,41 +38,41 @@ public final class UsageGraph<K>
     private List<K> resolved;
     private HashMap<K, List<K>> transitive;
 
-    public UsageGraph( Collection<K> data, Use<K> use, boolean allowCyclic )
+    public UsageGraph(Collection<K> data, Use<K> use, boolean allowCyclic)
     {
         this.data = data;
         this.use = use;
         this.allowCyclic = allowCyclic;
     }
 
-    public boolean transitiveUse( K source, K other )
+    public boolean transitiveUse(K source, K other)
         throws BindingException
     {
-        if( transitive == null )
+        if(transitive == null)
         {
             buildUsageGraph();
         }
-        return transitive.containsKey( source ) && transitive.get( source ).contains( other );
+        return transitive.containsKey(source) && transitive.get(source).contains(other);
     }
 
-    private void checkCyclic( List<K> visited, K sourceItem, K used )
+    private void checkCyclic(List<K> visited, K sourceItem, K used)
         throws BindingException
     {
-        Collection<K> nextLevel = use.uses( used );
-        for( K next : nextLevel )
+        Collection<K> nextLevel = use.uses(used);
+        for(K next : nextLevel)
         {
-            if( next == sourceItem )
+            if(next == sourceItem)
             {
-                if( !allowCyclic )
+                if(!allowCyclic)
                 {
-                    visited.add( next );
-                    throw new BindingException( "Cyclic usage detected: " + sourceItem + " -> " + visited );
+                    visited.add(next);
+                    throw new BindingException("Cyclic usage detected: " + sourceItem + " -> " + visited);
                 }
             }
-            if( !visited.contains( next ) )
+            if(!visited.contains(next))
             {
-                visited.add( next );
-                checkCyclic( visited, sourceItem, next );
+                visited.add(next);
+                checkCyclic(visited, sourceItem, next);
             }
         }
     }
@@ -89,22 +89,22 @@ public final class UsageGraph<K>
     public List<K> resolveOrder()
         throws BindingException
     {
-        if( resolved == null )
+        if(resolved == null)
         {
             buildUsageGraph();
             resolved = new LinkedList<>();
-            for( K item : data )
+            for(K item : data)
             {
                 int pos = resolved.size();
-                for( K entry : resolved )
+                for(K entry : resolved)
                 {
-                    if( transitiveUse( entry, item ) )
+                    if(transitiveUse(entry, item))
                     {
-                        pos = resolved.indexOf( entry );
+                        pos = resolved.indexOf(entry);
                         break;
                     }
                 }
-                resolved.add( pos, item );
+                resolved.add(pos, item);
             }
         }
         return resolved;
@@ -114,11 +114,11 @@ public final class UsageGraph<K>
         throws BindingException
     {
         transitive = new HashMap<>();
-        for( K sourceItem : data )
+        for(K sourceItem : data)
         {
             LinkedList<K> visited = new LinkedList<K>();
-            checkCyclic( visited, sourceItem, sourceItem );
-            transitive.put( sourceItem, visited );
+            checkCyclic(visited, sourceItem, sourceItem);
+            transitive.put(sourceItem, visited);
         }
     }
 
@@ -127,9 +127,8 @@ public final class UsageGraph<K>
 
         /**
          * @param source The item to be queried.
-         *
          * @return A list of items it uses.
          */
-        Collection<K> uses( K source );
+        Collection<K> uses(K source);
     }
 }

@@ -20,10 +20,11 @@
 
 package org.qi4j.bootstrap;
 
-import java.util.function.Predicate;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.structure.Layer;
+
+import java.util.function.Predicate;
 
 /**
  * Fluid API for declaring a layer in an application. This is obtained by calling {@link ApplicationAssembly#layer(String)}.
@@ -35,10 +36,9 @@ public interface LayerAssembly
      * is affected.
      *
      * @param name The name of the Module to retrieve or create.
-     *
      * @return The ModuleAssembly for the Module.
      */
-    ModuleAssembly module( String name );
+    ModuleAssembly module(String name);
 
     /**
      *
@@ -60,27 +60,38 @@ public interface LayerAssembly
      * @param name The name that the Layer should have.
      * @return this {@code LayerAssembly} instance to support fluent APIs
      */
-    LayerAssembly setName( String name );
+    LayerAssembly setName(String name);
 
-    /** Set metadata for the {@code Layer}.
+    /**
+     * Set metadata for the {@code Layer}.
      * Any arbitrary object can be attached as metainfo on a {@code Layer} that is available in runtime, by calling
      * {@link Layer#metaInfo(Class)}. Multiple registrations of the same type is
      * not possible, and the lookup will search registered meta-info objects against the lookup type, prioritizing
-     * interfaces over classes and the most sub-typed nterface first.
+     * interfaces over classes and the most sub-typed interface first.
      *
      * @param info The meta-info type to be looked up. Typically a type that is explicitly used for meta-info.
      * @return this {@code LayerAssembly} instance to support fluent APIs
      */
-    LayerAssembly setMetaInfo( Object info );
+    LayerAssembly setMetaInfo(Object info);
 
-    /** Declaration of which other {@code Layers} that this {@code Layer} is able to use.
+    /**
+     * Retrieve the metadata for the {@code Layer}, set elsewhere in the assembly.
+     *
+     * @param <T> The type of meta-info to be looked up. Typically a type that is explicitly used for meta-info.
+     * @return The meta-info object previously registered with {@link #setMetaInfo(Object)}.
+     * @see #setMetaInfo(Object)
+     */
+    <T> T metaInfo(Class<T> metaInfoType);
+
+    /**
+     * Declaration of which other {@code Layers} that this {@code Layer} is able to use.
      * This is how architecture reinforcement works. Any composites that are declared
      * {@link Visibility#application} in a "used" layer can be reached from this Layer.
      *
      * @param layerAssembly The {@code Layer(s)} that this {@code Layer} can reach/see.
      * @return this {@code LayerAssembly} instance to support fluent APIs
      */
-    LayerAssembly uses( LayerAssembly... layerAssembly );
+    LayerAssembly uses(LayerAssembly... layerAssembly);
 
     /**
      * Set the layer activators. Activators are executed in order around the
@@ -88,21 +99,20 @@ public interface LayerAssembly
      *
      * @param activators the layer activators
      * @return the assembly
-     */    
-    @SuppressWarnings( { "unchecked","varargs" } )
-    LayerAssembly withActivators( Class<? extends Activator<Layer>>... activators );
+     */
+    @SuppressWarnings({"unchecked", "varargs"})
+    LayerAssembly withActivators(Class<? extends Activator<Layer>>... activators);
 
     /**
      * The visitor pattern to inspect the entire pre-instantiated model.
      *
-     * @deprecated New mechanism is considered, using Java 8 Stream API.
-     *
-     * @param visitor The visitor to be called.
+     * @param visitor         The visitor to be called.
      * @param <ThrowableType> The exceptions that may be thrown.
      * @throws ThrowableType when there is an underlying problem in the model.
+     * @deprecated New mechanism is considered, using Java 8 Stream API.
      */
     @Deprecated
-    <ThrowableType extends Throwable> void visit( AssemblyVisitor<ThrowableType> visitor )
+    <ThrowableType extends Throwable> void visit(AssemblyVisitor<ThrowableType> visitor)
         throws ThrowableType;
 
     /**
@@ -110,58 +120,52 @@ public interface LayerAssembly
      * be used to work with all of the assemblies in this Layer matched by the specification.
      *
      * @param specification The Specification that specifies the EntityComposite types of interest.
-     *
      * @return An EntityDeclaration for the specified EntityComposite types.
      */
-    EntityDeclaration entities( Predicate<? super EntityAssembly> specification );
+    EntityDeclaration entities(Predicate<? super EntityAssembly> specification);
 
     /**
      * Given a Specification for ServiceAssembly's, returns a ServiceDeclaration that can
      * be used to work with all of the assemblies in this Layer matched by the specification.
      *
      * @param specification The Specification that specifies the ServiceComposite types of interest.
-     *
      * @return An ServiceDeclaration for the specified ServiceComposite types.
      */
-    ServiceDeclaration services( Predicate<? super ServiceAssembly> specification );
+    ServiceDeclaration services(Predicate<? super ServiceAssembly> specification);
 
     /**
      * Given a Specification for TransientAssembly's, returns a TransientDeclaration that can
      * be used to work with all of the assemblies in this Layer matched by the specification.
      *
      * @param specification The Specification that specifies the TransientComposite types of interest.
-     *
      * @return An TransientDeclaration for the specified TransientComposite types.
      */
-    TransientDeclaration transients( Predicate<? super TransientAssembly> specification );
+    TransientDeclaration transients(Predicate<? super TransientAssembly> specification);
 
     /**
      * Given a Specification for ValueAssembly's, returns a ValueDeclaration that can
      * be used to work with all of the assemblies in this Layer matched by the specification.
      *
      * @param specification The Specification that specifies the ValueComposite types of interest.
-     *
      * @return An ValueDeclaration for the specified ValueComposite types.
      */
-    ValueDeclaration values( Predicate<? super ValueAssembly> specification );
+    ValueDeclaration values(Predicate<? super ValueAssembly> specification);
 
     /**
      * Given a Specification for ObjectAssembly's, returns a ObjectDeclaration that can
      * be used to work with all of the assemblies in this Layer matched by the specification.
      *
      * @param specification The Specification that specifies the Object types of interest.
-     *
      * @return An ObjectDeclaration for the specified Object types.
      */
-    ObjectDeclaration objects( Predicate<? super ObjectAssembly> specification );
+    ObjectDeclaration objects(Predicate<? super ObjectAssembly> specification);
 
     /**
      * Given a Specification for ImportedServiceAssembly's, returns a ImportedServiceDeclaration that can
      * be used to work with all of the assemblies in this Layer matched by the specification.
      *
      * @param specification The Specification that specifies the Imported Service types of interest.
-     *
      * @return An ImportedServiceDeclaration for the specified Imported Service types.
      */
-    ImportedServiceDeclaration importedServices( Predicate<? super ImportedServiceAssembly> specification );
+    ImportedServiceDeclaration importedServices(Predicate<? super ImportedServiceAssembly> specification);
 }

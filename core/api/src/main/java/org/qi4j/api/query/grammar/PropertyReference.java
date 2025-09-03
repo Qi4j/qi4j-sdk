@@ -19,11 +19,10 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.composite.Composite;
+import org.qi4j.api.property.Property;
+
 import java.util.function.Function;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.property.Property;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.property.Property;
 
 /**
  * Property Reference.

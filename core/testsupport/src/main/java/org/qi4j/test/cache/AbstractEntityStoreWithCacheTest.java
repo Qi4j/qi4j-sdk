@@ -19,13 +19,12 @@
  */
 package org.qi4j.test.cache;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.test.entity.AbstractEntityStoreTest;
-import org.junit.jupiter.api.Test;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -39,20 +38,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public abstract class AbstractEntityStoreWithCacheTest
     extends AbstractEntityStoreTest
 {
-    @Optional @Service MemoryCachePoolService cachePool;
+    @Optional
+    @Service
+    MemoryCachePoolService cachePool;
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws Exception
     {
-        super.assemble( module );
-        assembleCachePool( module );
+        super.assemble(module);
+        assembleCachePool(module);
     }
 
-    protected void assembleCachePool( ModuleAssembly module )
+    protected void assembleCachePool(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( MemoryCachePoolService.class );
+        module.services(MemoryCachePoolService.class);
     }
 
     @Test
@@ -60,14 +61,14 @@ public abstract class AbstractEntityStoreWithCacheTest
         throws Exception
     {
         super.whenNewEntityThenCanFindEntityAndCorrectValues();
-        if( cachePool != null )
+        if(cachePool != null)
         {
             MemoryCacheImpl<?> cache = cachePool.singleCache();
-            assertThat( cache.size(), is( 1 ) );
-            assertThat( cache.gets(), is( 1 ) );
-            assertThat( cache.puts(), is( 1 ) );
-            assertThat( cache.removes(), is( 0 ) );
-            assertThat( cache.exists(), is( 0 ) );
+            assertThat(cache.size(), is(1));
+            assertThat(cache.gets(), is(1));
+            assertThat(cache.puts(), is(1));
+            assertThat(cache.removes(), is(0));
+            assertThat(cache.exists(), is(0));
         }
     }
 
@@ -76,14 +77,14 @@ public abstract class AbstractEntityStoreWithCacheTest
         throws Exception
     {
         super.whenRemovedEntityThenCannotFindEntity();
-        if( cachePool != null )
+        if(cachePool != null)
         {
             MemoryCacheImpl<?> cache = cachePool.singleCache();
-            assertThat( cache.size(), is( 0 ) );
-            assertThat( cache.gets(), is( 2 ) );
-            assertThat( cache.puts(), is( 1 ) );
-            assertThat( cache.removes(), is( 1 ) );
-            assertThat( cache.exists(), is( 0 ) );
+            assertThat(cache.size(), is(0));
+            assertThat(cache.gets(), is(2));
+            assertThat(cache.puts(), is(1));
+            assertThat(cache.removes(), is(1));
+            assertThat(cache.exists(), is(0));
         }
     }
 
@@ -92,14 +93,14 @@ public abstract class AbstractEntityStoreWithCacheTest
         throws UnitOfWorkCompletionException
     {
         super.givenEntityIsNotModifiedWhenUnitOfWorkCompletesThenDontStoreState();
-        if( cachePool != null )
+        if(cachePool != null)
         {
             MemoryCacheImpl<?> cache = cachePool.singleCache();
-            assertThat( cache.size(), is( 1 ) );
-            assertThat( cache.gets(), is( 2 ) );
-            assertThat( cache.puts(), is( 1 ) );
-            assertThat( cache.removes(), is( 0 ) );
-            assertThat( cache.exists(), is( 0 ) );
+            assertThat(cache.size(), is(1));
+            assertThat(cache.gets(), is(2));
+            assertThat(cache.puts(), is(1));
+            assertThat(cache.removes(), is(0));
+            assertThat(cache.exists(), is(0));
         }
     }
 
@@ -108,14 +109,14 @@ public abstract class AbstractEntityStoreWithCacheTest
         throws UnitOfWorkCompletionException
     {
         super.givenPropertyIsModifiedWhenUnitOfWorkCompletesThenStoreState();
-        if( cachePool != null )
+        if(cachePool != null)
         {
             MemoryCacheImpl<?> cache = cachePool.singleCache();
-            assertThat( cache.size(), is( 1 ) );
-            assertThat( cache.gets(), is( 2 ) );
-            assertThat( cache.puts(), is( 2 ) );
-            assertThat( cache.removes(), is( 0 ) );
-            assertThat( cache.exists(), is( 0 ) );
+            assertThat(cache.size(), is(1));
+            assertThat(cache.gets(), is(2));
+            assertThat(cache.puts(), is(2));
+            assertThat(cache.removes(), is(0));
+            assertThat(cache.exists(), is(0));
         }
     }
 
@@ -124,14 +125,14 @@ public abstract class AbstractEntityStoreWithCacheTest
         throws UnitOfWorkCompletionException
     {
         super.givenAssociationsModifiedWhenUnitOfWorkCompletesThenStoreState();
-        if( cachePool != null )
+        if(cachePool != null)
         {
             MemoryCacheImpl<?> cache = cachePool.singleCache();
-            assertThat( cache.size(), is( 1 ) );
-            assertThat( cache.gets(), is( 3 ) );
-            assertThat( cache.puts(), is( 3 ) );
-            assertThat( cache.removes(), is( 0 ) );
-            assertThat( cache.exists(), is( 0 ) );
+            assertThat(cache.size(), is(1));
+            assertThat(cache.gets(), is(3));
+            assertThat(cache.puts(), is(3));
+            assertThat(cache.removes(), is(0));
+            assertThat(cache.exists(), is(0));
         }
     }
 
@@ -140,14 +141,14 @@ public abstract class AbstractEntityStoreWithCacheTest
         throws UnitOfWorkCompletionException
     {
         super.givenConcurrentUnitOfWorksWhenUoWCompletesThenCheckConcurrentModification();
-        if( cachePool != null )
+        if(cachePool != null)
         {
             MemoryCacheImpl<?> cache = cachePool.singleCache();
-            assertThat( cache.size(), is( 1 ) );
-            assertThat( cache.gets(), is( 4 ) );
-            assertThat( cache.puts(), is( 2 ) );
-            assertThat( cache.removes(), is( 0 ) );
-            assertThat( cache.exists(), is( 0 ) );
+            assertThat(cache.size(), is(1));
+            assertThat(cache.gets(), is(4));
+            assertThat(cache.puts(), is(2));
+            assertThat(cache.removes(), is(0));
+            assertThat(cache.exists(), is(0));
         }
     }
 
@@ -156,14 +157,14 @@ public abstract class AbstractEntityStoreWithCacheTest
         throws UnitOfWorkCompletionException
     {
         super.givenEntityStoredLoadedChangedWhenUnitOfWorkDiscardsThenDontStoreState();
-        if( cachePool != null )
+        if(cachePool != null)
         {
             MemoryCacheImpl<?> cache = cachePool.singleCache();
-            assertThat( cache.size(), is( 1 ) );
-            assertThat( cache.gets(), is( 2 ) );
-            assertThat( cache.puts(), is( 1 ) );
-            assertThat( cache.removes(), is( 0 ) );
-            assertThat( cache.exists(), is( 0 ) );
+            assertThat(cache.size(), is(1));
+            assertThat(cache.gets(), is(2));
+            assertThat(cache.puts(), is(1));
+            assertThat(cache.removes(), is(0));
+            assertThat(cache.exists(), is(0));
         }
     }
 }

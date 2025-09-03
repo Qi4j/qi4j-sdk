@@ -27,33 +27,33 @@ import org.qi4j.api.common.MetaInfo;
  */
 public final class UsecaseBuilder
 {
-    public static UsecaseBuilder buildUsecase( String aName )
+    public static UsecaseBuilder buildUsecase(String aName)
     {
-        return new UsecaseBuilder( aName );
+        return new UsecaseBuilder(aName);
     }
 
-    public static Usecase newUsecase( String aName )
+    public static Usecase newUsecase(String aName)
     {
-        return new UsecaseBuilder( aName ).newUsecase();
+        return new UsecaseBuilder(aName).newUsecase();
     }
 
     private MetaInfo metaInfo = new MetaInfo();
 
     private String name;
 
-    private UsecaseBuilder( String name )
+    private UsecaseBuilder(String name)
     {
         this.name = name;
     }
 
-    public UsecaseBuilder withMetaInfo( Object metaInfo )
+    public UsecaseBuilder withMetaInfo(Object metaInfo)
     {
-        this.metaInfo.set( metaInfo );
+        this.metaInfo.set(metaInfo);
         return this;
     }
 
     public Usecase newUsecase()
     {
-        return new Usecase( name, metaInfo );
+        return new Usecase(name, metaInfo);
     }
 }

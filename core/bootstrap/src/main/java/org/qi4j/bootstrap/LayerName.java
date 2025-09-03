@@ -28,14 +28,14 @@ public final class LayerName
 {
     private final String name;
 
-    public LayerName( String name )
+    public LayerName(String name)
     {
         this.name = name;
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.layer().setName( name );
+        module.layer().setName(name);
     }
 }

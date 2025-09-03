@@ -19,15 +19,7 @@
  */
 package org.qi4j.test.serialization;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import org.junit.jupiter.api.*;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.association.NamedAssociation;
@@ -48,6 +40,7 @@ import org.qi4j.api.property.Property;
 import org.qi4j.api.serialization.ConvertedBy;
 import org.qi4j.api.serialization.JavaSerializationConverter;
 import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.value.ValueBuilder;
@@ -55,17 +48,18 @@ import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
+
+import java.io.Serializable;
+import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.qi4j.api.usecase.UsecaseBuilder.newUsecase;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.qi4j.api.usecase.UsecaseBuilder.newUsecase;
 
 /**
  * Assert that Serialization behaviour on ValueComposites is correct.
@@ -76,27 +70,27 @@ public abstract class AbstractValueCompositeSerializationTest
 {
 
     @BeforeEach
-    public void before( TestInfo info )
+    public void before(TestInfo info)
     {
-        System.out.println( "# BEGIN " + info.getDisplayName() );
+        System.out.println("# BEGIN " + info.getDisplayName());
     }
 
     @AfterEach
-    public void after( TestInfo info )
+    public void after(TestInfo info)
     {
-        System.out.println( "# END " + info.getDisplayName() );
+        System.out.println("# END " + info.getDisplayName());
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.objects( JavaSerializationConverter.class );
-        module.values( Some.class, SomeExtended.class, SomeShuffled.class,
-                       AnotherValue.class, FooValue.class, CustomFooValue.class,
-                       SpecificCollection.class /*, SpecificValue.class, GenericValue.class */ );
-        module.entities( Some.class, BarEntity.class );
+        module.objects(JavaSerializationConverter.class);
+        module.values(Some.class, SomeExtended.class, SomeShuffled.class,
+            AnotherValue.class, FooValue.class, CustomFooValue.class,
+            SpecificCollection.class /*, SpecificValue.class, GenericValue.class */);
+        module.entities(Some.class, BarEntity.class);
 
-        new EntityTestAssembler().visibleIn( Visibility.layer ).assemble( module.layer().module( "persistence" ) );
+        new EntityTestAssembler().visibleIn(Visibility.layer).assemble(module.layer().module("persistence"));
     }
 
     @Structure
@@ -109,36 +103,36 @@ public abstract class AbstractValueCompositeSerializationTest
     public void givenValueCompositeWhenSerializingAndDeserializingExpectEquals()
         throws Exception
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Some some = buildSomeValue( moduleInstance, uow, "23" );
+            Some some = buildSomeValue(moduleInstance, uow, "23");
 
             // Serialize using injected service
-            String stateString = serialization.serialize( some );
-            System.out.println( stateString );
+            String stateString = serialization.serialize(module, Options.DEFAULT, some);
+            System.out.println(stateString);
 
             // Deserialize using Module API
-            Some some2 = moduleInstance.newValueFromSerializedState( Some.class, stateString );
+            Some some2 = moduleInstance.newValueFromSerializedState(Some.class, stateString);
 
-            assertThat( "Map<String, Integer>",
-                        some2.stringIntMap().get().get( "foo" ),
-                        equalTo( 42 ) );
-            assertThat( "Map<String, Value>",
-                        some2.stringValueMap().get().get( "foo" ).internalVal(),
-                        equalTo( "Bar" ) );
+            assertThat("Map<String, Integer>",
+                some2.stringIntMap().get().get("foo"),
+                equalTo(42));
+            assertThat("Map<String, Value>",
+                some2.stringValueMap().get().get("foo").internalVal(),
+                equalTo("Bar"));
 
-            assertThat( "Nested Entities",
-                        some2.barAssociation().get().cathedral().get(),
-                        equalTo( "bazar in barAssociation" ) );
+            assertThat("Nested Entities",
+                some2.barAssociation().get().cathedral().get(),
+                equalTo("bazar in barAssociation"));
 
-            assertThat( "Polymorphic deserialization of value type NOT extending ValueComposite",
-                        some.customFoo().get() instanceof CustomFooValue,
-                        is( true ) );
-            assertThat( "Polymorphic deserialization of value type extending ValueComposite",
-                        some.customFooValue().get() instanceof CustomFooValue,
-                        is( true ) );
+            assertThat("Polymorphic deserialization of value type NOT extending ValueComposite",
+                some.customFoo().get() instanceof CustomFooValue,
+                is(true));
+            assertThat("Polymorphic deserialization of value type extending ValueComposite",
+                some.customFooValue().get() instanceof CustomFooValue,
+                is(true));
 
-            assertThat( "Value equality", some, equalTo( some2 ) );
+            assertThat("Value equality", some, equalTo(some2));
 
             uow.complete();
         }
@@ -148,36 +142,36 @@ public abstract class AbstractValueCompositeSerializationTest
     public void givenEntityCompositeWhenSerializingAndDeserializingExpectEquals()
         throws Exception
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Some some = buildSomeEntity( moduleInstance, uow, "23" );
+            Some some = buildSomeEntity(moduleInstance, uow, "23");
 
             // Serialize using injected service
-            String stateString = serialization.serialize( some );
-            System.out.println( stateString );
+            String stateString = serialization.serialize(module, Options.DEFAULT, some);
+            System.out.println(stateString);
 
             // Deserialize using Module API
-            Some some2 = moduleInstance.newValueFromSerializedState( Some.class, stateString );
+            Some some2 = moduleInstance.newValueFromSerializedState(Some.class, stateString);
 
-            assertThat( "Map<String, Integer>",
-                        some2.stringIntMap().get().get( "foo" ),
-                        equalTo( 42 ) );
-            assertThat( "Map<String, Value>",
-                        some2.stringValueMap().get().get( "foo" ).internalVal(),
-                        equalTo( "Bar" ) );
+            assertThat("Map<String, Integer>",
+                some2.stringIntMap().get().get("foo"),
+                equalTo(42));
+            assertThat("Map<String, Value>",
+                some2.stringValueMap().get().get("foo").internalVal(),
+                equalTo("Bar"));
 
-            assertThat( "Nested Entities",
-                        some2.barAssociation().get().cathedral().get(),
-                        equalTo( "bazar in barAssociation" ) );
+            assertThat("Nested Entities",
+                some2.barAssociation().get().cathedral().get(),
+                equalTo("bazar in barAssociation"));
 
-            assertThat( "Polymorphic deserialization of value type NOT extending ValueComposite",
-                        some.customFoo().get() instanceof CustomFooValue,
-                        is( true ) );
-            assertThat( "Polymorphic deserialization of value type extending ValueComposite",
-                        some.customFooValue().get() instanceof CustomFooValue,
-                        is( true ) );
+            assertThat("Polymorphic deserialization of value type NOT extending ValueComposite",
+                some.customFoo().get() instanceof CustomFooValue,
+                is(true));
+            assertThat("Polymorphic deserialization of value type extending ValueComposite",
+                some.customFooValue().get() instanceof CustomFooValue,
+                is(true));
 
-            assertThat( "Value equality", some, equalTo( some2 ) );
+            assertThat("Value equality", some, equalTo(some2));
 
             uow.complete();
         }
@@ -186,15 +180,15 @@ public abstract class AbstractValueCompositeSerializationTest
     @Test
     public void canDeserializeUsingSuperTypeWithLessState()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            SomeExtended someExtended = buildSomeExtendedValue( moduleInstance, uow, "42" );
+            SomeExtended someExtended = buildSomeExtendedValue(moduleInstance, uow, "42");
 
-            String serialized = serialization.serialize( someExtended );
-            System.out.println( serialized );
+            String serialized = serialization.serialize(module, Options.DEFAULT, someExtended);
+            System.out.println(serialized);
 
-            Some deserialized = serialization.deserialize( module, Some.class, serialized );
-            System.out.println( deserialized );
+            Some deserialized = serialization.deserialize(module, Options.DEFAULT, Some.class, serialized);
+            System.out.println(deserialized);
 
             uow.complete();
         }
@@ -203,15 +197,15 @@ public abstract class AbstractValueCompositeSerializationTest
     @Test
     public void canDeserializeUsingChildTypeWithSupplementaryOptionalState()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Some some = buildSomeValue( moduleInstance, uow, "42" );
+            Some some = buildSomeValue(moduleInstance, uow, "42");
 
-            String serialized = serialization.serialize( some );
-            System.out.println( serialized );
+            String serialized = serialization.serialize(module, Options.DEFAULT, some);
+            System.out.println(serialized);
 
-            SomeExtended deserialized = serialization.deserialize( module, SomeExtended.class, serialized );
-            System.out.println( deserialized );
+            SomeExtended deserialized = serialization.deserialize(module, Options.DEFAULT, SomeExtended.class, serialized);
+            System.out.println(deserialized);
 
             uow.complete();
         }
@@ -224,145 +218,145 @@ public abstract class AbstractValueCompositeSerializationTest
     @Test
     public void canDeserializeFromShuffledState()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            SomeExtended someExtended = buildSomeExtendedValue( moduleInstance, uow, "42" );
+            SomeExtended someExtended = buildSomeExtendedValue(moduleInstance, uow, "42");
 
-            String serialized = serialization.serialize( someExtended );
-            System.out.println( serialized );
+            String serialized = serialization.serialize(module, Options.DEFAULT, someExtended);
+            System.out.println(serialized);
 
-            SomeShuffled deserialized = serialization.deserialize( module, SomeShuffled.class, serialized );
-            System.out.println( deserialized );
+            SomeShuffled deserialized = serialization.deserialize(module, Options.DEFAULT, SomeShuffled.class, serialized);
+            System.out.println(deserialized);
 
-            serialized = serialization.serialize( deserialized );
-            System.out.println( serialized );
+            serialized = serialization.serialize(module, Options.DEFAULT, deserialized);
+            System.out.println(serialized);
 
-            serialization.deserialize( module, SomeExtended.class, serialized );
-            System.out.println( deserialized );
+            serialization.deserialize(module, Options.DEFAULT, SomeExtended.class, serialized);
+            System.out.println(deserialized);
 
             uow.complete();
         }
     }
 
     @Test
-    @Disabled( "JSONEntityState cannot handle polymorphic deserialization" )
+    @Disabled("JSONEntityState cannot handle polymorphic deserialization")
     // TODO Entity == Identity + Value
     // JSONEntityState does not allow for polymorphic serialization
     public void valueAndEntityTypeEquality()
     {
-        Identity identity = StringIdentity.identityOf( "42" );
+        Identity identity = StringIdentity.identityOf("42");
         Some createdValue, loadedValue;
 
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( newUsecase( "create" ) ) )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(newUsecase("create")))
         {
-            Some entity = buildSomeEntity( moduleInstance, uow, identity );
-            createdValue = uow.toValue( Some.class, entity );
-            System.out.println( "Created Entity\n\t" + entity + "\nCreated Value\n\t" + createdValue );
+            Some entity = buildSomeEntity(moduleInstance, uow, identity);
+            createdValue = uow.toValue(Some.class, entity);
+            System.out.println("Created Entity\n\t" + entity + "\nCreated Value\n\t" + createdValue);
             uow.complete();
         }
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( newUsecase( "load" ) ) )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(newUsecase("load")))
         {
-            Some entity = uow.get( Some.class, identity );
-            loadedValue = uow.toValue( Some.class, entity );
-            System.out.println( "Loaded Entity\n\t" + entity + "\nLoaded Value\n\t" + loadedValue );
+            Some entity = uow.get(Some.class, identity);
+            loadedValue = uow.toValue(Some.class, entity);
+            System.out.println("Loaded Entity\n\t" + entity + "\nLoaded Value\n\t" + loadedValue);
         }
 
-        assertThat( "Create/Read equality",
-                    createdValue, equalTo( loadedValue ) );
+        assertThat("Create/Read equality",
+            createdValue, equalTo(loadedValue));
 
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( newUsecase( "remove" ) ) )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(newUsecase("remove")))
         {
-            uow.remove( uow.get( Some.class, identity ) );
+            uow.remove(uow.get(Some.class, identity));
             uow.complete();
         }
 
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( newUsecase( "create from value" ) ) )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(newUsecase("create from value")))
         {
-            Some entity = uow.toEntity( Some.class, loadedValue );
-            createdValue = uow.toValue( Some.class, entity );
-            System.out.println( "Created Entity from Value\n\t" + entity + "\nCreated Value\n\t" + createdValue );
+            Some entity = uow.toEntity(Some.class, loadedValue);
+            createdValue = uow.toValue(Some.class, entity);
+            System.out.println("Created Entity from Value\n\t" + entity + "\nCreated Value\n\t" + createdValue);
             uow.complete();
         }
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( newUsecase( "read again" ) ) )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(newUsecase("read again")))
         {
-            Some entity = uow.get( Some.class, identity );
-            loadedValue = uow.toValue( Some.class, entity );
-            System.out.println( "Loaded Entity\n\t" + entity + "\nLoaded Value\n\t" + loadedValue );
+            Some entity = uow.get(Some.class, identity);
+            loadedValue = uow.toValue(Some.class, entity);
+            System.out.println("Loaded Entity\n\t" + entity + "\nLoaded Value\n\t" + loadedValue);
         }
 
-        assertThat( "Create from Value/Read equality",
-                    createdValue, equalTo( loadedValue ) );
+        assertThat("Create from Value/Read equality",
+            createdValue, equalTo(loadedValue));
     }
 
-    protected static Some buildSomeEntity( Module module, UnitOfWork uow, String identity )
+    protected static Some buildSomeEntity(Module module, UnitOfWork uow, String identity)
     {
-        EntityBuilder<Some> builder = uow.newEntityBuilder( Some.class );
+        EntityBuilder<Some> builder = uow.newEntityBuilder(Some.class);
         Some proto = builder.instance();
-        proto.identity().set( StringIdentity.identityOf( identity ) );
-        setSomeValueState( module, uow, proto );
+        proto.identity().set(StringIdentity.identityOf(identity));
+        setSomeValueState(module, uow, proto);
         return builder.newInstance();
     }
 
     /**
      * @return a Some ValueComposite whose state is populated with test data.
      */
-    protected static Some buildSomeValue( Module module, UnitOfWork uow, String identity )
+    protected static Some buildSomeValue(Module module, UnitOfWork uow, String identity)
     {
-        ValueBuilder<Some> builder = module.newValueBuilder( Some.class );
+        ValueBuilder<Some> builder = module.newValueBuilder(Some.class);
         Some proto = builder.prototype();
-        proto.identity().set( StringIdentity.identityOf( identity ) );
-        setSomeValueState( module, uow, proto );
+        proto.identity().set(StringIdentity.identityOf(identity));
+        setSomeValueState(module, uow, proto);
         return builder.newInstance();
     }
 
-    protected static SomeExtended buildSomeExtendedValue( Module module, UnitOfWork uow, String identity )
+    protected static SomeExtended buildSomeExtendedValue(Module module, UnitOfWork uow, String identity)
     {
-        ValueBuilder<SomeExtended> builder = module.newValueBuilder( SomeExtended.class );
+        ValueBuilder<SomeExtended> builder = module.newValueBuilder(SomeExtended.class);
         SomeExtended proto = builder.prototype();
-        proto.identity().set( StringIdentity.identityOf( identity ) );
-        setSomeValueState( module, uow, proto );
-        proto.extraProperty().set( "extra property" );
-        proto.extraAssociation().set( buildBarEntity( module, uow, "extra association" ) );
-        proto.extraManyAssociation().add( buildBarEntity( module, uow, "extra many association" ) );
-        proto.extraNamedAssociation().put( "extra", buildBarEntity( module, uow, "extra named association" ) );
+        proto.identity().set(StringIdentity.identityOf(identity));
+        setSomeValueState(module, uow, proto);
+        proto.extraProperty().set("extra property");
+        proto.extraAssociation().set(buildBarEntity(module, uow, "extra association"));
+        proto.extraManyAssociation().add(buildBarEntity(module, uow, "extra many association"));
+        proto.extraNamedAssociation().put("extra", buildBarEntity(module, uow, "extra named association"));
         return builder.newInstance();
     }
 
     /**
      * @return a Some EntityComposite whose state is populated with test data.
      */
-    protected static Some buildSomeEntity( Module module, UnitOfWork uow, Identity identity )
+    protected static Some buildSomeEntity(Module module, UnitOfWork uow, Identity identity)
     {
-        EntityBuilder<Some> builder = uow.newEntityBuilder( Some.class, identity );
-        setSomeValueState( module, uow, builder.instance() );
+        EntityBuilder<Some> builder = uow.newEntityBuilder(Some.class, identity);
+        setSomeValueState(module, uow, builder.instance());
         return builder.newInstance();
     }
 
-    private static void setSomeValueState( Module module, UnitOfWork uow, Some some )
+    private static void setSomeValueState(Module module, UnitOfWork uow, Some some)
     {
-        some.anotherList().get().add( module.newValue( AnotherValue.class ) );
+        some.anotherList().get().add(module.newValue(AnotherValue.class));
 
-        ValueBuilder<SpecificCollection> specificColBuilder = module.newValueBuilder( SpecificCollection.class );
+        ValueBuilder<SpecificCollection> specificColBuilder = module.newValueBuilder(SpecificCollection.class);
         SpecificCollection specificColProto = specificColBuilder.prototype();
-        List<String> genericList = new ArrayList<>( 2 );
-        genericList.add( "Some" );
-        genericList.add( "String" );
-        specificColProto.genericList().set( genericList );
-        some.specificCollection().set( specificColBuilder.newInstance() );
+        List<String> genericList = new ArrayList<>(2);
+        genericList.add("Some");
+        genericList.add("String");
+        specificColProto.genericList().set(genericList);
+        some.specificCollection().set(specificColBuilder.newInstance());
 
-        AnotherValue anotherValue1 = createAnotherValue( module, "Foo", "Bar" );
-        AnotherValue anotherValue2 = createAnotherValue( module, "Habba", "ZoutZout" );
-        AnotherValue anotherValue3 = createAnotherValue( module, "Niclas", "Hedhman" );
+        AnotherValue anotherValue1 = createAnotherValue(module, "Foo", "Bar");
+        AnotherValue anotherValue2 = createAnotherValue(module, "Habba", "ZoutZout");
+        AnotherValue anotherValue3 = createAnotherValue(module, "Niclas", "Hedhman");
 
-        some.string().set( "Foo\"Bar\"\nTest\f\t\b\r" );
-        some.string2().set( "/Foo/bar" );
-        some.number().set( 43L );
-        some.localTime().set( LocalTime.now() );
-        some.dateTime().set( OffsetDateTime.of( 2020, 3, 4, 13, 24, 35, 0, ZoneOffset.ofHours( 1 ) ) );
-        some.localDate().set( LocalDate.now() );
-        some.localDateTime().set( LocalDateTime.now() );
-        some.entityReference().set( EntityReference.parseEntityReference( "12345" ) );
-        some.stringIntMap().get().put( "foo", 42 );
+        some.string().set("Foo\"Bar\"\nTest\f\t\b\r");
+        some.string2().set("/Foo/bar");
+        some.number().set(43L);
+        some.localTime().set(LocalTime.now());
+        some.dateTime().set(OffsetDateTime.of(2020, 3, 4, 13, 24, 35, 0, ZoneOffset.ofHours(1)));
+        some.localDate().set(LocalDate.now());
+        some.localDateTime().set(LocalDateTime.now());
+        some.entityReference().set(EntityReference.parseEntityReference("12345"));
+        some.stringIntMap().get().put("foo", 42);
 
         // Can't put more than one entry in Map because this test rely on the fact that the underlying implementations
         // maintain a certain order but it's not the case on some JVMs. On OpenJDK 8 they are reversed for example.
@@ -372,46 +366,46 @@ public abstract class AbstractValueCompositeSerializationTest
         //
         // proto.stringIntMap().get().put( "bar", 67 );
 
-        some.stringValueMap().get().put( "foo", anotherValue1 );
-        some.another().set( anotherValue1 );
-        some.arrayOfValues().set( new AnotherValue[] { anotherValue1, anotherValue2, anotherValue3 } );
-        some.primitiveByteArray().set( "foo".getBytes( UTF_8 ) );
-        some.byteArray().set( new Byte[] { 23, null, 42 } );
-        some.serializable().set( new SerializableObject() );
-        some.foo().set( module.newValue( FooValue.class ) );
-        some.fooValue().set( module.newValue( FooValue.class ) );
-        some.customFoo().set( module.newValue( CustomFooValue.class ) );
-        some.customFooValue().set( module.newValue( CustomFooValue.class ) );
+        some.stringValueMap().get().put("foo", anotherValue1);
+        some.another().set(anotherValue1);
+        some.arrayOfValues().set(new AnotherValue[]{anotherValue1, anotherValue2, anotherValue3});
+        some.primitiveByteArray().set("foo".getBytes(UTF_8));
+        some.byteArray().set(new Byte[]{23, null, 42});
+        some.serializable().set(new SerializableObject());
+        some.foo().set(module.newValue(FooValue.class));
+        some.fooValue().set(module.newValue(FooValue.class));
+        some.customFoo().set(module.newValue(CustomFooValue.class));
+        some.customFooValue().set(module.newValue(CustomFooValue.class));
 
         // NestedEntities
-        some.barAssociation().set( buildBarEntity( module, uow, "bazar in barAssociation" ) );
-        some.barEntityAssociation().set( buildBarEntity( module, uow, "bazar in barEntityAssociation" ) );
-        some.barManyAssociation().add( buildBarEntity( module, uow, "bazar ONE in barManyAssociation" ) );
-        some.barManyAssociation().add( buildBarEntity( module, uow, "bazar TWO in barManyAssociation" ) );
-        some.barEntityManyAssociation().add( buildBarEntity( module, uow, "bazar ONE in barEntityManyAssociation" ) );
-        some.barEntityManyAssociation().add( buildBarEntity( module, uow, "bazar TWO in barEntityManyAssociation" ) );
-        some.barNamedAssociation().put( "bazar", buildBarEntity( module, uow, "bazar in barNamedAssociation" ) );
-        some.barNamedAssociation().put( "cathedral",
-                                        buildBarEntity( module, uow, "cathedral in barNamedAssociation" ) );
-        some.barEntityNamedAssociation().put( "bazar",
-                                              buildBarEntity( module, uow, "bazar in barEntityNamedAssociation" ) );
-        some.barEntityNamedAssociation().put( "cathedral",
-                                              buildBarEntity( module, uow, "cathedral in barEntityNamedAssociation" ) );
+        some.barAssociation().set(buildBarEntity(module, uow, "bazar in barAssociation"));
+        some.barEntityAssociation().set(buildBarEntity(module, uow, "bazar in barEntityAssociation"));
+        some.barManyAssociation().add(buildBarEntity(module, uow, "bazar ONE in barManyAssociation"));
+        some.barManyAssociation().add(buildBarEntity(module, uow, "bazar TWO in barManyAssociation"));
+        some.barEntityManyAssociation().add(buildBarEntity(module, uow, "bazar ONE in barEntityManyAssociation"));
+        some.barEntityManyAssociation().add(buildBarEntity(module, uow, "bazar TWO in barEntityManyAssociation"));
+        some.barNamedAssociation().put("bazar", buildBarEntity(module, uow, "bazar in barNamedAssociation"));
+        some.barNamedAssociation().put("cathedral",
+            buildBarEntity(module, uow, "cathedral in barNamedAssociation"));
+        some.barEntityNamedAssociation().put("bazar",
+            buildBarEntity(module, uow, "bazar in barEntityNamedAssociation"));
+        some.barEntityNamedAssociation().put("cathedral",
+            buildBarEntity(module, uow, "cathedral in barEntityNamedAssociation"));
     }
 
-    private static AnotherValue createAnotherValue( Module module, String val1, String val2 )
+    private static AnotherValue createAnotherValue(Module module, String val1, String val2)
     {
-        ValueBuilder<AnotherValue> valueBuilder = module.newValueBuilder( AnotherValue.class );
-        valueBuilder.prototype().val1().set( val1 );
-        valueBuilder.prototypeFor( AnotherValueInternalState.class ).val2().set( val2 );
+        ValueBuilder<AnotherValue> valueBuilder = module.newValueBuilder(AnotherValue.class);
+        valueBuilder.prototype().val1().set(val1);
+        valueBuilder.prototypeFor(AnotherValueInternalState.class).val2().set(val2);
         return valueBuilder.newInstance();
     }
 
-    private static BarEntity buildBarEntity( Module module, UnitOfWork uow, String cathedral )
+    private static BarEntity buildBarEntity(Module module, UnitOfWork uow, String cathedral)
     {
-        EntityBuilder<BarEntity> barBuilder = uow.newEntityBuilder( BarEntity.class );
-        barBuilder.instance().cathedral().set( cathedral );
-        barBuilder.instance().another().set( createAnotherValue( module, "nested", "value" ) );
+        EntityBuilder<BarEntity> barBuilder = uow.newEntityBuilder(BarEntity.class);
+        barBuilder.instance().cathedral().set(cathedral);
+        barBuilder.instance().another().set(createAnotherValue(module, "nested", "value"));
         return barBuilder.newInstance();
     }
 
@@ -579,7 +573,7 @@ public abstract class AbstractValueCompositeSerializationTest
         Property<TYPE> item();
     }
 
-    @Mixins( AnotherValueMixin.class )
+    @Mixins(AnotherValueMixin.class)
     public interface AnotherValue
         extends ValueComposite
     {
@@ -639,7 +633,7 @@ public abstract class AbstractValueCompositeSerializationTest
     {
     }
 
-    @ConvertedBy( JavaSerializationConverter.class )
+    @ConvertedBy(JavaSerializationConverter.class)
     public static class SerializableObject
         implements Serializable
     {
@@ -648,18 +642,18 @@ public abstract class AbstractValueCompositeSerializationTest
         private final int val = 35;
 
         @Override
-        public boolean equals( Object o )
+        public boolean equals(Object o)
         {
-            if( this == o )
+            if(this == o)
             {
                 return true;
             }
-            if( o == null || getClass() != o.getClass() )
+            if(o == null || getClass() != o.getClass())
             {
                 return false;
             }
             SerializableObject that = (SerializableObject) o;
-            return val == that.val && foo.equals( that.foo );
+            return val == that.val && foo.equals(that.foo);
         }
 
         @Override

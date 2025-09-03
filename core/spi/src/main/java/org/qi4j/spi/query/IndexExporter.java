@@ -35,11 +35,10 @@ public interface IndexExporter
      * Write the index to the provided output stream in an implementation specific, human-readable format.
      *
      * @param out The output stream that the index will be sent to.
-     *
      * @throws java.io.IOException           if an IOException occurs in the underlying PrintStream.
      * @throws UnsupportedOperationException if the method is not supported by this implementation.
      */
-    void exportReadableToStream( PrintStream out )
+    void exportReadableToStream(PrintStream out)
         throws IOException, UnsupportedOperationException;
 
     /**
@@ -47,10 +46,9 @@ public interface IndexExporter
      * either XML or JSON.
      *
      * @param out The print writer that the index will be sent to.
-     *
      * @throws java.io.IOException           if an IOException occurs in the underlying PrintWriter.
      * @throws UnsupportedOperationException if the method is not supported by this implementation.
      */
-    void exportFormalToWriter( PrintWriter out )
+    void exportFormalToWriter(PrintWriter out)
         throws IOException, UnsupportedOperationException;
 }

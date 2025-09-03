@@ -19,6 +19,7 @@
  */
 package org.qi4j.api.unitofwork;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityBuilderTemplate;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.property.Property;
@@ -26,7 +27,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 /**
  * TODO
@@ -35,11 +35,11 @@ public class UnitOfWorkTemplateTest
     extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( TestEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(TestEntity.class);
     }
 
     @Test
@@ -49,21 +49,21 @@ public class UnitOfWorkTemplateTest
         new UnitOfWorkTemplate<Void, RuntimeException>()
         {
             @Override
-            protected Void withUnitOfWork( UnitOfWork uow )
+            protected Void withUnitOfWork(UnitOfWork uow)
                 throws RuntimeException
             {
-                new EntityBuilderTemplate<TestEntity>( TestEntity.class )
+                new EntityBuilderTemplate<TestEntity>(TestEntity.class)
                 {
                     @Override
-                    protected void build( TestEntity prototype )
+                    protected void build(TestEntity prototype)
                     {
-                        prototype.name().set( "Rickard" );
+                        prototype.name().set("Rickard");
                     }
-                }.newInstance( module.instance() );
+                }.newInstance(module.instance());
 
                 return null;
             }
-        }.withModule( module.instance() );
+        }.withModule(module.instance());
     }
 
     interface TestEntity

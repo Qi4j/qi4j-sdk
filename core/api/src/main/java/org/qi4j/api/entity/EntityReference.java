@@ -20,13 +20,11 @@
 
 package org.qi4j.api.entity;
 
+import org.qi4j.api.identity.HasIdentity;
+import org.qi4j.api.identity.Identity;
+import org.qi4j.api.identity.StringIdentity;
+
 import java.util.Objects;
-import org.qi4j.api.identity.HasIdentity;
-import org.qi4j.api.identity.Identity;
-import org.qi4j.api.identity.StringIdentity;
-import org.qi4j.api.identity.HasIdentity;
-import org.qi4j.api.identity.Identity;
-import org.qi4j.api.identity.StringIdentity;
 
 /**
  * An EntityReference is reference of a specific Entity instance.
@@ -43,8 +41,8 @@ public final class EntityReference
      */
     public static EntityReference parseEntityReference(String identityString)
     {
-        Objects.requireNonNull( identityString, "identityString must not be null" );
-        return new EntityReference( StringIdentity.identityOf( identityString ) );
+        Objects.requireNonNull(identityString, "identityString must not be null");
+        return new EntityReference(StringIdentity.identityOf(identityString));
     }
 
     /**
@@ -53,21 +51,21 @@ public final class EntityReference
      */
     public static EntityReference entityReferenceFor(Object object)
     {
-        Objects.requireNonNull( object );
-        if( object instanceof Identity)
+        Objects.requireNonNull(object);
+        if(object instanceof Identity)
         {
-            return new EntityReference( ((Identity) object) );
+            return new EntityReference(((Identity) object));
         }
-        if( object instanceof HasIdentity)
+        if(object instanceof HasIdentity)
         {
-            return new EntityReference( ((HasIdentity) object).identity().get() );
+            return new EntityReference(((HasIdentity) object).identity().get());
         }
-        throw new IllegalArgumentException( "Can not get an entity reference for " + object.getClass() );
+        throw new IllegalArgumentException("Can not get an entity reference for " + object.getClass());
     }
 
     public static EntityReference create(Identity identity)
     {
-        if (identity == null)
+        if(identity == null)
         {
             return null;
         }
@@ -80,9 +78,9 @@ public final class EntityReference
      * @param identity reference reference
      * @throws NullPointerException if reference is null
      */
-    private EntityReference( Identity identity )
+    private EntityReference(Identity identity)
     {
-        Objects.requireNonNull(identity,"reference must not be null");
+        Objects.requireNonNull(identity, "reference must not be null");
         this.identity = identity;
     }
 
@@ -106,11 +104,11 @@ public final class EntityReference
     @Override
     public boolean equals(Object o)
     {
-        if (this == o)
+        if(this == o)
         {
             return true;
         }
-        if (o == null || getClass() != o.getClass())
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }

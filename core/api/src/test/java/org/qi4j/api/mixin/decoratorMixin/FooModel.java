@@ -29,6 +29,7 @@ public interface FooModel
 // END SNIPPET: decorator
 {
     String getBar();
+
     void setBar(String value);
 // END SNIPPET: plain
 

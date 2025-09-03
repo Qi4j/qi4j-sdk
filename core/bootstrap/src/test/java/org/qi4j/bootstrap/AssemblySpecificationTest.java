@@ -20,12 +20,13 @@
 
 package org.qi4j.bootstrap;
 
+import org.junit.jupiter.api.Test;
+import org.qi4j.api.type.HasTypes;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.qi4j.api.type.HasTypes;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,49 +36,49 @@ public class AssemblySpecificationTest
     @Test
     public void givenSingleMatchingTypeWhenFilteringExpectTrue()
     {
-        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType( String.class );
-        HasTypes hasTypes = new MockedHasTyoes( String.class );
-        assertThat( underTest.test( hasTypes ), equalTo(true) );
+        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType(String.class);
+        HasTypes hasTypes = new MockedHasTyoes(String.class);
+        assertThat(underTest.test(hasTypes), equalTo(true));
     }
 
     @Test
     public void givenMultipleMatchingTypeWhenFilteringExpectTrue()
     {
-        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType( Long.class, BigDecimal.class, String.class );
-        HasTypes hasTypes = new MockedHasTyoes( String.class );
-        assertThat( underTest.test( hasTypes ), equalTo(true) );
+        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType(Long.class, BigDecimal.class, String.class);
+        HasTypes hasTypes = new MockedHasTyoes(String.class);
+        assertThat(underTest.test(hasTypes), equalTo(true));
     }
 
     @Test
     public void givenSingleNonMatchingTypeWhenFilteringExpectFalse()
     {
-        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType( Long.class );
-        HasTypes hasTypes = new MockedHasTyoes( Integer.class );
-        assertThat( underTest.test( hasTypes ), equalTo(false) );
+        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType(Long.class);
+        HasTypes hasTypes = new MockedHasTyoes(Integer.class);
+        assertThat(underTest.test(hasTypes), equalTo(false));
     }
 
     @Test
     public void givenMultipleMatchingTypeWhenFilteringAgainstMultipleExpectTrue()
     {
-        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType( Long.class, Integer.class, BigDecimal.class );
-        HasTypes hasTypes = new MockedHasTyoes( String.class, Integer.class );
-        assertThat( underTest.test( hasTypes ), equalTo(true) );
+        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType(Long.class, Integer.class, BigDecimal.class);
+        HasTypes hasTypes = new MockedHasTyoes(String.class, Integer.class);
+        assertThat(underTest.test(hasTypes), equalTo(true));
     }
 
     @Test
     public void givenMultipleNonMatchingTypeWhenFilteringAgainstSingleExpectFalse()
     {
-        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType( Long.class, BigDecimal.class, String.class );
-        HasTypes hasTypes = new MockedHasTyoes( Integer.class );
-        assertThat( underTest.test( hasTypes ), equalTo(false) );
+        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType(Long.class, BigDecimal.class, String.class);
+        HasTypes hasTypes = new MockedHasTyoes(Integer.class);
+        assertThat(underTest.test(hasTypes), equalTo(false));
     }
 
     @Test
     public void givenMultipleNonMatchingTypeWhenFilteringAgainstMultipleExpectFalse()
     {
-        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType( Long.class, BigDecimal.class );
-        HasTypes hasTypes = new MockedHasTyoes( String.class, Integer.class );
-        assertThat( underTest.test( hasTypes ), equalTo(false) );
+        Predicate<HasTypes> underTest = AssemblySpecifications.ofAnyType(Long.class, BigDecimal.class);
+        HasTypes hasTypes = new MockedHasTyoes(String.class, Integer.class);
+        assertThat(underTest.test(hasTypes), equalTo(false));
     }
 
     private static class MockedHasTyoes
@@ -85,7 +86,7 @@ public class AssemblySpecificationTest
     {
         private final Class[] types;
 
-        public MockedHasTyoes( Class... types)
+        public MockedHasTyoes(Class... types)
         {
             this.types = types;
         }

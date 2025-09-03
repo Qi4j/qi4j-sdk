@@ -19,30 +19,23 @@
  */
 package org.qi4j.test.serialization;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Objects;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.serialization.Converter;
 import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.serialization.SerializationException;
 import org.qi4j.api.type.EnumType;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.spi.serialization.SerializationSettings;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.*;
+import java.util.Objects;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -54,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Assert that Serialization behaviour on plain values is correct.
- *
+ * <p>
  * Implementations must:
  * <ul>
  *     <li>implement {@link #assemble(ModuleAssembly)}</li>
@@ -70,317 +63,331 @@ public abstract class AbstractPlainValueSerializationTest extends AbstractQi4jTe
     @Service
     protected Serialization serialization;
 
-    @SuppressWarnings( "unchecked" )
-    protected <T extends SerializationSettings> T withTestSettings( T settings )
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    protected <T extends SerializationSettings> T withTestSettings(T settings)
     {
-        return (T) settings.withConverter( new CustomConverter() );
+        return (T) settings.withConverter(new CustomConverter());
     }
 
-    protected abstract String getSingleStringRawState( String state ) throws Exception;
+    protected abstract String getSingleStringRawState(String state)
+        throws Exception;
 
     @Test
     public void dontKnowHowToSerializeJavaLangObject()
     {
         try
         {
-            serialization.serialize( new Object() );
-            fail( "serialization.serialize( new Object() ) should have failed" );
+            serialization.serialize(module, Options.DEFAULT, new Object());
+            fail("serialization.serialize( new Object() ) should have failed");
         }
-        catch( SerializationException ex )
+        catch(SerializationException ex)
         {
-            assertThat( ex.getMessage(), startsWith( "Don't know how to serialize" ) );
+            assertThat(ex.getMessage(), startsWith("Don't know how to serialize"));
         }
     }
 
     @Test
     public void givenNullValueWhenSerializingAndDeserializingExpectNull()
     {
-        String output = serialization.serialize( null );
-        System.out.println( output );
+        String output = serialization.serialize(module, Options.DEFAULT, null);
+        System.out.println(output);
 
-        assertThat( serialization.deserialize( module, ValueType.of( Integer.class ), output ), nullValue() );
-        assertThat( serialization.deserialize( module, ValueType.of( String.class ), output ), nullValue() );
-        assertThat( serialization.deserialize( module, ValueType.of( SomeEnum.class ), output ), nullValue() );
+        assertThat(serialization.deserialize(module, Options.DEFAULT, ValueType.of(Integer.class), output), nullValue());
+        assertThat(serialization.deserialize(module, Options.DEFAULT, ValueType.of(String.class), output), nullValue());
+        assertThat(serialization.deserialize(module, Options.DEFAULT, ValueType.of(SomeEnum.class), output), nullValue());
     }
 
     @Test
-    public void givenEnumValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenEnumValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String output = serialization.serialize( SomeEnum.BÆR );
-        System.out.println( output );
-        assertThat( getSingleStringRawState( output ), equalTo( "BÆR" ) );
+        String output = serialization.serialize(module, Options.DEFAULT, SomeEnum.BÆR);
+        System.out.println(output);
+        assertThat(getSingleStringRawState(output), equalTo("BÆR"));
 
-        SomeEnum value = serialization.deserialize( module, EnumType.of( SomeEnum.class ), output );
-        assertThat( value, is( SomeEnum.BÆR ) );
+        SomeEnum value = serialization.deserialize(module, Options.DEFAULT, EnumType.of(SomeEnum.class), output);
+        assertThat(value, is(SomeEnum.BÆR));
     }
 
     @Test
     public void givenPrimitiveValueWhenSerializingAndDeserializingUsingPrimitiveAndBoxedTypesExpectEquals()
     {
-        assertPrimitiveBoxedDeserializationEquals( char.class, Character.class, '€' );
-        assertPrimitiveBoxedDeserializationEquals( boolean.class, Boolean.class, true );
-        assertPrimitiveBoxedDeserializationEquals( short.class, Short.class, (short) 23 );
-        assertPrimitiveBoxedDeserializationEquals( int.class, Integer.class, 23 );
-        assertPrimitiveBoxedDeserializationEquals( byte.class, Byte.class, (byte) 23 );
-        assertPrimitiveBoxedDeserializationEquals( long.class, Long.class, 23L );
-        assertPrimitiveBoxedDeserializationEquals( float.class, Float.class, 23F );
-        assertPrimitiveBoxedDeserializationEquals( double.class, Double.class, 23D );
+        assertPrimitiveBoxedDeserializationEquals(char.class, Character.class, '€');
+        assertPrimitiveBoxedDeserializationEquals(boolean.class, Boolean.class, true);
+        assertPrimitiveBoxedDeserializationEquals(short.class, Short.class, (short) 23);
+        assertPrimitiveBoxedDeserializationEquals(int.class, Integer.class, 23);
+        assertPrimitiveBoxedDeserializationEquals(byte.class, Byte.class, (byte) 23);
+        assertPrimitiveBoxedDeserializationEquals(long.class, Long.class, 23L);
+        assertPrimitiveBoxedDeserializationEquals(float.class, Float.class, 23F);
+        assertPrimitiveBoxedDeserializationEquals(double.class, Double.class, 23D);
     }
 
-    private <P, B> void assertPrimitiveBoxedDeserializationEquals( Class<P> primitiveType, Class<B> boxedType, P value )
+    private <P, B> void assertPrimitiveBoxedDeserializationEquals(Class<P> primitiveType, Class<B> boxedType, P value)
     {
-        String serialized = serialization.serialize( value );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, value);
+        System.out.println(serialized);
 
-        B boxed = serialization.deserialize( module, boxedType, serialized );
-        P primitive = serialization.deserialize( module, primitiveType, serialized );
-        assertThat( "Primitive/Boxed", boxed, equalTo( primitive ) );
-    }
-
-    @Test
-    public void givenCharacterValueWhenSerializingAndDeserializingExpectEquals() throws Exception
-    {
-        String serialized = serialization.serialize( '∫' );
-        System.out.println( serialized );
-
-        Character deserialized = serialization.deserialize( module, Character.class, serialized );
-        assertThat( "Deserialized", deserialized, equalTo( '∫' ) );
-
-        deserialized = serialization.deserialize( module, char.class, serialized );
-        assertThat( "Deserialized", deserialized, is( '∫' ) );
+        B boxed = serialization.deserialize(module, Options.DEFAULT, boxedType, serialized);
+        P primitive = serialization.deserialize(module, Options.DEFAULT, primitiveType, serialized);
+        assertThat("Primitive/Boxed", boxed, equalTo(primitive));
     }
 
     @Test
-    public void givenEmptyStringValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenCharacterValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( "" );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, '∫');
+        System.out.println(serialized);
 
-        String deserialized = serialization.deserialize( module, String.class, serialized );
-        assertThat( "Deserialized", deserialized, equalTo( "" ) );
+        Character deserialized = serialization.deserialize(module, Options.DEFAULT, Character.class, serialized);
+        assertThat("Deserialized", deserialized, equalTo('∫'));
+
+        deserialized = serialization.deserialize(module, Options.DEFAULT, char.class, serialized);
+        assertThat("Deserialized", deserialized, is('∫'));
     }
 
     @Test
-    public void givenStringValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenEmptyStringValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( "Å∫" );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "Å∫" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, "");
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo(""));
 
-        String deserialized = serialization.deserialize( module, String.class, serialized );
-        assertThat( deserialized, equalTo( "Å∫" ) );
+        String deserialized = serialization.deserialize(module, Options.DEFAULT, String.class, serialized);
+        assertThat("Deserialized", deserialized, equalTo(""));
+    }
+
+    @Test
+    public void givenStringValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
+    {
+        String serialized = serialization.serialize(module, Options.DEFAULT, "Å∫");
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("Å∫"));
+
+        String deserialized = serialization.deserialize(module, Options.DEFAULT, String.class, serialized);
+        assertThat(deserialized, equalTo("Å∫"));
     }
 
     @Test
     public void givenBooleanValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = serialization.serialize( true );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, true);
+        System.out.println(serialized);
 
-        Boolean deserialized = serialization.deserialize( module, Boolean.class, serialized );
-        assertThat( deserialized, equalTo( Boolean.TRUE ) );
+        Boolean deserialized = serialization.deserialize(module, Options.DEFAULT, Boolean.class, serialized);
+        assertThat(deserialized, equalTo(Boolean.TRUE));
     }
 
     @Test
     public void givenIntegerValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = serialization.serialize( 42 );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, 42);
+        System.out.println(serialized);
 
-        Integer deserialized = serialization.deserialize( module, Integer.class, serialized );
-        assertThat( deserialized, equalTo( 42 ) );
+        Integer deserialized = serialization.deserialize(module, Options.DEFAULT, Integer.class, serialized);
+        assertThat(deserialized, equalTo(42));
     }
 
     @Test
     public void givenLongValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = serialization.serialize( 42L );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, 42L);
+        System.out.println(serialized);
 
-        Long deserialized = serialization.deserialize( module, Long.class, serialized );
-        assertThat( deserialized, equalTo( 42L ) );
+        Long deserialized = serialization.deserialize(module, Options.DEFAULT, Long.class, serialized);
+        assertThat(deserialized, equalTo(42L));
     }
 
     @Test
     public void givenShortValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = serialization.serialize( (short) 42 );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, (short) 42);
+        System.out.println(serialized);
 
-        Short deserialized = serialization.deserialize( module, Short.class, serialized );
-        assertThat( deserialized, equalTo( (short) 42 ) );
+        Short deserialized = serialization.deserialize(module, Options.DEFAULT, Short.class, serialized);
+        assertThat(deserialized, equalTo((short) 42));
     }
 
     @Test
     public void givenByteValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = serialization.serialize( (byte) 42 );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, (byte) 42);
+        System.out.println(serialized);
 
-        Byte deserialized = serialization.deserialize( module, Byte.class, serialized );
-        assertThat( deserialized, equalTo( (byte) 42 ) );
+        Byte deserialized = serialization.deserialize(module, Options.DEFAULT, Byte.class, serialized);
+        assertThat(deserialized, equalTo((byte) 42));
     }
 
     @Test
     public void givenFloatValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = serialization.serialize( 42F );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, 42F);
+        System.out.println(serialized);
 
-        Float deserialized = serialization.deserialize( module, Float.class, serialized );
-        assertThat( deserialized, equalTo( 42F ) );
+        Float deserialized = serialization.deserialize(module, Options.DEFAULT, Float.class, serialized);
+        assertThat(deserialized, equalTo(42F));
     }
 
     @Test
     public void givenDoubleValueWhenSerializingAndDeserializingExpectEquals()
     {
-        String serialized = serialization.serialize( 42D );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, 42D);
+        System.out.println(serialized);
 
-        Double deserialized = serialization.deserialize( module, Double.class, serialized );
-        assertThat( deserialized, equalTo( 42D ) );
+        Double deserialized = serialization.deserialize(module, Options.DEFAULT, Double.class, serialized);
+        assertThat(deserialized, equalTo(42D));
     }
 
     @Test
     public void givenBigIntegerValueWhenSerializingAndDeserializingExpectEquals()
     {
-        BigInteger bigInteger = new BigInteger( "42424242424242424242424242" );
-        assertThat( bigInteger, not( equalTo( BigInteger.valueOf( bigInteger.longValue() ) ) ) );
+        BigInteger bigInteger = new BigInteger("42424242424242424242424242");
+        assertThat(bigInteger, not(equalTo(BigInteger.valueOf(bigInteger.longValue()))));
 
-        String serialized = serialization.serialize( bigInteger );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, bigInteger);
+        System.out.println(serialized);
 
-        BigInteger deserialized = serialization.deserialize( module, BigInteger.class, serialized );
-        assertThat( deserialized, equalTo( bigInteger ) );
+        BigInteger deserialized = serialization.deserialize(module, Options.DEFAULT, BigInteger.class, serialized);
+        assertThat(deserialized, equalTo(bigInteger));
     }
 
     @Test
     public void givenBigDecimalValueWhenSerializingAndDeserializingExpectEquals()
     {
-        BigDecimal bigDecimal = new BigDecimal( "42.2376931348623157e+309" );
-        assertThat( bigDecimal.doubleValue(), equalTo( Double.POSITIVE_INFINITY ) );
+        BigDecimal bigDecimal = new BigDecimal("42.2376931348623157e+309");
+        assertThat(bigDecimal.doubleValue(), equalTo(Double.POSITIVE_INFINITY));
 
-        String serialized = serialization.serialize( bigDecimal );
-        System.out.println( serialized );
+        String serialized = serialization.serialize(module, Options.DEFAULT, bigDecimal);
+        System.out.println(serialized);
 
-        BigDecimal deserialized = serialization.deserialize( module, BigDecimal.class, serialized );
-        assertThat( deserialized, equalTo( bigDecimal ) );
+        BigDecimal deserialized = serialization.deserialize(module, Options.DEFAULT, BigDecimal.class, serialized);
+        assertThat(deserialized, equalTo(bigDecimal));
     }
 
     @Test
-    public void givenLocalDateTimeValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenLocalDateTimeValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
         // Serialized without TimeZone
-        String serialized = serialization.serialize( LocalDateTime.of( 2020, 3, 4, 13, 23, 12 ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "2020-03-04T13:23:12" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, LocalDateTime.of(2020, 3, 4, 13, 23, 12));
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("2020-03-04T13:23:12"));
 
-        LocalDateTime deserialized = serialization.deserialize( module, LocalDateTime.class, serialized );
-        assertThat( deserialized, equalTo( LocalDateTime.of( 2020, 3, 4, 13, 23, 12 ) ) );
+        LocalDateTime deserialized = serialization.deserialize(module, Options.DEFAULT, LocalDateTime.class, serialized);
+        assertThat(deserialized, equalTo(LocalDateTime.of(2020, 3, 4, 13, 23, 12)));
     }
 
     @Test
-    public void givenLocalDateValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenLocalDateValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( LocalDate.of( 2020, 3, 4 ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "2020-03-04" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, LocalDate.of(2020, 3, 4));
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("2020-03-04"));
 
-        LocalDate deserialized = serialization.deserialize( module, LocalDate.class, serialized );
-        assertThat( deserialized, equalTo( LocalDate.of( 2020, 3, 4 ) ) );
+        LocalDate deserialized = serialization.deserialize(module, Options.DEFAULT, LocalDate.class, serialized);
+        assertThat(deserialized, equalTo(LocalDate.of(2020, 3, 4)));
     }
 
     @Test
-    public void givenLocalTimeValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenLocalTimeValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( LocalTime.of( 14, 54, 27 ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "14:54:27" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, LocalTime.of(14, 54, 27));
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("14:54:27"));
 
-        LocalTime deserialized = serialization.deserialize( module, LocalTime.class, serialized );
-        assertThat( deserialized, equalTo( LocalTime.of( 14, 54, 27 ) ) );
+        LocalTime deserialized = serialization.deserialize(module, Options.DEFAULT, LocalTime.class, serialized);
+        assertThat(deserialized, equalTo(LocalTime.of(14, 54, 27)));
     }
 
     @Test
-    public void givenOffsetDateTimeValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenOffsetDateTimeValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( OffsetDateTime.of( 2009, 8, 12, 14, 54, 27, 895000000,
-                                                                        ZoneOffset.ofHours( 8 ) ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "2009-08-12T14:54:27.895+08:00" ) );
+        OffsetDateTime targetTime = OffsetDateTime.of(2009, 8, 12, 14, 54, 27, 895000000, ZoneOffset.ofHours(8));
+        String serialized = serialization.serialize(module, Options.DEFAULT, targetTime);
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("2009-08-12T14:54:27.895+08:00"));
 
-        OffsetDateTime deserialized = serialization.deserialize( module, OffsetDateTime.class, serialized );
-        assertThat( deserialized, equalTo( OffsetDateTime.of( 2009, 8, 12, 14, 54, 27, 895000000,
-                                                              ZoneOffset.ofHours( 8 ) ) ) );
+        OffsetDateTime deserialized = serialization.deserialize(module, Options.DEFAULT, OffsetDateTime.class, serialized);
+        assertThat(deserialized, equalTo(targetTime));
     }
 
     @Test
-    public void givenZonedDateTimeValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenZonedDateTimeValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( ZonedDateTime.of( 2009, 8, 12, 14, 54, 27, 895000000,
-                                                                       ZoneId.of( "CET" ) ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "2009-08-12T14:54:27.895+02:00[CET]" ) );
+        ZonedDateTime targetTime = ZonedDateTime.of(2009, 8, 12, 14, 54, 27, 895000000,
+            ZoneId.of("CET"));
+        String serialized = serialization.serialize(module, Options.DEFAULT, targetTime);
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("2009-08-12T14:54:27.895+02:00[CET]"));
 
-        ZonedDateTime deserialized = serialization.deserialize( module, ZonedDateTime.class, serialized );
-        assertThat( deserialized, equalTo( ZonedDateTime.of( 2009, 8, 12, 14, 54, 27, 895000000,
-                                                             ZoneId.of( "CET" ) ) ) );
+        ZonedDateTime deserialized = serialization.deserialize(module, Options.DEFAULT, ZonedDateTime.class, serialized);
+        assertThat(deserialized, equalTo(targetTime));
     }
 
     @Test
-    public void givenInstantValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenInstantValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( Instant.parse( "2016-06-11T08:47:12.620Z" ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "2016-06-11T08:47:12.620Z" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, Instant.parse("2016-06-11T08:47:12.620Z"));
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("2016-06-11T08:47:12.620Z"));
 
-        Instant deserialized = serialization.deserialize( module, Instant.class, serialized );
-        assertThat( deserialized, equalTo( Instant.parse( "2016-06-11T08:47:12.620Z" ) ) );
+        Instant deserialized = serialization.deserialize(module, Options.DEFAULT, Instant.class, serialized);
+        assertThat(deserialized, equalTo(Instant.parse("2016-06-11T08:47:12.620Z")));
     }
 
     @Test
-    public void givenDurationValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenDurationValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( Duration.ofMillis( 3500 ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "PT3.5S" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, Duration.ofMillis(3500));
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("PT3.5S"));
 
-        Duration deserialized = serialization.deserialize( module, Duration.class, serialized );
-        assertThat( deserialized, equalTo( Duration.ofMillis( 3500 ) ) );
+        Duration deserialized = serialization.deserialize(module, Options.DEFAULT, Duration.class, serialized);
+        assertThat(deserialized, equalTo(Duration.ofMillis(3500)));
     }
 
     @Test
-    public void givenPeriodValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenPeriodValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( Period.of( 3, 5, 13 ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "P3Y5M13D" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, Period.of(3, 5, 13));
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("P3Y5M13D"));
 
-        Period deserialized = serialization.deserialize( module, Period.class, serialized );
-        assertThat( deserialized, equalTo( Period.of( 3, 5, 13 ) ) );
+        Period deserialized = serialization.deserialize(module, Options.DEFAULT, Period.class, serialized);
+        assertThat(deserialized, equalTo(Period.of(3, 5, 13)));
     }
 
     @Test
-    public void givenEntityReferenceValueWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenEntityReferenceValueWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( EntityReference.parseEntityReference( "ABCD-1234" ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "ABCD-1234" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, EntityReference.parseEntityReference("ABCD-1234"));
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("ABCD-1234"));
 
-        EntityReference deserialized = serialization.deserialize( module, EntityReference.class, serialized );
-        assertThat( deserialized, equalTo( EntityReference.parseEntityReference( "ABCD-1234" ) ) );
+        EntityReference deserialized = serialization.deserialize(module, Options.DEFAULT, EntityReference.class, serialized);
+        assertThat(deserialized, equalTo(EntityReference.parseEntityReference("ABCD-1234")));
     }
 
     @Test
-    public void givenCustomPlainValueTypeAndItsConverterWhenSerializingAndDeserializingExpectEquals() throws Exception
+    public void givenCustomPlainValueTypeAndItsConverterWhenSerializingAndDeserializingExpectEquals()
+        throws Exception
     {
-        String serialized = serialization.serialize( new CustomConvertedValue( "ABCD-1234" ) );
-        System.out.println( serialized );
-        assertThat( getSingleStringRawState( serialized ), equalTo( "ABCD-1234" ) );
+        String serialized = serialization.serialize(module, Options.DEFAULT, new CustomConvertedValue("ABCD-1234"));
+        System.out.println(serialized);
+        assertThat(getSingleStringRawState(serialized), equalTo("ABCD-1234"));
 
-        CustomConvertedValue deserialized = serialization.deserialize( module, CustomConvertedValue.class, serialized );
-        assertThat( deserialized, equalTo( new CustomConvertedValue( "ABCD-1234" ) ) );
+        CustomConvertedValue deserialized = serialization.deserialize(module, Options.DEFAULT, CustomConvertedValue.class, serialized);
+        assertThat(deserialized, equalTo(new CustomConvertedValue("ABCD-1234")));
     }
 
     private enum SomeEnum
@@ -398,15 +405,15 @@ public abstract class AbstractPlainValueSerializationTest extends AbstractQi4jTe
         }
 
         @Override
-        public String toString( CustomConvertedValue object )
+        public String toString(CustomConvertedValue object)
         {
             return object.value;
         }
 
         @Override
-        public CustomConvertedValue fromString( String string )
+        public CustomConvertedValue fromString(String string)
         {
-            return new CustomConvertedValue( string );
+            return new CustomConvertedValue(string);
         }
     }
 
@@ -414,24 +421,30 @@ public abstract class AbstractPlainValueSerializationTest extends AbstractQi4jTe
     {
         private final String value;
 
-        CustomConvertedValue( String value )
+        CustomConvertedValue(String value)
         {
             this.value = value;
         }
 
         @Override
-        public boolean equals( final Object o )
+        public boolean equals(final Object o)
         {
-            if( this == o ) { return true; }
-            if( o == null || getClass() != o.getClass() ) { return false; }
+            if(this == o)
+            {
+                return true;
+            }
+            if(o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
             CustomConvertedValue that = (CustomConvertedValue) o;
-            return Objects.equals( value, that.value );
+            return Objects.equals(value, that.value);
         }
 
         @Override
         public int hashCode()
         {
-            return Objects.hashCode( value );
+            return Objects.hashCode(value);
         }
     }
 }

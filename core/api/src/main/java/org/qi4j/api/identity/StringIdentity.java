@@ -29,7 +29,7 @@ public class StringIdentity
 
     private StringIdentity(String value)
     {
-        Objects.requireNonNull( value, "Identity can not be null." );
+        Objects.requireNonNull(value, "Identity can not be null.");
         this.value = value;
     }
 
@@ -55,19 +55,19 @@ public class StringIdentity
         return value;
     }
 
-    public static Identity identityOf( String serializedState )
+    public static Identity identityOf(String serializedState)
     {
-        return new StringIdentity( serializedState );
+        return new StringIdentity(serializedState);
     }
 
     @Override
     public boolean equals(Object o)
     {
-        if (this == o)
+        if(this == o)
         {
             return true;
         }
-        if (o == null || getClass() != o.getClass())
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }

@@ -26,13 +26,13 @@ package org.qi4j.bootstrap;
 public class BindingException
     extends Exception
 {
-    public BindingException( String s )
+    public BindingException(String s)
     {
-        super( s );
+        super(s);
     }
 
-    public BindingException( String s, InvalidInjectionException ex )
+    public BindingException(String s, InvalidInjectionException ex)
     {
-        super( s, ex );
+        super(s, ex);
     }
 }

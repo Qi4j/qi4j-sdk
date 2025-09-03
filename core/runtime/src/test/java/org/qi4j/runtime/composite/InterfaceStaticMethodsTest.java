@@ -17,12 +17,12 @@
  */
 package org.qi4j.runtime.composite;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -34,7 +34,7 @@ public class InterfaceStaticMethodsTest extends AbstractQi4jTest
 {
     public interface StaticMethods
     {
-        @UseDefaults( "foo" )
+        @UseDefaults("foo")
         Property<String> foo();
 
         static String bar()
@@ -52,26 +52,28 @@ public class InterfaceStaticMethodsTest extends AbstractQi4jTest
     }
 
     @Override
-    public void assemble( final ModuleAssembly module ) throws AssemblyException
+    public void assemble(final ModuleAssembly module)
+        throws AssemblyException
     {
-        module.transients( StaticMethods.class, OverrideStaticMethods.class );
+        module.transients(StaticMethods.class, OverrideStaticMethods.class);
     }
 
     @Test
-    public void staticMethods() throws NoSuchMethodException
+    public void staticMethods()
+        throws NoSuchMethodException
     {
-        StaticMethods staticMethods = transientBuilderFactory.newTransient( StaticMethods.class );
+        StaticMethods staticMethods = transientBuilderFactory.newTransient(StaticMethods.class);
 
-        assertThat( staticMethods.foo().get(), equalTo( "foo" ) );
-        assertThat( StaticMethods.bar(), equalTo( "bar" ) );
+        assertThat(staticMethods.foo().get(), equalTo("foo"));
+        assertThat(StaticMethods.bar(), equalTo("bar"));
     }
 
     @Test
     public void overrideStaticMethods()
     {
-        OverrideStaticMethods staticMethods = transientBuilderFactory.newTransient( OverrideStaticMethods.class );
+        OverrideStaticMethods staticMethods = transientBuilderFactory.newTransient(OverrideStaticMethods.class);
 
-        assertThat( staticMethods.foo().get(), equalTo( "foo" ) );
-        assertThat( OverrideStaticMethods.bar(), equalTo( "bar overridden" ) );
+        assertThat(staticMethods.foo().get(), equalTo("foo"));
+        assertThat(OverrideStaticMethods.bar(), equalTo("bar overridden"));
     }
 }

@@ -20,16 +20,12 @@
 
 package org.qi4j.bootstrap;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.Map;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.property.Property;
+
+import java.lang.reflect.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Declaration of a Property or Association.
@@ -43,48 +39,48 @@ public final class MetaInfoDeclaration
     {
     }
 
-    public <T> MixinDeclaration<T> on( Class<T> mixinType )
+    public <T> MixinDeclaration<T> on(Class<T> mixinType)
     {
-        @SuppressWarnings( "unchecked" )
-        InfoHolder<T> propertyDeclarationHolder = (InfoHolder<T>) mixinPropertyDeclarations.get( mixinType );
-        if( propertyDeclarationHolder == null )
+        @SuppressWarnings("unchecked")
+        InfoHolder<T> propertyDeclarationHolder = (InfoHolder<T>) mixinPropertyDeclarations.get(mixinType);
+        if(propertyDeclarationHolder == null)
         {
-            propertyDeclarationHolder = new InfoHolder<>( mixinType );
-            mixinPropertyDeclarations.put( mixinType, propertyDeclarationHolder );
+            propertyDeclarationHolder = new InfoHolder<>(mixinType);
+            mixinPropertyDeclarations.put(mixinType, propertyDeclarationHolder);
         }
         return propertyDeclarationHolder;
     }
 
     @Override
-    public MetaInfo metaInfoFor( AccessibleObject accessor )
+    public MetaInfo metaInfoFor(AccessibleObject accessor)
     {
-        for( Map.Entry<Class<?>, InfoHolder<?>> entry : mixinPropertyDeclarations.entrySet() )
+        for(Map.Entry<Class<?>, InfoHolder<?>> entry : mixinPropertyDeclarations.entrySet())
         {
             InfoHolder<?> holder = entry.getValue();
-            MetaInfo metaInfo = holder.metaInfoFor( accessor );
-            if( metaInfo != null )
+            MetaInfo metaInfo = holder.metaInfoFor(accessor);
+            if(metaInfo != null)
             {
                 Class<?> mixinType = entry.getKey();
-                return metaInfo.withAnnotations( mixinType )
-                    .withAnnotations( accessor )
-                    .withAnnotations( accessor instanceof Method ? ( (Method) accessor ).getReturnType() : ( (Field) accessor )
-                        .getType() );
+                return metaInfo.withAnnotations(mixinType)
+                    .withAnnotations(accessor)
+                    .withAnnotations(accessor instanceof Method ? ((Method) accessor).getReturnType() : ((Field) accessor)
+                        .getType());
             }
         }
         // TODO is this code reached at all??
-        Class<?> declaringType = ( (Member) accessor ).getDeclaringClass();
-        return new MetaInfo().withAnnotations( declaringType )
-            .withAnnotations( accessor )
-            .withAnnotations( accessor instanceof Method ? ( (Method) accessor ).getReturnType() : ( (Field) accessor ).getType() );
+        Class<?> declaringType = ((Member) accessor).getDeclaringClass();
+        return new MetaInfo().withAnnotations(declaringType)
+            .withAnnotations(accessor)
+            .withAnnotations(accessor instanceof Method ? ((Method) accessor).getReturnType() : ((Field) accessor).getType());
     }
 
     @Override
-    public Object initialValueOf( AccessibleObject accessor )
+    public Object initialValueOf(AccessibleObject accessor)
     {
-        for( InfoHolder<?> propertyDeclarationHolder : mixinPropertyDeclarations.values() )
+        for(InfoHolder<?> propertyDeclarationHolder : mixinPropertyDeclarations.values())
         {
-            final Object initialValue = propertyDeclarationHolder.initialValueOf( accessor );
-            if( initialValue != null )
+            final Object initialValue = propertyDeclarationHolder.initialValueOf(accessor);
+            if(initialValue != null)
             {
                 return initialValue;
             }
@@ -93,12 +89,12 @@ public final class MetaInfoDeclaration
     }
 
     @Override
-    public boolean useDefaults( AccessibleObject accessor )
+    public boolean useDefaults(AccessibleObject accessor)
     {
-        for( InfoHolder<?> propertyDeclarationHolder : mixinPropertyDeclarations.values() )
+        for(InfoHolder<?> propertyDeclarationHolder : mixinPropertyDeclarations.values())
         {
-            final boolean useDefaults = propertyDeclarationHolder.useDefaults( accessor );
-            if( useDefaults )
+            final boolean useDefaults = propertyDeclarationHolder.useDefaults(accessor);
+            if(useDefaults)
             {
                 return useDefaults;
             }
@@ -115,7 +111,7 @@ public final class MetaInfoDeclaration
             boolean useDefaults;
             MetaInfo metaInfo;
 
-            private MethodInfo( MetaInfo metaInfo )
+            private MethodInfo(MetaInfo metaInfo)
             {
                 this.metaInfo = metaInfo;
             }
@@ -126,49 +122,49 @@ public final class MetaInfoDeclaration
         // temporary holder
         private MetaInfo metaInfo = null;
 
-        private InfoHolder( Class<T> mixinType )
+        private InfoHolder(Class<T> mixinType)
         {
             this.mixinType = mixinType;
         }
 
         @Override
-        @SuppressWarnings( "raw" )
-        public Object invoke( Object o, Method method, Object[] objects )
+        @SuppressWarnings("raw")
+        public Object invoke(Object o, Method method, Object[] objects)
             throws Throwable
         {
-            final MethodInfo methodInfo = new MethodInfo( metaInfo );
+            final MethodInfo methodInfo = new MethodInfo(metaInfo);
             methodInfo.useDefaults = true;
-            methodInfos.put( method, methodInfo );
+            methodInfos.put(method, methodInfo);
             metaInfo = null; // reset
             final Class<?> returnType = method.getReturnType();
             try
             {
-                return Proxy.newProxyInstance( returnType.getClassLoader(), new Class[]{ returnType },
-                                               ( o1, method1, objects1 ) -> {
-                                                   if( method1.getName().equals( "set" ) )
-                                                   {
-                                                       methodInfo.initialValue = objects1[ 0 ];
-                                                   }
-                                                   return null;
-                                               } );
+                return Proxy.newProxyInstance(returnType.getClassLoader(), new Class[]{returnType},
+                    (o1, method1, objects1) -> {
+                        if(method1.getName().equals("set"))
+                        {
+                            methodInfo.initialValue = objects1[0];
+                        }
+                        return null;
+                    });
             }
-            catch( IllegalArgumentException e )
+            catch(IllegalArgumentException e)
             {
                 throw new IllegalArgumentException(
-                    "Only methods with " + Property.class.getName() + " as return type can have declareDefaults()" );
+                    "Only methods with " + Property.class.getName() + " as return type can have declareDefaults()");
             }
         }
 
-        public MethodInfo matches( AccessibleObject accessor )
+        public MethodInfo matches(AccessibleObject accessor)
         {
-            return methodInfos.get( accessor );
+            return methodInfos.get(accessor);
         }
 
         @Override
-        public MetaInfo metaInfoFor( AccessibleObject accessor )
+        public MetaInfo metaInfoFor(AccessibleObject accessor)
         {
-            final MethodInfo methodInfo = matches( accessor );
-            if( methodInfo == null )
+            final MethodInfo methodInfo = matches(accessor);
+            if(methodInfo == null)
             {
                 return null;
             }
@@ -176,10 +172,10 @@ public final class MetaInfoDeclaration
         }
 
         @Override
-        public Object initialValueOf( AccessibleObject accessor )
+        public Object initialValueOf(AccessibleObject accessor)
         {
-            final MethodInfo methodInfo = matches( accessor );
-            if( methodInfo == null )
+            final MethodInfo methodInfo = matches(accessor);
+            if(methodInfo == null)
             {
                 return null;
             }
@@ -187,10 +183,10 @@ public final class MetaInfoDeclaration
         }
 
         @Override
-        public boolean useDefaults( AccessibleObject accessor )
+        public boolean useDefaults(AccessibleObject accessor)
         {
-            final MethodInfo methodInfo = matches( accessor );
-            if( methodInfo == null )
+            final MethodInfo methodInfo = matches(accessor);
+            if(methodInfo == null)
             {
                 return false;
             }
@@ -200,21 +196,21 @@ public final class MetaInfoDeclaration
         // DSL Interface
 
         @Override
-        @SuppressWarnings( "raw" )
+        @SuppressWarnings("raw")
         public T declareDefaults()
         {
             return mixinType.cast(
-                Proxy.newProxyInstance( mixinType.getClassLoader(), new Class[]{ mixinType }, this ) );
+                Proxy.newProxyInstance(mixinType.getClassLoader(), new Class[]{mixinType}, this));
         }
 
         @Override
-        public MixinDeclaration<T> setMetaInfo( Object info )
+        public MixinDeclaration<T> setMetaInfo(Object info)
         {
-            if( metaInfo == null )
+            if(metaInfo == null)
             {
                 metaInfo = new MetaInfo();
             }
-            metaInfo.set( info );
+            metaInfo.set(info);
             return this;
         }
     }

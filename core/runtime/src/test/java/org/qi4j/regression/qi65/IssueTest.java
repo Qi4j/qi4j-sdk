@@ -19,50 +19,50 @@
  */
 package org.qi4j.regression.qi65;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class IssueTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
     private final static Class<?> CLAZZ = Object.class;
     private final static String METHOD_NAME = "toString";
-    private final static Class<?> PARAM_TYPES[] = { };
+    private final static Class<?> PARAM_TYPES[] = {};
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestComposite.class );
+        module.transients(TestComposite.class);
     }
 
     @Test
     public void constraintOnMethodParameter()
         throws SecurityException, NoSuchMethodException
     {
-        assertThrows( IllegalArgumentException.class, () -> {
-            TestComposite test = transientBuilderFactory.newTransient( TestComposite.class );
+        assertThrows(IllegalArgumentException.class, () -> {
+            TestComposite test = transientBuilderFactory.newTransient(TestComposite.class);
 
-            test.someMethod( null );
-        } );
+            test.someMethod(null);
+        });
     }
 
-    @Mixins( TestMixin.class )
+    @Mixins(TestMixin.class)
     public interface TestComposite
         extends TransientComposite
     {
-        String someMethod( String value );
+        String someMethod(String value);
     }
 
     public static abstract class TestMixin
         implements TestComposite
     {
-        public String someMethod( String value )
+        public String someMethod(String value)
         {
             return value + " " + value;
         }

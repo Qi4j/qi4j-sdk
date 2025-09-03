@@ -19,14 +19,15 @@
  */
 package org.qi4j.bootstrap;
 
-import java.lang.reflect.AccessibleObject;
-import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.association.NamedAssociation;
+import org.qi4j.api.common.MetaInfo;
+
+import java.lang.reflect.AccessibleObject;
 
 /**
  * This provides declared {@link NamedAssociation} information that the runtime can use.
  */
 public interface NamedAssociationDeclarations
 {
-    MetaInfo metaInfoFor( AccessibleObject accessor );
+    MetaInfo metaInfoFor(AccessibleObject accessor);
 }

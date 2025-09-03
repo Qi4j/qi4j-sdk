@@ -64,15 +64,13 @@ public final class QualifiedName
      * </p>
      *
      * @param method Type method that returns a Property, for which the QualifiedName will be representing.
-     *
      * @return A QualifiedName representing this method.
-     *
      * @throws NullPointerException If the {@code method} argument passed is null.
      */
-    public static QualifiedName fromAccessor( AccessibleObject method )
+    public static QualifiedName fromAccessor(AccessibleObject method)
     {
-        Objects.requireNonNull( method, "method" );
-        return fromClass( ( (Member) method ).getDeclaringClass(), ( (Member) method ).getName() );
+        Objects.requireNonNull(method, "method");
+        return fromClass(((Member) method).getDeclaringClass(), ((Member) method).getName());
     }
 
     /**
@@ -82,15 +80,13 @@ public final class QualifiedName
      *
      * @param type The Class that is the base of the QualifiedName.
      * @param name The qualifier name which will be appended to the base name derived from the {@code type} argument.
-     *
      * @return A QualifiedName instance representing the {@code type} and {@code name} arguments.
-     *
-     * @throws NullPointerException if any of the two arguments are {@code null}
-     * @throws IllegalArgumentException  if the name string is empty.
+     * @throws NullPointerException     if any of the two arguments are {@code null}
+     * @throws IllegalArgumentException if the name string is empty.
      */
-    public static QualifiedName fromClass( Class type, String name )
+    public static QualifiedName fromClass(Class type, String name)
     {
-        return new QualifiedName( TypeName.nameOf( type ), name );
+        return new QualifiedName(TypeName.nameOf(type), name);
     }
 
     /**
@@ -99,15 +95,13 @@ public final class QualifiedName
      * @param type The type name as a a string, which must be properly formatted. No checks for correctly formatted
      *             type name is performed.
      * @param name The qualifier name which will be appended to the base name derived from the {@code type} argument.
-     *
      * @return A QualifiedName instance representing the {@code type} and {@code name} arguments.
-     *
-     * @throws NullPointerException if any of the two arguments are {@code null}
-     * @throws IllegalArgumentException  if the name string is empty.
+     * @throws NullPointerException     if any of the two arguments are {@code null}
+     * @throws IllegalArgumentException if the name string is empty.
      */
-    public static QualifiedName fromName( String type, String name )
+    public static QualifiedName fromName(String type, String name)
     {
-        return new QualifiedName( TypeName.nameOf( type ), name );
+        return new QualifiedName(TypeName.nameOf(type), name);
     }
 
     /**
@@ -118,32 +112,31 @@ public final class QualifiedName
      * </p>
      *
      * @param fullQualifiedName The QualifiedName external string representation to be converted back into a QualifiedName
-     *                      instance.
-     *
+     *                          instance.
      * @return The QualifiedName instance represented by the {@code qualifiedName} argument.
-     *
-     * @throws NullPointerException If the {@code qualifiedName} argument is null
+     * @throws NullPointerException     If the {@code qualifiedName} argument is null
      * @throws IllegalArgumentException If the {@code qualifiedName} argument has wrong format.
      */
-    public static QualifiedName fromFQN( String fullQualifiedName )
+    public static QualifiedName fromFQN(String fullQualifiedName)
     {
-        Objects.requireNonNull( fullQualifiedName, "qualifiedName" );
-        int idx = fullQualifiedName.lastIndexOf( ":" );
-        if( idx == -1 )
+        Objects.requireNonNull(fullQualifiedName, "qualifiedName");
+        int idx = fullQualifiedName.lastIndexOf(":");
+        if(idx == -1)
         {
-            throw new IllegalArgumentException( "Name '" + fullQualifiedName + "' is not a qualified name" );
+            throw new IllegalArgumentException("Name '" + fullQualifiedName + "' is not a qualified name");
         }
-        final String type = fullQualifiedName.substring( 0, idx );
-        final String name = fullQualifiedName.substring( idx + 1 );
-        return new QualifiedName( TypeName.nameOf( type ), name );
+        final String type = fullQualifiedName.substring(0, idx);
+        final String name = fullQualifiedName.substring(idx + 1);
+        return new QualifiedName(TypeName.nameOf(type), name);
     }
 
-    QualifiedName( TypeName typeName, String name )
+    QualifiedName(TypeName typeName, String name)
     {
-        Objects.requireNonNull( typeName, "typeName" );
-        Objects.requireNonNull( name, "name" );
-        if( name.isEmpty() ){
-            throw new IllegalArgumentException( "name" );
+        Objects.requireNonNull(typeName, "typeName");
+        Objects.requireNonNull(name, "name");
+        if(name.isEmpty())
+        {
+            throw new IllegalArgumentException("name");
         }
         this.typeName = typeName;
         this.name = name;
@@ -181,7 +174,6 @@ public final class QualifiedName
      * <p>
      *
      * @return the URI of the QualifiedName.
-     *
      * @see #toNamespace()
      */
     public String toURI()
@@ -228,18 +220,18 @@ public final class QualifiedName
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
         QualifiedName that = (QualifiedName) o;
-        return name.equals( that.name ) && typeName.equals( that.typeName );
+        return name.equals(that.name) && typeName.equals(that.typeName);
     }
 
     @Override
@@ -249,18 +241,18 @@ public final class QualifiedName
     }
 
     @Override
-    public int compareTo( QualifiedName other )
+    public int compareTo(QualifiedName other)
     {
-        final int result = typeName.compareTo( other.typeName );
-        if( result != 0 )
+        final int result = typeName.compareTo(other.typeName);
+        if(result != 0)
         {
             return result;
         }
-        return name.compareTo( other.name );
+        return name.compareTo(other.name);
     }
 
-    public boolean isOriginatingFrom( Class<?> mixinType )
+    public boolean isOriginatingFrom(Class<?> mixinType)
     {
-        return typeName.isClass( mixinType );
+        return typeName.isClass(mixinType);
     }
 }

@@ -19,29 +19,23 @@
  */
 package org.qi4j.runtime.activation;
 
+import org.qi4j.api.activation.*;
+import org.qi4j.api.composite.ModelDescriptor;
+import org.qi4j.api.identity.Identity;
+import org.qi4j.api.service.ServiceReference;
+
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.qi4j.api.activation.Activation;
-import org.qi4j.api.activation.ActivationEvent;
-import org.qi4j.api.activation.ActivationEventListener;
-import org.qi4j.api.activation.ActivationException;
-import org.qi4j.api.activation.PassivationException;
-import org.qi4j.api.composite.ModelDescriptor;
-import org.qi4j.api.identity.Identity;
-import org.qi4j.api.service.ServiceReference;
 
-import static org.qi4j.api.activation.ActivationEvent.EventType.ACTIVATED;
-import static org.qi4j.api.activation.ActivationEvent.EventType.ACTIVATING;
-import static org.qi4j.api.activation.ActivationEvent.EventType.PASSIVATED;
-import static org.qi4j.api.activation.ActivationEvent.EventType.PASSIVATING;
+import static org.qi4j.api.activation.ActivationEvent.EventType.*;
 
 /**
  * This class manage Activation of a target and propagates to children.
  */
-@SuppressWarnings( "raw" )
+@SuppressWarnings("raw")
 public final class ActivationDelegate
     extends ActivationEventListenerSupport
 {
@@ -52,248 +46,251 @@ public final class ActivationDelegate
 
     /**
      * Create a new ActivationDelegate that will fire events.
+     *
      * @param target target of Activation
      */
-    public ActivationDelegate( Object target )
+    public ActivationDelegate(Object target)
     {
-        this( target, true );
+        this(target, true);
     }
 
     /**
      * Create a new ActivationDelegate.
-     * @param target target of Activation
+     *
+     * @param target     target of Activation
      * @param fireEvents if {@link ActivationEvent}s should be fired
      */
-    public ActivationDelegate( Object target, boolean fireEvents )
+    public ActivationDelegate(Object target, boolean fireEvents)
     {
         super();
         this.target = target;
         this.fireEvents = fireEvents;
     }
 
-    public void activate( ActivatorsInstance targetActivators, Activation child )
+    public void activate(ActivatorsInstance targetActivators, Activation child)
         throws Exception
     {
-        activate( targetActivators, Collections.singleton( child ), null );
+        activate(targetActivators, Collections.singleton(child), null);
     }
 
-    public void activate( ActivatorsInstance targetActivators, Activation child, Runnable callback )
+    public void activate(ActivatorsInstance targetActivators, Activation child, Runnable callback)
         throws Exception
     {
-        activate( targetActivators, Collections.singleton( child ), callback );
+        activate(targetActivators, Collections.singleton(child), callback);
     }
 
-    public void activate( ActivatorsInstance targetActivators, Iterable<? extends Activation> children )
+    public void activate(ActivatorsInstance targetActivators, Iterable<? extends Activation> children)
         throws ActivationException
     {
-        activate( targetActivators, children, null );
+        activate(targetActivators, children, null);
     }
 
-    @SuppressWarnings( "unchecked" )
-    public void activate( ActivatorsInstance targetActivators, Iterable<? extends Activation> children, Runnable callback )
+    @SuppressWarnings("unchecked")
+    public void activate(ActivatorsInstance targetActivators, Iterable<? extends Activation> children, Runnable callback)
         throws ActivationException
     {
-        if( this.targetActivators != null )
+        if(this.targetActivators != null)
         {
-            throw new IllegalStateException( "Activation.activate() called multiple times "
-                                             + "or without calling passivate() first!" );
+            throw new IllegalStateException("Activation.activate() called multiple times "
+                + "or without calling passivate() first!");
         }
 
         try
         {
             // Before Activation Events
-            if( fireEvents )
+            if(fireEvents)
             {
-                fireEvent( new ActivationEvent( target, ACTIVATING ) );
+                fireEvent(new ActivationEvent(target, ACTIVATING));
             }
 
             // Before Activation for Activators
-            targetActivators.beforeActivation( target instanceof ServiceReference
-                                               ? new PassiveServiceReference( (ServiceReference) target )
-                                               : target );
+            targetActivators.beforeActivation(target instanceof ServiceReference
+                ? new PassiveServiceReference((ServiceReference) target)
+                : target);
 
             // Activation
-            for( Activation child : children )
+            for(Activation child : children)
             {
-                if( !activeChildren.contains( child ) )
+                if(!activeChildren.contains(child))
                 {
                     child.activate();
                 }
-                activeChildren.addFirst( child );
+                activeChildren.addFirst(child);
             }
 
             // Internal Activation Callback
-            if( callback != null )
+            if(callback != null)
             {
                 callback.run();
             }
 
             // After Activation
-            targetActivators.afterActivation( target );
+            targetActivators.afterActivation(target);
 
             // After Activation Events
-            if( fireEvents )
+            if(fireEvents)
             {
-                fireEvent( new ActivationEvent( target, ACTIVATED ) );
+                fireEvent(new ActivationEvent(target, ACTIVATED));
             }
 
             // Activated
             this.targetActivators = targetActivators;
         }
-        catch( Exception e )
+        catch(Exception e)
         {
             // Passivate actives
             try
             {
                 passivate();
             }
-            catch( PassivationException e1 )
+            catch(PassivationException e1)
             {
-                ActivationException activationEx = new ActivationException( "Unable to Activate application.", e );
-                activationEx.addSuppressed( e1 );
+                ActivationException activationEx = new ActivationException("Unable to Activate application.", e);
+                activationEx.addSuppressed(e1);
                 throw activationEx;
             }
-            if( e instanceof ActivationException )
+            if(e instanceof ActivationException)
             {
-                throw ( (ActivationException) e );
+                throw ((ActivationException) e);
             }
-            throw new ActivationException( "Unable to Activate application: " + target, e );
+            throw new ActivationException("Unable to Activate application: " + target, e);
         }
     }
 
     public void passivate()
         throws PassivationException
     {
-        passivate( null );
+        passivate(null);
     }
 
-    @SuppressWarnings( "unchecked" )
-    public void passivate( Runnable callback )
+    @SuppressWarnings("unchecked")
+    public void passivate(Runnable callback)
         throws PassivationException
     {
         Set<Exception> exceptions = new LinkedHashSet<>();
 
         // Before Passivation Events
-        fireEvents( PASSIVATING, exceptions );
+        fireEvents(PASSIVATING, exceptions);
 
         // Before Passivation for Activators
-        if( targetActivators != null )
+        if(targetActivators != null)
         {
             try
             {
-                targetActivators.beforePassivation( target );
+                targetActivators.beforePassivation(target);
             }
-            catch( PassivationException ex )
+            catch(PassivationException ex)
             {
-                exceptions.addAll( ex.causes() );
+                exceptions.addAll(ex.causes());
             }
-            catch( Exception ex )
+            catch(Exception ex)
             {
-                exceptions.add( ex );
+                exceptions.add(ex);
             }
         }
 
         // Passivation
-        while( !activeChildren.isEmpty() )
+        while(!activeChildren.isEmpty())
         {
-            passivateOneChild( exceptions );
+            passivateOneChild(exceptions);
         }
 
         // Internal Passivation Callback
-        if( callback != null )
+        if(callback != null)
         {
             try
             {
                 callback.run();
             }
-            catch( Exception ex )
+            catch(Exception ex)
             {
-                exceptions.add( ex );
+                exceptions.add(ex);
             }
         }
 
         // After Passivation for Activators
-        if( targetActivators != null )
+        if(targetActivators != null)
         {
             try
             {
-                targetActivators.afterPassivation( target instanceof ServiceReference
-                                                   ? new PassiveServiceReference( (ServiceReference) target )
-                                                   : target );
+                targetActivators.afterPassivation(target instanceof ServiceReference
+                    ? new PassiveServiceReference((ServiceReference) target)
+                    : target);
             }
-            catch( PassivationException ex )
+            catch(PassivationException ex)
             {
-                exceptions.addAll( ex.causes() );
+                exceptions.addAll(ex.causes());
             }
-            catch( Exception ex )
+            catch(Exception ex)
             {
-                exceptions.add( ex );
+                exceptions.add(ex);
             }
         }
         targetActivators = null;
 
         // After Passivation Events
-        fireEvents( PASSIVATED, exceptions );
+        fireEvents(PASSIVATED, exceptions);
 
         // Error handling
-        if( exceptions.isEmpty() )
+        if(exceptions.isEmpty())
         {
             return;
         }
-        throw new PassivationException( exceptions );
+        throw new PassivationException(exceptions);
     }
 
-    private void fireEvents( ActivationEvent.EventType eventType, Set<Exception> exceptions ) {
-        if( fireEvents )
+    private void fireEvents(ActivationEvent.EventType eventType, Set<Exception> exceptions)
+    {
+        if(fireEvents)
         {
-            ActivationEvent event = new ActivationEvent( target, eventType );
-            for( ActivationEventListener listener : listeners )
+            ActivationEvent event = new ActivationEvent(target, eventType);
+            for(ActivationEventListener listener : listeners)
             {
                 try
                 {
-                    listener.onEvent( event );
+                    listener.onEvent(event);
                 }
-                catch( Exception ex )
+                catch(Exception ex)
                 {
-                    if( ex instanceof PassivationException )
+                    if(ex instanceof PassivationException)
                     {
-                        exceptions.addAll( ( (PassivationException) ex ).causes() );
+                        exceptions.addAll(((PassivationException) ex).causes());
                     }
                     else
                     {
-                        exceptions.add( ex );
+                        exceptions.add(ex);
                     }
                 }
             }
         }
     }
 
-    @SuppressWarnings( "TooBroadCatch" )
-    private void passivateOneChild( Set<Exception> exceptions )
+    @SuppressWarnings("TooBroadCatch")
+    private void passivateOneChild(Set<Exception> exceptions)
     {
         Activation activeChild = activeChildren.removeFirst();
         try
         {
             activeChild.passivate();
         }
-        catch( PassivationException ex )
+        catch(PassivationException ex)
         {
-            exceptions.addAll( ex.causes() );
+            exceptions.addAll(ex.causes());
         }
-        catch( Exception ex )
+        catch(Exception ex)
         {
-            exceptions.add( ex );
+            exceptions.add(ex);
         }
     }
 
-    @SuppressWarnings( "raw" )
+    @SuppressWarnings("raw")
     private static class PassiveServiceReference
         implements ServiceReference
     {
 
         private final ServiceReference reference;
 
-        private PassiveServiceReference( ServiceReference reference )
+        private PassiveServiceReference(ServiceReference reference)
         {
             this.reference = reference;
         }
@@ -307,8 +304,8 @@ public final class ActivationDelegate
         @Override
         public Object get()
         {
-            throw new IllegalStateException( "Service is passive, either activating and"
-                                             + " cannot be used yet or passivating and cannot be used anymore: " + reference );
+            throw new IllegalStateException("Service is passive, either activating and"
+                + " cannot be used yet or passivating and cannot be used anymore: " + reference);
         }
 
         @Override
@@ -336,21 +333,21 @@ public final class ActivationDelegate
         }
 
         @Override
-        public <T> T metaInfo( Class<T> infoType )
+        public <T> T metaInfo(Class<T> infoType)
         {
-            return reference.metaInfo( infoType );
+            return reference.metaInfo(infoType);
         }
 
         @Override
-        public void registerActivationEventListener( ActivationEventListener listener )
+        public void registerActivationEventListener(ActivationEventListener listener)
         {
-            reference.registerActivationEventListener( listener );
+            reference.registerActivationEventListener(listener);
         }
 
         @Override
-        public void deregisterActivationEventListener( ActivationEventListener listener )
+        public void deregisterActivationEventListener(ActivationEventListener listener)
         {
-            reference.deregisterActivationEventListener( listener );
+            reference.deregisterActivationEventListener(listener);
         }
 
         @Override
@@ -360,18 +357,18 @@ public final class ActivationDelegate
         }
 
         @Override
-        public boolean equals( Object obj )
+        public boolean equals(Object obj)
         {
-            if( obj == null )
+            if(obj == null)
             {
                 return false;
             }
-            if( getClass() != obj.getClass() )
+            if(getClass() != obj.getClass())
             {
                 return false;
             }
             final ServiceReference other = (ServiceReference) obj;
-            return identity().equals( other.identity() );
+            return identity().equals(other.identity());
         }
 
         @Override

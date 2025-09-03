@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.threaded;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.composite.CompositeContext;
 import org.qi4j.api.composite.TransientBuilder;
@@ -27,7 +28,6 @@ import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -40,35 +40,35 @@ public class ContextCompositeTest
     public void testThreadScope()
         throws InterruptedException
     {
-        for( int i = 0; i < 5; i++ )
+        for(int i = 0; i < 5; i++)
         {
-            TransientBuilder<MyCompositeContext> builder = transientBuilderFactory.newTransientBuilder( MyCompositeContext.class );
-            builder.prototypeFor( MyData.class ).data().set( 0 );
-            MyCompositeContext context = new CompositeContext<>( module, MyCompositeContext.class ).proxy();
+            TransientBuilder<MyCompositeContext> builder = transientBuilderFactory.newTransientBuilder(MyCompositeContext.class);
+            builder.prototypeFor(MyData.class).data().set(0);
+            MyCompositeContext context = new CompositeContext<>(module, MyCompositeContext.class).proxy();
 
             Worker w1;
             Worker w2;
             MyCompositeContext c1 = builder.newInstance();
             {
-                w1 = new Worker( "w1", context, 100, 0 );
-                w2 = new Worker( "w2", context, 400, 20 );
+                w1 = new Worker("w1", context, 100, 0);
+                w2 = new Worker("w2", context, 400, 20);
                 w2.start();
                 w1.start();
             }
             w1.join();
             w2.join();
-            System.out.println( "W1: " + w1.getData() );
-            System.out.println( "W2: " + w2.getData() );
-            assertThat( (int) c1.data().get(), equalTo( 0 ) );
-            assertThat( w1.getData(), equalTo( 100 ) );
-            assertThat( w2.getData(), equalTo( 400 ) );
+            System.out.println("W1: " + w1.getData());
+            System.out.println("W2: " + w2.getData());
+            assertThat((int) c1.data().get(), equalTo(0));
+            assertThat(w1.getData(), equalTo(100));
+            assertThat(w2.getData(), equalTo(400));
         }
     }
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( MyCompositeContext.class );
+        module.transients(MyCompositeContext.class);
     }
 
     public static interface MyCompositeContext
@@ -90,15 +90,15 @@ public class ContextCompositeTest
         private final String spaces;
         private int data;
 
-        public Worker( String name, MyCompositeContext composite, int loops, int spaces )
+        public Worker(String name, MyCompositeContext composite, int loops, int spaces)
         {
-            super( name );
+            super(name);
             this.composite = composite;
             this.loops = loops;
             StringBuilder builder = new StringBuilder();
-            for( int i = 0; i < spaces; i++ )
+            for(int i = 0; i < spaces; i++)
             {
-                builder.append( " " );
+                builder.append(" ");
             }
             this.spaces = builder.toString();
         }
@@ -112,29 +112,29 @@ public class ContextCompositeTest
             try
             {
                 int oldValue = 0;
-                for( int i = 0; i < loops; i++ )
+                for(int i = 0; i < loops; i++)
                 {
                     int value;
                     value = readProperty.get();
-                    if( oldValue != value )
+                    if(oldValue != value)
                     {
                         mismatchCounter++;
                     }
                     value = value + 1;
                     oldValue = value;
-                    Thread.sleep( Math.round( Math.random() * 3 ) );
-                    writeProperty.set( value );
+                    Thread.sleep(Math.round(Math.random() * 3));
+                    writeProperty.set(value);
                     counter++;
                 }
             }
-            catch( InterruptedException e )
+            catch(InterruptedException e)
             {
                 e.printStackTrace();
             }
             data = composite.data().get();
             System.out
-                .println( counter + "/" + loops + "    " + data + ", " + mismatchCounter + ", " + System.identityHashCode( readProperty ) + ", " + System
-                    .identityHashCode( writeProperty ) );
+                .println(counter + "/" + loops + "    " + data + ", " + mismatchCounter + ", " + System.identityHashCode(readProperty) + ", " + System
+                    .identityHashCode(writeProperty));
         }
 
         public int getData()

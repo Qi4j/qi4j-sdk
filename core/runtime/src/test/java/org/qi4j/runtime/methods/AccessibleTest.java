@@ -19,13 +19,14 @@
  */
 package org.qi4j.runtime.methods;
 
-import java.lang.reflect.UndeclaredThrowableException;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.UndeclaredThrowableException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -35,34 +36,35 @@ public class AccessibleTest extends AbstractQi4jTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( MyComposite.class );
+        module.transients(MyComposite.class);
     }
 
     @Test
     public void givenPackageReturnTypeWhenCallingFromWithinExpectSuccess()
     {
-        MyComposite myComposite = transientBuilderFactory.newTransient( MyComposite.class );
+        MyComposite myComposite = transientBuilderFactory.newTransient(MyComposite.class);
         try
         {
             myComposite.doSomething();
             fail("Should have gotten an IllegalAccessException");
-        } catch( UndeclaredThrowableException e )
+        }
+        catch(UndeclaredThrowableException e)
         {
             Throwable thrown = e.getUndeclaredThrowable();
-            assertThat( thrown, instanceOf(IllegalAccessException.class));
+            assertThat(thrown, instanceOf(IllegalAccessException.class));
         }
     }
 
-    @Mixins( MyCompositeMixin.class)
+    @Mixins(MyCompositeMixin.class)
     public interface MyComposite
     {
         String doSomething();
     }
 
-    @Mixins( MyFunctionMixin.class )
+    @Mixins(MyFunctionMixin.class)
     public interface MyFunction
     {
         MyString doSomething();
@@ -77,7 +79,7 @@ public class AccessibleTest extends AbstractQi4jTest
         @Override
         public String doSomething()
         {
-            return new MyObject( function ).doSomething() + " ---- " + getClass().getClassLoader();
+            return new MyObject(function).doSomething() + " ---- " + getClass().getClassLoader();
         }
 
     }
@@ -88,7 +90,7 @@ public class AccessibleTest extends AbstractQi4jTest
         @Override
         public MyString doSomething()
         {
-            return new MyString( "Hello " );
+            return new MyString("Hello ");
         }
     }
 
@@ -96,7 +98,7 @@ public class AccessibleTest extends AbstractQi4jTest
     {
         private MyFunction fn;
 
-        public MyObject( MyFunction fn )
+        public MyObject(MyFunction fn)
         {
             this.fn = fn;
         }
@@ -111,7 +113,7 @@ public class AccessibleTest extends AbstractQi4jTest
     {
         String mine;
 
-        public MyString( String mine )
+        public MyString(String mine)
         {
             this.mine = mine;
         }

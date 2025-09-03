@@ -20,13 +20,14 @@
 
 package org.qi4j.runtime.structure;
 
+import org.qi4j.api.common.Visibility;
+import org.qi4j.api.composite.AmbiguousTypeException;
+import org.qi4j.api.composite.ModelDescriptor;
+
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import org.qi4j.api.common.Visibility;
-import org.qi4j.api.composite.AmbiguousTypeException;
-import org.qi4j.api.composite.ModelDescriptor;
 
 import static java.util.stream.Stream.concat;
 import static org.qi4j.api.common.Visibility.application;
@@ -41,39 +42,39 @@ class ModuleClassLoader
     private final ModuleModel moduleModel;
     private final ConcurrentHashMap<String, Class<?>> classes = new ConcurrentHashMap<>();
 
-    ModuleClassLoader( ModuleModel moduleModel, ClassLoader classLoader )
+    ModuleClassLoader(ModuleModel moduleModel, ClassLoader classLoader)
     {
-        super( classLoader );
+        super(classLoader);
         this.moduleModel = moduleModel;
     }
 
     @Override
-    protected Class<?> findClass( String className )
+    protected Class<?> findClass(String className)
         throws ClassNotFoundException
     {
         try
         {
-            Class<?> resultingClass = classes.computeIfAbsent( className, name ->
+            Class<?> resultingClass = classes.computeIfAbsent(className, name ->
             {
-                Predicate<ModelDescriptor> modelTypeSpecification = modelTypeSpecification( name );
+                Predicate<ModelDescriptor> modelTypeSpecification = modelTypeSpecification(name);
                 Stream<? extends ModelDescriptor> moduleModels = concat(
-                    moduleModel.visibleObjects( Visibility.module ),
+                    moduleModel.visibleObjects(Visibility.module),
                     concat(
-                        moduleModel.visibleEntities( Visibility.module ),
+                        moduleModel.visibleEntities(Visibility.module),
                         concat(
-                            moduleModel.visibleTransients( Visibility.module ),
-                            moduleModel.visibleValues( Visibility.module )
+                            moduleModel.visibleTransients(Visibility.module),
+                            moduleModel.visibleValues(Visibility.module)
                         )
                     )
-                ).filter( modelTypeSpecification );
+                ).filter(modelTypeSpecification);
 
                 Class<?> clazz = null;
                 Iterator<? extends ModelDescriptor> iterator = moduleModels.iterator();
-                if( iterator.hasNext() )
+                if(iterator.hasNext())
                 {
-                    clazz = iterator.next().types().findFirst().orElse( null );
+                    clazz = iterator.next().types().findFirst().orElse(null);
 
-                    if( iterator.hasNext() )
+                    if(iterator.hasNext())
                     {
                         // Ambiguous exception
                         throw new AmbiguousTypeException(
@@ -83,40 +84,40 @@ class ModuleClassLoader
                 }
 
                 // Check layer
-                if( clazz == null )
+                if(clazz == null)
                 {
                     Stream<? extends ModelDescriptor> modelsInLayer1 = concat(
-                        moduleModel.layer().visibleObjects( Visibility.layer ),
+                        moduleModel.layer().visibleObjects(Visibility.layer),
                         concat(
-                            moduleModel.layer().visibleEntities( Visibility.layer ),
+                            moduleModel.layer().visibleEntities(Visibility.layer),
                             concat(
-                                moduleModel.layer().visibleTransients( Visibility.layer ),
-                                moduleModel.layer().visibleValues( Visibility.layer )
+                                moduleModel.layer().visibleTransients(Visibility.layer),
+                                moduleModel.layer().visibleValues(Visibility.layer)
                             )
                         )
                     );
                     // TODO: What does this actually represents?? Shouldn't 'application' visible models already be handed back from lasyerInstance().visibleXyz() ??
                     Stream<? extends ModelDescriptor> modelsInLayer2 = concat(
-                        moduleModel.layer().visibleObjects( Visibility.application ),
+                        moduleModel.layer().visibleObjects(Visibility.application),
                         concat(
-                            moduleModel.layer().visibleEntities( Visibility.application ),
+                            moduleModel.layer().visibleEntities(Visibility.application),
                             concat(
-                                moduleModel.layer().visibleTransients( Visibility.application ),
-                                moduleModel.layer().visibleValues( Visibility.application )
+                                moduleModel.layer().visibleTransients(Visibility.application),
+                                moduleModel.layer().visibleValues(Visibility.application)
                             )
                         )
                     );
                     Stream<? extends ModelDescriptor> layerModels = concat(
                         modelsInLayer1,
                         modelsInLayer2
-                    ).filter( modelTypeSpecification );
+                    ).filter(modelTypeSpecification);
 
                     Iterator<? extends ModelDescriptor> layerModelsIter = layerModels.iterator();
-                    if( layerModelsIter.hasNext() )
+                    if(layerModelsIter.hasNext())
                     {
-                        clazz = layerModelsIter.next().types().findFirst().orElse( null );
+                        clazz = layerModelsIter.next().types().findFirst().orElse(null);
 
-                        if( layerModelsIter.hasNext() )
+                        if(layerModelsIter.hasNext())
                         {
                             // Ambiguous exception
                             throw new AmbiguousTypeException(
@@ -127,37 +128,37 @@ class ModuleClassLoader
                 }
 
                 // Check used layers
-                if( clazz == null )
+                if(clazz == null)
                 {
                     Stream<? extends ModelDescriptor> usedLayersModels = concat(
                         moduleModel.layer()
                             .usedLayers()
                             .layers()
-                            .flatMap( layer -> layer.visibleObjects( module ) ),
+                            .flatMap(layer -> layer.visibleObjects(module)),
                         concat(
                             moduleModel.layer()
                                 .usedLayers()
                                 .layers()
-                                .flatMap( layer -> layer.visibleEntities( Visibility.layer ) ),
+                                .flatMap(layer -> layer.visibleEntities(Visibility.layer)),
                             concat(
                                 moduleModel.layer()
                                     .usedLayers()
                                     .layers()
-                                    .flatMap( layer -> layer.visibleTransients( application ) ),
+                                    .flatMap(layer -> layer.visibleTransients(application)),
                                 moduleModel.layer()
                                     .usedLayers()
                                     .layers()
-                                    .flatMap( layer -> layer.visibleValues( application ) )
+                                    .flatMap(layer -> layer.visibleValues(application))
                             )
                         )
-                    ).filter( modelTypeSpecification );
+                    ).filter(modelTypeSpecification);
 
                     Iterator<? extends ModelDescriptor> usedLayersModelsIter = usedLayersModels.iterator();
-                    if( usedLayersModelsIter.hasNext() )
+                    if(usedLayersModelsIter.hasNext())
                     {
-                        clazz = usedLayersModelsIter.next().types().findFirst().orElse( null );
+                        clazz = usedLayersModelsIter.next().types().findFirst().orElse(null);
 
-                        if( usedLayersModelsIter.hasNext() )
+                        if(usedLayersModelsIter.hasNext())
                         {
                             // Ambiguous exception
                             throw new AmbiguousTypeException(
@@ -167,16 +168,16 @@ class ModuleClassLoader
                     }
                 }
                 return clazz;
-            } );
-            if( resultingClass == null )
+            });
+            if(resultingClass == null)
             {
                 throw new ClassNotFoundException();
             }
             return resultingClass;
         }
-        catch( AmbiguousTypeException e )
+        catch(AmbiguousTypeException e)
         {
-            throw new ClassNotFoundException( className, e );
+            throw new ClassNotFoundException(className, e);
         }
     }
 }

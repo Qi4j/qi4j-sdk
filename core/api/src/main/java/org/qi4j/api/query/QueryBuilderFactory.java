@@ -20,7 +20,6 @@
 package org.qi4j.api.query;
 
 import org.qi4j.api.indexing.MissingIndexingSystemException;
-import org.qi4j.api.indexing.MissingIndexingSystemException;
 
 /**
  * This is used to create QueryBuilders.
@@ -32,13 +31,11 @@ public interface QueryBuilderFactory
     /**
      * Create a new QueryBuilder.
      *
-     * @param <T> Result type
+     * @param <T>        Result type
      * @param resultType the type of the result that you want
-     *
      * @return a QueryBuilder
-     *
      * @throws MissingIndexingSystemException if there is no EntityFinder service available
      */
-    <T> QueryBuilder<T> newQueryBuilder( Class<T> resultType )
+    <T> QueryBuilder<T> newQueryBuilder(Class<T> resultType)
         throws MissingIndexingSystemException;
 }

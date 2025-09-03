@@ -20,14 +20,13 @@
 
 package org.qi4j.api.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
 import org.qi4j.api.property.StateHolder;
 import org.qi4j.api.structure.MetaInfoHolder;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.HasTypes;
-import org.qi4j.api.structure.MetaInfoHolder;
-import org.qi4j.api.structure.ModuleDescriptor;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 
 /**
  * Composite Instance.
@@ -37,7 +36,7 @@ public interface CompositeInstance
 {
     <T> T proxy();
 
-    <T> T newProxy( Class<T> mixinType )
+    <T> T newProxy(Class<T> mixinType)
         throws IllegalArgumentException;
 
     ModuleDescriptor module();
@@ -46,9 +45,9 @@ public interface CompositeInstance
 
     StateHolder state();
 
-    static CompositeInstance compositeInstanceOf( Composite composite )
+    static CompositeInstance compositeInstanceOf(Composite composite)
     {
-        InvocationHandler handler = Proxy.getInvocationHandler( composite );
+        InvocationHandler handler = Proxy.getInvocationHandler(composite);
         return (CompositeInstance) handler;
     }
 

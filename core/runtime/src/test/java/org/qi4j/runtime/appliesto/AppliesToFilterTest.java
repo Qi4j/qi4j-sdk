@@ -19,7 +19,7 @@
  */
 package org.qi4j.runtime.appliesto;
 
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.AppliesToFilter;
 import org.qi4j.api.composite.TransientComposite;
@@ -29,7 +29,8 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -38,26 +39,26 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Test of the AppliesToFilter
  */
 public class AppliesToFilterTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( SomeComposite.class );
+        module.transients(SomeComposite.class);
     }
 
     @Test
     public void givenAnAppliesToFilterWhenAppliedThenFilterMethods()
         throws Exception
     {
-        Some some = transientBuilderFactory.newTransient( Some.class );
-        assertThat( some.doStuff1(), equalTo( "," ) );
-        assertThat( some.doStuff2(), equalTo( ",,.." ) );
-        assertThat( some.doStuff3(), equalTo( ",,," ) );
+        Some some = transientBuilderFactory.newTransient(Some.class);
+        assertThat(some.doStuff1(), equalTo(","));
+        assertThat(some.doStuff2(), equalTo(",,.."));
+        assertThat(some.doStuff3(), equalTo(",,,"));
     }
 
-    @Concerns( MyConcern.class )
-    @Mixins( SomeMixin.class )
+    @Concerns(MyConcern.class)
+    @Mixins(SomeMixin.class)
     private interface SomeComposite
         extends Some, TransientComposite
     {
@@ -72,14 +73,14 @@ public class AppliesToFilterTest
         String doStuff3();
     }
 
-    @AppliesTo( TestFilter.class )
+    @AppliesTo(TestFilter.class)
     public static class MyConcern
         extends GenericConcern
     {
-        public Object invoke( Object proxy, Method method, Object[] args )
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
-            String str = (String) next.invoke( proxy, method, args );
+            String str = (String) next.invoke(proxy, method, args);
             return str + "..";
         }
     }
@@ -107,9 +108,9 @@ public class AppliesToFilterTest
     public static class TestFilter
         implements AppliesToFilter
     {
-        public boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass )
+        public boolean appliesTo(Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass)
         {
-            return method.getName().equals( "doStuff2" );
+            return method.getName().equals("doStuff2");
         }
     }
 }

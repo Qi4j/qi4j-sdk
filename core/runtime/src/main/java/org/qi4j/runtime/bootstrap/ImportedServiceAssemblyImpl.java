@@ -20,9 +20,6 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.InvalidApplicationException;
 import org.qi4j.api.common.MetaInfo;
@@ -35,12 +32,14 @@ import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.bootstrap.ImportedServiceAssembly;
 import org.qi4j.runtime.activation.ActivatorsModel;
 import org.qi4j.runtime.service.ImportedServiceModel;
-import org.qi4j.bootstrap.ImportedServiceAssembly;
-import org.qi4j.runtime.activation.ActivatorsModel;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Declaration of an imported Service.
- *
+ * <p>
  * Created by {@link ModuleAssemblyImpl#importedServices(Class[])}.
  */
 public final class ImportedServiceAssemblyImpl
@@ -48,7 +47,7 @@ public final class ImportedServiceAssemblyImpl
 {
     private final Class<?> serviceType;
     private final ModuleAssemblyImpl moduleAssembly;
-    @SuppressWarnings( "raw" )
+    @SuppressWarnings("raw")
     Class<? extends ServiceImporter> serviceProvider = InstanceImporter.class;
     String identity;
     boolean importOnStartup = false;
@@ -56,7 +55,7 @@ public final class ImportedServiceAssemblyImpl
     Visibility visibility = Visibility.module;
     List<Class<? extends Activator<?>>> activators = new ArrayList<>();
 
-    public ImportedServiceAssemblyImpl( Class<?> serviceType, ModuleAssemblyImpl moduleAssembly )
+    public ImportedServiceAssemblyImpl(Class<?> serviceType, ModuleAssemblyImpl moduleAssembly)
     {
         this.serviceType = serviceType;
         this.moduleAssembly = moduleAssembly;
@@ -65,63 +64,63 @@ public final class ImportedServiceAssemblyImpl
     @Override
     public Stream<Class<?>> types()
     {
-        return Stream.of( serviceType );
+        return Stream.of(serviceType);
     }
 
-    @SuppressWarnings( { "raw", "unchecked" } )
-    void addImportedServiceModel( ModuleDescriptor module, List<ImportedServiceModel> serviceModels )
+    @SuppressWarnings({"raw", "unchecked"})
+    void addImportedServiceModel(ModuleDescriptor module, List<ImportedServiceModel> serviceModels)
     {
         try
         {
             Identity id;
-            if( identity == null )
+            if(identity == null)
             {
-                id = generateId( serviceModels, serviceType );
+                id = generateId(serviceModels, serviceType);
             }
             else
             {
-                id = StringIdentity.identityOf( identity );
+                id = StringIdentity.identityOf(identity);
             }
 
-            ImportedServiceModel serviceModel = new ImportedServiceModel( module,
-                                                                          serviceType,
-                                                                          visibility,
-                                                                          serviceProvider,
-                                                                          id,
-                                                                          importOnStartup,
-                                                                          new MetaInfo( metaInfo ).withAnnotations( serviceType ),
-                                                                          new ActivatorsModel( activators ),
-                                                                          moduleAssembly.name() );
-            serviceModels.add( serviceModel );
+            ImportedServiceModel serviceModel = new ImportedServiceModel(module,
+                serviceType,
+                visibility,
+                serviceProvider,
+                id,
+                importOnStartup,
+                new MetaInfo(metaInfo).withAnnotations(serviceType),
+                new ActivatorsModel(activators),
+                moduleAssembly.name());
+            serviceModels.add(serviceModel);
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new InvalidApplicationException( "Could not register " + serviceType.getName(), e );
+            throw new InvalidApplicationException("Could not register " + serviceType.getName(), e);
         }
     }
 
-    @SuppressWarnings( "raw" )
-    private Identity generateId( List<ImportedServiceModel> serviceModels, Class serviceType )
+    @SuppressWarnings("raw")
+    private Identity generateId(List<ImportedServiceModel> serviceModels, Class serviceType)
     {
         // Find reference that is not yet used
         int idx = 0;
-        Identity id = StringIdentity.identityOf( serviceType.getSimpleName() );
+        Identity id = StringIdentity.identityOf(serviceType.getSimpleName());
         boolean invalid;
         do
         {
             invalid = false;
-            for( ImportedServiceModel serviceModel : serviceModels )
+            for(ImportedServiceModel serviceModel : serviceModels)
             {
-                if( serviceModel.identity().equals( id ) )
+                if(serviceModel.identity().equals(id))
                 {
                     idx++;
-                    id = StringIdentity.identityOf( serviceType.getSimpleName() + "_" + idx );
+                    id = StringIdentity.identityOf(serviceType.getSimpleName() + "_" + idx);
                     invalid = true;
                     break;
                 }
             }
         }
-        while( invalid );
+        while(invalid);
         return id;
     }
 }

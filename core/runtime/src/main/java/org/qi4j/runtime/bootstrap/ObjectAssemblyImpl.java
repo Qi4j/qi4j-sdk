@@ -20,9 +20,6 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.lang.reflect.Modifier;
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.common.InvalidApplicationException;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
@@ -30,7 +27,10 @@ import org.qi4j.api.composite.Composite;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.bootstrap.ObjectAssembly;
 import org.qi4j.runtime.object.ObjectModel;
-import org.qi4j.bootstrap.ObjectAssembly;
+
+import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Assembly of an Object.
@@ -42,13 +42,13 @@ public final class ObjectAssemblyImpl
     MetaInfo metaInfo = new MetaInfo();
     Visibility visibility = Visibility.module;
 
-    public ObjectAssemblyImpl( Class<?> clazz )
+    public ObjectAssemblyImpl(Class<?> clazz)
     {
         // best try to find out if the class is a concrete class
-        if( clazz.isEnum() ||
-            ( !Composite.class.isAssignableFrom( clazz ) && Modifier.isAbstract( clazz.getModifiers() ) ) )
+        if(clazz.isEnum() ||
+            (!Composite.class.isAssignableFrom(clazz) && Modifier.isAbstract(clazz.getModifiers())))
         {
-            throw new IllegalArgumentException( "Declared objects must be concrete classes: " + clazz );
+            throw new IllegalArgumentException("Declared objects must be concrete classes: " + clazz);
         }
         this.objectType = clazz;
     }
@@ -56,19 +56,19 @@ public final class ObjectAssemblyImpl
     @Override
     public Stream<Class<?>> types()
     {
-        return Stream.of( objectType );
+        return Stream.of(objectType);
     }
 
-    void addObjectModel( ModuleDescriptor module, List<ObjectModel> objectModels )
+    void addObjectModel(ModuleDescriptor module, List<ObjectModel> objectModels)
     {
         try
         {
-            ObjectModel objectModel = new ObjectModel( module, objectType, visibility, metaInfo );
-            objectModels.add( objectModel );
+            ObjectModel objectModel = new ObjectModel(module, objectType, visibility, metaInfo);
+            objectModels.add(objectModel);
         }
-        catch( Throwable e )
+        catch(Throwable e)
         {
-            throw new InvalidApplicationException( "Could not register " + objectType.getName(), e );
+            throw new InvalidApplicationException("Could not register " + objectType.getName(), e);
         }
     }
 }

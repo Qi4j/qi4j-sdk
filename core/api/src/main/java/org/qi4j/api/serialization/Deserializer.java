@@ -17,57 +17,42 @@
  */
 package org.qi4j.api.serialization;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
 
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.function.Function;
+
 /**
  * Deserializer.
- *
+ * <p>
  * Provides methods and functions to deserialize objects and set of objects.
  */
 public interface Deserializer
 {
-    <T> T deserialize( ModuleDescriptor module, ValueType valueType, InputStream state );
+    <T> T deserialize(ModuleDescriptor module, Options options, ValueType valueType, InputStream state);
 
-    <T> T deserialize( ModuleDescriptor module, ValueType valueType, Reader state );
+    <T> T deserialize(ModuleDescriptor module, Options options, ValueType valueType, Reader state);
 
-    <T> T deserialize( ModuleDescriptor module, ValueType valueType, String state );
+    <T> T deserialize(ModuleDescriptor module, Options options, ValueType valueType, String state);
 
-    <T> Function<String, T> deserializeFunction( ModuleDescriptor module, ValueType valueType );
+    <T> Function<String, T> deserializeFunction(ModuleDescriptor module, Options options, ValueType valueType);
 
-    <T> Stream<T> deserializeEach( ModuleDescriptor module, ValueType valueType, Iterable<String> states );
+    <T> T fromBytes(ModuleDescriptor module, Options options, ValueType valueType, byte[] bytes);
 
-    <T> Stream<T> deserializeEach( ModuleDescriptor module, ValueType valueType, String... states );
+    <T> Function<byte[], T> fromBytesFunction(ModuleDescriptor module, Options options, ValueType valueType);
 
-    <T> T fromBytes( ModuleDescriptor module, ValueType valueType, byte[] bytes );
+    <T> T deserialize(ModuleDescriptor module, Options options, Class<T> type, InputStream state);
 
-    <T> Function<byte[], T> fromBytesFunction( ModuleDescriptor module, ValueType valueType );
+    <T> T deserialize(ModuleDescriptor module, Options options, Class<T> type, Reader state);
 
-    <T> Stream<T> fromBytesEach( ModuleDescriptor module, ValueType valueType, Iterable<byte[]> states );
+    <T> T deserialize(ModuleDescriptor module, Options options, Class<T> type, String state);
 
-    <T> Stream<T> fromBytesEach( ModuleDescriptor module, ValueType valueType, byte[]... states );
+    <T> Function<String, T> deserializeFunction(ModuleDescriptor module, Options options, Class<T> type);
 
-    <T> T deserialize( ModuleDescriptor module, Class<T> type, InputStream state );
+    <T> T fromBytes(ModuleDescriptor module, Options options, Class<T> type, byte[] bytes);
 
-    <T> T deserialize( ModuleDescriptor module, Class<T> type, Reader state );
-
-    <T> T deserialize( ModuleDescriptor module, Class<T> type, String state );
-
-    <T> Function<String, T> deserializeFunction( ModuleDescriptor module, Class<T> type );
-
-    <T> Stream<T> deserializeEach( ModuleDescriptor module, Class<T> type, Iterable<String> states );
-
-    <T> Stream<T> deserializeEach( ModuleDescriptor module, Class<T> type, String... states );
-
-    <T> T fromBytes( ModuleDescriptor module, Class<T> type, byte[] bytes );
-
-    <T> Function<byte[], T> fromBytesFunction( ModuleDescriptor module, Class<T> type );
-
-    <T> Stream<T> fromBytesEach( ModuleDescriptor module, Class<T> type, Iterable<byte[]> states );
-
-    <T> Stream<T> fromBytesEach( ModuleDescriptor module, Class<T> type, byte[]... states );
+    <T> Function<byte[], T> fromBytesFunction(ModuleDescriptor module, Options options, Class<T> type);
 }

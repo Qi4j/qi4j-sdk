@@ -19,17 +19,14 @@
  */
 package org.qi4j.api.value;
 
+import org.qi4j.api.association.AssociationDescriptor;
+import org.qi4j.api.common.ConstructionException;
+import org.qi4j.api.entity.EntityReference;
+import org.qi4j.api.property.PropertyDescriptor;
+
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import org.qi4j.api.association.AssociationDescriptor;
-import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.api.property.PropertyDescriptor;
-import org.qi4j.api.association.AssociationDescriptor;
-import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.api.property.PropertyDescriptor;
 
 /**
  * Factory for Values and ValueBuilders.
@@ -40,77 +37,67 @@ public interface ValueBuilderFactory
     /**
      * Instantiate a Value of the given type.
      *
-     * @param <T> Value type
+     * @param <T>       Value type
      * @param valueType the Value type to instantiate
-     *
      * @return a new Value instance
-     *
      * @throws NoSuchValueTypeException if no value extending the mixinType has been registered
-     * @throws ConstructionException if the value could not be instantiated
+     * @throws ConstructionException    if the value could not be instantiated
      */
-    <T> T newValue( Class<T> valueType )
+    <T> T newValue(Class<T> valueType)
         throws NoSuchValueTypeException, ConstructionException;
 
     /**
      * Create a builder for creating new Values that implements the given Value type.
      * <p>The returned ValueBuilder can be reused to create several Values instances.</p>
      *
-     * @param <T> Value type
+     * @param <T>       Value type
      * @param valueType an interface that describes the Composite to be instantiated
-     *
      * @return a ValueBuilder for creation of ValueComposites implementing the interface
-     *
      * @throws NoSuchValueTypeException if no value extending the mixinType has been registered
      */
-    <T> ValueBuilder<T> newValueBuilder( Class<T> valueType )
+    <T> ValueBuilder<T> newValueBuilder(Class<T> valueType)
         throws NoSuchValueTypeException;
 
     /**
      * Create a builder for creating a new Value starting with the given prototype.
      * <p>The returned ValueBuilder can only be used ONCE.</p>
      *
-     * @param <T> Value type
+     * @param <T>       Value type
      * @param prototype a prototype the builder will use
-     *
      * @return a ValueBuilder for creation of ValueComposites implementing the interface of the prototype
-     *
      * @throws NoSuchValueTypeException if no value extending the mixinType has been registered
      */
-    <T> ValueBuilder<T> newValueBuilderWithPrototype( T prototype );
+    <T> ValueBuilder<T> newValueBuilderWithPrototype(T prototype);
 
     /**
      * Create a builder for creating a new Value starting with the given state.
      * <p>The returned ValueBuilder can only be used ONCE.</p>
      *
-     * @param <T> Value type
-     * @param mixinType an interface that describes the Composite to be instantiated
-     * @param propertyFunction a function providing the state of properties
-     * @param associationFunction a function providing the state of associations
-     * @param manyAssociationFunction a function providing the state of many associations
+     * @param <T>                      Value type
+     * @param mixinType                an interface that describes the Composite to be instantiated
+     * @param propertyFunction         a function providing the state of properties
+     * @param associationFunction      a function providing the state of associations
+     * @param manyAssociationFunction  a function providing the state of many associations
      * @param namedAssociationFunction a function providing the state of named associations
-     *
      * @return a ValueBuilder for creation of ValueComposites implementing the interface
-     *
      * @throws NoSuchValueTypeException if no value extending the mixinType has been registered
      */
-    <T> ValueBuilder<T> newValueBuilderWithState( Class<T> mixinType,
-                                                  Function<PropertyDescriptor, Object> propertyFunction,
-                                                  Function<AssociationDescriptor, EntityReference> associationFunction,
-                                                  Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
-                                                  Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction );
+    <T> ValueBuilder<T> newValueBuilderWithState(Class<T> mixinType,
+                                                 Function<PropertyDescriptor, Object> propertyFunction,
+                                                 Function<AssociationDescriptor, EntityReference> associationFunction,
+                                                 Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
+                                                 Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction);
 
     /**
      * Instantiate a Value of the given type using the serialized state given as String.
      *
-     * @param <T> Value type
-     * @param valueType the Value type to instantiate
-     * @param serializedState  the state of the Value
-     *
+     * @param <T>             Value type
+     * @param valueType       the Value type to instantiate
+     * @param serializedState the state of the Value
      * @return a new Value instance
-     *
      * @throws NoSuchValueTypeException if no value extending the mixinType has been registered
-     * @throws ConstructionException if the value could not be instantiated
+     * @throws ConstructionException    if the value could not be instantiated
      */
-    <T> T newValueFromSerializedState( Class<T> valueType, String serializedState );
+    <T> T newValueFromSerializedState(Class<T> valueType, String serializedState);
 
 }

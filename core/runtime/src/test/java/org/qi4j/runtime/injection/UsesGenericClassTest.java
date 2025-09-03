@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.Uses;
@@ -26,7 +27,6 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,26 +35,26 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test of generic class injection
  */
 public class UsesGenericClassTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestCase.class );
+        module.transients(TestCase.class);
     }
 
     @Test
     public void givenMixinUsesGenericClassWhenUseClassThenInjectWorks()
     {
-        TransientBuilder<TestCase> builder = transientBuilderFactory.newTransientBuilder( TestCase.class );
+        TransientBuilder<TestCase> builder = transientBuilderFactory.newTransientBuilder(TestCase.class);
 
-        builder.use( UsesGenericClassTest.class );
+        builder.use(UsesGenericClassTest.class);
 
         TestCase testCase = builder.newInstance();
-        assertThat( "class name is returned", testCase.test(), equalTo( UsesGenericClassTest.class.getName() ) );
+        assertThat("class name is returned", testCase.test(), equalTo(UsesGenericClassTest.class.getName()));
     }
 
-    @Mixins( TestMixin.class )
+    @Mixins(TestMixin.class)
     public interface TestCase
         extends TransientComposite
     {

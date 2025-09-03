@@ -34,7 +34,7 @@ public class UnresolvableMockResolver
      * @see MockResolver#getInvocationHandler(Object, java.lang.reflect.Method, Object[])
      */
     @Override
-    public InvocationHandler getInvocationHandler( final Object proxy, final Method method, final Object[] args )
+    public InvocationHandler getInvocationHandler(final Object proxy, final Method method, final Object[] args)
     {
         return null;
     }

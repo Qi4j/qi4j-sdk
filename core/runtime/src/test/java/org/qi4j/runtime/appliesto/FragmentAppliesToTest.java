@@ -19,13 +19,7 @@
  */
 package org.qi4j.runtime.appliesto;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientBuilderFactory;
@@ -38,7 +32,9 @@ import org.qi4j.api.sideeffect.SideEffects;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.annotation.*;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -47,32 +43,32 @@ import static org.hamcrest.core.IsNull.notNullValue;
 public class FragmentAppliesToTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( Composite1.class );
+        module.transients(Composite1.class);
     }
 
     @Test
     public void testMixin()
         throws Exception
     {
-        TransientBuilder<Composite1> builder = transientBuilderFactory.newTransientBuilder( Composite1.class );
+        TransientBuilder<Composite1> builder = transientBuilderFactory.newTransientBuilder(Composite1.class);
 
         Composite1 instance = builder.newInstance();
-        assertThat( "DependencyOld not injected.", instance.getBuilderFactory(), notNullValue() );
-        assertThat( "This not injected.", instance.getMeAsMixin2(), notNullValue() );
-        assertThat( instance.getValue(), equalTo( 1 ) );
+        assertThat("DependencyOld not injected.", instance.getBuilderFactory(), notNullValue());
+        assertThat("This not injected.", instance.getMeAsMixin2(), notNullValue());
+        assertThat(instance.getValue(), equalTo(1));
         instance.getBuilderFactory();
         instance.getMeAsMixin2();
         instance.getBuilderFactory();
         instance.getMeAsMixin2();
         instance.getMeAsMixin2();
         instance.getBuilderFactory();
-        assertThat( instance.getValue(), equalTo( 4 ) );
+        assertThat(instance.getValue(), equalTo(4));
     }
 
-    @Mixins( { Mixin1.Mixin1Impl.class, Mixin2.Mixin2Impl.class, CounterImpl.class } )
+    @Mixins({Mixin1.Mixin1Impl.class, Mixin2.Mixin2Impl.class, CounterImpl.class})
     public interface Composite1
         extends TransientComposite, Mixin1, Mixin2, Counter
     {
@@ -84,7 +80,7 @@ public class FragmentAppliesToTest
 
         Mixin2 getMeAsMixin2();
 
-        @SideEffects( CountCallsSideEffect.class )
+        @SideEffects(CountCallsSideEffect.class)
         public static class Mixin1Impl
             implements Mixin1
         {
@@ -146,7 +142,7 @@ public class FragmentAppliesToTest
         int getValue();
     }
 
-    @AppliesTo( CountCalls.class )
+    @AppliesTo(CountCalls.class)
     public static class CountCallsSideEffect
         extends GenericSideEffect
     {
@@ -154,14 +150,14 @@ public class FragmentAppliesToTest
         @This
         private Counter counter;
 
-        protected void invoke( Method method, Object[] args )
+        protected void invoke(Method method, Object[] args)
         {
             counter.increment();
         }
     }
 
-    @Retention( RetentionPolicy.RUNTIME )
-    @Target( ElementType.METHOD )
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
     @Documented
     @Inherited
     public @interface CountCalls

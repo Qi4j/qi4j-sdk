@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
@@ -30,7 +31,6 @@ import org.qi4j.api.property.StateHolder;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -42,10 +42,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class StateInjectionTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( StateInjectionTest.PropertyFieldInjectionComposite.class );
+        module.transients(StateInjectionTest.PropertyFieldInjectionComposite.class);
     }
 
     /**
@@ -58,17 +58,17 @@ public class StateInjectionTest
         throws Exception
     {
         TransientBuilder<PropertyFieldInjectionComposite> pficBuilder =
-            transientBuilderFactory.newTransientBuilder( StateInjectionTest.PropertyFieldInjectionComposite.class );
-        pficBuilder.prototype().testField().set( "X" );
+            transientBuilderFactory.newTransientBuilder(StateInjectionTest.PropertyFieldInjectionComposite.class);
+        pficBuilder.prototype().testField().set("X");
         PropertyFieldInjectionComposite pfic = pficBuilder.newInstance();
-        assertThat( "Test field", pfic.testField().get(), is( equalTo( "X" ) ) );
-        assertThat( "Named fieldX", pfic.namedField().get(), is( equalTo( "X" ) ) );
-        assertThat( "State", pfic.getState()
-                                 .propertyFor( PropertyFieldInjectionComposite.class.getMethod( "testField" ) )
-                                 .get(), is( equalTo( "X" ) ) );
+        assertThat("Test field", pfic.testField().get(), is(equalTo("X")));
+        assertThat("Named fieldX", pfic.namedField().get(), is(equalTo("X")));
+        assertThat("State", pfic.getState()
+            .propertyFor(PropertyFieldInjectionComposite.class.getMethod("testField"))
+            .get(), is(equalTo("X")));
     }
 
-    @Mixins( PropertyFieldInjectionMixin.class )
+    @Mixins(PropertyFieldInjectionMixin.class)
     public interface PropertyFieldInjectionComposite
         extends TransientComposite
     {
@@ -87,7 +87,7 @@ public class StateInjectionTest
         @State
         Property<String> testField;
 
-        @State( "testField" )
+        @State("testField")
         Property<String> namedField;
 
         @State

@@ -29,11 +29,11 @@ package org.qi4j.spi.cache;
  */
 public interface Cache<T>
 {
-    T get( String key );
+    T get(String key);
 
-    T remove( String key );
+    T remove(String key);
 
-    void put( String key, T value );
+    void put(String key, T value);
 
-    boolean exists( String key );
+    boolean exists(String key);
 }

@@ -50,9 +50,9 @@ public class Suite1Case1
     public void given()
         throws Exception
     {
-        QueryBuilder<Male> qb = qbf.newQueryBuilder( Male.class );
-        Male prototype = QueryExpressions.templateFor( Male.class );
-        builder = qb.where( QueryExpressions.eq(prototype.name(), "Joe Doe" ) );
+        QueryBuilder<Male> qb = qbf.newQueryBuilder(Male.class);
+        Male prototype = QueryExpressions.templateFor(Male.class);
+        builder = qb.where(QueryExpressions.eq(prototype.name(), "Joe Doe"));
     }
 
     @Override
@@ -60,16 +60,16 @@ public class Suite1Case1
         throws Exception
     {
         UnitOfWork uow = uowf.currentUnitOfWork();
-        query = uow.newQuery( builder );
+        query = uow.newQuery(builder);
     }
 
     @Override
     public void expect()
         throws Exception
     {
-        assertThat( query.count(), equalTo(1L) );
+        assertThat(query.count(), equalTo(1L));
         Male male = query.find();
-        assertThat( male.title().get(), equalTo( Person.Title.MR ));
-        assertThat( male.name().get(), equalTo( "Joe Doe" ));
+        assertThat(male.title().get(), equalTo(Person.Title.MR));
+        assertThat(male.name().get(), equalTo("Joe Doe"));
     }
 }

@@ -19,14 +19,14 @@
  */
 package org.qi4j.runtime.value;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.api.value.ValueDescriptor;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 import org.qi4j.runtime.property.PropertyEqualityTest;
+import org.qi4j.test.AbstractQi4jTest;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -43,10 +43,10 @@ public class ValueEqualityTest
     // --------------------------------------:: Types under test ::-----------------------------------------------------
     //
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.values( PropertyEqualityTest.PrimitivesValue.class, PropertyEqualityTest.Some.class, PropertyEqualityTest.AnotherSome.class, PropertyEqualityTest.Other.class );
+        module.values(PropertyEqualityTest.PrimitivesValue.class, PropertyEqualityTest.Some.class, PropertyEqualityTest.AnotherSome.class, PropertyEqualityTest.Other.class);
     }
 
     //
@@ -56,51 +56,51 @@ public class ValueEqualityTest
     public void givenValuesOfTheSameTypeWhenTestingValueDescriptorEqualityExpectEquals()
     {
         PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
-        ValueDescriptor someDescriptor = qi4j.api().valueDescriptorFor( some );
+        ValueDescriptor someDescriptor = qi4j.api().valueDescriptorFor(some);
 
-        PropertyEqualityTest.Some other = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        ValueDescriptor otherDescriptor = qi4j.api().valueDescriptorFor( other );
+        PropertyEqualityTest.Some other = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        ValueDescriptor otherDescriptor = qi4j.api().valueDescriptorFor(other);
 
-        assertThat( "ValueDescriptors equal",
-                    someDescriptor,
-                    equalTo( otherDescriptor ) );
-        assertThat( "ValueDescriptors hashcode equal",
-                    someDescriptor.hashCode(),
-                    equalTo( otherDescriptor.hashCode() ) );
+        assertThat("ValueDescriptors equal",
+            someDescriptor,
+            equalTo(otherDescriptor));
+        assertThat("ValueDescriptors hashcode equal",
+            someDescriptor.hashCode(),
+            equalTo(otherDescriptor.hashCode()));
     }
 
     @Test
     public void givenValuesOfCommonTypesWhenTestingValueDescriptorEqualityExpectNotEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        ValueDescriptor someDescriptor = qi4j.api().valueDescriptorFor( some );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        ValueDescriptor someDescriptor = qi4j.api().valueDescriptorFor(some);
 
-        PropertyEqualityTest.PrimitivesValue primitive = PropertyEqualityTest.buildPrimitivesValue( valueBuilderFactory );
-        ValueDescriptor primitiveDescriptor = qi4j.api().valueDescriptorFor( primitive );
+        PropertyEqualityTest.PrimitivesValue primitive = PropertyEqualityTest.buildPrimitivesValue(valueBuilderFactory);
+        ValueDescriptor primitiveDescriptor = qi4j.api().valueDescriptorFor(primitive);
 
-        assertThat( "ValueDescriptors not equal",
-                    someDescriptor,
-                    not( equalTo( primitiveDescriptor ) ) );
-        assertThat( "ValueDescriptors hashcode not equal",
-                    someDescriptor.hashCode(),
-                    not( equalTo( primitiveDescriptor.hashCode() ) ) );
+        assertThat("ValueDescriptors not equal",
+            someDescriptor,
+            not(equalTo(primitiveDescriptor)));
+        assertThat("ValueDescriptors hashcode not equal",
+            someDescriptor.hashCode(),
+            not(equalTo(primitiveDescriptor.hashCode())));
     }
 
     @Test
     public void givenValuesOfDifferentTypesWhenTestingValueDescriptorEqualityExpectNotEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        ValueDescriptor someDescriptor = qi4j.api().valueDescriptorFor( some );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        ValueDescriptor someDescriptor = qi4j.api().valueDescriptorFor(some);
 
-        PropertyEqualityTest.Other other = PropertyEqualityTest.buildOtherValue( valueBuilderFactory );
-        ValueDescriptor otherDescriptor = qi4j.api().valueDescriptorFor( other );
+        PropertyEqualityTest.Other other = PropertyEqualityTest.buildOtherValue(valueBuilderFactory);
+        ValueDescriptor otherDescriptor = qi4j.api().valueDescriptorFor(other);
 
-        assertThat( "ValueDescriptors not equal",
-                    someDescriptor,
-                    not( equalTo( otherDescriptor ) ) );
-        assertThat( "ValueDescriptors hashcode not equal",
-                    someDescriptor.hashCode(),
-                    not( equalTo( otherDescriptor.hashCode() ) ) );
+        assertThat("ValueDescriptors not equal",
+            someDescriptor,
+            not(equalTo(otherDescriptor)));
+        assertThat("ValueDescriptors hashcode not equal",
+            someDescriptor.hashCode(),
+            not(equalTo(otherDescriptor.hashCode())));
     }
 
     //
@@ -109,69 +109,69 @@ public class ValueEqualityTest
     @Test
     public void givenValuesOfSameTypesAndSameStateWhenTestingValueStateEqualityExpectEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        AssociationStateHolder someState = qi4j.spi().stateOf( (ValueComposite) some );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        AssociationStateHolder someState = qi4j.spi().stateOf((ValueComposite) some);
 
-        PropertyEqualityTest.Some some2 = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        AssociationStateHolder some2State = qi4j.spi().stateOf( (ValueComposite) some2 );
+        PropertyEqualityTest.Some some2 = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        AssociationStateHolder some2State = qi4j.spi().stateOf((ValueComposite) some2);
 
-        assertThat( "ValueStates equal",
-                    someState,
-                    equalTo( some2State ) );
-        assertThat( "ValueStates hashcode equal",
-                    someState.hashCode(),
-                    equalTo( some2State.hashCode() ) );
+        assertThat("ValueStates equal",
+            someState,
+            equalTo(some2State));
+        assertThat("ValueStates hashcode equal",
+            someState.hashCode(),
+            equalTo(some2State.hashCode()));
     }
 
     @Test
     public void givenValuesOfSameTypesAndDifferentStateWhenTestingValueStateEqualityExpectNotEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        AssociationStateHolder someState = qi4j.spi().stateOf( (ValueComposite) some );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        AssociationStateHolder someState = qi4j.spi().stateOf((ValueComposite) some);
 
-        PropertyEqualityTest.Some some2 = PropertyEqualityTest.buildSomeValueWithDifferentState( valueBuilderFactory );
-        AssociationStateHolder some2State = qi4j.spi().stateOf( (ValueComposite) some2 );
+        PropertyEqualityTest.Some some2 = PropertyEqualityTest.buildSomeValueWithDifferentState(valueBuilderFactory);
+        AssociationStateHolder some2State = qi4j.spi().stateOf((ValueComposite) some2);
 
-        assertThat( "ValueStates not equal",
-                    someState,
-                    not( equalTo( some2State ) ) );
-        assertThat( "ValueStates hashcode not equal",
-                    someState.hashCode(),
-                    not( equalTo( some2State.hashCode() ) ) );
+        assertThat("ValueStates not equal",
+            someState,
+            not(equalTo(some2State)));
+        assertThat("ValueStates hashcode not equal",
+            someState.hashCode(),
+            not(equalTo(some2State.hashCode())));
     }
 
     @Test
     public void givenValuesOfDifferentTypesAndSameStateWhenTestingValueStateEqualityExpectEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        AssociationStateHolder someState = qi4j.spi().stateOf( (ValueComposite) some );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        AssociationStateHolder someState = qi4j.spi().stateOf((ValueComposite) some);
 
-        PropertyEqualityTest.AnotherSome anotherSome = PropertyEqualityTest.buildAnotherSomeValue( valueBuilderFactory );
-        AssociationStateHolder anotherSomeState = qi4j.spi().stateOf( (ValueComposite) anotherSome );
+        PropertyEqualityTest.AnotherSome anotherSome = PropertyEqualityTest.buildAnotherSomeValue(valueBuilderFactory);
+        AssociationStateHolder anotherSomeState = qi4j.spi().stateOf((ValueComposite) anotherSome);
 
-        assertThat( "ValueStates equal",
-                    someState,
-                    equalTo( anotherSomeState ) );
-        assertThat( "ValueStates hashcode equal",
-                    someState.hashCode(),
-                    equalTo( anotherSomeState.hashCode() ) );
+        assertThat("ValueStates equal",
+            someState,
+            equalTo(anotherSomeState));
+        assertThat("ValueStates hashcode equal",
+            someState.hashCode(),
+            equalTo(anotherSomeState.hashCode()));
     }
 
     @Test
     public void givenValuesOfDifferentTypesAndDifferentStateWhenTestingValueStateEqualityExpectNotEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        AssociationStateHolder someState = qi4j.spi().stateOf( (ValueComposite) some );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        AssociationStateHolder someState = qi4j.spi().stateOf((ValueComposite) some);
 
-        PropertyEqualityTest.AnotherSome anotherSome = PropertyEqualityTest.buildAnotherSomeValueWithDifferentState( valueBuilderFactory );
-        AssociationStateHolder anotherSomeState = qi4j.spi().stateOf( (ValueComposite) anotherSome );
+        PropertyEqualityTest.AnotherSome anotherSome = PropertyEqualityTest.buildAnotherSomeValueWithDifferentState(valueBuilderFactory);
+        AssociationStateHolder anotherSomeState = qi4j.spi().stateOf((ValueComposite) anotherSome);
 
-        assertThat( "ValueStates not equal",
-                    someState,
-                    not( equalTo( anotherSomeState ) ) );
-        assertThat( "ValueStates hashcode not equal",
-                    someState.hashCode(),
-                    not( equalTo( anotherSomeState.hashCode() ) ) );
+        assertThat("ValueStates not equal",
+            someState,
+            not(equalTo(anotherSomeState)));
+        assertThat("ValueStates hashcode not equal",
+            someState.hashCode(),
+            not(equalTo(anotherSomeState.hashCode())));
     }
 
     //
@@ -180,53 +180,53 @@ public class ValueEqualityTest
     @Test
     public void givenValuesOfSameTypesAndSameStateWhenTestingValueEqualityExpectEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        PropertyEqualityTest.Some some2 = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        assertThat( "Values equal",
-                    some,
-                    equalTo( some2 ) );
-        assertThat( "Values hashcode equal",
-                    some.hashCode(),
-                    equalTo( some2.hashCode() ) );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        PropertyEqualityTest.Some some2 = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        assertThat("Values equal",
+            some,
+            equalTo(some2));
+        assertThat("Values hashcode equal",
+            some.hashCode(),
+            equalTo(some2.hashCode()));
     }
 
     @Test
     public void givenValuesOfTheSameTypeWithDifferentStateWhenTestingValueEqualityExpectNotEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        PropertyEqualityTest.Some some2 = PropertyEqualityTest.buildSomeValueWithDifferentState( valueBuilderFactory );
-        assertThat( "Values not equals",
-                    some,
-                    not( equalTo( some2 ) ) );
-        assertThat( "Values hashcode not equals",
-                    some.hashCode(),
-                    not( equalTo( some2.hashCode() ) ) );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        PropertyEqualityTest.Some some2 = PropertyEqualityTest.buildSomeValueWithDifferentState(valueBuilderFactory);
+        assertThat("Values not equals",
+            some,
+            not(equalTo(some2)));
+        assertThat("Values hashcode not equals",
+            some.hashCode(),
+            not(equalTo(some2.hashCode())));
     }
 
     @Test
     public void givenValuesOfDifferentTypesAndSameStateWhenTestingValueEqualityExpectNotEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        PropertyEqualityTest.Some anotherSome = PropertyEqualityTest.buildAnotherSomeValue( valueBuilderFactory );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        PropertyEqualityTest.Some anotherSome = PropertyEqualityTest.buildAnotherSomeValue(valueBuilderFactory);
 
-        assertThat( "Values not equal",
-                    some,
-                    not( equalTo( anotherSome ) ) );
-        assertThat( "Values hashcode not equal",
-                    some.hashCode(),
-                    not( equalTo( anotherSome.hashCode() ) ) );
+        assertThat("Values not equal",
+            some,
+            not(equalTo(anotherSome)));
+        assertThat("Values hashcode not equal",
+            some.hashCode(),
+            not(equalTo(anotherSome.hashCode())));
     }
 
     @Test
     public void givenValuesOfDifferentTypesAndDifferentStateWhenTestingValueEqualityExpectNotEquals()
     {
-        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue( valueBuilderFactory );
-        PropertyEqualityTest.Some anotherSome = PropertyEqualityTest.buildAnotherSomeValueWithDifferentState( valueBuilderFactory );
-        assertThat( "Values not equal",
-                    some,
-                    not( equalTo( anotherSome ) ) );
-        assertThat( "Values hashcode not equal",
-                    some.hashCode(),
-                    not( equalTo( anotherSome.hashCode() ) ) );
+        PropertyEqualityTest.Some some = PropertyEqualityTest.buildSomeValue(valueBuilderFactory);
+        PropertyEqualityTest.Some anotherSome = PropertyEqualityTest.buildAnotherSomeValueWithDifferentState(valueBuilderFactory);
+        assertThat("Values not equal",
+            some,
+            not(equalTo(anotherSome)));
+        assertThat("Values hashcode not equal",
+            some.hashCode(),
+            not(equalTo(anotherSome.hashCode())));
     }
 }

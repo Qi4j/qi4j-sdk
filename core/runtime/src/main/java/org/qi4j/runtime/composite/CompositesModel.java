@@ -28,30 +28,30 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public abstract class CompositesModel<MD extends VisitableModelDescriptor>
-        implements VisitableHierarchy<Object, Object>
+    implements VisitableHierarchy<Object, Object>
 {
     private final List<MD> compositeModels;
 
-    public CompositesModel( List<MD> compositeModels)
+    public CompositesModel(List<MD> compositeModels)
     {
         this.compositeModels = compositeModels;
     }
 
     @Override
-    public final <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
-            throws ThrowableType
+    public final <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
+        throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            for( MD compositeModel : compositeModels)
+            for(MD compositeModel : compositeModels)
             {
-                if( !compositeModel.accept( modelVisitor ) )
+                if(!compositeModel.accept(modelVisitor))
                 {
                     break;
                 }
             }
         }
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
 
     public final Stream<MD> stream()

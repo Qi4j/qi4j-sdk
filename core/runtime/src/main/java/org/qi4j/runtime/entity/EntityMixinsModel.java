@@ -20,9 +20,6 @@
 
 package org.qi4j.runtime.entity;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.entity.Lifecycle;
 import org.qi4j.api.entity.LifecycleException;
@@ -34,6 +31,10 @@ import org.qi4j.runtime.composite.UsesInstance;
 import org.qi4j.runtime.injection.InjectionContext;
 import org.qi4j.runtime.model.Resolution;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * JAVADOC
  */
@@ -43,61 +44,61 @@ public final class EntityMixinsModel
     private List<Integer> lifecycleMixins;
 
     @Override
-    public void bind( Resolution resolution )
+    public void bind(Resolution resolution)
         throws BindingException
     {
-        super.bind( resolution );
+        super.bind(resolution);
 
         // Find what mixins implement Lifecycle
-        for( int i = 0; i < mixinModels.size(); i++ )
+        for(int i = 0; i < mixinModels.size(); i++)
         {
-            MixinModel mixinModel = mixinModels.get( i );
+            MixinModel mixinModel = mixinModels.get(i);
 
-            if( Lifecycle.class.isAssignableFrom( mixinModel.mixinClass() ) )
+            if(Lifecycle.class.isAssignableFrom(mixinModel.mixinClass()))
             {
-                if( lifecycleMixins == null )
+                if(lifecycleMixins == null)
                 {
                     lifecycleMixins = new ArrayList<>();
                 }
 
-                lifecycleMixins.add( i );
+                lifecycleMixins.add(i);
             }
         }
     }
 
-    Object newMixin( EntityInstance entityInstance, StateHolder state, Object[] mixins, Method method )
+    Object newMixin(EntityInstance entityInstance, StateHolder state, Object[] mixins, Method method)
     {
-        MixinModel model = methodImplementation.get( method );
-        InjectionContext injectionContext = new InjectionContext( entityInstance, UsesInstance.EMPTY_USES, state );
-        Object mixin = model.newInstance( injectionContext );
-        mixins[ methodIndex.get( method ) ] = mixin;
+        MixinModel model = methodImplementation.get(method);
+        InjectionContext injectionContext = new InjectionContext(entityInstance, UsesInstance.EMPTY_USES, state);
+        Object mixin = model.newInstance(injectionContext);
+        mixins[methodIndex.get(method)] = mixin;
         return mixin;
     }
 
-    void invokeLifecycle( boolean create, Object[] mixins, CompositeInstance instance, StateHolder state )
+    void invokeLifecycle(boolean create, Object[] mixins, CompositeInstance instance, StateHolder state)
     {
-        if( lifecycleMixins != null )
+        if(lifecycleMixins != null)
         {
-            InjectionContext injectionContext = new InjectionContext( instance, UsesInstance.EMPTY_USES, state );
-            for( Integer lifecycleMixin : lifecycleMixins )
+            InjectionContext injectionContext = new InjectionContext(instance, UsesInstance.EMPTY_USES, state);
+            for(Integer lifecycleMixin : lifecycleMixins)
             {
-                Lifecycle lifecycle = (Lifecycle) mixins[ lifecycleMixin ];
+                Lifecycle lifecycle = (Lifecycle) mixins[lifecycleMixin];
 
-                if( lifecycle == null )
+                if(lifecycle == null)
                 {
-                    lifecycle = (Lifecycle) mixinModels.get( lifecycleMixin ).newInstance( injectionContext );
+                    lifecycle = (Lifecycle) mixinModels.get(lifecycleMixin).newInstance(injectionContext);
                 }
 
-                if( create )
+                if(create)
                 {
                     try
                     {
                         lifecycle.create();
                     }
-                    catch( Exception ex )
+                    catch(Exception ex)
                     {
                         String message = "Unable to invoke create lifecycle on " + lifecycle;
-                        throw new LifecycleException( message, ex );
+                        throw new LifecycleException(message, ex);
                     }
                 }
                 else
@@ -106,10 +107,10 @@ public final class EntityMixinsModel
                     {
                         lifecycle.remove();
                     }
-                    catch( Exception ex )
+                    catch(Exception ex)
                     {
                         String message = "Unable to invoke remove lifecycle on " + lifecycle;
-                        throw new LifecycleException( message, ex );
+                        throw new LifecycleException(message, ex);
                     }
                 }
             }

@@ -20,6 +20,9 @@
 
 package org.qi4j.runtime.mixin;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.mixin.Mixins;
@@ -27,9 +30,6 @@ import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,64 +39,64 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class InitializableTest extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.objects( TestObject.class );
-        module.transients( TestComposite.class, NoMethod.class );
-        module.values( TestComposite.class );
-        module.services( TestComposite.class );
-        module.entities( TestComposite.class );
-        new EntityTestAssembler().assemble( module );
+        module.objects(TestObject.class);
+        module.transients(TestComposite.class, NoMethod.class);
+        module.values(TestComposite.class);
+        module.services(TestComposite.class);
+        module.entities(TestComposite.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
     public void givenTransientWithInitializableMixinWhenInstantiatedThenInvokeInitialize()
     {
-        TestComposite instance = transientBuilderFactory.newTransient( TestComposite.class );
-        assertThat( "mixin has been initialized", instance.ok(), equalTo( true ) );
+        TestComposite instance = transientBuilderFactory.newTransient(TestComposite.class);
+        assertThat("mixin has been initialized", instance.ok(), equalTo(true));
     }
 
     @Test
     public void givenValueWithInitializableMixinWhenInstantiatedThenInvokeInitialize()
     {
-        TestComposite instance = valueBuilderFactory.newValue( TestComposite.class );
-        assertThat( "mixin has been initialized", instance.ok(), equalTo( true ) );
+        TestComposite instance = valueBuilderFactory.newValue(TestComposite.class);
+        assertThat("mixin has been initialized", instance.ok(), equalTo(true));
     }
 
     @Test
     public void givenServiceWithInitializableMixinWhenInstantiatedThenInvokeInitialize()
     {
-        TestComposite instance = serviceFinder.findService( TestComposite.class ).get();
-        assertThat( "mixin has been initialized", instance.ok(), equalTo( true ) );
+        TestComposite instance = serviceFinder.findService(TestComposite.class).get();
+        assertThat("mixin has been initialized", instance.ok(), equalTo(true));
     }
 
     @Test
     public void givenEntityWithInitializableMixinWhenInstantiatedThenInvokeInitialize()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            TestComposite instance = uow.newEntity( TestComposite.class );
-            assertThat( "mixin has been initialized", instance.ok(), equalTo( true ) );
+            TestComposite instance = uow.newEntity(TestComposite.class);
+            assertThat("mixin has been initialized", instance.ok(), equalTo(true));
         }
     }
 
     @Test
     public void givenObjectImplementingInitializableWhenInstantiatedThenInvokeInitialize()
     {
-        TestObject instance = objectFactory.newObject( TestObject.class );
-        assertThat( "object has been initialized", instance.ok(), equalTo( true ) );
+        TestObject instance = objectFactory.newObject(TestObject.class);
+        assertThat("object has been initialized", instance.ok(), equalTo(true));
     }
 
     // TODO: (niclas) This is part of the whole lifecycle mess, that needs to be worked out once and for all.
-    @Disabled( "Mixin of types with no method are not scrutinized for Initializable implementation" )
+    @Disabled("Mixin of types with no method are not scrutinized for Initializable implementation")
     @Test
     public void givenTypeWithNoMethodsAndInitializableMixinWhenInstantiatedThenInvokeInitialize()
     {
-        NoMethod instance = transientBuilderFactory.newTransient( NoMethod.class );
-        assertThat( "mixin has not been initialized", noMethodMixinOk, equalTo( true ) );
+        NoMethod instance = transientBuilderFactory.newTransient(NoMethod.class);
+        assertThat("mixin has not been initialized", noMethodMixinOk, equalTo(true));
     }
 
-    @Mixins( TestMixin.class )
+    @Mixins(TestMixin.class)
     public interface TestComposite extends ComposedInitializable
     {
         boolean ok();
@@ -125,7 +125,7 @@ public class InitializableTest extends AbstractQi4jTest
         }
     }
 
-    @Mixins( ComposedInitializableMixin.class )
+    @Mixins(ComposedInitializableMixin.class)
     public interface ComposedInitializable
     {
         boolean composedOk();
@@ -148,7 +148,7 @@ public class InitializableTest extends AbstractQi4jTest
         }
     }
 
-    @Mixins( PrivateInitializableMixin.class )
+    @Mixins(PrivateInitializableMixin.class)
     public interface PrivateInitializable
     {
         boolean ok();
@@ -174,7 +174,7 @@ public class InitializableTest extends AbstractQi4jTest
         }
     }
 
-    @Mixins( NestedInitializableMixin.class )
+    @Mixins(NestedInitializableMixin.class)
     public interface NestedInitializable
     {
         boolean nestedOk();
@@ -205,8 +205,10 @@ public class InitializableTest extends AbstractQi4jTest
         noMethodMixinOk = false;
     }
 
-    @Mixins( NoMethodMixin.class )
-    public interface NoMethod {}
+    @Mixins(NoMethodMixin.class)
+    public interface NoMethod
+    {
+    }
 
     public static class NoMethodMixin implements Initializable
     {

@@ -27,28 +27,25 @@ import org.qi4j.bootstrap.layered.ModuleAssembler;
 import org.qi4j.test.indexing.layered.Suite1Case1;
 import org.qi4j.test.indexing.layered.Suite1Case2;
 import org.qi4j.test.indexing.layered.TestCase;
-import org.qi4j.test.indexing.layered.Suite1Case1;
-import org.qi4j.test.indexing.layered.Suite1Case2;
-import org.qi4j.test.indexing.layered.TestCase;
 
 class TestSuite1Module
     implements ModuleAssembler
 {
 
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
     {
-        declareTestCase( module, Suite1Case1.class );
-        declareTestCase( module, Suite1Case2.class );
+        declareTestCase(module, Suite1Case1.class);
+        declareTestCase(module, Suite1Case2.class);
         return module;
     }
 
-    private void declareTestCase( ModuleAssembly module, Class<?> testcaseMixin )
+    private void declareTestCase(ModuleAssembly module, Class<?> testcaseMixin)
     {
-        module.services( TestCase.class )
-            .withMixins( testcaseMixin )
-            .visibleIn( Visibility.layer )
-            .taggedWith( testcaseMixin.getSimpleName() );
+        module.services(TestCase.class)
+            .withMixins(testcaseMixin)
+            .visibleIn(Visibility.layer)
+            .taggedWith(testcaseMixin.getSimpleName());
 
     }
 }

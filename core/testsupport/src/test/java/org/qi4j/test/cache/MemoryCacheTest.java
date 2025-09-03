@@ -25,9 +25,9 @@ import org.qi4j.bootstrap.ModuleAssembly;
 public class MemoryCacheTest extends AbstractCachePoolTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( MemoryCachePoolService.class );
+        module.services(MemoryCachePoolService.class);
     }
 }

@@ -20,17 +20,18 @@
 
 package org.qi4j.runtime.defaults;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -43,10 +44,10 @@ import static org.hamcrest.core.Is.is;
 public class UseDefaultsTest extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.transients( TestComposite.class );
-        module.forMixin( TestComposite.class ).declareDefaults().assemblyString().set( "habba" );
+        module.transients(TestComposite.class);
+        module.forMixin(TestComposite.class).declareDefaults().assemblyString().set("habba");
 
         module.defaultServices();
     }
@@ -54,44 +55,44 @@ public class UseDefaultsTest extends AbstractQi4jTest
     @Test
     public void givenPropertyWithUseDefaultsWhenInstantiatedThenPropertiesAreDefaulted()
     {
-        TransientBuilder<TestComposite> builder = transientBuilderFactory.newTransientBuilder( TestComposite.class );
+        TransientBuilder<TestComposite> builder = transientBuilderFactory.newTransientBuilder(TestComposite.class);
         TestComposite testComposite = builder.newInstance();
 
-        assertThat( "nullInt is null", testComposite.nullInt().get(), nullValue() );
-        assertThat( "zeroInt is zero", testComposite.defaultInt().get(), equalTo( 0 ) );
-        assertThat( "nullString is null", testComposite.nullString().get(), nullValue() );
-        assertThat( "defaultString is empty string", testComposite.defaultString().get(), equalTo( "" ) );
-        assertThat( "assemblyString is set string", testComposite.assemblyString().get(), equalTo( "habba" ) );
+        assertThat("nullInt is null", testComposite.nullInt().get(), nullValue());
+        assertThat("zeroInt is zero", testComposite.defaultInt().get(), equalTo(0));
+        assertThat("nullString is null", testComposite.nullString().get(), nullValue());
+        assertThat("defaultString is empty string", testComposite.defaultString().get(), equalTo(""));
+        assertThat("assemblyString is set string", testComposite.assemblyString().get(), equalTo("habba"));
 
-        assertThat( "nullPrimitiveArray is null", testComposite.nullPrimitiveArray().get(), nullValue() );
-        assertThat( "emptyPrimitiveArray is empty",
-                    Arrays.equals( testComposite.emptyPrimitiveArray().get(), new int[ 0 ] ), is( true ) );
-        assertThat( "nullArray is null", testComposite.nullArray().get(), nullValue() );
-        assertThat( "emptyArray is empty array",
-                    Arrays.equals( testComposite.emptyArray().get(), new Integer[ 0 ] ), is( true ) );
+        assertThat("nullPrimitiveArray is null", testComposite.nullPrimitiveArray().get(), nullValue());
+        assertThat("emptyPrimitiveArray is empty",
+            Arrays.equals(testComposite.emptyPrimitiveArray().get(), new int[0]), is(true));
+        assertThat("nullArray is null", testComposite.nullArray().get(), nullValue());
+        assertThat("emptyArray is empty array",
+            Arrays.equals(testComposite.emptyArray().get(), new Integer[0]), is(true));
     }
 
     @Test
     public void givenPropertyWithValuedUseDefaultsWhenInstantiatedExpectCorrectDefaultValues()
     {
-        TransientBuilder<TestComposite> builder = transientBuilderFactory.newTransientBuilder( TestComposite.class );
+        TransientBuilder<TestComposite> builder = transientBuilderFactory.newTransientBuilder(TestComposite.class);
         TestComposite testComposite = builder.newInstance();
 
-        assertThat( testComposite.initializedStringDefault().get(), equalTo( "abc" ) );
-        assertThat( testComposite.initializedIntegerDefaultValue().get(), equalTo( 123 ) );
-        assertThat( testComposite.initializedFloatDefaultValue().get(), equalTo( 123.45f ) );
-        List<String> expectedList = Collections.singletonList( "abcde" );
-        assertThat( testComposite.initializedStringListDefultString().get(), equalTo( expectedList ) );
-        Map<String, Integer> expectedMap = Collections.singletonMap( "abcd", 345 );
-        assertThat( testComposite.initializedMapDefaultValue().get(), equalTo( expectedMap ) );
+        assertThat(testComposite.initializedStringDefault().get(), equalTo("abc"));
+        assertThat(testComposite.initializedIntegerDefaultValue().get(), equalTo(123));
+        assertThat(testComposite.initializedFloatDefaultValue().get(), equalTo(123.45f));
+        List<String> expectedList = Collections.singletonList("abcde");
+        assertThat(testComposite.initializedStringListDefultString().get(), equalTo(expectedList));
+        Map<String, Integer> expectedMap = Collections.singletonMap("abcd", 345);
+        assertThat(testComposite.initializedMapDefaultValue().get(), equalTo(expectedMap));
 
-        assertThat( "initializedPrimitiveArray is set",
-                    Arrays.equals( testComposite.initializedPrimitiveArray().get(), new int[]{ 23, 42 } ),
-                    is( true )
+        assertThat("initializedPrimitiveArray is set",
+            Arrays.equals(testComposite.initializedPrimitiveArray().get(), new int[]{23, 42}),
+            is(true)
         );
-        assertThat( "initializedArray is set",
-                    Arrays.equals( testComposite.initializedArray().get(), new Integer[]{ 23, 42 } ),
-                    is( true )
+        assertThat("initializedArray is set",
+            Arrays.equals(testComposite.initializedArray().get(), new Integer[]{23, 42}),
+            is(true)
         );
     }
 
@@ -113,19 +114,19 @@ public class UseDefaultsTest extends AbstractQi4jTest
 
         Property<String> assemblyString();
 
-        @UseDefaults( "abc" )
+        @UseDefaults("abc")
         Property<String> initializedStringDefault();
 
-        @UseDefaults( "123" )
+        @UseDefaults("123")
         Property<Integer> initializedIntegerDefaultValue();
 
-        @UseDefaults( "123.45" )
+        @UseDefaults("123.45")
         Property<Float> initializedFloatDefaultValue();
 
-        @UseDefaults( "[\"abcde\"]" )
+        @UseDefaults("[\"abcde\"]")
         Property<List<String>> initializedStringListDefultString();
 
-        @UseDefaults( "{\"abcd\": 345}" )
+        @UseDefaults("{\"abcd\": 345}")
         Property<Map<String, Integer>> initializedMapDefaultValue();
 
         @Optional
@@ -134,7 +135,7 @@ public class UseDefaultsTest extends AbstractQi4jTest
         @UseDefaults
         Property<int[]> emptyPrimitiveArray();
 
-        @UseDefaults( "[23, 42]" )
+        @UseDefaults("[23, 42]")
         Property<int[]> initializedPrimitiveArray();
 
         @Optional
@@ -143,7 +144,7 @@ public class UseDefaultsTest extends AbstractQi4jTest
         @UseDefaults
         Property<Integer[]> emptyArray();
 
-        @UseDefaults( "[23, 42]" )
+        @UseDefaults("[23, 42]")
         Property<Integer[]> initializedArray();
     }
 }

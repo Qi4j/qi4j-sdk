@@ -23,8 +23,6 @@ package org.qi4j.api.value;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.StatefulAssociationCompositeDescriptor;
 import org.qi4j.api.type.ValueCompositeType;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.composite.StatefulAssociationCompositeDescriptor;
 
 /**
  * Descriptor for ValueComposites.

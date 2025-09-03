@@ -35,19 +35,19 @@ public abstract class StateChangeNotificationConcern
     Iterable<StateChangeListener> listeners;
 
     @Override
-    public StateCommitter applyChanges( final EntityStoreUnitOfWork unitofwork,
-                                        final Iterable<EntityState> state
+    public StateCommitter applyChanges(final EntityStoreUnitOfWork unitofwork,
+                                       final Iterable<EntityState> state
     )
     {
-        final StateCommitter committer = next.applyChanges( unitofwork, state );
+        final StateCommitter committer = next.applyChanges(unitofwork, state);
         return new StateCommitter()
         {
             @Override
             public void commit()
             {
-                for( StateChangeListener listener : listeners )
+                for(StateChangeListener listener : listeners)
                 {
-                    listener.notifyChanges( state );
+                    listener.notifyChanges(state);
                 }
                 committer.commit();
             }

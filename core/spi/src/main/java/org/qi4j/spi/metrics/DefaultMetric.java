@@ -20,12 +20,7 @@
 
 package org.qi4j.spi.metrics;
 
-import org.qi4j.api.metrics.MetricsCounter;
-import org.qi4j.api.metrics.MetricsGauge;
-import org.qi4j.api.metrics.MetricsHealthCheck;
-import org.qi4j.api.metrics.MetricsHistogram;
-import org.qi4j.api.metrics.MetricsMeter;
-import org.qi4j.api.metrics.MetricsTimer;
+import org.qi4j.api.metrics.*;
 
 /**
  * Default Metric implementing all supported Metrics as a null object.
@@ -41,7 +36,7 @@ public final class DefaultMetric
     }
 
     @Override
-    public void increment( int steps )
+    public void increment(int steps)
     {
     }
 
@@ -51,14 +46,15 @@ public final class DefaultMetric
     }
 
     @Override
-    public void decrement( int steps )
+    public void decrement(int steps)
     {
     }
 
     @Override
     public Context start()
     {
-        return () -> {};
+        return () -> {
+        };
     }
 
     @Override
@@ -68,7 +64,7 @@ public final class DefaultMetric
     }
 
     @Override
-    public void update( long newValue )
+    public void update(long newValue)
     {
     }
 
@@ -76,7 +72,7 @@ public final class DefaultMetric
     public Result check()
         throws Exception
     {
-        return  Result.healthOk();
+        return Result.healthOk();
     }
 
     @Override
@@ -85,7 +81,7 @@ public final class DefaultMetric
     }
 
     @Override
-    public void mark( int numberOfEvents )
+    public void mark(int numberOfEvents)
     {
     }
 }

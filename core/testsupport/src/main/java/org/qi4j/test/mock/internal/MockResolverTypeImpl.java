@@ -26,14 +26,14 @@ public class MockResolverTypeImpl
 {
     private final MockResolverProxy proxy;
 
-    public MockResolverTypeImpl( MockResolverProxy proxy )
+    public MockResolverTypeImpl(MockResolverProxy proxy)
     {
         this.proxy = proxy;
     }
 
     @Override
-    public void forClass( final Class clazz )
+    public void forClass(final Class clazz)
     {
-        proxy.setMock( new MethodClassMatcherMockResolver( proxy.getRegisteredMock(), clazz ) );
+        proxy.setMock(new MethodClassMatcherMockResolver(proxy.getRegisteredMock(), clazz));
     }
 }

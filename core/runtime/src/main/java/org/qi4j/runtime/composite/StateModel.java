@@ -19,14 +19,15 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.AccessibleObject;
-import java.util.stream.Stream;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.composite.StateDescriptor;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.property.PropertiesModel;
 import org.qi4j.runtime.property.PropertyModel;
+
+import java.lang.reflect.AccessibleObject;
+import java.util.stream.Stream;
 
 /**
  * Base model for Composite state
@@ -36,28 +37,28 @@ public class StateModel
 {
     protected final PropertiesModel propertiesModel;
 
-    public StateModel( PropertiesModel propertiesModel )
+    public StateModel(PropertiesModel propertiesModel)
     {
         this.propertiesModel = propertiesModel;
     }
 
-    public PropertyModel propertyModelFor( AccessibleObject accessor )
+    public PropertyModel propertyModelFor(AccessibleObject accessor)
     {
-        return propertiesModel.getProperty( accessor );
+        return propertiesModel.getProperty(accessor);
     }
 
     @Override
-    public PropertyModel findPropertyModelByName( String name )
+    public PropertyModel findPropertyModelByName(String name)
         throws IllegalArgumentException
     {
-        return propertiesModel.getPropertyByName( name );
+        return propertiesModel.getPropertyByName(name);
     }
 
     @Override
-    public PropertyModel findPropertyModelByQualifiedName( QualifiedName name )
+    public PropertyModel findPropertyModelByQualifiedName(QualifiedName name)
         throws IllegalArgumentException
     {
-        return propertiesModel.getPropertyByQualifiedName( name );
+        return propertiesModel.getPropertyByQualifiedName(name);
     }
 
     @Override
@@ -67,19 +68,19 @@ public class StateModel
     }
 
     @Override
-    public boolean hasProperty( QualifiedName name )
+    public boolean hasProperty(QualifiedName name)
     {
-        return propertiesModel.hasProperty( name );
+        return propertiesModel.hasProperty(name);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            ( (VisitableHierarchy<Object, Object>) propertiesModel ).accept( visitor );
+            ((VisitableHierarchy<Object, Object>) propertiesModel).accept(visitor);
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 }

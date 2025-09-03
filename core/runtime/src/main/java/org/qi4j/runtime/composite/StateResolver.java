@@ -19,22 +19,23 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.util.Map;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.property.PropertyDescriptor;
+
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * StateResolver.
  */
 public interface StateResolver
 {
-    Object getPropertyState( PropertyDescriptor propertyDescriptor );
+    Object getPropertyState(PropertyDescriptor propertyDescriptor);
 
-    EntityReference getAssociationState( AssociationDescriptor associationDescriptor );
+    EntityReference getAssociationState(AssociationDescriptor associationDescriptor);
 
-    Stream<EntityReference> getManyAssociationState( AssociationDescriptor associationDescriptor );
+    Stream<EntityReference> getManyAssociationState(AssociationDescriptor associationDescriptor);
 
-    Stream<Map.Entry<String, EntityReference>> getNamedAssociationState( AssociationDescriptor associationDescriptor );
+    Stream<Map.Entry<String, EntityReference>> getNamedAssociationState(AssociationDescriptor associationDescriptor);
 }

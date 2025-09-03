@@ -30,7 +30,7 @@ public class InterfaceCollisionWithUnrelatedReturnTypesTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
         module.defaultServices();

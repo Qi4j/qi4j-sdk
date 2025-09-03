@@ -19,14 +19,11 @@
  */
 package org.qi4j.runtime.activation;
 
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.stream.StreamSupport;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.activation.PassivationException;
+
+import java.util.*;
+import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toCollection;
 
@@ -39,88 +36,88 @@ import static java.util.stream.Collectors.toCollection;
 public class ActivatorsInstance<ActivateeType>
     implements Activator<ActivateeType>
 {
-    @SuppressWarnings( { "raw", "unchecked" } )
-    public static final ActivatorsInstance EMPTY = new ActivatorsInstance( Collections.emptyList() );
+    @SuppressWarnings({"raw", "unchecked"})
+    public static final ActivatorsInstance EMPTY = new ActivatorsInstance(Collections.emptyList());
 
     private final Iterable<Activator<ActivateeType>> activators;
 
-    public ActivatorsInstance( Iterable<Activator<ActivateeType>> activators )
+    public ActivatorsInstance(Iterable<Activator<ActivateeType>> activators)
     {
         this.activators = activators;
     }
 
     @Override
-    public void beforeActivation( ActivateeType activating )
+    public void beforeActivation(ActivateeType activating)
         throws Exception
     {
-        for( Activator<ActivateeType> activator : activators )
+        for(Activator<ActivateeType> activator : activators)
         {
-            activator.beforeActivation( activating );
+            activator.beforeActivation(activating);
         }
     }
 
     @Override
-    public void afterActivation( ActivateeType activated )
+    public void afterActivation(ActivateeType activated)
         throws Exception
     {
-        for( Activator<ActivateeType> activator : activators )
+        for(Activator<ActivateeType> activator : activators)
         {
-            activator.afterActivation( activated );
+            activator.afterActivation(activated);
         }
     }
 
     @Override
-    public void beforePassivation( ActivateeType passivating )
+    public void beforePassivation(ActivateeType passivating)
         throws Exception
     {
         Set<Exception> exceptions = new LinkedHashSet<>();
         Iterator<Activator<ActivateeType>> iterator = reverseActivatorsIterator();
-        while( iterator.hasNext() )
+        while(iterator.hasNext())
         {
             Activator<ActivateeType> activator = iterator.next();
             try
             {
-                activator.beforePassivation( passivating );
+                activator.beforePassivation(passivating);
             }
-            catch( Exception ex )
+            catch(Exception ex)
             {
-                exceptions.add( ex );
+                exceptions.add(ex);
             }
         }
-        if( !exceptions.isEmpty() )
+        if(!exceptions.isEmpty())
         {
-            throw new PassivationException( exceptions );
+            throw new PassivationException(exceptions);
         }
     }
 
     @Override
-    public void afterPassivation( ActivateeType passivated )
+    public void afterPassivation(ActivateeType passivated)
         throws Exception
     {
         Set<Exception> exceptions = new LinkedHashSet<>();
         Iterator<Activator<ActivateeType>> iterator = reverseActivatorsIterator();
-        while( iterator.hasNext() )
+        while(iterator.hasNext())
         {
             Activator<ActivateeType> activator = iterator.next();
             try
             {
-                activator.afterPassivation( passivated );
+                activator.afterPassivation(passivated);
             }
-            catch( Exception ex )
+            catch(Exception ex)
             {
-                exceptions.add( ex );
+                exceptions.add(ex);
             }
         }
-        if( !exceptions.isEmpty() )
+        if(!exceptions.isEmpty())
         {
-            throw new PassivationException( exceptions );
+            throw new PassivationException(exceptions);
         }
     }
 
     private Iterator<Activator<ActivateeType>> reverseActivatorsIterator()
     {
-        return StreamSupport.stream( activators.spliterator(), false )
-                            .collect( toCollection( LinkedList::new ) )
-                            .descendingIterator();
+        return StreamSupport.stream(activators.spliterator(), false)
+            .collect(toCollection(LinkedList::new))
+            .descendingIterator();
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.association;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.ManyAssociation;
@@ -30,7 +31,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
@@ -47,12 +47,12 @@ public class AssociationEqualityTest
     // --------------------------------------:: Types under test ::-----------------------------------------------------
     //
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( AnEntity.class );
-        module.values( SomeWithAssociations.class, OtherWithAssociations.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(AnEntity.class);
+        module.values(SomeWithAssociations.class, OtherWithAssociations.class);
     }
 
     public interface AnEntity
@@ -90,36 +90,36 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            AnEntity anEntity = uow.newEntity( AnEntity.class );
+            AnEntity anEntity = uow.newEntity(AnEntity.class);
 
-            SomeWithAssociations some = buildSomeWithAssociation( anEntity );
-            AssociationDescriptor someAssocDesc = qi4j.api().associationDescriptorFor( some.anEntity() );
-            AssociationDescriptor someManyAssocDesc = qi4j.api().associationDescriptorFor( some.manyEntities() );
-            AssociationDescriptor someNamedAssocDesc = qi4j.api().associationDescriptorFor( some.namedEntities() );
+            SomeWithAssociations some = buildSomeWithAssociation(anEntity);
+            AssociationDescriptor someAssocDesc = qi4j.api().associationDescriptorFor(some.anEntity());
+            AssociationDescriptor someManyAssocDesc = qi4j.api().associationDescriptorFor(some.manyEntities());
+            AssociationDescriptor someNamedAssocDesc = qi4j.api().associationDescriptorFor(some.namedEntities());
 
-            SomeWithAssociations some2 = buildSomeWithAssociation( anEntity );
-            AssociationDescriptor some2AssocDesc = qi4j.api().associationDescriptorFor( some2.anEntity() );
-            AssociationDescriptor some2ManyAssocDesc = qi4j.api().associationDescriptorFor( some2.manyEntities() );
-            AssociationDescriptor some2NamedAssocDesc = qi4j.api().associationDescriptorFor( some2.namedEntities() );
+            SomeWithAssociations some2 = buildSomeWithAssociation(anEntity);
+            AssociationDescriptor some2AssocDesc = qi4j.api().associationDescriptorFor(some2.anEntity());
+            AssociationDescriptor some2ManyAssocDesc = qi4j.api().associationDescriptorFor(some2.manyEntities());
+            AssociationDescriptor some2NamedAssocDesc = qi4j.api().associationDescriptorFor(some2.namedEntities());
 
-            assertThat( "AssociationDescriptor equal",
-                        someAssocDesc,
-                        equalTo( some2AssocDesc ) );
-            assertThat( "AssociationDescriptor hashcode equal",
-                        someAssocDesc.hashCode(),
-                        equalTo( some2AssocDesc.hashCode() ) );
-            assertThat( "ManyAssociationDescriptor equal",
-                        someManyAssocDesc,
-                        equalTo( some2ManyAssocDesc ) );
-            assertThat( "ManyAssociationDescriptor hashcode equal",
-                        someManyAssocDesc.hashCode(),
-                        equalTo( some2ManyAssocDesc.hashCode() ) );
-            assertThat( "NamedAssociationDescriptor equal",
-                        someNamedAssocDesc,
-                        equalTo( some2NamedAssocDesc ) );
-            assertThat( "NamedAssociationDescriptor hashcode equal",
-                        someNamedAssocDesc.hashCode(),
-                        equalTo( some2NamedAssocDesc.hashCode() ) );
+            assertThat("AssociationDescriptor equal",
+                someAssocDesc,
+                equalTo(some2AssocDesc));
+            assertThat("AssociationDescriptor hashcode equal",
+                someAssocDesc.hashCode(),
+                equalTo(some2AssocDesc.hashCode()));
+            assertThat("ManyAssociationDescriptor equal",
+                someManyAssocDesc,
+                equalTo(some2ManyAssocDesc));
+            assertThat("ManyAssociationDescriptor hashcode equal",
+                someManyAssocDesc.hashCode(),
+                equalTo(some2ManyAssocDesc.hashCode()));
+            assertThat("NamedAssociationDescriptor equal",
+                someNamedAssocDesc,
+                equalTo(some2NamedAssocDesc));
+            assertThat("NamedAssociationDescriptor hashcode equal",
+                someNamedAssocDesc.hashCode(),
+                equalTo(some2NamedAssocDesc.hashCode()));
         }
         finally
         {
@@ -133,34 +133,34 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            SomeWithAssociations some = buildSomeWithAssociation( uow.newEntity( AnEntity.class ) );
-            AssociationDescriptor someAssocDesc = qi4j.api().associationDescriptorFor( some.anEntity() );
-            AssociationDescriptor someManyAssocDesc = qi4j.api().associationDescriptorFor( some.manyEntities() );
-            AssociationDescriptor someNamedAssocDesc = qi4j.api().associationDescriptorFor( some.namedEntities() );
+            SomeWithAssociations some = buildSomeWithAssociation(uow.newEntity(AnEntity.class));
+            AssociationDescriptor someAssocDesc = qi4j.api().associationDescriptorFor(some.anEntity());
+            AssociationDescriptor someManyAssocDesc = qi4j.api().associationDescriptorFor(some.manyEntities());
+            AssociationDescriptor someNamedAssocDesc = qi4j.api().associationDescriptorFor(some.namedEntities());
 
-            SomeWithAssociations some2 = buildSomeWithAssociation( uow.newEntity( AnEntity.class ) );
-            AssociationDescriptor some2AssocDesc = qi4j.api().associationDescriptorFor( some2.anEntity() );
-            AssociationDescriptor some2ManyAssocDesc = qi4j.api().associationDescriptorFor( some2.manyEntities() );
-            AssociationDescriptor some2NamedAssocDesc = qi4j.api().associationDescriptorFor( some2.namedEntities() );
+            SomeWithAssociations some2 = buildSomeWithAssociation(uow.newEntity(AnEntity.class));
+            AssociationDescriptor some2AssocDesc = qi4j.api().associationDescriptorFor(some2.anEntity());
+            AssociationDescriptor some2ManyAssocDesc = qi4j.api().associationDescriptorFor(some2.manyEntities());
+            AssociationDescriptor some2NamedAssocDesc = qi4j.api().associationDescriptorFor(some2.namedEntities());
 
-            assertThat( "AssociationDescriptor equal",
-                        someAssocDesc,
-                        equalTo( some2AssocDesc ) );
-            assertThat( "AssociationDescriptor hashcode equal",
-                        someAssocDesc.hashCode(),
-                        equalTo( some2AssocDesc.hashCode() ) );
-            assertThat( "ManyAssociationDescriptor equal",
-                        someManyAssocDesc,
-                        equalTo( some2ManyAssocDesc ) );
-            assertThat( "ManyAssociationDescriptor hashcode equal",
-                        someManyAssocDesc.hashCode(),
-                        equalTo( some2ManyAssocDesc.hashCode() ) );
-            assertThat( "NamedAssociationDescriptor equal",
-                        someNamedAssocDesc,
-                        equalTo( some2NamedAssocDesc ) );
-            assertThat( "NamedAssociationDescriptor hashcode equal",
-                        someNamedAssocDesc.hashCode(),
-                        equalTo( some2NamedAssocDesc.hashCode() ) );
+            assertThat("AssociationDescriptor equal",
+                someAssocDesc,
+                equalTo(some2AssocDesc));
+            assertThat("AssociationDescriptor hashcode equal",
+                someAssocDesc.hashCode(),
+                equalTo(some2AssocDesc.hashCode()));
+            assertThat("ManyAssociationDescriptor equal",
+                someManyAssocDesc,
+                equalTo(some2ManyAssocDesc));
+            assertThat("ManyAssociationDescriptor hashcode equal",
+                someManyAssocDesc.hashCode(),
+                equalTo(some2ManyAssocDesc.hashCode()));
+            assertThat("NamedAssociationDescriptor equal",
+                someNamedAssocDesc,
+                equalTo(some2NamedAssocDesc));
+            assertThat("NamedAssociationDescriptor hashcode equal",
+                someNamedAssocDesc.hashCode(),
+                equalTo(some2NamedAssocDesc.hashCode()));
         }
         finally
         {
@@ -174,36 +174,36 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            AnEntity anEntity = uow.newEntity( AnEntity.class );
+            AnEntity anEntity = uow.newEntity(AnEntity.class);
 
-            SomeWithAssociations some = buildSomeWithAssociation( anEntity );
-            AssociationDescriptor someAssocDesc = qi4j.api().associationDescriptorFor( some.anEntity() );
-            AssociationDescriptor someManyAssocDesc = qi4j.api().associationDescriptorFor( some.manyEntities() );
-            AssociationDescriptor someNamedAssocDesc = qi4j.api().associationDescriptorFor( some.namedEntities() );
+            SomeWithAssociations some = buildSomeWithAssociation(anEntity);
+            AssociationDescriptor someAssocDesc = qi4j.api().associationDescriptorFor(some.anEntity());
+            AssociationDescriptor someManyAssocDesc = qi4j.api().associationDescriptorFor(some.manyEntities());
+            AssociationDescriptor someNamedAssocDesc = qi4j.api().associationDescriptorFor(some.namedEntities());
 
-            OtherWithAssociations other = buildOtherWithAssociation( anEntity );
-            AssociationDescriptor otherAssocDesc = qi4j.api().associationDescriptorFor( other.anEntity() );
-            AssociationDescriptor otherManyAssocDesc = qi4j.api().associationDescriptorFor( other.manyEntities() );
-            AssociationDescriptor otherNamedAssocDesc = qi4j.api().associationDescriptorFor( other.namedEntities() );
+            OtherWithAssociations other = buildOtherWithAssociation(anEntity);
+            AssociationDescriptor otherAssocDesc = qi4j.api().associationDescriptorFor(other.anEntity());
+            AssociationDescriptor otherManyAssocDesc = qi4j.api().associationDescriptorFor(other.manyEntities());
+            AssociationDescriptor otherNamedAssocDesc = qi4j.api().associationDescriptorFor(other.namedEntities());
 
-            assertThat( "AssociationDescriptor not equal",
-                        someAssocDesc,
-                        not( equalTo( otherAssocDesc ) ) );
-            assertThat( "AssociationDescriptor hashcode not equal",
-                        someAssocDesc.hashCode(),
-                        not( equalTo( otherAssocDesc.hashCode() ) ) );
-            assertThat( "ManyAssociationDescriptor not equal",
-                        someManyAssocDesc,
-                        not( equalTo( otherManyAssocDesc ) ) );
-            assertThat( "ManyAssociationDescriptor hashcode not equal",
-                        someManyAssocDesc.hashCode(),
-                        not( equalTo( otherManyAssocDesc.hashCode() ) ) );
-            assertThat( "NamedAssociationDescriptor not equal",
-                        someNamedAssocDesc,
-                        not( equalTo( otherNamedAssocDesc ) ) );
-            assertThat( "NamedAssociationDescriptor hashcode not equal",
-                        someNamedAssocDesc.hashCode(),
-                        not( equalTo( otherNamedAssocDesc.hashCode() ) ) );
+            assertThat("AssociationDescriptor not equal",
+                someAssocDesc,
+                not(equalTo(otherAssocDesc)));
+            assertThat("AssociationDescriptor hashcode not equal",
+                someAssocDesc.hashCode(),
+                not(equalTo(otherAssocDesc.hashCode())));
+            assertThat("ManyAssociationDescriptor not equal",
+                someManyAssocDesc,
+                not(equalTo(otherManyAssocDesc)));
+            assertThat("ManyAssociationDescriptor hashcode not equal",
+                someManyAssocDesc.hashCode(),
+                not(equalTo(otherManyAssocDesc.hashCode())));
+            assertThat("NamedAssociationDescriptor not equal",
+                someNamedAssocDesc,
+                not(equalTo(otherNamedAssocDesc)));
+            assertThat("NamedAssociationDescriptor hashcode not equal",
+                someNamedAssocDesc.hashCode(),
+                not(equalTo(otherNamedAssocDesc.hashCode())));
         }
         finally
         {
@@ -220,27 +220,27 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            SomeWithAssociations some = buildSomeWithAssociation( uow.newEntity( AnEntity.class ) );
-            SomeWithAssociations some2 = buildSomeWithAssociation( uow.newEntity( AnEntity.class ) );
+            SomeWithAssociations some = buildSomeWithAssociation(uow.newEntity(AnEntity.class));
+            SomeWithAssociations some2 = buildSomeWithAssociation(uow.newEntity(AnEntity.class));
 
-            assertThat( "Association State not equal",
-                        some.anEntity().get(),
-                        not( equalTo( some2.anEntity().get() ) ) );
-            assertThat( "Association State hashcode not equal",
-                        some.anEntity().get().hashCode(),
-                        not( equalTo( some2.anEntity().get().hashCode() ) ) );
-            assertThat( "ManyAssociation State not equal",
-                        some.manyEntities().toList(),
-                        not( equalTo( some2.manyEntities().toList() ) ) );
-            assertThat( "ManyAssociation State hashcode not equal",
-                        some.manyEntities().toList().hashCode(),
-                        not( equalTo( some2.manyEntities().toList().hashCode() ) ) );
-            assertThat( "NamedAssociation State not equal",
-                        some.namedEntities().toMap(),
-                        not( equalTo( some2.namedEntities().toMap() ) ) );
-            assertThat( "NamedAssociation State hashcode not equal",
-                        some.namedEntities().toMap().hashCode(),
-                        not( equalTo( some2.namedEntities().toMap().hashCode() ) ) );
+            assertThat("Association State not equal",
+                some.anEntity().get(),
+                not(equalTo(some2.anEntity().get())));
+            assertThat("Association State hashcode not equal",
+                some.anEntity().get().hashCode(),
+                not(equalTo(some2.anEntity().get().hashCode())));
+            assertThat("ManyAssociation State not equal",
+                some.manyEntities().toList(),
+                not(equalTo(some2.manyEntities().toList())));
+            assertThat("ManyAssociation State hashcode not equal",
+                some.manyEntities().toList().hashCode(),
+                not(equalTo(some2.manyEntities().toList().hashCode())));
+            assertThat("NamedAssociation State not equal",
+                some.namedEntities().toMap(),
+                not(equalTo(some2.namedEntities().toMap())));
+            assertThat("NamedAssociation State hashcode not equal",
+                some.namedEntities().toMap().hashCode(),
+                not(equalTo(some2.namedEntities().toMap().hashCode())));
         }
         finally
         {
@@ -254,29 +254,29 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            AnEntity anEntity = uow.newEntity( AnEntity.class );
+            AnEntity anEntity = uow.newEntity(AnEntity.class);
 
-            SomeWithAssociations some = buildSomeWithAssociation( anEntity );
-            OtherWithAssociations other = buildOtherWithAssociation( anEntity );
+            SomeWithAssociations some = buildSomeWithAssociation(anEntity);
+            OtherWithAssociations other = buildOtherWithAssociation(anEntity);
 
-            assertThat( "Association State equal",
-                        some.anEntity().get(),
-                        equalTo( other.anEntity().get() ) );
-            assertThat( "Association State hashcode equal",
-                        some.anEntity().get().hashCode(),
-                        equalTo( other.anEntity().get().hashCode() ) );
-            assertThat( "ManyAssociation State equal",
-                        some.manyEntities().toList(),
-                        equalTo( other.manyEntities().toList() ) );
-            assertThat( "ManyAssociation State hashcode equal",
-                        some.manyEntities().toList().hashCode(),
-                        equalTo( other.manyEntities().toList().hashCode() ) );
-            assertThat( "NamedAssociation State equal",
-                        some.namedEntities().toMap(),
-                        equalTo( other.namedEntities().toMap() ) );
-            assertThat( "NamedAssociation State hashcode equal",
-                        some.namedEntities().toMap().hashCode(),
-                        equalTo( other.namedEntities().toMap().hashCode() ) );
+            assertThat("Association State equal",
+                some.anEntity().get(),
+                equalTo(other.anEntity().get()));
+            assertThat("Association State hashcode equal",
+                some.anEntity().get().hashCode(),
+                equalTo(other.anEntity().get().hashCode()));
+            assertThat("ManyAssociation State equal",
+                some.manyEntities().toList(),
+                equalTo(other.manyEntities().toList()));
+            assertThat("ManyAssociation State hashcode equal",
+                some.manyEntities().toList().hashCode(),
+                equalTo(other.manyEntities().toList().hashCode()));
+            assertThat("NamedAssociation State equal",
+                some.namedEntities().toMap(),
+                equalTo(other.namedEntities().toMap()));
+            assertThat("NamedAssociation State hashcode equal",
+                some.namedEntities().toMap().hashCode(),
+                equalTo(other.namedEntities().toMap().hashCode()));
         }
         finally
         {
@@ -293,29 +293,29 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            AnEntity anEntity = uow.newEntity( AnEntity.class );
+            AnEntity anEntity = uow.newEntity(AnEntity.class);
 
-            SomeWithAssociations some = buildSomeWithAssociation( anEntity );
-            SomeWithAssociations some2 = buildSomeWithAssociation( anEntity );
+            SomeWithAssociations some = buildSomeWithAssociation(anEntity);
+            SomeWithAssociations some2 = buildSomeWithAssociation(anEntity);
 
-            assertThat( "Association equal",
-                        some.anEntity(),
-                        equalTo( some2.anEntity() ) );
-            assertThat( "Association hashcode equal",
-                        some.anEntity().hashCode(),
-                        equalTo( some2.anEntity().hashCode() ) );
-            assertThat( "ManyAssociation equal",
-                        some.manyEntities(),
-                        equalTo( some2.manyEntities() ) );
-            assertThat( "ManyAssociation hashcode equal",
-                        some.manyEntities().hashCode(),
-                        equalTo( some2.manyEntities().hashCode() ) );
-            assertThat( "NamedAssociation equal",
-                        some.namedEntities(),
-                        equalTo( some2.namedEntities() ) );
-            assertThat( "NamedAssociation hashcode equal",
-                        some.namedEntities().hashCode(),
-                        equalTo( some2.namedEntities().hashCode() ) );
+            assertThat("Association equal",
+                some.anEntity(),
+                equalTo(some2.anEntity()));
+            assertThat("Association hashcode equal",
+                some.anEntity().hashCode(),
+                equalTo(some2.anEntity().hashCode()));
+            assertThat("ManyAssociation equal",
+                some.manyEntities(),
+                equalTo(some2.manyEntities()));
+            assertThat("ManyAssociation hashcode equal",
+                some.manyEntities().hashCode(),
+                equalTo(some2.manyEntities().hashCode()));
+            assertThat("NamedAssociation equal",
+                some.namedEntities(),
+                equalTo(some2.namedEntities()));
+            assertThat("NamedAssociation hashcode equal",
+                some.namedEntities().hashCode(),
+                equalTo(some2.namedEntities().hashCode()));
         }
         finally
         {
@@ -329,27 +329,27 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            SomeWithAssociations some = buildSomeWithAssociation( uow.newEntity( AnEntity.class ) );
-            SomeWithAssociations some2 = buildSomeWithAssociation( uow.newEntity( AnEntity.class ) );
+            SomeWithAssociations some = buildSomeWithAssociation(uow.newEntity(AnEntity.class));
+            SomeWithAssociations some2 = buildSomeWithAssociation(uow.newEntity(AnEntity.class));
 
-            assertThat( "Association not equal",
-                        some.anEntity(),
-                        not( equalTo( some2.anEntity() ) ) );
-            assertThat( "Association hashcode not equal",
-                        some.anEntity().hashCode(),
-                        not( equalTo( some2.anEntity().hashCode() ) ) );
-            assertThat( "ManyAssociation not equal",
-                        some.manyEntities(),
-                        not( equalTo( some2.manyEntities() ) ) );
-            assertThat( "ManyAssociation hashcode not equal",
-                        some.manyEntities().hashCode(),
-                        not( equalTo( some2.manyEntities().hashCode() ) ) );
-            assertThat( "NamedAssociation not equal",
-                        some.namedEntities(),
-                        not( equalTo( some2.namedEntities() ) ) );
-            assertThat( "NamedAssociation hashcode not equal",
-                        some.namedEntities().hashCode(),
-                        not( equalTo( some2.namedEntities().hashCode() ) ) );
+            assertThat("Association not equal",
+                some.anEntity(),
+                not(equalTo(some2.anEntity())));
+            assertThat("Association hashcode not equal",
+                some.anEntity().hashCode(),
+                not(equalTo(some2.anEntity().hashCode())));
+            assertThat("ManyAssociation not equal",
+                some.manyEntities(),
+                not(equalTo(some2.manyEntities())));
+            assertThat("ManyAssociation hashcode not equal",
+                some.manyEntities().hashCode(),
+                not(equalTo(some2.manyEntities().hashCode())));
+            assertThat("NamedAssociation not equal",
+                some.namedEntities(),
+                not(equalTo(some2.namedEntities())));
+            assertThat("NamedAssociation hashcode not equal",
+                some.namedEntities().hashCode(),
+                not(equalTo(some2.namedEntities().hashCode())));
         }
         finally
         {
@@ -363,29 +363,29 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            AnEntity anEntity = uow.newEntity( AnEntity.class );
+            AnEntity anEntity = uow.newEntity(AnEntity.class);
 
-            SomeWithAssociations some = buildSomeWithAssociation( anEntity );
-            OtherWithAssociations other = buildOtherWithAssociation( anEntity );
+            SomeWithAssociations some = buildSomeWithAssociation(anEntity);
+            OtherWithAssociations other = buildOtherWithAssociation(anEntity);
 
-            assertThat( "Association not equal",
-                        some.anEntity(),
-                        not( equalTo( other.anEntity() ) ) );
-            assertThat( "Association hashcode not equal",
-                        some.anEntity().hashCode(),
-                        not( equalTo( other.anEntity().hashCode() ) ) );
-            assertThat( "ManyAssociation not equal",
-                        some.manyEntities(),
-                        not( equalTo( other.manyEntities() ) ) );
-            assertThat( "ManyAssociation hashcode not equal",
-                        some.manyEntities().hashCode(),
-                        not( equalTo( other.manyEntities().hashCode() ) ) );
-            assertThat( "NamedAssociation not equal",
-                        some.namedEntities(),
-                        not( equalTo( other.namedEntities() ) ) );
-            assertThat( "NamedAssociation hashcode not equal",
-                        some.namedEntities().hashCode(),
-                        not( equalTo( other.namedEntities().hashCode() ) ) );
+            assertThat("Association not equal",
+                some.anEntity(),
+                not(equalTo(other.anEntity())));
+            assertThat("Association hashcode not equal",
+                some.anEntity().hashCode(),
+                not(equalTo(other.anEntity().hashCode())));
+            assertThat("ManyAssociation not equal",
+                some.manyEntities(),
+                not(equalTo(other.manyEntities())));
+            assertThat("ManyAssociation hashcode not equal",
+                some.manyEntities().hashCode(),
+                not(equalTo(other.manyEntities().hashCode())));
+            assertThat("NamedAssociation not equal",
+                some.namedEntities(),
+                not(equalTo(other.namedEntities())));
+            assertThat("NamedAssociation hashcode not equal",
+                some.namedEntities().hashCode(),
+                not(equalTo(other.namedEntities().hashCode())));
         }
         finally
         {
@@ -399,27 +399,27 @@ public class AssociationEqualityTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            SomeWithAssociations some = buildSomeWithAssociation( uow.newEntity( AnEntity.class ) );
-            OtherWithAssociations other = buildOtherWithAssociation( uow.newEntity( AnEntity.class ) );
+            SomeWithAssociations some = buildSomeWithAssociation(uow.newEntity(AnEntity.class));
+            OtherWithAssociations other = buildOtherWithAssociation(uow.newEntity(AnEntity.class));
 
-            assertThat( "Association not equal",
-                        some.anEntity(),
-                        not( equalTo( other.anEntity() ) ) );
-            assertThat( "Association hashcode not equal",
-                        some.anEntity().hashCode(),
-                        not( equalTo( other.anEntity().hashCode() ) ) );
-            assertThat( "ManyAssociation not equal",
-                        some.manyEntities(),
-                        not( equalTo( other.manyEntities() ) ) );
-            assertThat( "ManyAssociation hashcode not equal",
-                        some.manyEntities().hashCode(),
-                        not( equalTo( other.manyEntities().hashCode() ) ) );
-            assertThat( "NamedAssociation not equal",
-                        some.namedEntities(),
-                        not( equalTo( other.namedEntities() ) ) );
-            assertThat( "NamedAssociation hashcode not equal",
-                        some.namedEntities().hashCode(),
-                        not( equalTo( other.namedEntities().hashCode() ) ) );
+            assertThat("Association not equal",
+                some.anEntity(),
+                not(equalTo(other.anEntity())));
+            assertThat("Association hashcode not equal",
+                some.anEntity().hashCode(),
+                not(equalTo(other.anEntity().hashCode())));
+            assertThat("ManyAssociation not equal",
+                some.manyEntities(),
+                not(equalTo(other.manyEntities())));
+            assertThat("ManyAssociation hashcode not equal",
+                some.manyEntities().hashCode(),
+                not(equalTo(other.manyEntities().hashCode())));
+            assertThat("NamedAssociation not equal",
+                some.namedEntities(),
+                not(equalTo(other.namedEntities())));
+            assertThat("NamedAssociation hashcode not equal",
+                some.namedEntities().hashCode(),
+                not(equalTo(other.namedEntities().hashCode())));
         }
         finally
         {
@@ -430,27 +430,27 @@ public class AssociationEqualityTest
     //
     // -----------------------------------:: Values factory methods ::--------------------------------------------------
     //
-    private SomeWithAssociations buildSomeWithAssociation( AnEntity associated )
+    private SomeWithAssociations buildSomeWithAssociation(AnEntity associated)
     {
         SomeWithAssociations some;
         {
-            ValueBuilder<SomeWithAssociations> builder = valueBuilderFactory.newValueBuilder( SomeWithAssociations.class );
-            builder.prototype().anEntity().set( associated );
-            builder.prototype().manyEntities().add( associated );
-            builder.prototype().namedEntities().put( "someKey", associated );
+            ValueBuilder<SomeWithAssociations> builder = valueBuilderFactory.newValueBuilder(SomeWithAssociations.class);
+            builder.prototype().anEntity().set(associated);
+            builder.prototype().manyEntities().add(associated);
+            builder.prototype().namedEntities().put("someKey", associated);
             some = builder.newInstance();
         }
         return some;
     }
 
-    private OtherWithAssociations buildOtherWithAssociation( AnEntity associated )
+    private OtherWithAssociations buildOtherWithAssociation(AnEntity associated)
     {
         OtherWithAssociations some;
         {
-            ValueBuilder<OtherWithAssociations> builder = valueBuilderFactory.newValueBuilder( OtherWithAssociations.class );
-            builder.prototype().anEntity().set( associated );
-            builder.prototype().manyEntities().add( associated );
-            builder.prototype().namedEntities().put( "someKey", associated );
+            ValueBuilder<OtherWithAssociations> builder = valueBuilderFactory.newValueBuilder(OtherWithAssociations.class);
+            builder.prototype().anEntity().set(associated);
+            builder.prototype().manyEntities().add(associated);
+            builder.prototype().namedEntities().put("someKey", associated);
             some = builder.newInstance();
         }
         return some;

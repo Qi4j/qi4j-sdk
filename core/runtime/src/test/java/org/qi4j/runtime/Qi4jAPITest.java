@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.service.ServiceComposite;
@@ -29,22 +30,21 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 /**
  * JAVADOC
  */
 public class Qi4jAPITest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.transients( TestTransient.class );
-        module.entities( TestEntity.class );
-        module.values( TestValue.class );
-        module.services( TestService.class );
+        new EntityTestAssembler().assemble(module);
+        module.transients(TestTransient.class);
+        module.entities(TestEntity.class);
+        module.values(TestValue.class);
+        module.services(TestService.class);
     }
 
     @Test
@@ -52,17 +52,17 @@ public class Qi4jAPITest
         throws Exception
     {
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
-        TestEntity testEntity = unitOfWork.newEntity( TestEntity.class );
+        TestEntity testEntity = unitOfWork.newEntity(TestEntity.class);
 
-        api.moduleOf( testEntity );
+        api.moduleOf(testEntity);
 
         unitOfWork.discard();
 
-        api.moduleOf( valueBuilderFactory.newValue( TestValue.class ) );
+        api.moduleOf(valueBuilderFactory.newValue(TestValue.class));
 
-        api.moduleOf( transientBuilderFactory.newTransient( TestTransient.class ) );
+        api.moduleOf(transientBuilderFactory.newTransient(TestTransient.class));
 
-        api.moduleOf( serviceFinder.findService( TestService.class ).get() );
+        api.moduleOf(serviceFinder.findService(TestService.class).get());
     }
 
     public interface TestTransient

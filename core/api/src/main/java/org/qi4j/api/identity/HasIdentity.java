@@ -19,22 +19,20 @@
  */
 package org.qi4j.api.identity;
 
-import java.lang.reflect.Method;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.injection.scope.State;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Immutable;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.injection.scope.State;
-import org.qi4j.api.property.Immutable;
-import org.qi4j.api.property.Property;
+
+import java.lang.reflect.Method;
 
 /**
  * This interface provides the identity of the object which may be used
  * to store the state in a database. It is not the responsibility of the
  * framework to come up with a good identity string.
  */
-@Mixins( HasIdentity.HasIdentityMixin.class )
+@Mixins(HasIdentity.HasIdentityMixin.class)
 public interface HasIdentity
 {
     Method IDENTITY_METHOD = HasIdentityMixin.identityMethod();
@@ -60,18 +58,18 @@ public interface HasIdentity
 
         private static QualifiedName stateName()
         {
-            return QualifiedName.fromAccessor( identityMethod() );
+            return QualifiedName.fromAccessor(identityMethod());
         }
 
         private static Method identityMethod()
         {
             try
             {
-                return HasIdentity.class.getMethod( "identity" );
+                return HasIdentity.class.getMethod("identity");
             }
-            catch( NoSuchMethodException e )
+            catch(NoSuchMethodException e)
             {
-                throw new InternalError( "Qi4j Core Runtime codebase is corrupted." );
+                throw new InternalError("Qi4j Core Runtime codebase is corrupted.");
             }
         }
     }

@@ -29,16 +29,16 @@ public class MethodClassMatcherMockResolver
     private final Object recordedMock;
     private final Class methodClass;
 
-    public MethodClassMatcherMockResolver( Object recordedMock, Class methodClass )
+    public MethodClassMatcherMockResolver(Object recordedMock, Class methodClass)
     {
         this.recordedMock = recordedMock;
         this.methodClass = methodClass;
     }
 
     @Override
-    public InvocationHandler getInvocationHandler( Object proxy, Method method, Object[] args )
+    public InvocationHandler getInvocationHandler(Object proxy, Method method, Object[] args)
     {
-        if( method.getDeclaringClass().equals( methodClass ) )
+        if(method.getDeclaringClass().equals(methodClass))
         {
             return this;
         }
@@ -46,9 +46,9 @@ public class MethodClassMatcherMockResolver
     }
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
-        return method.invoke( recordedMock, args );
+        return method.invoke(recordedMock, args);
     }
 }

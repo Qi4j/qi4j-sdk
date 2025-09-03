@@ -19,18 +19,15 @@
  */
 package org.qi4j.test;
 
-import java.util.Collections;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ApplicationDescriptor;
-import org.qi4j.bootstrap.ApplicationAssembler;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.AssemblyReportException;
-import org.qi4j.bootstrap.Energy4Java;
+import org.qi4j.bootstrap.*;
 import org.qi4j.spi.Qi4jSPI;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+
+import java.util.Collections;
 
 public abstract class AbstractQi4jBaseTest
 {
@@ -47,13 +44,13 @@ public abstract class AbstractQi4jBaseTest
     {
         qi4j = new Energy4Java();
         applicationModel = newApplicationModel();
-        if( applicationModel == null )
+        if(applicationModel == null)
         {
             // An AssemblyException has occurred that the Test wants to check for.
             return;
         }
-        application = newApplicationInstance( applicationModel );
-        initApplication( application );
+        application = newApplicationInstance(applicationModel);
+        initApplication(application);
         api = spi = qi4j.spi();
         application.activate();
     }
@@ -65,12 +62,12 @@ public abstract class AbstractQi4jBaseTest
      * @param applicationAssembly the {@link ApplicationAssembly} to be populated.
      * @throws AssemblyException on invalid assembly
      */
-    protected abstract void defineApplication( ApplicationAssembly applicationAssembly )
+    protected abstract void defineApplication(ApplicationAssembly applicationAssembly)
         throws Exception;
 
-    protected Application newApplicationInstance( ApplicationDescriptor applicationModel )
+    protected Application newApplicationInstance(ApplicationDescriptor applicationModel)
     {
-        return applicationModel.newInstance( qi4j.api() );
+        return applicationModel.newInstance(qi4j.api());
     }
 
     protected ApplicationDescriptor newApplicationModel()
@@ -79,25 +76,25 @@ public abstract class AbstractQi4jBaseTest
         ApplicationAssembler assembler = applicationFactory ->
         {
             ApplicationAssembly applicationAssembly = applicationFactory.newApplicationAssembly();
-            applicationAssembly.setMode( Application.Mode.test );
+            applicationAssembly.setMode(Application.Mode.test);
             try
             {
-                defineApplication( applicationAssembly );
+                defineApplication(applicationAssembly);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
-                throw new AssemblyReportException( Collections.singleton( e ) );
+                throw new AssemblyReportException(Collections.singleton(e));
             }
             return applicationAssembly;
         };
 
         try
         {
-            return qi4j.newApplicationModel( assembler );
+            return qi4j.newApplicationModel(assembler);
         }
-        catch( AssemblyException e )
+        catch(AssemblyException e)
         {
-            assemblyException( e );
+            assemblyException(e);
             return null;
         }
     }
@@ -111,13 +108,13 @@ public abstract class AbstractQi4jBaseTest
      * @param exception the exception thrown.
      * @throws AssemblyException The default implementation of this method will simply re-throw the exception.
      */
-    protected void assemblyException( AssemblyException exception )
+    protected void assemblyException(AssemblyException exception)
         throws AssemblyException
     {
         throw exception;
     }
 
-    protected void initApplication( Application app )
+    protected void initApplication(Application app)
         throws Exception
     {
     }
@@ -125,15 +122,15 @@ public abstract class AbstractQi4jBaseTest
     @AfterEach
     public void tearDown()
     {
-        if( application != null )
+        if(application != null)
         {
             try
             {
                 application.passivate();
             }
-            catch( Exception e )
+            catch(Exception e)
             {
-                throw new RuntimeException( "Unable to shut down test harness cleanly.", e );
+                throw new RuntimeException("Unable to shut down test harness cleanly.", e);
             }
         }
     }

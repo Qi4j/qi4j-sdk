@@ -19,11 +19,12 @@
  */
 package org.qi4j.api.service.qualifier;
 
+import org.qi4j.api.service.ServiceReference;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.function.Predicate;
-import org.qi4j.api.service.ServiceReference;
 
 /**
  * Filter services based on Meta Info being declared on the Service.
@@ -43,8 +44,8 @@ import org.qi4j.api.service.ServiceReference;
  * to get only a service that has a MyCustomInfo instance set as meta info.
  * </p>
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Qualifier( HasMetaInfo.HasMetaInfoQualifier.class )
+@Retention(RetentionPolicy.RUNTIME)
+@Qualifier(HasMetaInfo.HasMetaInfoQualifier.class)
 @Documented
 public @interface HasMetaInfo
 {
@@ -52,8 +53,8 @@ public @interface HasMetaInfo
      * The Class(es) needed to have been defined in the Service meta info for a qualifier to evaluate true.
      *
      * @return One or more classes that should be defined in the service's meta info for the service to be considered
-     *         qualified. If more than one class is defined, the {@code anded()} parameter will define if they must be
-     *         AND'ed or OR'ed together.
+     * qualified. If more than one class is defined, the {@code anded()} parameter will define if they must be
+     * AND'ed or OR'ed together.
      */
     Class[] value();
 
@@ -61,8 +62,8 @@ public @interface HasMetaInfo
      * True if the Classes defined in the value() field should be AND'ed instead of OR'ed.
      *
      * @return If true, all the Class types defined in {@code value()} must be defined for the service for it to be
-     *         qualified. If false, if any of the Class types defined in {@code value()} is defined for the service
-     *         the service is qualified.
+     * qualified. If false, if any of the Class types defined in {@code value()} is defined for the service
+     * the service is qualified.
      */
     boolean anded() default false;
 
@@ -74,24 +75,24 @@ public @interface HasMetaInfo
         implements AnnotationQualifier<HasMetaInfo>
     {
         @Override
-        public Predicate<ServiceReference<?>> qualifier( final HasMetaInfo hasMetaInfo )
+        public Predicate<ServiceReference<?>> qualifier(final HasMetaInfo hasMetaInfo)
         {
             return service ->
             {
-                for( Class metaInfoType : hasMetaInfo.value() )
+                for(Class metaInfoType : hasMetaInfo.value())
                 {
-                    @SuppressWarnings( "unchecked" )
-                    Object metaInfo = service.metaInfo( metaInfoType );
-                    if( hasMetaInfo.anded() )
+                    @SuppressWarnings("unchecked")
+                    Object metaInfo = service.metaInfo(metaInfoType);
+                    if(hasMetaInfo.anded())
                     {
-                        if( metaInfo == null )
+                        if(metaInfo == null)
                         {
                             return false;
                         }
                     }
                     else
                     {
-                        if( metaInfo != null )
+                        if(metaInfo != null)
                         {
                             return true;
                         }

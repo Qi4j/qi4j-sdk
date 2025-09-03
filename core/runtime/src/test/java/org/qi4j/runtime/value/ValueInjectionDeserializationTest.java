@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.value;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.identity.Identity;
@@ -36,7 +37,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -46,13 +46,13 @@ public class ValueInjectionDeserializationTest
     extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( Niclas.class );
-        module.values( SomeValue.class );
-        module.services( DummyService.class );
-        new EntityTestAssembler().assemble( module );
+        module.entities(Niclas.class);
+        module.values(SomeValue.class);
+        module.services(DummyService.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
@@ -62,27 +62,27 @@ public class ValueInjectionDeserializationTest
         UnitOfWork uow = null;
         try
         {
-            ValueBuilder<Some> builder = valueBuilderFactory.newValueBuilder( Some.class );
-            builder.prototype().data().set( "Niclas" );
+            ValueBuilder<Some> builder = valueBuilderFactory.newValueBuilder(Some.class);
+            builder.prototype().data().set("Niclas");
             Some value = builder.newInstance();
 
             uow = unitOfWorkFactory.newUnitOfWork();
-            EntityBuilder<Niclas> eb = uow.newEntityBuilder( Niclas.class );
-            eb.instance().value().set( value );
+            EntityBuilder<Niclas> eb = uow.newEntityBuilder(Niclas.class);
+            eb.instance().value().set(value);
             Niclas niclas1 = eb.newInstance();
             Identity id = niclas1.identity().get();
             uow.complete();
 
             uow = unitOfWorkFactory.newUnitOfWork();
-            Niclas niclas2 = uow.get( Niclas.class, id );
+            Niclas niclas2 = uow.get(Niclas.class, id);
             Some someValue = niclas2.value().get();
-            assertThat( someValue.data().get(), equalTo( "Niclas" ) );
-            assertThat( someValue.module(), notNullValue() );
-            assertThat( someValue.service(), notNullValue() );
+            assertThat(someValue.data().get(), equalTo("Niclas"));
+            assertThat(someValue.module(), notNullValue());
+            assertThat(someValue.service(), notNullValue());
         }
         finally
         {
-            if( uow != null )
+            if(uow != null)
             {
                 uow.discard();
             }
@@ -104,7 +104,7 @@ public class ValueInjectionDeserializationTest
         Property<String> data();
     }
 
-    @Mixins( SomeMixin.class )
+    @Mixins(SomeMixin.class)
     public interface SomeValue
         extends Some, ValueComposite
     {

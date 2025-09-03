@@ -30,13 +30,13 @@ import org.qi4j.spi.entity.EntityState;
  */
 public interface EntityStoreSPI
 {
-    EntityState newEntityState( EntityStoreUnitOfWork unitOfWork,
-                                EntityReference reference, EntityDescriptor entityDescriptor
+    EntityState newEntityState(EntityStoreUnitOfWork unitOfWork,
+                               EntityReference reference, EntityDescriptor entityDescriptor
     );
 
-    EntityState entityStateOf( EntityStoreUnitOfWork unitOfWork, ModuleDescriptor module, EntityReference reference );
+    EntityState entityStateOf(EntityStoreUnitOfWork unitOfWork, ModuleDescriptor module, EntityReference reference);
 
-    String versionOf( EntityStoreUnitOfWork unitOfWork, EntityReference reference );
+    String versionOf(EntityStoreUnitOfWork unitOfWork, EntityReference reference);
 
-    StateCommitter applyChanges( EntityStoreUnitOfWork unitOfWork, Iterable<EntityState> state );
+    StateCommitter applyChanges(EntityStoreUnitOfWork unitOfWork, Iterable<EntityState> state);
 }

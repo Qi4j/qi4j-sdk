@@ -20,9 +20,10 @@
 
 package org.qi4j.runtime.bootstrap;
 
+import org.qi4j.api.common.AppliesToFilter;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import org.qi4j.api.common.AppliesToFilter;
 
 /**
  * JAVADOC
@@ -31,14 +32,14 @@ final class ImplementsMethodAppliesToFilter
     implements AppliesToFilter
 {
     @Override
-    public boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass )
+    public boolean appliesTo(Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass)
     {
         try
         {
-            Method fragmentMethod = fragmentClass.getMethod( method.getName(), method.getParameterTypes() );
-            return !Modifier.isAbstract( fragmentMethod.getModifiers() );
+            Method fragmentMethod = fragmentClass.getMethod(method.getName(), method.getParameterTypes());
+            return !Modifier.isAbstract(fragmentMethod.getModifiers());
         }
-        catch( NoSuchMethodException e )
+        catch(NoSuchMethodException e)
         {
             return false;
         }

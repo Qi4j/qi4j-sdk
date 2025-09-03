@@ -20,10 +20,11 @@
 
 package org.qi4j.spi.entitystore.helpers;
 
-import java.util.Iterator;
-import java.util.List;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.spi.entity.ManyAssociationState;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Default implementation of ManyAssociationState. Backed by ArrayList.
@@ -34,7 +35,7 @@ public final class DefaultManyAssociationState
     private DefaultEntityState entityState;
     private List<EntityReference> references;
 
-    public DefaultManyAssociationState( DefaultEntityState entityState, List<EntityReference> references )
+    public DefaultManyAssociationState(DefaultEntityState entityState, List<EntityReference> references)
     {
         this.entityState = entityState;
         this.references = references;
@@ -47,24 +48,24 @@ public final class DefaultManyAssociationState
     }
 
     @Override
-    public boolean contains( EntityReference entityReference )
+    public boolean contains(EntityReference entityReference)
     {
-        return references.contains( entityReference );
+        return references.contains(entityReference);
     }
 
     @Override
-    public boolean add( int i, EntityReference entityReference )
+    public boolean add(int i, EntityReference entityReference)
     {
-        references.add( i, entityReference );
+        references.add(i, entityReference);
         entityState.markUpdated();
         return true;
     }
 
     @Override
-    public boolean remove( EntityReference entity )
+    public boolean remove(EntityReference entity)
     {
-        boolean removed = references.remove( entity );
-        if( removed )
+        boolean removed = references.remove(entity);
+        if(removed)
         {
             entityState.markUpdated();
         }
@@ -74,7 +75,7 @@ public final class DefaultManyAssociationState
     @Override
     public boolean clear()
     {
-        if( !references.isEmpty() )
+        if(!references.isEmpty())
         {
             references.clear();
             entityState.markUpdated();
@@ -84,9 +85,9 @@ public final class DefaultManyAssociationState
     }
 
     @Override
-    public EntityReference get( int i )
+    public EntityReference get(int i)
     {
-        return references.get( i );
+        return references.get(i);
     }
 
     @Override

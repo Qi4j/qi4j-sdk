@@ -36,12 +36,10 @@ public interface TransientBuilder<T>
      * dependency injection annotation.
      *
      * @param usedObjects The objects that can be injected into mixins.
-     *
      * @return the transient builder instance
-     *
      * @see Uses
      */
-    TransientBuilder<T> use( Object... usedObjects );
+    TransientBuilder<T> use(Object... usedObjects);
 
     /**
      * Get a representation of the state for the new Composite.
@@ -56,18 +54,16 @@ public interface TransientBuilder<T>
      * Get a representation of the state of the given type for the new Composite.
      * This is primarily used if you want to provide state for a private mixin type.
      *
-     * @param <K> Mixin type
+     * @param <K>       Mixin type
      * @param mixinType the mixin which you want to provide state for
-     *
      * @return a proxy implementing the given mixin type
      */
-    <K> K prototypeFor( Class<K> mixinType );
+    <K> K prototypeFor(Class<K> mixinType);
 
     /**
      * Create a new Composite instance.
      *
      * @return a new Composite instance
-     *
      * @throws ConstructionException thrown if it was not possible to instantiate the Composite
      */
     T newInstance()

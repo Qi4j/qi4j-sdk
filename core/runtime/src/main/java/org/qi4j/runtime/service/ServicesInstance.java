@@ -19,20 +19,15 @@
  */
 package org.qi4j.runtime.service;
 
-import java.util.List;
-import java.util.stream.Stream;
-import org.qi4j.api.activation.Activation;
-import org.qi4j.api.activation.ActivationEventListener;
-import org.qi4j.api.activation.ActivationEventListenerRegistration;
-import org.qi4j.api.activation.ActivationException;
-import org.qi4j.api.activation.PassivationException;
+import org.qi4j.api.activation.*;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.runtime.activation.ActivationDelegate;
 import org.qi4j.runtime.activation.ActivatorsInstance;
-import org.qi4j.runtime.activation.ActivationDelegate;
-import org.qi4j.runtime.activation.ActivatorsInstance;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -44,15 +39,15 @@ public class ServicesInstance
 {
     private final ServicesModel servicesModel;
     private final List<ServiceReference<?>> serviceReferences;
-    private final ActivationDelegate activation = new ActivationDelegate( this, false );
+    private final ActivationDelegate activation = new ActivationDelegate(this, false);
 
-    public ServicesInstance( ServicesModel servicesModel, List<ServiceReference<?>> serviceReferences )
+    public ServicesInstance(ServicesModel servicesModel, List<ServiceReference<?>> serviceReferences)
     {
         this.servicesModel = servicesModel;
         this.serviceReferences = serviceReferences;
-        for( ServiceReference serviceReference : serviceReferences )
+        for(ServiceReference serviceReference : serviceReferences)
         {
-            serviceReference.registerActivationEventListener( activation );
+            serviceReference.registerActivationEventListener(activation);
         }
     }
 
@@ -65,10 +60,10 @@ public class ServicesInstance
     public void activate()
         throws ActivationException
     {
-        Iterable<Activation> activatees = serviceReferences.stream().filter( Activation.class::isInstance )
-                                                           .map( Activation.class::cast )
-                                                           .collect( toList() );
-        activation.activate( ActivatorsInstance.EMPTY, activatees );
+        Iterable<Activation> activatees = serviceReferences.stream().filter(Activation.class::isInstance)
+            .map(Activation.class::cast)
+            .collect(toList());
+        activation.activate(ActivatorsInstance.EMPTY, activatees);
     }
 
     @Override
@@ -78,38 +73,38 @@ public class ServicesInstance
         activation.passivate();
     }
 
-    public Stream<ServiceReference<?>> visibleServices( final Visibility visibility )
+    public Stream<ServiceReference<?>> visibleServices(final Visibility visibility)
     {
         return serviceReferences.stream()
-            .filter( item -> ( (ServiceReferenceInstance) item ).serviceDescriptor()
-                                 .visibility().ordinal() >= visibility.ordinal() );
+            .filter(item -> ((ServiceReferenceInstance) item).serviceDescriptor()
+                .visibility().ordinal() >= visibility.ordinal());
     }
 
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder( "Services{" );
+        StringBuilder sb = new StringBuilder("Services{");
         String sep = " ";
-        for( ServiceReference serviceReference : serviceReferences )
+        for(ServiceReference serviceReference : serviceReferences)
         {
-            sb.append( sep ).
-                append( serviceReference.identity() ).
-                append( "(active=" ).append( serviceReference.isActive() ).append( ")" );
+            sb.append(sep).
+                append(serviceReference.identity()).
+                append("(active=").append(serviceReference.isActive()).append(")");
             sep = ", ";
         }
-        return sb.append( " }" ).toString();
+        return sb.append(" }").toString();
     }
 
     @Override
-    public void registerActivationEventListener( ActivationEventListener listener )
+    public void registerActivationEventListener(ActivationEventListener listener)
     {
-        activation.registerActivationEventListener( listener );
+        activation.registerActivationEventListener(listener);
     }
 
     @Override
-    public void deregisterActivationEventListener( ActivationEventListener listener )
+    public void deregisterActivationEventListener(ActivationEventListener listener)
     {
-        activation.deregisterActivationEventListener( listener );
+        activation.deregisterActivationEventListener(listener);
     }
 
     public Stream<? extends ServiceDescriptor> descriptors()

@@ -20,11 +20,9 @@
 
 package org.qi4j.runtime;
 
-import org.qi4j.api.association.AbstractAssociation;
-import org.qi4j.api.association.Association;
-import org.qi4j.api.association.AssociationStateDescriptor;
-import org.qi4j.api.association.AssociationStateHolder;
-import org.qi4j.api.association.ManyAssociation;
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Test;
+import org.qi4j.api.association.*;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
@@ -35,8 +33,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -46,11 +42,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class Qi4jSPITest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( TestEntity.class, TestEntity2.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(TestEntity.class, TestEntity2.class);
     }
 
     @Test
@@ -61,13 +57,13 @@ public class Qi4jSPITest
         TestEntity testEntity;
         try
         {
-            EntityBuilder<TestEntity> builder = unitOfWork.newEntityBuilder( TestEntity.class );
+            EntityBuilder<TestEntity> builder = unitOfWork.newEntityBuilder(TestEntity.class);
 
             testEntity = builder.newInstance();
 
-            AssociationStateHolder state = spi.stateOf( testEntity );
+            AssociationStateHolder state = spi.stateOf(testEntity);
 
-            validateState( state, spi.entityDescriptorFor( testEntity ) );
+            validateState(state, spi.entityDescriptorFor(testEntity));
 
             unitOfWork.complete();
         }
@@ -79,8 +75,8 @@ public class Qi4jSPITest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            testEntity = uow.get( testEntity );
-            validateState( spi.stateOf( testEntity ), spi.entityDescriptorFor( testEntity ) );
+            testEntity = uow.get(testEntity);
+            validateState(spi.stateOf(testEntity), spi.entityDescriptorFor(testEntity));
             uow.complete();
         }
         finally
@@ -89,18 +85,18 @@ public class Qi4jSPITest
         }
     }
 
-    private void validateState( AssociationStateHolder state, EntityDescriptor entityDescriptor )
+    private void validateState(AssociationStateHolder state, EntityDescriptor entityDescriptor)
     {
-        entityDescriptor.state().properties().forEach( propertyDescriptor -> {
-            Property<?> prop = state.propertyFor( propertyDescriptor.accessor() );
-            assertThat( "Properties could be listed", prop, CoreMatchers.notNullValue() );
-        } );
+        entityDescriptor.state().properties().forEach(propertyDescriptor -> {
+            Property<?> prop = state.propertyFor(propertyDescriptor.accessor());
+            assertThat("Properties could be listed", prop, CoreMatchers.notNullValue());
+        });
 
         AssociationStateDescriptor descriptor = entityDescriptor.state();
-        descriptor.associations().forEach( associationDescriptor -> {
-            AbstractAssociation assoc = state.associationFor( associationDescriptor.accessor() );
-            assertThat( "Assocs could be listed", assoc, CoreMatchers.notNullValue() );
-        } );
+        descriptor.associations().forEach(associationDescriptor -> {
+            AbstractAssociation assoc = state.associationFor(associationDescriptor.accessor());
+            assertThat("Assocs could be listed", assoc, CoreMatchers.notNullValue());
+        });
     }
 
     public interface TestEntity

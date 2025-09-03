@@ -17,8 +17,6 @@
  */
 package org.qi4j.bootstrap;
 
-import org.qi4j.api.common.Visibility;
-
 /**
  * Assembler adapters for common use cases (visibility, reference, configuration).
  */
@@ -30,6 +28,7 @@ public class Assemblers
 
     /**
      * Assembler with Visibility interface.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public interface Visible<AssemblerType>
@@ -37,14 +36,16 @@ public class Assemblers
     {
         /**
          * Set Visibility.
+         *
          * @param visibility Visibility
          * @return This Assembler instance
          */
-        AssemblerType visibleIn( org.qi4j.api.common.Visibility visibility );
+        AssemblerType visibleIn(org.qi4j.api.common.Visibility visibility);
 
         /**
          * Get Visibility.
          * <p>Default to {@link org.qi4j.api.common.Visibility#module}.</p>
+         *
          * @return Visibility
          */
         org.qi4j.api.common.Visibility visibility();
@@ -52,6 +53,7 @@ public class Assemblers
 
     /**
      * Assembler with Identity interface.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public interface Identifiable<AssemblerType>
@@ -59,10 +61,11 @@ public class Assemblers
     {
         /**
          * Set Identity.
+         *
          * @param identity Identity
          * @return This Assembler instance
          */
-        AssemblerType identifiedBy( String identity );
+        AssemblerType identifiedBy(String identity);
 
         /**
          * @return {@literal true} if {@link #identity()} do not return null, {@literal false} otherwise
@@ -72,6 +75,7 @@ public class Assemblers
         /**
          * Get Identity.
          * <p>Default to {@literal null}.</p>
+         *
          * @return Identity
          */
         String identity();
@@ -79,6 +83,7 @@ public class Assemblers
 
     /**
      * Assembler with Configuration interface.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public interface Configurable<AssemblerType>
@@ -86,12 +91,13 @@ public class Assemblers
     {
         /**
          * Set Configuration Module and Visibility.
-         * @param configModule Configuration Module
+         *
+         * @param configModule     Configuration Module
          * @param configVisibility Configuration Visiblity
          * @return This Assembler instance
          */
-        AssemblerType withConfig( ModuleAssembly configModule,
-                                  org.qi4j.api.common.Visibility configVisibility );
+        AssemblerType withConfig(ModuleAssembly configModule,
+                                 org.qi4j.api.common.Visibility configVisibility);
 
         /**
          * @return {@literal true} if {@link #configModule() ()} do not return null, {@literal false} otherwise
@@ -101,6 +107,7 @@ public class Assemblers
         /**
          * Get Configuration Module.
          * <p>Default to {@literal null}.</p>
+         *
          * @return Configuration Module
          */
         ModuleAssembly configModule();
@@ -108,6 +115,7 @@ public class Assemblers
         /**
          * Get Configuration Visibility.
          * <p>Default to {@link org.qi4j.api.common.Visibility#module}.</p>
+         *
          * @return Configuration Visibility
          */
         org.qi4j.api.common.Visibility configVisibility();
@@ -115,6 +123,7 @@ public class Assemblers
 
     /**
      * Assembler with Visibility adapter.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public static abstract class Visibility<AssemblerType> extends AssembleChecker
@@ -123,8 +132,8 @@ public class Assemblers
         private org.qi4j.api.common.Visibility visibility = org.qi4j.api.common.Visibility.module;
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType visibleIn( org.qi4j.api.common.Visibility visibility )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType visibleIn(org.qi4j.api.common.Visibility visibility)
         {
             this.visibility = visibility;
             return (AssemblerType) this;
@@ -139,6 +148,7 @@ public class Assemblers
 
     /**
      * Assembler with Identity adapter.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public static abstract class Identity<AssemblerType> extends AssembleChecker
@@ -147,8 +157,8 @@ public class Assemblers
         private String identity;
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType identifiedBy( String identity )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType identifiedBy(String identity)
         {
             this.identity = identity;
             return (AssemblerType) this;
@@ -169,6 +179,7 @@ public class Assemblers
 
     /**
      * Assembler with Configuration adapter.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public static abstract class Config<AssemblerType> extends AssembleChecker
@@ -178,9 +189,9 @@ public class Assemblers
         private org.qi4j.api.common.Visibility configVisibility = org.qi4j.api.common.Visibility.module;
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType withConfig( ModuleAssembly configModule,
-                                               org.qi4j.api.common.Visibility configVisibility )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType withConfig(ModuleAssembly configModule,
+                                              org.qi4j.api.common.Visibility configVisibility)
         {
             this.configModule = configModule;
             this.configVisibility = configVisibility;
@@ -208,18 +219,19 @@ public class Assemblers
 
     /**
      * Assembler with Visibility and Identity adapter.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public static abstract class VisibilityIdentity<AssemblerType> extends AssembleChecker
         implements Visible<AssemblerType>,
-                   Identifiable<AssemblerType>
+        Identifiable<AssemblerType>
     {
         private org.qi4j.api.common.Visibility visibility = org.qi4j.api.common.Visibility.module;
         private String identity;
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType visibleIn( org.qi4j.api.common.Visibility visibility )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType visibleIn(org.qi4j.api.common.Visibility visibility)
         {
             this.visibility = visibility;
             return (AssemblerType) this;
@@ -232,8 +244,8 @@ public class Assemblers
         }
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType identifiedBy( String identityString )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType identifiedBy(String identityString)
         {
             this.identity = identityString;
             return (AssemblerType) this;
@@ -254,19 +266,20 @@ public class Assemblers
 
     /**
      * Assembler with Visibility and Configuration adapter.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public static abstract class VisibilityConfig<AssemblerType> extends AssembleChecker
         implements Visible<AssemblerType>,
-                   Configurable<AssemblerType>
+        Configurable<AssemblerType>
     {
         private org.qi4j.api.common.Visibility visibility = org.qi4j.api.common.Visibility.module;
         private ModuleAssembly configModule = null;
         private org.qi4j.api.common.Visibility configVisibility = org.qi4j.api.common.Visibility.module;
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType visibleIn( org.qi4j.api.common.Visibility visibility )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType visibleIn(org.qi4j.api.common.Visibility visibility)
         {
             this.visibility = visibility;
             return (AssemblerType) this;
@@ -279,9 +292,9 @@ public class Assemblers
         }
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType withConfig( ModuleAssembly configModule,
-                                               org.qi4j.api.common.Visibility configVisibility )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType withConfig(ModuleAssembly configModule,
+                                              org.qi4j.api.common.Visibility configVisibility)
         {
             this.configModule = configModule;
             this.configVisibility = configVisibility;
@@ -309,19 +322,20 @@ public class Assemblers
 
     /**
      * Assembler with Identity and Configuration adapter.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public static abstract class IdentityConfig<AssemblerType> extends AssembleChecker
         implements Identifiable<AssemblerType>,
-                   Configurable<AssemblerType>
+        Configurable<AssemblerType>
     {
         private String identity;
         private ModuleAssembly configModule = null;
         private org.qi4j.api.common.Visibility configVisibility = org.qi4j.api.common.Visibility.module;
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType identifiedBy( String identity )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType identifiedBy(String identity)
         {
             this.identity = identity;
             return (AssemblerType) this;
@@ -340,9 +354,9 @@ public class Assemblers
         }
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType withConfig( ModuleAssembly configModule,
-                                               org.qi4j.api.common.Visibility configVisibility )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType withConfig(ModuleAssembly configModule,
+                                              org.qi4j.api.common.Visibility configVisibility)
         {
             this.configModule = configModule;
             this.configVisibility = configVisibility;
@@ -370,12 +384,13 @@ public class Assemblers
 
     /**
      * Assembler with Visibility, Identity and Configuation adapter.
+     *
      * @param <AssemblerType> Parameterized type of Assembler
      */
     public static abstract class VisibilityIdentityConfig<AssemblerType> extends AssembleChecker
         implements Visible<AssemblerType>,
-                   Identifiable<AssemblerType>,
-                   Configurable<AssemblerType>
+        Identifiable<AssemblerType>,
+        Configurable<AssemblerType>
     {
         private org.qi4j.api.common.Visibility visibility = org.qi4j.api.common.Visibility.module;
         private String identity;
@@ -383,8 +398,8 @@ public class Assemblers
         private org.qi4j.api.common.Visibility configVisibility = org.qi4j.api.common.Visibility.module;
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType visibleIn( org.qi4j.api.common.Visibility visibility )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType visibleIn(org.qi4j.api.common.Visibility visibility)
         {
             this.visibility = visibility;
             return (AssemblerType) this;
@@ -397,8 +412,8 @@ public class Assemblers
         }
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType identifiedBy( String identity )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType identifiedBy(String identity)
         {
             this.identity = identity;
             return (AssemblerType) this;
@@ -417,9 +432,9 @@ public class Assemblers
         }
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public final AssemblerType withConfig( ModuleAssembly configModule,
-                                               org.qi4j.api.common.Visibility configVisibility )
+        @SuppressWarnings("unchecked")
+        public final AssemblerType withConfig(ModuleAssembly configModule,
+                                              org.qi4j.api.common.Visibility configVisibility)
         {
             this.configModule = configModule;
             this.configVisibility = configVisibility;
@@ -451,7 +466,7 @@ public class Assemblers
         private boolean assembled = false;
 
         @Override
-        public void assemble( ModuleAssembly module )
+        public void assemble(ModuleAssembly module)
             throws AssemblyException
         {
             assembled = true;
@@ -462,28 +477,28 @@ public class Assemblers
             throws Throwable
         {
             super.finalize();
-            if( !assembled )
+            if(!assembled)
             {
-                System.err.println( "WARNING!!!!!" );
-                System.err.println( "############################################################################" );
-                System.err.println( "##" );
-                System.err.println( "##  The " + getClass().getName() + " assembler was not assembled." );
-                System.err.println( "##" );
-                System.err.println( "##  Expect that some functionality to be missing or incorrect." );
-                System.err.println( "##" );
-                if( getClass().getName().startsWith( "org.qi4j" ))
+                System.err.println("WARNING!!!!!");
+                System.err.println("############################################################################");
+                System.err.println("##");
+                System.err.println("##  The " + getClass().getName() + " assembler was not assembled.");
+                System.err.println("##");
+                System.err.println("##  Expect that some functionality to be missing or incorrect.");
+                System.err.println("##");
+                if(getClass().getName().startsWith("org.qi4j"))
                 {
-                    System.err.println( "## When instantiating a provided Assembler, you must call the assemble(module)" );
-                    System.err.println( "## method after setting the options. This was not done." );
+                    System.err.println("## When instantiating a provided Assembler, you must call the assemble(module)");
+                    System.err.println("## method after setting the options. This was not done.");
                 }
                 else
                 {
-                    System.err.println( "## When overriding any helper class in org.qi4j.bootstrap.Assemblers" );
-                    System.err.println( "## you must call super.assemble(module) in the assmeble(ModuleAssembly module)" );
-                    System.err.println( "## method. This was not done, OR that you forgot to call assemble() method " );
-                    System.err.println( "## after instantiating and setting the options." );
+                    System.err.println("## When overriding any helper class in org.qi4j.bootstrap.Assemblers");
+                    System.err.println("## you must call super.assemble(module) in the assmeble(ModuleAssembly module)");
+                    System.err.println("## method. This was not done, OR that you forgot to call assemble() method ");
+                    System.err.println("## after instantiating and setting the options.");
                 }
-                System.err.println( "############################################################################" );
+                System.err.println("############################################################################");
             }
         }
     }

@@ -19,7 +19,6 @@
  */
 package org.qi4j.runtime.query;
 
-import java.util.Objects;
 import org.qi4j.api.query.NotQueryableException;
 import org.qi4j.api.query.QueryBuilder;
 import org.qi4j.api.query.QueryBuilderFactory;
@@ -27,6 +26,8 @@ import org.qi4j.api.service.NoSuchServiceTypeException;
 import org.qi4j.api.service.ServiceFinder;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.spi.query.EntityFinder;
+
+import java.util.Objects;
 
 /**
  * Default implementation of {@link QueryBuilderFactory}
@@ -41,9 +42,9 @@ public final class QueryBuilderFactoryImpl
      *
      * @param finder The ServiceFinder of the Module this QueryBuilderFactory belongs to.
      */
-    public QueryBuilderFactoryImpl( ServiceFinder finder )
+    public QueryBuilderFactoryImpl(ServiceFinder finder)
     {
-        Objects.requireNonNull( finder, "ServiceFinder" );
+        Objects.requireNonNull(finder, "ServiceFinder");
         this.finder = finder;
     }
 
@@ -51,19 +52,19 @@ public final class QueryBuilderFactoryImpl
      * @see QueryBuilderFactory#newQueryBuilder(Class)
      */
     @Override
-    public <T> QueryBuilder<T> newQueryBuilder( final Class<T> resultType )
+    public <T> QueryBuilder<T> newQueryBuilder(final Class<T> resultType)
     {
-        NotQueryableException.throwIfNotQueryable( resultType );
+        NotQueryableException.throwIfNotQueryable(resultType);
 
         final ServiceReference<EntityFinder> serviceReference;
         try
         {
-            serviceReference = finder.findService( EntityFinder.class );
-            return new QueryBuilderImpl<>( serviceReference.get(), resultType, null );
+            serviceReference = finder.findService(EntityFinder.class);
+            return new QueryBuilderImpl<>(serviceReference.get(), resultType, null);
         }
-        catch( NoSuchServiceTypeException e )
+        catch(NoSuchServiceTypeException e)
         {
-            return new QueryBuilderImpl<>( null, resultType, null );
+            return new QueryBuilderImpl<>(null, resultType, null);
         }
     }
 }

@@ -19,28 +19,28 @@
  */
 package org.qi4j.regression.qi55;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 public class IssueTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.objects( AClass.class );
+        module.objects(AClass.class);
     }
 
     @Test
     public void objectWithGenericUsage()
     {
-        assertThat( objectFactory.newObject( AClass.class, "Test string" ).uses(), equalTo( "Using - Test string" ) );
+        assertThat(objectFactory.newObject(AClass.class, "Test string").uses(), equalTo("Using - Test string"));
     }
 
     public static class AClass<T>

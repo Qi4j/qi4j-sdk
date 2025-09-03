@@ -26,19 +26,19 @@ public class HasEqualOrAssignableFromType<T extends HasTypes> implements Predica
 {
     private final Predicate<T> composedPredicate;
 
-    public HasEqualOrAssignableFromType( Type type )
+    public HasEqualOrAssignableFromType(Type type)
     {
-        composedPredicate = new HasEqualType<T>( type ).or( new HasAssignableFromType<>( type ) );
+        composedPredicate = new HasEqualType<T>(type).or(new HasAssignableFromType<>(type));
     }
 
-    public HasEqualOrAssignableFromType( T hasTypes )
+    public HasEqualOrAssignableFromType(T hasTypes)
     {
-        composedPredicate = new HasEqualType<>( hasTypes ).or( new HasAssignableFromType<>( hasTypes ) );
+        composedPredicate = new HasEqualType<>(hasTypes).or(new HasAssignableFromType<>(hasTypes));
     }
 
     @Override
-    public boolean test( T hasTypes )
+    public boolean test(T hasTypes)
     {
-        return composedPredicate.test( hasTypes );
+        return composedPredicate.test(hasTypes);
     }
 }

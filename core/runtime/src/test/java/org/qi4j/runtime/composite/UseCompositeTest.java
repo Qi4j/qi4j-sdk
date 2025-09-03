@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.composite;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Mixins;
@@ -26,7 +27,6 @@ import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,23 +35,23 @@ public class UseCompositeTest extends AbstractQi4jTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( Hello.class );
-        module.objects( Speaker.class );
+        module.transients(Hello.class);
+        module.objects(Speaker.class);
     }
 
     @Test
     public void givenCompositeToUsesWhenInstantiatingExpectException()
     {
-        Hello hello = transientBuilderFactory.newTransient( Hello.class );
-        hello.name().set( "World" );
-        Speaker speaker = objectFactory.newObject( Speaker.class, hello );
-        assertThat( speaker.speak(), equalTo( "Hello, World!" ) );
+        Hello hello = transientBuilderFactory.newTransient(Hello.class);
+        hello.name().set("World");
+        Speaker speaker = objectFactory.newObject(Speaker.class, hello);
+        assertThat(speaker.speak(), equalTo("Hello, World!"));
     }
 
-    @Mixins( HelloMixin.class )
+    @Mixins(HelloMixin.class)
     public interface Hello
     {
         String sayHello();

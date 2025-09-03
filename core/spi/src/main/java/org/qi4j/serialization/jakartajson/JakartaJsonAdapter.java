@@ -17,10 +17,13 @@
  */
 package org.qi4j.serialization.jakartajson;
 
+import jakarta.json.JsonValue;
+import org.qi4j.api.serialization.Serialization.Options;
+import org.qi4j.api.structure.ModuleDescriptor;
+import org.qi4j.api.type.ValueType;
+
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import jakarta.json.JsonValue;
-import org.qi4j.api.type.ValueType;
 
 /**
  * Adapter for JSON (de)serialization.
@@ -37,19 +40,21 @@ public interface JakartaJsonAdapter<T>
     /**
      * Serialize.
      *
+     * @param module
      * @param jsonFactories Factories to create JSON
-     * @param object Object to serialize, never null
-     * @param serialize Serialization function for nested structure serialization
+     * @param object        Object to serialize, never null
+     * @param serialize     Serialization function for nested structure serialization
      * @return Serialized JSON representation
      */
-    JsonValue serialize(JakartaJsonFactories jsonFactories, T object, Function<Object, JsonValue> serialize );
+    JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories, T object, Function<Object, JsonValue> serialize);
 
     /**
      * Deserialize.
      *
-     * @param json JSON to deserialize from, never null
+     * @param module
+     * @param json        JSON to deserialize from, never null
      * @param deserialize Deserialization function for nested structure deserialization
      * @return Deserialized object
      */
-    T deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize );
+    T deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize);
 }

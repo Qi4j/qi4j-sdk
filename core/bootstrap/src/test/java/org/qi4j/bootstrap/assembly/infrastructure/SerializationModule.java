@@ -28,7 +28,7 @@ public class SerializationModule
     implements ModuleAssembler
 {
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module
     )
         throws AssemblyException
     {

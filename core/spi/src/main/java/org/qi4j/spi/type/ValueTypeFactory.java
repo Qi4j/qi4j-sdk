@@ -24,7 +24,7 @@ import org.qi4j.api.type.ValueType;
 
 public interface ValueTypeFactory
 {
-    ValueType valueTypeOf( ModuleDescriptor module, Object object );
+    ValueType valueTypeOf(ModuleDescriptor module, Object object);
 
-    ValueType valueTypeOf( ModuleDescriptor module, Class<?> type );
+    ValueType valueTypeOf(ModuleDescriptor module, Class<?> type);
 }

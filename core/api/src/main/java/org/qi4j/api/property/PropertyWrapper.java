@@ -29,7 +29,7 @@ public class PropertyWrapper
 {
     protected Property<Object> next;
 
-    public PropertyWrapper( Property<Object> next )
+    public PropertyWrapper(Property<Object> next)
     {
         this.next = next;
     }
@@ -46,10 +46,10 @@ public class PropertyWrapper
     }
 
     @Override
-    public void set( Object newValue )
+    public void set(Object newValue)
         throws IllegalArgumentException, IllegalStateException
     {
-        next.set( newValue );
+        next.set(newValue);
     }
 
     @Override
@@ -59,9 +59,9 @@ public class PropertyWrapper
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals(Object obj)
     {
-        return next.equals( obj );
+        return next.equals(obj);
     }
 
     @Override

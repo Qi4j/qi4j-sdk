@@ -17,98 +17,109 @@
  */
 package org.qi4j.api.util;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class CollectorsTest
 {
-@Test
-public void single()
-{
-    assertThat( Stream.of( 1L ).collect( Collectors.single() ), is( 1L ) );
+    @Test
+    public void single()
+    {
+        assertThat(Stream.of(1L).collect(Collectors.single()), is(1L));
 
-    try
-    {
-        Stream.of().collect( Collectors.single() );
-        fail( "Should have failed" );
+        try
+        {
+            Stream.of().collect(Collectors.single());
+            fail("Should have failed");
+        }
+        catch(IllegalArgumentException ex)
+        {
+        }
+        try
+        {
+            Stream.of(1, 1).collect(Collectors.single());
+            fail("Should have failed");
+        }
+        catch(IllegalArgumentException ex)
+        {
+        }
+        try
+        {
+            Stream.of(1, 1, 1).collect(Collectors.single());
+            fail("Should have failed");
+        }
+        catch(IllegalArgumentException ex)
+        {
+        }
     }
-    catch( IllegalArgumentException ex ) {}
-    try
-    {
-        Stream.of( 1, 1 ).collect( Collectors.single() );
-        fail( "Should have failed" );
-    }
-    catch( IllegalArgumentException ex ) {}
-    try
-    {
-        Stream.of( 1, 1, 1 ).collect( Collectors.single() );
-        fail( "Should have failed" );
-    }
-    catch( IllegalArgumentException ex ) {}
-}
 
-@Test
-public void singleOrEmpty()
-{
-    assertThat( Stream.of().collect( Collectors.singleOrEmpty() ), equalTo( Optional.empty() ) );
-    assertThat( Stream.of( 1 ).collect( Collectors.singleOrEmpty() ), equalTo( Optional.of( 1 ) ) );
+    @Test
+    public void singleOrEmpty()
+    {
+        assertThat(Stream.of().collect(Collectors.singleOrEmpty()), equalTo(Optional.empty()));
+        assertThat(Stream.of(1).collect(Collectors.singleOrEmpty()), equalTo(Optional.of(1)));
 
-    try
-    {
-        Stream.of( 1, 1 ).collect( Collectors.singleOrEmpty() );
-        fail( "Should have failed" );
+        try
+        {
+            Stream.of(1, 1).collect(Collectors.singleOrEmpty());
+            fail("Should have failed");
+        }
+        catch(IllegalArgumentException ex)
+        {
+        }
+        try
+        {
+            Stream.of(1, 1, 1).collect(Collectors.singleOrEmpty());
+            fail("Should have failed");
+        }
+        catch(IllegalArgumentException ex)
+        {
+        }
     }
-    catch( IllegalArgumentException ex ) {}
-    try
-    {
-        Stream.of( 1, 1, 1 ).collect( Collectors.singleOrEmpty() );
-        fail( "Should have failed" );
-    }
-    catch( IllegalArgumentException ex ) {}
-}
 
     @Test
     public void toMap()
     {
         Map<String, String> input = new LinkedHashMap<>();
-        input.put( "foo", "bar" );
-        input.put( "bazar", "cathedral" );
-        Map<String, String> output = input.entrySet().stream().collect( Collectors.toMap() );
-        assertThat( output.get( "foo" ), equalTo( "bar" ) );
-        assertThat( output.get( "bazar" ), equalTo( "cathedral" ) );
+        input.put("foo", "bar");
+        input.put("bazar", "cathedral");
+        Map<String, String> output = input.entrySet().stream().collect(Collectors.toMap());
+        assertThat(output.get("foo"), equalTo("bar"));
+        assertThat(output.get("bazar"), equalTo("cathedral"));
     }
 
     @Test
     public void toMapRejectNullValues()
     {
         Map<String, String> input = new LinkedHashMap<>();
-        input.put( "foo", "bar" );
-        input.put( "bazar", null );
+        input.put("foo", "bar");
+        input.put("bazar", null);
         try
         {
-            input.entrySet().stream().collect( Collectors.toMap() );
-            fail( "Should have failed, that's the default Map::merge behaviour" );
+            input.entrySet().stream().collect(Collectors.toMap());
+            fail("Should have failed, that's the default Map::merge behaviour");
         }
-        catch( NullPointerException expected ) {}
+        catch(NullPointerException expected)
+        {
+        }
     }
 
     @Test
     public void toMapWithNullValues()
     {
         Map<String, String> input = new LinkedHashMap<>();
-        input.put( "foo", "bar" );
-        input.put( "bazar", null );
-        Map<String, String> output = input.entrySet().stream().collect( Collectors.toMapWithNullValues() );
-        assertThat( output.get( "foo" ), equalTo( "bar" ) );
-        assertThat( output.get( "bazar" ), nullValue() );
+        input.put("foo", "bar");
+        input.put("bazar", null);
+        Map<String, String> output = input.entrySet().stream().collect(Collectors.toMapWithNullValues());
+        assertThat(output.get("foo"), equalTo("bar"));
+        assertThat(output.get("bazar"), nullValue());
     }
 }

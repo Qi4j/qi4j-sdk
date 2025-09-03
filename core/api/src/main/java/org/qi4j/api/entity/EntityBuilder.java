@@ -26,7 +26,7 @@ import org.qi4j.api.unitofwork.UnitOfWork;
  * EntityBuilders are used to instantiate EntityComposites. They can be acquired from
  * {@link UnitOfWork#newEntityBuilder(Class)} and allows the client
  * to provide additional settings before instantiating the Composite.
- *
+ * <p>
  * After calling newInstance() the builder becomes invalid, and may not be called again.
  *
  * @param <T> Entity type
@@ -46,21 +46,18 @@ public interface EntityBuilder<T>
      * Get a representation of the state of the given type for the new Composite.
      * This is primarily used if you want to provide state for a private mixin type.
      *
-     * @param <K> Mixin type
+     * @param <K>       Mixin type
      * @param mixinType the mixin which you want to provide state for
-     *
      * @return a proxy implementing the given mixin type
      */
-    <K> K instanceFor( Class<K> mixinType );
+    <K> K instanceFor(Class<K> mixinType);
 
     /**
      * Create a new Entity instance.
      *
      * @return a new Entity instance
-     *
-     * @throws ConstructionException
-     *                            thrown if it was not possible to instantiate the Composite
-     * @throws LifecycleException if the entity could not be created
+     * @throws ConstructionException thrown if it was not possible to instantiate the Composite
+     * @throws LifecycleException    if the entity could not be created
      */
     T newInstance()
         throws ConstructionException, LifecycleException;

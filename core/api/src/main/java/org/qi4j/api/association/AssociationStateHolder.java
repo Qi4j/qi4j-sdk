@@ -19,9 +19,10 @@
  */
 package org.qi4j.api.association;
 
+import org.qi4j.api.property.StateHolder;
+
 import java.lang.reflect.AccessibleObject;
 import java.util.stream.Stream;
-import org.qi4j.api.property.StateHolder;
 
 /**
  * This represents the state of a entity (properties+associations).
@@ -31,12 +32,11 @@ public interface AssociationStateHolder extends StateHolder
     /**
      * Get an association for a specific accessor method.
      *
-     * @param <T> Association type
+     * @param <T>               Association type
      * @param associationMethod for the association
-     *
      * @return the association
      */
-    <T> Association<T> associationFor( AccessibleObject associationMethod );
+    <T> Association<T> associationFor(AccessibleObject associationMethod);
 
     /**
      * Get all associations.
@@ -48,12 +48,11 @@ public interface AssociationStateHolder extends StateHolder
     /**
      * Get a many-association for a specific accessor method.
      *
-     * @param <T> Association type
+     * @param <T>                   Association type
      * @param manyassociationMethod for the many-association
-     *
      * @return the association
      */
-    <T> ManyAssociation<T> manyAssociationFor( AccessibleObject manyassociationMethod );
+    <T> ManyAssociation<T> manyAssociationFor(AccessibleObject manyassociationMethod);
 
     /**
      * Get all ManyAssociations.
@@ -65,12 +64,11 @@ public interface AssociationStateHolder extends StateHolder
     /**
      * Get a named-association for a specific accessor method.
      *
-     * @param <T> Association type
+     * @param <T>                    Association type
      * @param namedassociationMethod for the named-association
-     *
      * @return the association
      */
-    <T> NamedAssociation<T> namedAssociationFor( AccessibleObject namedassociationMethod );
+    <T> NamedAssociation<T> namedAssociationFor(AccessibleObject namedassociationMethod);
 
     /**
      * Get all named-associations.

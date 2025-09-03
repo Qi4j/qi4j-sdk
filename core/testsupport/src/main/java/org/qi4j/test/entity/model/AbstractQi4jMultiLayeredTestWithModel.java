@@ -35,20 +35,10 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.spi.serialization.JsonSerialization;
 import org.qi4j.test.AbstractQi4jBaseTest;
-import org.qi4j.test.entity.model.legal.LegalService;
-import org.qi4j.test.entity.model.legal.Will;
-import org.qi4j.test.entity.model.legal.WillAmount;
-import org.qi4j.test.entity.model.legal.WillItem;
-import org.qi4j.test.entity.model.legal.WillPercentage;
+import org.qi4j.test.entity.model.legal.*;
 import org.qi4j.test.entity.model.monetary.CheckBookSlip;
 import org.qi4j.test.entity.model.monetary.Currency;
-import org.qi4j.test.entity.model.people.Address;
-import org.qi4j.test.entity.model.people.City;
-import org.qi4j.test.entity.model.people.Country;
-import org.qi4j.test.entity.model.people.PeopleRepository;
-import org.qi4j.test.entity.model.people.Person;
-import org.qi4j.test.entity.model.people.PhoneNumber;
-import org.qi4j.test.entity.model.people.Rent;
+import org.qi4j.test.entity.model.people.*;
 
 public abstract class AbstractQi4jMultiLayeredTestWithModel extends AbstractQi4jBaseTest
 {
@@ -85,76 +75,76 @@ public abstract class AbstractQi4jMultiLayeredTestWithModel extends AbstractQi4j
     protected ObjectFactory objectFactory;
 
     @Override
-    protected void defineApplication( ApplicationAssembly applicationAssembly )
+    protected void defineApplication(ApplicationAssembly applicationAssembly)
         throws AssemblyException
     {
-        LayerAssembly accessLayer = applicationAssembly.layer( ACCESS_LAYER );
-        LayerAssembly domainLayer = applicationAssembly.layer( DOMAIN_LAYER );
-        LayerAssembly infrastructureLayer = applicationAssembly.layer( INFRASTRUCTURE_LAYER );
-        LayerAssembly configLayer = applicationAssembly.layer( CONFIGURATION_LAYER );
-        accessLayer.uses( domainLayer.uses( infrastructureLayer.uses( configLayer ) ) );
-        defineConfigModule( configLayer.module( CONFIGURATION_MODULE ) );
-        defineSerializationModule( configLayer.module( SERIALIZATION_MODULE ) );
-        defineStorageModule( infrastructureLayer.module( STORAGE_MODULE ) );
-        defineMonetaryModule( domainLayer.module( MONETARY_MODULE ) );
-        definePeopleModule( domainLayer.module( PEOPLE_MODULE ) );
-        defineLegalModule( domainLayer.module( LEGAL_MODULE ) );
-        defineTestModule( accessLayer.module( TEST_CASE_MODULE ) );
+        LayerAssembly accessLayer = applicationAssembly.layer(ACCESS_LAYER);
+        LayerAssembly domainLayer = applicationAssembly.layer(DOMAIN_LAYER);
+        LayerAssembly infrastructureLayer = applicationAssembly.layer(INFRASTRUCTURE_LAYER);
+        LayerAssembly configLayer = applicationAssembly.layer(CONFIGURATION_LAYER);
+        accessLayer.uses(domainLayer.uses(infrastructureLayer.uses(configLayer)));
+        defineConfigModule(configLayer.module(CONFIGURATION_MODULE));
+        defineSerializationModule(configLayer.module(SERIALIZATION_MODULE));
+        defineStorageModule(infrastructureLayer.module(STORAGE_MODULE));
+        defineMonetaryModule(domainLayer.module(MONETARY_MODULE));
+        definePeopleModule(domainLayer.module(PEOPLE_MODULE));
+        defineLegalModule(domainLayer.module(LEGAL_MODULE));
+        defineTestModule(accessLayer.module(TEST_CASE_MODULE));
     }
 
     @Override
-    protected Application newApplicationInstance( ApplicationDescriptor applicationModel )
+    protected Application newApplicationInstance(ApplicationDescriptor applicationModel)
     {
-        Application application = super.newApplicationInstance( applicationModel );
-        Module module = application.findModule( "Access Layer", "TestCase Module" );
-        module.injectTo( this );
+        Application application = super.newApplicationInstance(applicationModel);
+        Module module = application.findModule("Access Layer", "TestCase Module");
+        module.injectTo(this);
         return application;
     }
 
-    protected void defineTestModule( ModuleAssembly module )
+    protected void defineTestModule(ModuleAssembly module)
     {
         module.defaultServices();
-        module.objects( this.getClass() );
+        module.objects(this.getClass());
     }
 
-    protected void definePeopleModule( ModuleAssembly module )
+    protected void definePeopleModule(ModuleAssembly module)
     {
         module.defaultServices();
-        module.entities( Address.class, Country.class, City.class, PhoneNumber.class );
-        module.entities( Person.class ).visibleIn( Visibility.layer );
-        module.services( PeopleRepository.class ).visibleIn( Visibility.application );
-        module.values( Rent.class );
-        module.objects( Rent.Builder.class ).visibleIn( Visibility.application );
+        module.entities(Address.class, Country.class, City.class, PhoneNumber.class);
+        module.entities(Person.class).visibleIn(Visibility.layer);
+        module.services(PeopleRepository.class).visibleIn(Visibility.application);
+        module.values(Rent.class);
+        module.objects(Rent.Builder.class).visibleIn(Visibility.application);
     }
 
-    protected void defineLegalModule( ModuleAssembly module )
+    protected void defineLegalModule(ModuleAssembly module)
     {
         module.defaultServices();
-        module.services( LegalService.class ).visibleIn( Visibility.application );
-        module.entities( Will.class );
-        module.values( WillAmount.class, WillItem.class, WillPercentage.class );
+        module.services(LegalService.class).visibleIn(Visibility.application);
+        module.entities(Will.class);
+        module.values(WillAmount.class, WillItem.class, WillPercentage.class);
     }
 
-    protected void defineMonetaryModule( ModuleAssembly module )
+    protected void defineMonetaryModule(ModuleAssembly module)
     {
         module.defaultServices();
-        module.values( Currency.class ).visibleIn( Visibility.layer );
-        module.transients( CheckBookSlip.class );
-        module.transients( Currency.Builder.class ).visibleIn( Visibility.application );
+        module.values(Currency.class).visibleIn(Visibility.layer);
+        module.transients(CheckBookSlip.class);
+        module.transients(Currency.Builder.class).visibleIn(Visibility.application);
     }
 
-    protected void defineSerializationModule( ModuleAssembly module )
+    protected void defineSerializationModule(ModuleAssembly module)
     {
         module.defaultServices();
-        module.services( JsonSerialization.class ).visibleIn( Visibility.application );
+        module.services(JsonSerialization.class).visibleIn(Visibility.application);
     }
 
-    protected abstract void defineStorageModule( ModuleAssembly module );
+    protected abstract void defineStorageModule(ModuleAssembly module);
 
-    protected void defineConfigModule( ModuleAssembly module )
+    protected void defineConfigModule(ModuleAssembly module)
     {
         module.defaultServices();
-        module.services( MemoryEntityStoreService.class ).visibleIn( Visibility.module );
+        module.services(MemoryEntityStoreService.class).visibleIn(Visibility.module);
         configModule = module;
     }
 }

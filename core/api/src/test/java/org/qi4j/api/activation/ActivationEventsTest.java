@@ -19,28 +19,23 @@
  */
 package org.qi4j.api.activation;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationEvent.EventType;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
 
-import static org.qi4j.api.activation.ActivationEvent.EventType.ACTIVATED;
-import static org.qi4j.api.activation.ActivationEvent.EventType.ACTIVATING;
-import static org.qi4j.api.activation.ActivationEvent.EventType.PASSIVATED;
-import static org.qi4j.api.activation.ActivationEvent.EventType.PASSIVATING;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.qi4j.api.activation.ActivationEvent.EventType.*;
 
 public class ActivationEventsTest
 {
@@ -51,7 +46,7 @@ public class ActivationEventsTest
     }
 
     public static class TestServiceInstance
-            implements TestService
+        implements TestService
     {
 
         @Override
@@ -61,7 +56,7 @@ public class ActivationEventsTest
 
     }
 
-    @Mixins( TestServiceInstance.class )
+    @Mixins(TestServiceInstance.class)
     public static interface TestServiceComposite
         extends TestService, ServiceComposite
     {
@@ -76,15 +71,15 @@ public class ActivationEventsTest
         new SingletonAssembler()
         {
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
             {
-                module.services( TestServiceComposite.class ).instantiateOnStartup();
+                module.services(TestServiceComposite.class).instantiateOnStartup();
             }
 
             @Override
-            protected void beforeActivation( Application application )
+            protected void beforeActivation(Application application)
             {
-                application.registerActivationEventListener( new EventsRecorder( events ) );
+                application.registerActivationEventListener(new EventsRecorder(events));
             }
 
 
@@ -93,48 +88,48 @@ public class ActivationEventsTest
         Iterator<ActivationEvent> it = events.iterator();
 
         // Activation
-        assertEvent( it.next(), ACTIVATING, "Application" );
-        assertEvent( it.next(), ACTIVATING, "Layer" );
-        assertEvent( it.next(), ACTIVATING, "Module" );
-        assertEvent( it.next(), ACTIVATING, "TestService" );
-        assertEvent( it.next(), ACTIVATED, "TestService" );
-        assertEvent( it.next(), ACTIVATED, "Module" );
-        assertEvent( it.next(), ACTIVATED, "Layer" );
-        assertEvent( it.next(), ACTIVATED, "Application" );
+        assertEvent(it.next(), ACTIVATING, "Application");
+        assertEvent(it.next(), ACTIVATING, "Layer");
+        assertEvent(it.next(), ACTIVATING, "Module");
+        assertEvent(it.next(), ACTIVATING, "TestService");
+        assertEvent(it.next(), ACTIVATED, "TestService");
+        assertEvent(it.next(), ACTIVATED, "Module");
+        assertEvent(it.next(), ACTIVATED, "Layer");
+        assertEvent(it.next(), ACTIVATED, "Application");
 
         // Passivation
-        assertEvent( it.next(), PASSIVATING, "Application" );
-        assertEvent( it.next(), PASSIVATING, "Layer" );
-        assertEvent( it.next(), PASSIVATING, "Module" );
-        assertEvent( it.next(), PASSIVATING, "TestService" );
-        assertEvent( it.next(), PASSIVATED, "TestService" );
-        assertEvent( it.next(), PASSIVATED, "Module" );
-        assertEvent( it.next(), PASSIVATED, "Layer" );
-        assertEvent( it.next(), PASSIVATED, "Application" );
+        assertEvent(it.next(), PASSIVATING, "Application");
+        assertEvent(it.next(), PASSIVATING, "Layer");
+        assertEvent(it.next(), PASSIVATING, "Module");
+        assertEvent(it.next(), PASSIVATING, "TestService");
+        assertEvent(it.next(), PASSIVATED, "TestService");
+        assertEvent(it.next(), PASSIVATED, "Module");
+        assertEvent(it.next(), PASSIVATED, "Layer");
+        assertEvent(it.next(), PASSIVATED, "Application");
 
-        assertThat( it.hasNext(), is( false ) );
+        assertThat(it.hasNext(), is(false));
     }
 
     @Test
     public void testSingleModuleSingleImportedService()
-            throws Exception
+        throws Exception
     {
         final List<ActivationEvent> events = new ArrayList<>();
 
         new SingletonAssembler()
         {
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
             {
-                module.importedServices( TestService.class ).
-                        setMetaInfo( new TestServiceInstance() ).
-                        importOnStartup();
+                module.importedServices(TestService.class).
+                    setMetaInfo(new TestServiceInstance()).
+                    importOnStartup();
             }
 
             @Override
-            protected void beforeActivation( Application application )
+            protected void beforeActivation(Application application)
             {
-                application.registerActivationEventListener( new EventsRecorder( events ) );
+                application.registerActivationEventListener(new EventsRecorder(events));
             }
 
 
@@ -143,31 +138,31 @@ public class ActivationEventsTest
         Iterator<ActivationEvent> it = events.iterator();
 
         // Activation
-        assertEvent( it.next(), ACTIVATING, "Application" );
-        assertEvent( it.next(), ACTIVATING, "Layer" );
-        assertEvent( it.next(), ACTIVATING, "Module" );
-        assertEvent( it.next(), ACTIVATING, "TestService" );
-        assertEvent( it.next(), ACTIVATED, "TestService" );
-        assertEvent( it.next(), ACTIVATED, "Module" );
-        assertEvent( it.next(), ACTIVATED, "Layer" );
-        assertEvent( it.next(), ACTIVATED, "Application" );
+        assertEvent(it.next(), ACTIVATING, "Application");
+        assertEvent(it.next(), ACTIVATING, "Layer");
+        assertEvent(it.next(), ACTIVATING, "Module");
+        assertEvent(it.next(), ACTIVATING, "TestService");
+        assertEvent(it.next(), ACTIVATED, "TestService");
+        assertEvent(it.next(), ACTIVATED, "Module");
+        assertEvent(it.next(), ACTIVATED, "Layer");
+        assertEvent(it.next(), ACTIVATED, "Application");
 
         // Passivation
-        assertEvent( it.next(), PASSIVATING, "Application" );
-        assertEvent( it.next(), PASSIVATING, "Layer" );
-        assertEvent( it.next(), PASSIVATING, "Module" );
-        assertEvent( it.next(), PASSIVATING, "TestService" );
-        assertEvent( it.next(), PASSIVATED, "TestService" );
-        assertEvent( it.next(), PASSIVATED, "Module" );
-        assertEvent( it.next(), PASSIVATED, "Layer" );
-        assertEvent( it.next(), PASSIVATED, "Application" );
+        assertEvent(it.next(), PASSIVATING, "Application");
+        assertEvent(it.next(), PASSIVATING, "Layer");
+        assertEvent(it.next(), PASSIVATING, "Module");
+        assertEvent(it.next(), PASSIVATING, "TestService");
+        assertEvent(it.next(), PASSIVATED, "TestService");
+        assertEvent(it.next(), PASSIVATED, "Module");
+        assertEvent(it.next(), PASSIVATED, "Layer");
+        assertEvent(it.next(), PASSIVATED, "Application");
 
-        assertThat( it.hasNext(), is( false ) );
+        assertThat(it.hasNext(), is(false));
     }
 
     @Test
     public void testSingleModuleSingleLazyService()
-            throws Exception
+        throws Exception
     {
         final List<ActivationEvent> events = new ArrayList<>();
 
@@ -175,15 +170,15 @@ public class ActivationEventsTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
             {
-                module.services( TestServiceComposite.class );
+                module.services(TestServiceComposite.class);
             }
 
             @Override
-            protected void beforeActivation( Application application )
+            protected void beforeActivation(Application application)
             {
-                application.registerActivationEventListener( new EventsRecorder( events ) );
+                application.registerActivationEventListener(new EventsRecorder(events));
             }
 
         };
@@ -193,105 +188,106 @@ public class ActivationEventsTest
         Iterator<ActivationEvent> it = events.iterator();
 
         // Activation
-        assertEvent( it.next(), ACTIVATING, "Application" );
-        assertEvent( it.next(), ACTIVATING, "Layer" );
-        assertEvent( it.next(), ACTIVATING, "Module" );
+        assertEvent(it.next(), ACTIVATING, "Application");
+        assertEvent(it.next(), ACTIVATING, "Layer");
+        assertEvent(it.next(), ACTIVATING, "Module");
         // Lazy Service NOT activated
-        assertEvent( it.next(), ACTIVATED, "Module" );
-        assertEvent( it.next(), ACTIVATED, "Layer" );
-        assertEvent( it.next(), ACTIVATED, "Application" );
+        assertEvent(it.next(), ACTIVATED, "Module");
+        assertEvent(it.next(), ACTIVATED, "Layer");
+        assertEvent(it.next(), ACTIVATED, "Application");
 
         // Passivation
-        assertEvent( it.next(), PASSIVATING, "Application" );
-        assertEvent( it.next(), PASSIVATING, "Layer" );
-        assertEvent( it.next(), PASSIVATING, "Module" );
+        assertEvent(it.next(), PASSIVATING, "Application");
+        assertEvent(it.next(), PASSIVATING, "Layer");
+        assertEvent(it.next(), PASSIVATING, "Module");
         // Lazy Service NOT passivated
-        assertEvent( it.next(), PASSIVATED, "Module" );
-        assertEvent( it.next(), PASSIVATED, "Layer" );
-        assertEvent( it.next(), PASSIVATED, "Application" );
+        assertEvent(it.next(), PASSIVATED, "Module");
+        assertEvent(it.next(), PASSIVATED, "Layer");
+        assertEvent(it.next(), PASSIVATED, "Application");
 
-        assertThat( it.hasNext(), is( false ) );
+        assertThat(it.hasNext(), is(false));
 
         events.clear();
         application.activate();
         Module module = assembler.module();
-        module.findService( TestService.class ).get().test();
+        module.findService(TestService.class).get().test();
         application.passivate();
 
-        for( ActivationEvent event : events ) {
-            System.out.println( event );
+        for(ActivationEvent event : events)
+        {
+            System.out.println(event);
         }
 
         it = events.iterator();
 
         // Activation
-        assertEvent( it.next(), ACTIVATING, "Application" );
-        assertEvent( it.next(), ACTIVATING, "Layer" );
-        assertEvent( it.next(), ACTIVATING, "Module" );
-        assertEvent( it.next(), ACTIVATED, "Module" );
-        assertEvent( it.next(), ACTIVATED, "Layer" );
-        assertEvent( it.next(), ACTIVATED, "Application" );
+        assertEvent(it.next(), ACTIVATING, "Application");
+        assertEvent(it.next(), ACTIVATING, "Layer");
+        assertEvent(it.next(), ACTIVATING, "Module");
+        assertEvent(it.next(), ACTIVATED, "Module");
+        assertEvent(it.next(), ACTIVATED, "Layer");
+        assertEvent(it.next(), ACTIVATED, "Application");
 
         // Lazy Service Activation
-        assertEvent( it.next(), ACTIVATING, "TestService" );
-        assertEvent( it.next(), ACTIVATED, "TestService" );
+        assertEvent(it.next(), ACTIVATING, "TestService");
+        assertEvent(it.next(), ACTIVATED, "TestService");
 
         // Passivation
-        assertEvent( it.next(), PASSIVATING, "Application" );
-        assertEvent( it.next(), PASSIVATING, "Layer" );
-        assertEvent( it.next(), PASSIVATING, "Module" );
-        assertEvent( it.next(), PASSIVATING, "TestService" );
-        assertEvent( it.next(), PASSIVATED, "TestService" );
-        assertEvent( it.next(), PASSIVATED, "Module" );
-        assertEvent( it.next(), PASSIVATED, "Layer" );
-        assertEvent( it.next(), PASSIVATED, "Application" );
+        assertEvent(it.next(), PASSIVATING, "Application");
+        assertEvent(it.next(), PASSIVATING, "Layer");
+        assertEvent(it.next(), PASSIVATING, "Module");
+        assertEvent(it.next(), PASSIVATING, "TestService");
+        assertEvent(it.next(), PASSIVATED, "TestService");
+        assertEvent(it.next(), PASSIVATED, "Module");
+        assertEvent(it.next(), PASSIVATED, "Layer");
+        assertEvent(it.next(), PASSIVATED, "Application");
 
-        assertThat( it.hasNext(), is( false ) );
+        assertThat(it.hasNext(), is(false));
     }
 
     private static class EventsRecorder
-            implements ActivationEventListener
+        implements ActivationEventListener
     {
 
         private final List<ActivationEvent> events;
 
-        private EventsRecorder( List<ActivationEvent> events )
+        private EventsRecorder(List<ActivationEvent> events)
         {
             this.events = events;
         }
 
         @Override
-        public void onEvent( ActivationEvent event )
+        public void onEvent(ActivationEvent event)
         {
-            events.add( event );
+            events.add(event);
         }
 
     }
 
     // WARN This assertion depends on ApplicationInstance, LayerInstance, ModuleInstance and ServiceReferenceInstance toString() method.
-    private static void assertEvent( ActivationEvent event, EventType expectedType, String expected )
+    private static void assertEvent(ActivationEvent event, EventType expectedType, String expected)
     {
         boolean wrongEvent = expectedType != event.type();
-        boolean wrongMessage = ! event.message().contains( expected );
-        if( wrongEvent || wrongMessage )
+        boolean wrongMessage = !event.message().contains(expected);
+        if(wrongEvent || wrongMessage)
         {
             StringBuilder sb = new StringBuilder();
-            sb.append("Event (").append( event ).append( ") has");
-            if( wrongEvent )
+            sb.append("Event (").append(event).append(") has");
+            if(wrongEvent)
             {
-                sb.append( " wrong type (expected:'" ).append( expectedType ).
-                        append( "' but was:'" ).append( event.type() ).append( "')" );
-                if( wrongMessage )
+                sb.append(" wrong type (expected:'").append(expectedType).
+                    append("' but was:'").append(event.type()).append("')");
+                if(wrongMessage)
                 {
-                    sb.append( ";" );
+                    sb.append(";");
                 }
             }
-            if( wrongMessage )
+            if(wrongMessage)
             {
-                sb.append( " wrong message (expected:'" ).append( expected ).
-                        append( "' but was:'" ).append( event.message() ).append( "')" );
+                sb.append(" wrong message (expected:'").append(expected).
+                    append("' but was:'").append(event.message()).append("')");
             }
-            fail( sb.toString() );
+            fail(sb.toString());
         }
     }
 

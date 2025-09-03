@@ -40,67 +40,67 @@ public final class Energy4Java
 {
     private Qi4jRuntime runtime;
 
-    public Energy4Java( RuntimeFactory runtimeFactory )
+    public Energy4Java(RuntimeFactory runtimeFactory)
     {
-        this( runtimeFactory.createRuntime() );
+        this(runtimeFactory.createRuntime());
     }
 
     public Energy4Java()
     {
-        this( new RuntimeFactory.StandaloneApplicationRuntimeFactory().createRuntime() );
+        this(new RuntimeFactory.StandaloneApplicationRuntimeFactory().createRuntime());
     }
 
-    public Energy4Java( Qi4jRuntime runtime )
+    public Energy4Java(Qi4jRuntime runtime)
     {
-        if( runtime == null )
+        if(runtime == null)
         {
-            throw new BootstrapException( "Can not create Qi4j without a Qi4j Runtime." );
+            throw new BootstrapException("Can not create Qi4j without a Qi4j Runtime.");
         }
         this.runtime = runtime;
     }
 
-    public ApplicationDescriptor newApplicationModel( ApplicationAssembler assembler )
+    public ApplicationDescriptor newApplicationModel(ApplicationAssembler assembler)
         throws AssemblyException
     {
-        ApplicationAssembly assembly = assembler.assemble( runtime.applicationAssemblyFactory() );
+        ApplicationAssembly assembly = assembler.assemble(runtime.applicationAssemblyFactory());
 
-        if( assembly == null )
+        if(assembly == null)
         {
-            throw new AssemblyException( "Application assembler did not return any ApplicationAssembly" );
+            throw new AssemblyException("Application assembler did not return any ApplicationAssembly");
         }
 
         try
         {
             ApplicationModelFactory modelFactory = runtime.applicationModelFactory();
-            ApplicationDescriptor model = modelFactory.newApplicationModel( assembly );
+            ApplicationDescriptor model = modelFactory.newApplicationModel(assembly);
             String modelReport = InvalidCompositeException.modelReport();
-            if( modelReport != null )
+            if(modelReport != null)
             {
-                String nl = System.getProperty( "line.separator" );
-                throw new AssemblyException( "Composition problems" + nl + nl + modelReport );
+                String nl = System.getProperty("line.separator");
+                throw new AssemblyException("Composition problems" + nl + nl + modelReport);
             }
             return model;
         }
-        catch( AssemblyReportException e )
+        catch(AssemblyReportException e)
         {
-            e.attacheModelReport( InvalidCompositeException.modelReport() );
+            e.attacheModelReport(InvalidCompositeException.modelReport());
             throw e;
         }
-        catch( AssemblyException e )
+        catch(AssemblyException e)
         {
             throw e;
         }
-        catch( RuntimeException e )
+        catch(RuntimeException e)
         {
-            throw new AssemblyException( "Unable to create Application Model.", e );
+            throw new AssemblyException("Unable to create Application Model.", e);
         }
     }
 
-    public Application newApplication( ApplicationAssembler assembler, Object... importedServiceInstances )
+    public Application newApplication(ApplicationAssembler assembler, Object... importedServiceInstances)
         throws AssemblyException
     {
-        ApplicationDescriptor model = newApplicationModel( assembler );
-        return model.newInstance( runtime.spi(), importedServiceInstances );
+        ApplicationDescriptor model = newApplicationModel(assembler);
+        return model.newInstance(runtime.spi(), importedServiceInstances);
     }
 
     public Qi4jSPI spi()

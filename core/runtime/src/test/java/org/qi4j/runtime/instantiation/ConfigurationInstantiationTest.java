@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.instantiation;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.entity.Lifecycle;
 import org.qi4j.api.injection.scope.This;
@@ -28,7 +29,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -38,29 +38,29 @@ public class ConfigurationInstantiationTest extends AbstractQi4jTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
         module.defaultServices();
-        module.services( MemoryEntityStoreService.class );
-        module.services( MyService.class ).instantiateOnStartup();
-        module.configurations( MyConfig.class );
-        System.setProperty( "path", "fakepath" );
+        module.services(MemoryEntityStoreService.class);
+        module.services(MyService.class).instantiateOnStartup();
+        module.configurations(MyConfig.class);
+        System.setProperty("path", "fakepath");
     }
 
     @Test
     public void givenSpecialInitializableWhenStartingExpectOsNameToBeSet()
     {
-        MyService myService = serviceFinder.findService( MyService.class ).get();
-        assertThat( myService.osName(), equalTo( System.getProperty( "os.name" ) ) );
-        if( myService.osName().equalsIgnoreCase( "Linux" ) )
+        MyService myService = serviceFinder.findService(MyService.class).get();
+        assertThat(myService.osName(), equalTo(System.getProperty("os.name")));
+        if(myService.osName().equalsIgnoreCase("Linux"))
         {
-            assertThat( myService.home(), notNullValue() );
+            assertThat(myService.home(), notNullValue());
         }
-        assertThat( myService.path(), equalTo( System.getProperty( "path" ) ) );
+        assertThat(myService.path(), equalTo(System.getProperty("path")));
     }
 
-    @Mixins( MyMixin.class )
+    @Mixins(MyMixin.class)
     public interface MyService
     {
         String osName();
@@ -98,7 +98,7 @@ public class ConfigurationInstantiationTest extends AbstractQi4jTest
         public void create()
             throws Exception
         {
-            config.get().osName().set( System.getProperty( "os.name" ) );
+            config.get().osName().set(System.getProperty("os.name"));
         }
 
         @Override

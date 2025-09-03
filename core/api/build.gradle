@@ -23,9 +23,9 @@ apply plugin: 'qi4j-core'
 // jar { manifest { name = "Qi4j Core API" } }
 
 dependencies {
-  testImplementation qi4j.core.testsupport
-  testImplementation qi4j.extension( 'serialization-jakartajson' )
-  testImplementation qi4j.library( 'constraints' )
+    testImplementation qi4j.core.testsupport
+    testImplementation qi4j.extension('serialization-jakartajson')
+    testImplementation qi4j.library('constraints')
 
-  testRuntimeOnly qi4j.core.runtime
+    testRuntimeOnly qi4j.core.runtime
 }

@@ -19,9 +19,10 @@
  */
 package org.qi4j.runtime.structure;
 
-import java.util.function.Predicate;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.ModelDescriptor;
+
+import java.util.function.Predicate;
 
 /**
  * TODO
@@ -29,19 +30,19 @@ import org.qi4j.api.composite.ModelDescriptor;
 public class VisibilityPredicate
     implements Predicate<ModelDescriptor>
 {
-    public static final Predicate<ModelDescriptor> MODULE = new VisibilityPredicate( Visibility.module );
-    public static final Predicate<ModelDescriptor> LAYER = new VisibilityPredicate( Visibility.layer );
-    public static final Predicate<ModelDescriptor> APPLICATION = new VisibilityPredicate( Visibility.application );
+    public static final Predicate<ModelDescriptor> MODULE = new VisibilityPredicate(Visibility.module);
+    public static final Predicate<ModelDescriptor> LAYER = new VisibilityPredicate(Visibility.layer);
+    public static final Predicate<ModelDescriptor> APPLICATION = new VisibilityPredicate(Visibility.application);
 
     private final Visibility visibility;
 
-    public VisibilityPredicate( Visibility visibility )
+    public VisibilityPredicate(Visibility visibility)
     {
         this.visibility = visibility;
     }
 
     @Override
-    public boolean test( ModelDescriptor item )
+    public boolean test(ModelDescriptor item)
     {
         return item.visibility().ordinal() >= visibility.ordinal();
     }

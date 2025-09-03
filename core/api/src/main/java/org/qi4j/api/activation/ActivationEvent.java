@@ -19,8 +19,9 @@
  */
 package org.qi4j.api.activation;
 
-import java.time.Instant;
 import org.qi4j.api.time.SystemTime;
+
+import java.time.Instant;
 
 /**
  * ActivationEvents are fired during activation and passivation of instances in Qi4j.
@@ -36,7 +37,7 @@ public final class ActivationEvent
     private final Object source;
     private final EventType type;
 
-    public ActivationEvent( Object source, EventType type )
+    public ActivationEvent(Object source, EventType type)
     {
         this.timestamp = SystemTime.now();
         this.source = source;
@@ -74,16 +75,16 @@ public final class ActivationEvent
      */
     public String message()
     {
-        switch( type )
+        switch(type)
         {
-        case ACTIVATING:
-            return "Activating " + source;
-        case ACTIVATED:
-            return "Activated " + source;
-        case PASSIVATING:
-            return "Passivating " + source;
-        case PASSIVATED:
-            return "Passivated " + source;
+            case ACTIVATING:
+                return "Activating " + source;
+            case ACTIVATED:
+                return "Activated " + source;
+            case PASSIVATING:
+                return "Passivating " + source;
+            case PASSIVATED:
+                return "Passivated " + source;
         }
         return "";
     }

@@ -20,7 +20,6 @@
 
 package org.qi4j.runtime.composite;
 
-import java.util.List;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.TransientDescriptor;
@@ -29,57 +28,59 @@ import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.runtime.injection.InjectionContext;
 import org.qi4j.runtime.property.PropertyModel;
 
+import java.util.List;
+
 /**
  * Model for Transient Composites
  */
 public class TransientModel extends CompositeModel
     implements TransientDescriptor
 {
-    public TransientModel( ModuleDescriptor module,
-                           List<Class<?>> types, final Visibility visibility,
-                           final MetaInfo metaInfo,
-                           final MixinsModel mixinsModel,
-                           final StateModel stateModel,
-                           final CompositeMethodsModel compositeMethodsModel
+    public TransientModel(ModuleDescriptor module,
+                          List<Class<?>> types, final Visibility visibility,
+                          final MetaInfo metaInfo,
+                          final MixinsModel mixinsModel,
+                          final StateModel stateModel,
+                          final CompositeMethodsModel compositeMethodsModel
     )
     {
-        super( module, types, visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel );
+        super(module, types, visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel);
     }
 
-    public TransientInstance newInstance( UsesInstance uses,
-                                          TransientStateInstance state
+    public TransientInstance newInstance(UsesInstance uses,
+                                         TransientStateInstance state
     )
     {
         Object[] mixins = mixinsModel.newMixinHolder();
-        TransientInstance compositeInstance = new TransientInstance( this, mixins, state );
+        TransientInstance compositeInstance = new TransientInstance(this, mixins, state);
 
         // Instantiate all mixins
         int i = 0;
-        InjectionContext injectionContext = new InjectionContext( compositeInstance, uses, state );
-        for( MixinModel mixinModel : mixinsModel.mixinModels() )
+        InjectionContext injectionContext = new InjectionContext(compositeInstance, uses, state);
+        for(MixinModel mixinModel : mixinsModel.mixinModels())
         {
-            mixins[ i++ ] = mixinModel.newInstance( injectionContext );
+            mixins[i++] = mixinModel.newInstance(injectionContext);
         }
 
         // Return
         return compositeInstance;
     }
 
-    public void checkConstraints( TransientStateInstance instanceState )
+    public void checkConstraints(TransientStateInstance instanceState)
         throws ConstraintViolationException
     {
-        stateModel.properties().forEach( ( PropertyModel propertyModel ) ->
-                                         {
-                                             try
-                                             {
-                                                 propertyModel.checkConstraints( instanceState.propertyFor( propertyModel.accessor() ).get() );
-                                             }
-                                             catch( ConstraintViolationException e )
-                                             {
-                                                 e.setCompositeDescriptor( this );
-                                                 throw e;
-                                             }
-                                         }
+        stateModel.properties().forEach((PropertyModel propertyModel) ->
+            {
+                try
+                {
+                    propertyModel.checkConstraints(instanceState.propertyFor(propertyModel.accessor()).get());
+                }
+                catch(ConstraintViolationException e)
+                {
+                    e.setCompositeDescriptor(this);
+                    throw e;
+                }
+            }
         );
     }
 }

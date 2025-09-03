@@ -26,6 +26,8 @@ import org.qi4j.api.property.Property;
 public interface PetShop
 {
     Property<Address> address();
+
     Association<City> city();
+
     ManyAssociation<Owner> owners();
 }

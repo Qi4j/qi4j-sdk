@@ -33,7 +33,7 @@ public class ParameterizedTypeInstance
     private Type rawType;
     private Type ownerType;
 
-    public ParameterizedTypeInstance( Type[] actualTypeArguments, Type rawType, Type ownerType )
+    public ParameterizedTypeInstance(Type[] actualTypeArguments, Type rawType, Type ownerType)
     {
         this.actualTypeArguments = actualTypeArguments;
         this.rawType = rawType;
@@ -61,6 +61,6 @@ public class ParameterizedTypeInstance
     @Override
     public String toString()
     {
-        return rawType.toString() + Arrays.asList( actualTypeArguments );
+        return rawType.toString() + Arrays.asList(actualTypeArguments);
     }
 }

@@ -32,40 +32,44 @@ public class ActivatorAdapter<ActivateeType>
 {
     /**
      * Called before activatee activation.
+     *
      * @param activating Activating activatee
      */
     @Override
-    public void beforeActivation( ActivateeType activating )
+    public void beforeActivation(ActivateeType activating)
         throws Exception
     {
     }
 
     /**
      * Called after activatee activation.
+     *
      * @param activated Activating activatee
      */
     @Override
-    public void afterActivation( ActivateeType activated )
+    public void afterActivation(ActivateeType activated)
         throws Exception
     {
     }
 
     /**
      * Called before activatee passivation.
+     *
      * @param passivating Passivating activatee
      */
     @Override
-    public void beforePassivation( ActivateeType passivating )
+    public void beforePassivation(ActivateeType passivating)
         throws Exception
     {
     }
 
     /**
      * Called after activatee passivation.
+     *
      * @param passivated Passivated activatee
      */
     @Override
-    public void afterPassivation( ActivateeType passivated )
+    public void afterPassivation(ActivateeType passivated)
         throws Exception
     {
     }

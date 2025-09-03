@@ -46,14 +46,13 @@ public class MockResolverProxy
      *
      * @param registeredMock registered mock; cannot be null
      * @param mockResolver   mock resolver delegate; cannot be null
-     *
      * @throws NullPointerException - If registred mock is null
-     *                               - If mock resolver is null
+     *                              - If mock resolver is null
      */
-    MockResolverProxy( final Object registeredMock, final MockResolver mockResolver )
+    MockResolverProxy(final Object registeredMock, final MockResolver mockResolver)
     {
-        Objects.requireNonNull( registeredMock, "Registered mock" );
-        Objects.requireNonNull( mockResolver, "Mock resolver delegate" );
+        Objects.requireNonNull(registeredMock, "Registered mock");
+        Objects.requireNonNull(mockResolver, "Mock resolver delegate");
         this.registeredMock = registeredMock;
         this.mockResolver = mockResolver;
     }
@@ -62,14 +61,12 @@ public class MockResolverProxy
      * Setter.
      *
      * @param mockResolver mock resolver delegate; cannot be null
-     *
      * @return itself
-     *
      * @throws NullPointerException - If mock resolver is null
      */
-    MockResolverProxy setMock( final MockResolver mockResolver )
+    MockResolverProxy setMock(final MockResolver mockResolver)
     {
-        Objects.requireNonNull( mockResolver, "Mock resolver delegate" );
+        Objects.requireNonNull(mockResolver, "Mock resolver delegate");
         this.mockResolver = mockResolver;
         return this;
     }
@@ -90,8 +87,8 @@ public class MockResolverProxy
      * @see MockResolver#getInvocationHandler(Object, java.lang.reflect.Method, Object[])
      */
     @Override
-    public InvocationHandler getInvocationHandler( final Object proxy, final Method method, final Object[] args )
+    public InvocationHandler getInvocationHandler(final Object proxy, final Method method, final Object[] args)
     {
-        return mockResolver.getInvocationHandler( proxy, method, args );
+        return mockResolver.getInvocationHandler(proxy, method, args);
     }
 }

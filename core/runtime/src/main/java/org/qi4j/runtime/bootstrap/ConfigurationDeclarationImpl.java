@@ -22,7 +22,6 @@ package org.qi4j.runtime.bootstrap;
 
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.ConfigurationDeclaration;
-import org.qi4j.bootstrap.ConfigurationDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
 
 import static java.util.Arrays.asList;
@@ -36,34 +35,34 @@ public final class ConfigurationDeclarationImpl
     private final Iterable<EntityAssemblyImpl> entities;
     private final Iterable<ValueAssemblyImpl> values;
 
-    public ConfigurationDeclarationImpl( Iterable<EntityAssemblyImpl> entities, Iterable<ValueAssemblyImpl> values  )
+    public ConfigurationDeclarationImpl(Iterable<EntityAssemblyImpl> entities, Iterable<ValueAssemblyImpl> values)
     {
         this.entities = entities;
         this.values = values;
     }
 
     @Override
-    public ConfigurationDeclaration setMetaInfo( Object info )
+    public ConfigurationDeclaration setMetaInfo(Object info)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.metaInfo.set( info );
+            entity.metaInfo.set(info);
         }
-        for( ValueAssemblyImpl value : values )
+        for(ValueAssemblyImpl value : values)
         {
-            value.metaInfo.set( info );
+            value.metaInfo.set(info);
         }
         return this;
     }
 
     @Override
-    public ConfigurationDeclaration visibleIn( Visibility visibility )
+    public ConfigurationDeclaration visibleIn(Visibility visibility)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
             entity.visibility = visibility;
         }
-        for( ValueAssemblyImpl value : values )
+        for(ValueAssemblyImpl value : values)
         {
             value.visibility = visibility;
         }
@@ -71,57 +70,57 @@ public final class ConfigurationDeclarationImpl
     }
 
     @Override
-    public ConfigurationDeclaration withConcerns( Class<?>... concerns )
+    public ConfigurationDeclaration withConcerns(Class<?>... concerns)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.concerns.addAll( asList( concerns ) );
+            entity.concerns.addAll(asList(concerns));
         }
-        for( ValueAssemblyImpl value : values )
+        for(ValueAssemblyImpl value : values)
         {
-            value.concerns.addAll( asList( concerns ) );
+            value.concerns.addAll(asList(concerns));
         }
         return this;
     }
 
     @Override
-    public ConfigurationDeclaration withSideEffects( Class<?>... sideEffects )
+    public ConfigurationDeclaration withSideEffects(Class<?>... sideEffects)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.sideEffects.addAll( asList( sideEffects ) );
+            entity.sideEffects.addAll(asList(sideEffects));
         }
-        for( ValueAssemblyImpl value : values )
+        for(ValueAssemblyImpl value : values)
         {
-            value.sideEffects.addAll( asList( sideEffects ) );
+            value.sideEffects.addAll(asList(sideEffects));
         }
         return this;
     }
 
     @Override
-    public ConfigurationDeclaration withMixins( Class<?>... mixins )
+    public ConfigurationDeclaration withMixins(Class<?>... mixins)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.mixins.addAll( asList( mixins ) );
+            entity.mixins.addAll(asList(mixins));
         }
-        for( ValueAssemblyImpl value : values )
+        for(ValueAssemblyImpl value : values)
         {
-            value.mixins.addAll( asList( mixins ) );
+            value.mixins.addAll(asList(mixins));
         }
         return this;
     }
 
     @Override
-    public ConfigurationDeclaration withTypes( Class<?>... types )
+    public ConfigurationDeclaration withTypes(Class<?>... types)
     {
-        for( EntityAssemblyImpl entity : entities )
+        for(EntityAssemblyImpl entity : entities)
         {
-            entity.types.addAll( asList( types ) );
+            entity.types.addAll(asList(types));
         }
-        for( ValueAssemblyImpl value : values )
+        for(ValueAssemblyImpl value : values)
         {
-            value.types.addAll( asList( types ) );
+            value.types.addAll(asList(types));
         }
         return this;
     }

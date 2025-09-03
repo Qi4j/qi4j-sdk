@@ -19,7 +19,7 @@
  */
 package org.qi4j.runtime.structure;
 
-import java.util.Iterator;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.composite.AmbiguousTypeException;
 import org.qi4j.api.identity.HasIdentity;
@@ -34,11 +34,8 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.qi4j.test.EntityTestAssembler;
+
+import java.util.Iterator;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -84,13 +81,13 @@ public class TypeToCompositeLookupTest
 
     }
 
-    @Mixins( BasicFooImpl.class )
+    @Mixins(BasicFooImpl.class)
     public interface BasicFoo
         extends Foo
     {
     }
 
-    @Mixins( SomeOtherFooImpl.class )
+    @Mixins(SomeOtherFooImpl.class)
     public interface SomeOtherFoo
         extends BasicFoo
     {
@@ -104,17 +101,17 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.objects( SomeOtherFooImpl.class );
+                module.objects(SomeOtherFooImpl.class);
             }
 
         }.module();
 
-        assertThat( module.newObject( SomeOtherFooImpl.class ).bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newObject( BasicFooImpl.class ).bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newObject( Foo.class ).bar(), equalTo( CATHEDRAL ) );
+        assertThat(module.newObject(SomeOtherFooImpl.class).bar(), equalTo(CATHEDRAL));
+        assertThat(module.newObject(BasicFooImpl.class).bar(), equalTo(CATHEDRAL));
+        assertThat(module.newObject(Foo.class).bar(), equalTo(CATHEDRAL));
     }
 
     @Test
@@ -125,23 +122,23 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.objects( SomeOtherFooImpl.class, BasicFooImpl.class );
+                module.objects(SomeOtherFooImpl.class, BasicFooImpl.class);
             }
 
         }.module();
 
-        assertThat( module.newObject( SomeOtherFooImpl.class ).bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newObject( BasicFooImpl.class ).bar(), equalTo( BAZAR ) );
+        assertThat(module.newObject(SomeOtherFooImpl.class).bar(), equalTo(CATHEDRAL));
+        assertThat(module.newObject(BasicFooImpl.class).bar(), equalTo(BAZAR));
 
         try
         {
-            module.newObject( Foo.class );
-            fail( "Ambiguous type exception not detected for Objects" );
+            module.newObject(Foo.class);
+            fail("Ambiguous type exception not detected for Objects");
         }
-        catch( AmbiguousTypeException expected )
+        catch(AmbiguousTypeException expected)
         {
         }
     }
@@ -154,17 +151,17 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.transients( SomeOtherFoo.class );
+                module.transients(SomeOtherFoo.class);
             }
 
         }.module();
 
-        assertThat( module.newTransientBuilder( SomeOtherFoo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newTransientBuilder( BasicFoo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newTransientBuilder( Foo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
+        assertThat(module.newTransientBuilder(SomeOtherFoo.class).newInstance().bar(), equalTo(CATHEDRAL));
+        assertThat(module.newTransientBuilder(BasicFoo.class).newInstance().bar(), equalTo(CATHEDRAL));
+        assertThat(module.newTransientBuilder(Foo.class).newInstance().bar(), equalTo(CATHEDRAL));
     }
 
     @Test
@@ -175,23 +172,23 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.transients( SomeOtherFoo.class, BasicFoo.class );
+                module.transients(SomeOtherFoo.class, BasicFoo.class);
             }
 
         }.module();
 
-        assertThat( module.newTransientBuilder( SomeOtherFoo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newTransientBuilder( BasicFoo.class ).newInstance().bar(), equalTo( BAZAR ) );
+        assertThat(module.newTransientBuilder(SomeOtherFoo.class).newInstance().bar(), equalTo(CATHEDRAL));
+        assertThat(module.newTransientBuilder(BasicFoo.class).newInstance().bar(), equalTo(BAZAR));
 
         try
         {
-            module.newTransientBuilder( Foo.class );
-            fail( "Ambiguous type exception not detected for Transients" );
+            module.newTransientBuilder(Foo.class);
+            fail("Ambiguous type exception not detected for Transients");
         }
-        catch( AmbiguousTypeException expected )
+        catch(AmbiguousTypeException expected)
         {
         }
     }
@@ -204,17 +201,17 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.values( SomeOtherFoo.class );
+                module.values(SomeOtherFoo.class);
             }
 
         }.module();
 
-        assertThat( module.newValueBuilder( SomeOtherFoo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newValueBuilder( BasicFoo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newValueBuilder( Foo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
+        assertThat(module.newValueBuilder(SomeOtherFoo.class).newInstance().bar(), equalTo(CATHEDRAL));
+        assertThat(module.newValueBuilder(BasicFoo.class).newInstance().bar(), equalTo(CATHEDRAL));
+        assertThat(module.newValueBuilder(Foo.class).newInstance().bar(), equalTo(CATHEDRAL));
     }
 
     @Test
@@ -225,23 +222,23 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.values( SomeOtherFoo.class, BasicFoo.class );
+                module.values(SomeOtherFoo.class, BasicFoo.class);
             }
 
         }.module();
 
-        assertThat( module.newValueBuilder( SomeOtherFoo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.newValueBuilder( BasicFoo.class ).newInstance().bar(), equalTo( BAZAR ) );
+        assertThat(module.newValueBuilder(SomeOtherFoo.class).newInstance().bar(), equalTo(CATHEDRAL));
+        assertThat(module.newValueBuilder(BasicFoo.class).newInstance().bar(), equalTo(BAZAR));
 
         try
         {
-            module.newValueBuilder( Foo.class );
-            fail( "Ambiguous type exception not detected for Values" );
+            module.newValueBuilder(Foo.class);
+            fail("Ambiguous type exception not detected for Values");
         }
-        catch( AmbiguousTypeException expected )
+        catch(AmbiguousTypeException expected)
         {
         }
     }
@@ -254,24 +251,24 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                new EntityTestAssembler().assemble( module );
-                module.entities( SomeOtherFoo.class );
+                new EntityTestAssembler().assemble(module);
+                module.entities(SomeOtherFoo.class);
             }
 
         }.module().unitOfWorkFactory();
 
         UnitOfWork uow = uowf.newUnitOfWork();
 
-        SomeOtherFoo someOtherFoo = uow.newEntityBuilder( SomeOtherFoo.class ).newInstance();
-        BasicFoo basicFoo = uow.newEntityBuilder( BasicFoo.class ).newInstance();
-        Foo foo = uow.newEntityBuilder( Foo.class ).newInstance();
+        SomeOtherFoo someOtherFoo = uow.newEntityBuilder(SomeOtherFoo.class).newInstance();
+        BasicFoo basicFoo = uow.newEntityBuilder(BasicFoo.class).newInstance();
+        Foo foo = uow.newEntityBuilder(Foo.class).newInstance();
 
-        assertThat( someOtherFoo.bar(), equalTo( CATHEDRAL ) );
-        assertThat( basicFoo.bar(), equalTo( CATHEDRAL ) );
-        assertThat( foo.bar(), equalTo( CATHEDRAL ) );
+        assertThat(someOtherFoo.bar(), equalTo(CATHEDRAL));
+        assertThat(basicFoo.bar(), equalTo(CATHEDRAL));
+        assertThat(foo.bar(), equalTo(CATHEDRAL));
 
         Identity someOtherFooIdentity = ((HasIdentity) someOtherFoo).identity().get();
         Identity basicFooIdentity = ((HasIdentity) basicFoo).identity().get();
@@ -281,9 +278,9 @@ public class TypeToCompositeLookupTest
 
         uow = uowf.newUnitOfWork();
 
-        uow.get( SomeOtherFoo.class,  someOtherFooIdentity );
-        uow.get( BasicFoo.class, basicFooIdentity );
-        uow.get( Foo.class,  fooIdentity );
+        uow.get(SomeOtherFoo.class, someOtherFooIdentity);
+        uow.get(BasicFoo.class, basicFooIdentity);
+        uow.get(Foo.class, fooIdentity);
 
         uow.discard();
     }
@@ -296,33 +293,33 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                new EntityTestAssembler().assemble( module );
-                module.entities( SomeOtherFoo.class, BasicFoo.class );
+                new EntityTestAssembler().assemble(module);
+                module.entities(SomeOtherFoo.class, BasicFoo.class);
             }
 
         }.module().unitOfWorkFactory();
 
         UnitOfWork uow = uowf.newUnitOfWork();
 
-        SomeOtherFoo someOtherFoo = uow.newEntityBuilder( SomeOtherFoo.class ).newInstance();
-        BasicFoo basicFoo = uow.newEntityBuilder( BasicFoo.class ).newInstance();
+        SomeOtherFoo someOtherFoo = uow.newEntityBuilder(SomeOtherFoo.class).newInstance();
+        BasicFoo basicFoo = uow.newEntityBuilder(BasicFoo.class).newInstance();
         try
         {
-            uow.newEntityBuilder( Foo.class ).newInstance();
-            fail( "Ambiguous type exception not detected for Entities" );
+            uow.newEntityBuilder(Foo.class).newInstance();
+            fail("Ambiguous type exception not detected for Entities");
         }
-        catch( AmbiguousTypeException expected )
+        catch(AmbiguousTypeException expected)
         {
         }
 
         // Specific Type used
-        assertThat( uow.newEntityBuilder( SomeOtherFoo.class ).newInstance().bar(), equalTo( CATHEDRAL ) );
+        assertThat(uow.newEntityBuilder(SomeOtherFoo.class).newInstance().bar(), equalTo(CATHEDRAL));
 
         // Specific Type used
-        assertThat( uow.newEntityBuilder( BasicFoo.class ).newInstance().bar(), equalTo( BAZAR ) );
+        assertThat(uow.newEntityBuilder(BasicFoo.class).newInstance().bar(), equalTo(BAZAR));
 
         Identity someOtherFooIdentity = ((HasIdentity) someOtherFoo).identity().get();
         Identity basicFooIdentity = ((HasIdentity) basicFoo).identity().get();
@@ -331,10 +328,10 @@ public class TypeToCompositeLookupTest
 
         uow = uowf.newUnitOfWork();
 
-        assertThat( uow.get( SomeOtherFoo.class, someOtherFooIdentity ).bar(), equalTo( CATHEDRAL ) );
-        assertThat( uow.get( BasicFoo.class, basicFooIdentity ).bar(), equalTo( BAZAR ) );
-        assertThat( uow.get( Foo.class, someOtherFooIdentity ).bar(), equalTo( CATHEDRAL ) );
-        assertThat( uow.get( Foo.class, basicFooIdentity ).bar(), equalTo( BAZAR ) );
+        assertThat(uow.get(SomeOtherFoo.class, someOtherFooIdentity).bar(), equalTo(CATHEDRAL));
+        assertThat(uow.get(BasicFoo.class, basicFooIdentity).bar(), equalTo(BAZAR));
+        assertThat(uow.get(Foo.class, someOtherFooIdentity).bar(), equalTo(CATHEDRAL));
+        assertThat(uow.get(Foo.class, basicFooIdentity).bar(), equalTo(BAZAR));
 
         uow.discard();
     }
@@ -347,17 +344,17 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.services( SomeOtherFoo.class );
+                module.services(SomeOtherFoo.class);
             }
 
         }.module();
 
-        assertThat( module.findService( SomeOtherFoo.class ).get().bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.findService( BasicFoo.class ).get().bar(), equalTo( CATHEDRAL ) );
-        assertThat( module.findService( Foo.class ).get().bar(), equalTo( CATHEDRAL ) );
+        assertThat(module.findService(SomeOtherFoo.class).get().bar(), equalTo(CATHEDRAL));
+        assertThat(module.findService(BasicFoo.class).get().bar(), equalTo(CATHEDRAL));
+        assertThat(module.findService(Foo.class).get().bar(), equalTo(CATHEDRAL));
     }
 
     @Test
@@ -368,31 +365,31 @@ public class TypeToCompositeLookupTest
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.services( SomeOtherFoo.class, BasicFoo.class );
+                module.services(SomeOtherFoo.class, BasicFoo.class);
             }
 
         }.module();
 
-        assertThat( module.findServices( SomeOtherFoo.class ).count(), equalTo( 1L ) );
-        assertThat( module.findServices( BasicFoo.class ).count(), equalTo( 2L ) );
-        assertThat( module.findServices( Foo.class ).count(), equalTo( 2L ) );
+        assertThat(module.findServices(SomeOtherFoo.class).count(), equalTo(1L));
+        assertThat(module.findServices(BasicFoo.class).count(), equalTo(2L));
+        assertThat(module.findServices(Foo.class).count(), equalTo(2L));
 
-        assertThat( module.findService( SomeOtherFoo.class ).get().bar(), equalTo( CATHEDRAL ) );
+        assertThat(module.findService(SomeOtherFoo.class).get().bar(), equalTo(CATHEDRAL));
 
         // Exact type match first even if it is assembled _after_ an assignable, the assignable comes after
-        Iterator<ServiceReference<BasicFoo>> basicFoos = module.findServices( BasicFoo.class ).iterator();
-        assertThat( basicFoos.next().get().bar(), equalTo( BAZAR ) );
-        assertThat( basicFoos.next().get().bar(), equalTo( CATHEDRAL ) );
-        assertThat( basicFoos.hasNext(), is( false ) );
+        Iterator<ServiceReference<BasicFoo>> basicFoos = module.findServices(BasicFoo.class).iterator();
+        assertThat(basicFoos.next().get().bar(), equalTo(BAZAR));
+        assertThat(basicFoos.next().get().bar(), equalTo(CATHEDRAL));
+        assertThat(basicFoos.hasNext(), is(false));
 
         // No exact type match, all assembled are assignable, follows assembly Type order
-        Iterator<ServiceReference<Foo>> foos = module.findServices( Foo.class ).iterator();
-        assertThat( foos.next().get().bar(), equalTo( CATHEDRAL ) );
-        assertThat( foos.next().get().bar(), equalTo( BAZAR ) );
-        assertThat( foos.hasNext(), is( false ) );
+        Iterator<ServiceReference<Foo>> foos = module.findServices(Foo.class).iterator();
+        assertThat(foos.next().get().bar(), equalTo(CATHEDRAL));
+        assertThat(foos.next().get().bar(), equalTo(BAZAR));
+        assertThat(foos.hasNext(), is(false));
     }
 
 }

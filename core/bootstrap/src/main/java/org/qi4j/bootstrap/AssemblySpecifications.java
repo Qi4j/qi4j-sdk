@@ -19,17 +19,18 @@
  */
 package org.qi4j.bootstrap;
 
+import org.qi4j.api.type.HasTypes;
+
 import java.util.Arrays;
 import java.util.function.Predicate;
-import org.qi4j.api.type.HasTypes;
 
 /**
  * Utility specifications for Assemblies.
  */
 public class AssemblySpecifications
 {
-    public static Predicate<HasTypes> ofAnyType( final Class... types )
+    public static Predicate<HasTypes> ofAnyType(final Class... types)
     {
-        return item -> item.types().anyMatch( a -> Arrays.stream( types ).anyMatch( a::equals ) );
+        return item -> item.types().anyMatch(a -> Arrays.stream(types).anyMatch(a::equals));
     }
 }

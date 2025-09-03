@@ -19,21 +19,17 @@
  */
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.association.ManyAssociationWrapper;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.identity.HasIdentity;
 import org.qi4j.spi.entity.ManyAssociationState;
+
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -43,12 +39,12 @@ public class ManyAssociationInstance<T> extends AbstractAssociationInstance<T>
 {
     private ManyAssociationState manyAssociationState;
 
-    public ManyAssociationInstance( AssociationInfo associationInfo,
-                                    BiFunction<EntityReference, Type, Object> associationFunction,
-                                    ManyAssociationState manyAssociationState
+    public ManyAssociationInstance(AssociationInfo associationInfo,
+                                   BiFunction<EntityReference, Type, Object> associationFunction,
+                                   ManyAssociationState manyAssociationState
     )
     {
-        super( associationInfo, associationFunction );
+        super(associationInfo, associationFunction);
         this.manyAssociationState = manyAssociationState;
     }
 
@@ -59,35 +55,35 @@ public class ManyAssociationInstance<T> extends AbstractAssociationInstance<T>
     }
 
     @Override
-    public boolean contains( T entity )
+    public boolean contains(T entity)
     {
-        return manyAssociationState.contains( getEntityReference( entity ) );
+        return manyAssociationState.contains(getEntityReference(entity));
     }
 
     @Override
-    public boolean add( int i, T entity )
+    public boolean add(int i, T entity)
     {
-        Objects.requireNonNull( entity, "entity" );
+        Objects.requireNonNull(entity, "entity");
         checkImmutable();
-        checkType( entity );
-        associationInfo.checkConstraints( entity );
-        return manyAssociationState.add( i, EntityReference.create( ((HasIdentity) entity ).identity().get()) );
+        checkType(entity);
+        associationInfo.checkConstraints(entity);
+        return manyAssociationState.add(i, EntityReference.create(((HasIdentity) entity).identity().get()));
     }
 
     @Override
-    public boolean add( T entity )
+    public boolean add(T entity)
     {
-        return add( manyAssociationState.count(), entity );
+        return add(manyAssociationState.count(), entity);
     }
 
     @Override
-    public boolean remove( T entity )
+    public boolean remove(T entity)
     {
-        Objects.requireNonNull( entity, "entity" );
+        Objects.requireNonNull(entity, "entity");
         checkImmutable();
-        checkType( entity );
+        checkType(entity);
 
-        return manyAssociationState.remove( EntityReference.create( ((HasIdentity) entity).identity().get() ) );
+        return manyAssociationState.remove(EntityReference.create(((HasIdentity) entity).identity().get()));
     }
 
     @Override
@@ -98,18 +94,18 @@ public class ManyAssociationInstance<T> extends AbstractAssociationInstance<T>
     }
 
     @Override
-    public T get( int i )
+    public T get(int i)
     {
-        return getEntity( manyAssociationState.get( i ) );
+        return getEntity(manyAssociationState.get(i));
     }
 
     @Override
     public List<T> toList()
     {
         ArrayList<T> list = new ArrayList<>();
-        for( EntityReference entityReference : manyAssociationState )
+        for(EntityReference entityReference : manyAssociationState)
         {
-            list.add( getEntity( entityReference ) );
+            list.add(getEntity(entityReference));
         }
 
         return list;
@@ -119,9 +115,9 @@ public class ManyAssociationInstance<T> extends AbstractAssociationInstance<T>
     public Set<T> toSet()
     {
         Set<T> set = new HashSet<>();
-        for( EntityReference entityReference : manyAssociationState )
+        for(EntityReference entityReference : manyAssociationState)
         {
-            set.add( getEntity( entityReference ) );
+            set.add(getEntity(entityReference));
         }
 
         return set;
@@ -142,41 +138,41 @@ public class ManyAssociationInstance<T> extends AbstractAssociationInstance<T>
     @Override
     public Iterator<T> iterator()
     {
-        return new ManyAssociationIterator( manyAssociationState.iterator() );
+        return new ManyAssociationIterator(manyAssociationState.iterator());
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
         ManyAssociation<?> that = (ManyAssociation) o;
         // Unwrap if needed
-        while( that instanceof ManyAssociationWrapper )
+        while(that instanceof ManyAssociationWrapper)
         {
-            that = ( (ManyAssociationWrapper) that ).next();
+            that = ((ManyAssociationWrapper) that).next();
         }
         // Descriptor equality
         ManyAssociationInstance<?> thatInstance = (ManyAssociationInstance) that;
         AssociationDescriptor thatDescriptor = (AssociationDescriptor) thatInstance.associationInfo();
-        if( !associationInfo.equals( thatDescriptor ) )
+        if(!associationInfo.equals(thatDescriptor))
         {
             return false;
         }
         // State equality
-        if( manyAssociationState.count() != thatInstance.manyAssociationState.count() )
+        if(manyAssociationState.count() != thatInstance.manyAssociationState.count())
         {
             return false;
         }
-        for( EntityReference ref : manyAssociationState )
+        for(EntityReference ref : manyAssociationState)
         {
-            if( !thatInstance.manyAssociationState.contains( ref ) )
+            if(!thatInstance.manyAssociationState.contains(ref))
             {
                 return false;
             }
@@ -188,7 +184,7 @@ public class ManyAssociationInstance<T> extends AbstractAssociationInstance<T>
     public int hashCode()
     {
         int hash = associationInfo.hashCode() * 31; // Descriptor
-        for( EntityReference ref : manyAssociationState )
+        for(EntityReference ref : manyAssociationState)
         {
             hash += ref.hashCode() * 7; // State
         }
@@ -205,7 +201,7 @@ public class ManyAssociationInstance<T> extends AbstractAssociationInstance<T>
     {
         private final Iterator<EntityReference> idIterator;
 
-        ManyAssociationIterator( Iterator<EntityReference> idIterator )
+        ManyAssociationIterator(Iterator<EntityReference> idIterator)
         {
             this.idIterator = idIterator;
         }
@@ -219,7 +215,7 @@ public class ManyAssociationInstance<T> extends AbstractAssociationInstance<T>
         @Override
         public T next()
         {
-            return getEntity( idIterator.next() );
+            return getEntity(idIterator.next());
         }
 
         @Override

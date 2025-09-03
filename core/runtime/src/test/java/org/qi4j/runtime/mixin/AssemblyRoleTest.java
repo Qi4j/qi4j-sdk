@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.mixin;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.identity.StringIdentity;
@@ -30,7 +31,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,31 +39,31 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test of declaring types in assembly
  */
 public class AssemblyRoleTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
+        new EntityTestAssembler().assemble(module);
 
-        module.transients( FooComposite.class ).withTypes( Foo.class );
-        module.transients( FooComposite2.class ).withTypes( Foo.class ).withMixins( CustomFooMixin.class );
+        module.transients(FooComposite.class).withTypes(Foo.class);
+        module.transients(FooComposite2.class).withTypes(Foo.class).withMixins(CustomFooMixin.class);
 
-        module.entities( FooEntity.class ).withTypes( Foo.class );
+        module.entities(FooEntity.class).withTypes(Foo.class);
     }
 
     @Test
     public void testAssemblyTypesCustomMixin()
     {
-        FooComposite2 composite2 = transientBuilderFactory.newTransient( FooComposite2.class );
-        assertThat( "Custom mixin has executed", ( (Foo) composite2 ).test( "Foo", 42 ), equalTo( "Foo/42" ) );
+        FooComposite2 composite2 = transientBuilderFactory.newTransient(FooComposite2.class);
+        assertThat("Custom mixin has executed", ((Foo) composite2).test("Foo", 42), equalTo("Foo/42"));
     }
 
     @Test
     public void testAssemblyTypesDefaultMixin()
     {
-        FooComposite composite = transientBuilderFactory.newTransient( FooComposite.class );
-        assertThat( "Default mixin has executed", ( (Foo) composite ).test( "Foo", 42 ), equalTo( "Foo 42" ) );
+        FooComposite composite = transientBuilderFactory.newTransient(FooComposite.class);
+        assertThat("Default mixin has executed", ((Foo) composite).test("Foo", 42), equalTo("Foo 42"));
     }
 
     @Test
@@ -71,15 +71,15 @@ public class AssemblyRoleTest
         throws UnitOfWorkCompletionException
     {
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
-        uow.newEntity( FooEntity.class, StringIdentity.identityOf( "123" ) );
+        uow.newEntity(FooEntity.class, StringIdentity.identityOf("123"));
         uow.complete();
 
         uow = unitOfWorkFactory.newUnitOfWork();
-        Foo foo = uow.get( Foo.class, StringIdentity.identityOf( "123" ) );
+        Foo foo = uow.get(Foo.class, StringIdentity.identityOf("123"));
 
         try
         {
-            assertThat( "Default mixin has executed", foo.test( "Foo", 42 ), equalTo( "Foo 42" ) );
+            assertThat("Default mixin has executed", foo.test("Foo", 42), equalTo("Foo 42"));
         }
         finally
         {
@@ -97,16 +97,16 @@ public class AssemblyRoleTest
     {
     }
 
-    @Mixins( FooMixin.class )
+    @Mixins(FooMixin.class)
     public interface Foo
     {
-        String test( String foo, int bar );
+        String test(String foo, int bar);
     }
 
     public static class FooMixin
         implements Foo
     {
-        public String test( String foo, int bar )
+        public String test(String foo, int bar)
         {
             return foo + " " + bar;
         }
@@ -115,7 +115,7 @@ public class AssemblyRoleTest
     public static class CustomFooMixin
         implements Foo
     {
-        public String test( String foo, int bar )
+        public String test(String foo, int bar)
         {
             return foo + "/" + bar;
         }

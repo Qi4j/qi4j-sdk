@@ -20,8 +20,6 @@
 
 package org.qi4j.runtime.unitofwork;
 
-import java.time.Instant;
-import java.util.Stack;
 import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.composite.TransientBuilderFactory;
 import org.qi4j.api.entity.EntityComposite;
@@ -33,6 +31,9 @@ import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.runtime.entity.EntityInstance;
 import org.qi4j.spi.module.ModuleSpi;
+
+import java.time.Instant;
+import java.util.Stack;
 
 public class UnitOfWorkFactoryMixin
     implements UnitOfWorkFactory
@@ -47,26 +48,26 @@ public class UnitOfWorkFactoryMixin
     @Override
     public UnitOfWork newUnitOfWork()
     {
-        return newUnitOfWork( Usecase.DEFAULT );
+        return newUnitOfWork(Usecase.DEFAULT);
     }
 
     @Override
-    public UnitOfWork newUnitOfWork(Instant currentTime )
+    public UnitOfWork newUnitOfWork(Instant currentTime)
     {
-        return newUnitOfWork( Usecase.DEFAULT, currentTime );
+        return newUnitOfWork(Usecase.DEFAULT, currentTime);
     }
 
     @Override
-    public UnitOfWork newUnitOfWork( Usecase usecase )
+    public UnitOfWork newUnitOfWork(Usecase usecase)
     {
-        return newUnitOfWork( usecase == null ? Usecase.DEFAULT : usecase, SystemTime.now() );
+        return newUnitOfWork(usecase == null ? Usecase.DEFAULT : usecase, SystemTime.now());
     }
 
     @Override
-    public UnitOfWork newUnitOfWork( Usecase usecase, Instant currentTime )
+    public UnitOfWork newUnitOfWork(Usecase usecase, Instant currentTime)
     {
-        UnitOfWorkInstance unitOfWorkInstance = new UnitOfWorkInstance( module, usecase, currentTime, metricsProvider() );
-        return tbf.newTransient( UnitOfWork.class, unitOfWorkInstance );
+        UnitOfWorkInstance unitOfWorkInstance = new UnitOfWorkInstance(module, usecase, currentTime, metricsProvider());
+        return tbf.newTransient(UnitOfWork.class, unitOfWorkInstance);
     }
 
     private MetricsProvider metricsProvider()
@@ -85,17 +86,17 @@ public class UnitOfWorkFactoryMixin
     public UnitOfWork currentUnitOfWork()
     {
         Stack<UnitOfWorkInstance> stack = UnitOfWorkInstance.getCurrent();
-        if( stack.size() == 0 )
+        if(stack.size() == 0)
         {
-            throw new IllegalStateException( "No current UnitOfWork active" );
+            throw new IllegalStateException("No current UnitOfWork active");
         }
-        return tbf.newTransient( UnitOfWork.class, stack.peek() );
+        return tbf.newTransient(UnitOfWork.class, stack.peek());
     }
 
     @Override
-    public UnitOfWork getUnitOfWork( EntityComposite entity )
+    public UnitOfWork getUnitOfWork(EntityComposite entity)
     {
-        EntityInstance instance = (EntityInstance) CompositeInstance.compositeInstanceOf( entity );
+        EntityInstance instance = (EntityInstance) CompositeInstance.compositeInstanceOf(entity);
         return instance.unitOfWork();
     }
 }

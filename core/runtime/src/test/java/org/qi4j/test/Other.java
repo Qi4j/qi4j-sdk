@@ -29,26 +29,26 @@ public interface Other
 {
     public String other();
 
-    public String foo( String bar, int blah )
+    public String foo(String bar, int blah)
         throws IllegalArgumentException;
 
-    public void bar( double doub,
-                     boolean bool,
-                     float fl,
-                     char ch,
-                     int integer,
-                     long lg,
-                     short sh,
-                     byte b,
-                     Double doubObj,
-                     Object[] objArr,
-                     int[] intArr
+    public void bar(double doub,
+                    boolean bool,
+                    float fl,
+                    char ch,
+                    int integer,
+                    long lg,
+                    short sh,
+                    byte b,
+                    Double doubObj,
+                    Object[] objArr,
+                    int[] intArr
     );
 
-    public void multiEx( String bar )
+    public void multiEx(String bar)
         throws Exception1, Exception2;
 
     public long unwrapResult();
 
-    public void generic( List<String> list );
+    public void generic(List<String> list);
 }

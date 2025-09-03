@@ -21,8 +21,6 @@ package org.qi4j.api.query.grammar;
 
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.property.Property;
 
 /**
  * Regular expression match Specification.
@@ -33,13 +31,13 @@ public class MatchesPredicate
     private PropertyFunction<String> property;
     private Object value;
 
-    public MatchesPredicate( PropertyFunction<String> property, String regexp )
+    public MatchesPredicate(PropertyFunction<String> property, String regexp)
     {
         this.property = property;
         this.value = regexp;
     }
 
-    public MatchesPredicate( PropertyFunction<String> property, Variable variable )
+    public MatchesPredicate(PropertyFunction<String> property, Variable variable)
     {
         this.property = property;
         this.value = variable;
@@ -57,27 +55,27 @@ public class MatchesPredicate
 
     public String regexp()
     {
-        return ( String ) value;
+        return (String) value;
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
-        Property<String> prop = property.apply( item );
+        Property<String> prop = property.apply(item);
 
-        if( prop == null )
+        if(prop == null)
         {
             return false;
         }
 
         String val = prop.get();
 
-        if( val == null )
+        if(val == null)
         {
             return false;
         }
 
-        return val.matches( ( String ) value );
+        return val.matches((String) value);
     }
 
     @Override

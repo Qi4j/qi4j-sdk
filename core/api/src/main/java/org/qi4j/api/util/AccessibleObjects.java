@@ -27,31 +27,33 @@ public final class AccessibleObjects
 {
     /**
      * Ensure that a Method, Field, Constructor is accessible.
-     *
+     * <p>
      * If it is public, do nothing.
      * Otherwise, use {@link AccessibleObject#setAccessible(boolean)} if it hasn't already been done.
      *
      * @param accessibleObject The AccessibleObject
-     * @param <T> AccessibleObject type
+     * @param <T>              AccessibleObject type
      * @return The given AccessibleObject, accessible
      */
-    public static <T extends AccessibleObject> T accessible( T accessibleObject )
+    public static <T extends AccessibleObject> T accessible(T accessibleObject)
     {
-        if( accessibleObject instanceof Member )
+        if(accessibleObject instanceof Member)
         {
             Member member = (Member) accessibleObject;
-            if( Modifier.isPublic( member.getModifiers() )
-                && Modifier.isPublic( member.getDeclaringClass().getModifiers() ) )
+            if(Modifier.isPublic(member.getModifiers())
+                && Modifier.isPublic(member.getDeclaringClass().getModifiers()))
             {
                 return accessibleObject;
             }
         }
-        if( !accessibleObject.isAccessible() )
+        if(!accessibleObject.isAccessible())
         {
-            accessibleObject.setAccessible( true );
+            accessibleObject.setAccessible(true);
         }
         return accessibleObject;
     }
 
-    private AccessibleObjects() {}
+    private AccessibleObjects()
+    {
+    }
 }

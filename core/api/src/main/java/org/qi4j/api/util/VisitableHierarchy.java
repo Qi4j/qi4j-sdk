@@ -24,6 +24,6 @@ package org.qi4j.api.util;
  */
 public interface VisitableHierarchy<NODE, LEAF>
 {
-    <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super NODE, ? super LEAF, ThrowableType> visitor )
+    <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super NODE, ? super LEAF, ThrowableType> visitor)
         throws ThrowableType;
 }

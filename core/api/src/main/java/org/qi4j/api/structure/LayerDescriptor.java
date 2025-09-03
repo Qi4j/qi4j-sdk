@@ -19,13 +19,15 @@
  */
 package org.qi4j.api.structure;
 
-import java.util.stream.Stream;
+import org.qi4j.api.activation.ActivatorDescriptor;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.api.composite.TransientDescriptor;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.object.ObjectDescriptor;
 import org.qi4j.api.value.ValueDescriptor;
+
+import java.util.stream.Stream;
 
 /**
  * Layer Descriptor.
@@ -46,13 +48,15 @@ public interface LayerDescriptor
 
     Stream<? extends ModuleDescriptor> modules();
 
-    Stream<? extends ObjectDescriptor> visibleObjects( Visibility visibility );
+    Stream<? extends ObjectDescriptor> visibleObjects(Visibility visibility);
 
-    Stream<? extends TransientDescriptor> visibleTransients( Visibility visibility );
+    Stream<? extends TransientDescriptor> visibleTransients(Visibility visibility);
 
-    Stream<? extends EntityDescriptor> visibleEntities( Visibility visibility );
+    Stream<? extends EntityDescriptor> visibleEntities(Visibility visibility);
 
-    Stream<? extends ValueDescriptor> visibleValues( Visibility visibility );
+    Stream<? extends ValueDescriptor> visibleValues(Visibility visibility);
 
-    Stream<? extends ModelDescriptor> visibleServices( Visibility visibility );
+    Stream<? extends ModelDescriptor> visibleServices(Visibility visibility);
+
+    Stream<? extends ActivatorDescriptor> activators();
 }

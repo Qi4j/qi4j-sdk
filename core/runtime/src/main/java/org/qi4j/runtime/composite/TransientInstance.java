@@ -20,16 +20,17 @@
 
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Arrays;
-import java.util.stream.Stream;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.property.StateHolder;
 import org.qi4j.api.structure.LayerDescriptor;
 import org.qi4j.api.structure.ModuleDescriptor;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.Arrays;
+import java.util.stream.Stream;
 
 /**
  * InvocationHandler for proxy objects.
@@ -42,43 +43,43 @@ public class TransientInstance
     protected StateHolder state;
     protected final CompositeModel compositeModel;
 
-    public TransientInstance( CompositeModel compositeModel,
-                              Object[] mixins,
-                              StateHolder state
+    public TransientInstance(CompositeModel compositeModel,
+                             Object[] mixins,
+                             StateHolder state
     )
     {
         this.compositeModel = compositeModel;
         this.mixins = mixins;
         this.state = state;
-        proxy = compositeModel.newProxy( this );
+        proxy = compositeModel.newProxy(this);
     }
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
-        return compositeModel.invoke( this, proxy, method, args );
+        return compositeModel.invoke(this, proxy, method, args);
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public <T> T proxy()
     {
         return (T) proxy;
     }
 
     @Override
-    public <T> T newProxy( Class<T> mixinType )
+    public <T> T newProxy(Class<T> mixinType)
         throws IllegalArgumentException
     {
-        return compositeModel.newProxy( this, mixinType );
+        return compositeModel.newProxy(this, mixinType);
     }
 
     @Override
-    public Object invokeComposite( Method method, Object[] args )
+    public Object invokeComposite(Method method, Object[] args)
         throws Throwable
     {
-        return compositeModel.invoke( this, proxy, method, args );
+        return compositeModel.invoke(this, proxy, method, args);
     }
 
     @Override
@@ -88,9 +89,9 @@ public class TransientInstance
     }
 
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return compositeModel.metaInfo( infoType );
+        return compositeModel.metaInfo(infoType);
     }
 
     @Override
@@ -117,40 +118,40 @@ public class TransientInstance
     }
 
     @Override
-    public Object invoke( Object composite, Object[] params, CompositeMethodInstance methodInstance )
+    public Object invoke(Object composite, Object[] params, CompositeMethodInstance methodInstance)
         throws Throwable
     {
-        Object mixin = methodInstance.getMixinFrom( mixins );
-        return methodInstance.invoke( proxy, params, mixin );
+        Object mixin = methodInstance.getMixinFrom(mixins);
+        return methodInstance.invoke(proxy, params, mixin);
     }
 
     @Override
-    public Object invokeObject( Object proxy, Object[] args, Method method )
+    public Object invokeObject(Object proxy, Object[] args, Method method)
         throws Throwable
     {
-        return method.invoke( this, args );
+        return method.invoke(this, args);
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( o == null )
+        if(o == null)
         {
             return false;
         }
-        if( !Proxy.isProxyClass( o.getClass() ) )
+        if(!Proxy.isProxyClass(o.getClass()))
         {
             return false;
         }
-        TransientInstance other = (TransientInstance) Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply( (Composite) o );
-        if( other.mixins.length != mixins.length )
+        TransientInstance other = (TransientInstance) Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply((Composite) o);
+        if(other.mixins.length != mixins.length)
         {
             return false;
         }
 
-        for( int i = 0; i < mixins.length; i++ )
+        for(int i = 0; i < mixins.length; i++)
         {
-            if( !mixins[ i ].equals( other.mixins[ i ] ) )
+            if(!mixins[i].equals(other.mixins[i]))
             {
                 return false;
             }
@@ -162,7 +163,7 @@ public class TransientInstance
     public int hashCode()
     {
         int hashCode = 0;
-        for( Object mixin : mixins )
+        for(Object mixin : mixins)
         {
             hashCode = hashCode * 31 + mixin.hashCode();
         }
@@ -174,42 +175,42 @@ public class TransientInstance
     {
         StringBuilder buffer = new StringBuilder();
         boolean first = true;
-        for( Object mixin : mixins )
+        for(Object mixin : mixins)
         {
             try
             {
-                if( mixin != null )  // Can happen during construction of incorrect composites, during exception creation.
+                if(mixin != null)  // Can happen during construction of incorrect composites, during exception creation.
                 {
                     Class<?> type = mixin.getClass();
-                    Method toStringMethod = type.getMethod( "toString" );
+                    Method toStringMethod = type.getMethod("toString");
                     Class<?> declaringClass = toStringMethod.getDeclaringClass();
-                    if( !declaringClass.equals( Object.class ) )
+                    if(!declaringClass.equals(Object.class))
                     {
-                        if( !first )
+                        if(!first)
                         {
-                            buffer.append( ", " );
+                            buffer.append(", ");
                         }
                         first = false;
-                        buffer.append( mixin.toString() );
+                        buffer.append(mixin.toString());
                     }
                 }
             }
-            catch( NoSuchMethodException e )
+            catch(NoSuchMethodException e)
             {
                 // Can not happen??
                 e.printStackTrace();
             }
         }
-        if( first )
+        if(first)
         {
             String modelTypeName = compositeModel.getClass().getSimpleName();
-            String metaTypeModel = modelTypeName.substring( 0, modelTypeName.length() - 5 );
+            String metaTypeModel = modelTypeName.substring(0, modelTypeName.length() - 5);
             return metaTypeModel + "Instance{" +
-                   "mixins=" + Arrays.asList( mixins ) +
-                   ", state=" + state +
-                   ", compositeModel=" + compositeModel +
-                   ", module=" + module() +
-                   '}';
+                "mixins=" + Arrays.asList(mixins) +
+                ", state=" + state +
+                ", compositeModel=" + compositeModel +
+                ", module=" + module() +
+                '}';
         }
         return buffer.toString();
     }

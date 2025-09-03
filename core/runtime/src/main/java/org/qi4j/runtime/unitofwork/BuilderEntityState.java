@@ -19,9 +19,6 @@
  */
 package org.qi4j.runtime.unitofwork;
 
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
@@ -30,6 +27,10 @@ import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.entity.NamedAssociationState;
+
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of EntityState for use through EntityBuilder.
@@ -44,7 +45,7 @@ public final class BuilderEntityState
     private final Map<QualifiedName, ManyAssociationState> manyAssociations = new HashMap<>();
     private final Map<QualifiedName, NamedAssociationState> namedAssociations = new HashMap<>();
 
-    public BuilderEntityState( EntityDescriptor type, EntityReference reference )
+    public BuilderEntityState(EntityDescriptor type, EntityReference reference)
     {
         this.entityType = type;
         this.reference = reference;
@@ -80,9 +81,9 @@ public final class BuilderEntityState
     }
 
     @Override
-    public boolean isAssignableTo( Class<?> type )
+    public boolean isAssignableTo(Class<?> type)
     {
-        return Classes.exactTypeSpecification( type ).test( entityType );
+        return Classes.exactTypeSpecification(type).test(entityType);
     }
 
     @Override
@@ -92,71 +93,71 @@ public final class BuilderEntityState
     }
 
     @Override
-    public Object propertyValueOf( QualifiedName stateName )
+    public Object propertyValueOf(QualifiedName stateName)
     {
-        return properties.get( stateName );
+        return properties.get(stateName);
     }
 
     @Override
-    public EntityReference associationValueOf( QualifiedName stateName )
+    public EntityReference associationValueOf(QualifiedName stateName)
     {
-        return associations.get( stateName );
+        return associations.get(stateName);
     }
 
     @Override
-    public void setPropertyValue( QualifiedName stateName, Object newValue )
+    public void setPropertyValue(QualifiedName stateName, Object newValue)
     {
-        properties.put( stateName, newValue );
+        properties.put(stateName, newValue);
     }
 
     @Override
-    public void setAssociationValue( QualifiedName stateName, EntityReference newEntity )
+    public void setAssociationValue(QualifiedName stateName, EntityReference newEntity)
     {
-        associations.put( stateName, newEntity );
+        associations.put(stateName, newEntity);
     }
 
     @Override
-    public ManyAssociationState manyAssociationValueOf( QualifiedName stateName )
+    public ManyAssociationState manyAssociationValueOf(QualifiedName stateName)
     {
-        return manyAssociations.computeIfAbsent( stateName,
-                                                 qualifiedName -> new BuilderManyAssociationState() );
+        return manyAssociations.computeIfAbsent(stateName,
+            qualifiedName -> new BuilderManyAssociationState());
     }
 
     @Override
-    public NamedAssociationState namedAssociationValueOf( QualifiedName stateName )
+    public NamedAssociationState namedAssociationValueOf(QualifiedName stateName)
     {
-        return namedAssociations.computeIfAbsent( stateName,
-                                                  qualifiedName -> new BuilderNamedAssociationState() );
+        return namedAssociations.computeIfAbsent(stateName,
+            qualifiedName -> new BuilderNamedAssociationState());
     }
 
-    public void copyTo( EntityState newEntityState )
+    public void copyTo(EntityState newEntityState)
     {
-        for( Map.Entry<QualifiedName, Object> fromPropertyEntry : properties.entrySet() )
+        for(Map.Entry<QualifiedName, Object> fromPropertyEntry : properties.entrySet())
         {
-            newEntityState.setPropertyValue( fromPropertyEntry.getKey(), fromPropertyEntry.getValue() );
+            newEntityState.setPropertyValue(fromPropertyEntry.getKey(), fromPropertyEntry.getValue());
         }
-        for( Map.Entry<QualifiedName, EntityReference> fromAssociationEntry : associations.entrySet() )
+        for(Map.Entry<QualifiedName, EntityReference> fromAssociationEntry : associations.entrySet())
         {
-            newEntityState.setAssociationValue( fromAssociationEntry.getKey(), fromAssociationEntry.getValue() );
+            newEntityState.setAssociationValue(fromAssociationEntry.getKey(), fromAssociationEntry.getValue());
         }
-        for( Map.Entry<QualifiedName, ManyAssociationState> fromManyAssociationEntry : manyAssociations.entrySet() )
+        for(Map.Entry<QualifiedName, ManyAssociationState> fromManyAssociationEntry : manyAssociations.entrySet())
         {
             QualifiedName qName = fromManyAssociationEntry.getKey();
             ManyAssociationState fromManyAssoc = fromManyAssociationEntry.getValue();
-            ManyAssociationState toManyAssoc = newEntityState.manyAssociationValueOf( qName );
-            for( EntityReference entityReference : fromManyAssoc )
+            ManyAssociationState toManyAssoc = newEntityState.manyAssociationValueOf(qName);
+            for(EntityReference entityReference : fromManyAssoc)
             {
-                toManyAssoc.add( 0, entityReference );
+                toManyAssoc.add(0, entityReference);
             }
         }
-        for( Map.Entry<QualifiedName, NamedAssociationState> fromNamedAssociationEntry : namedAssociations.entrySet() )
+        for(Map.Entry<QualifiedName, NamedAssociationState> fromNamedAssociationEntry : namedAssociations.entrySet())
         {
             QualifiedName qName = fromNamedAssociationEntry.getKey();
             NamedAssociationState fromNamedAssoc = fromNamedAssociationEntry.getValue();
-            NamedAssociationState toNamedAssoc = newEntityState.namedAssociationValueOf( qName );
-            for( String name : fromNamedAssoc )
+            NamedAssociationState toNamedAssoc = newEntityState.namedAssociationValueOf(qName);
+            for(String name : fromNamedAssoc)
             {
-                toNamedAssoc.put( name, fromNamedAssoc.get( name ) );
+                toNamedAssoc.put(name, fromNamedAssoc.get(name));
             }
         }
     }

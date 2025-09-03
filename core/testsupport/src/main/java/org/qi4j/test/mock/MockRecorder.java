@@ -21,5 +21,5 @@ package org.qi4j.test.mock;
 
 public interface MockRecorder
 {
-    MockResolverType useMock( Object mock );
+    MockResolverType useMock(Object mock);
 }

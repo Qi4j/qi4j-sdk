@@ -19,8 +19,6 @@
  */
 package org.qi4j.runtime.entity;
 
-import java.lang.reflect.Method;
-import java.util.List;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
@@ -44,6 +42,9 @@ import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
 import org.qi4j.spi.module.ModuleSpi;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import static org.qi4j.api.identity.HasIdentity.IDENTITY_METHOD;
 
 /**
@@ -55,24 +56,24 @@ public final class EntityModel extends CompositeModel
     private final EntityCompositeType valueType;
     private final boolean queryable;
 
-    public EntityModel( ModuleDescriptor module,
-                        List<Class<?>> types,
-                        Visibility visibility,
-                        MetaInfo info,
-                        EntityMixinsModel mixinsModel,
-                        EntityStateModel stateModel,
-                        CompositeMethodsModel compositeMethodsModel
+    public EntityModel(ModuleDescriptor module,
+                       List<Class<?>> types,
+                       Visibility visibility,
+                       MetaInfo info,
+                       EntityMixinsModel mixinsModel,
+                       EntityStateModel stateModel,
+                       CompositeMethodsModel compositeMethodsModel
     )
     {
-        super( module, types, visibility, info, mixinsModel, stateModel, compositeMethodsModel );
+        super(module, types, visibility, info, mixinsModel, stateModel, compositeMethodsModel);
 
-        this.valueType = EntityCompositeType.of( this );
+        this.valueType = EntityCompositeType.of(this);
         this.queryable = types.stream()
-            .flatMap( Annotations.ANNOTATIONS_OF )
-            .filter( Annotations.isType( Queryable.class ) )
-            .map( annot -> ( (Queryable) annot ).value() )
+            .flatMap(Annotations.ANNOTATIONS_OF)
+            .filter(Annotations.isType(Queryable.class))
+            .map(annot -> ((Queryable) annot).value())
             .findFirst()
-            .orElse( true );
+            .orElse(true);
     }
 
     @Override
@@ -93,9 +94,9 @@ public final class EntityModel extends CompositeModel
         return (EntityStateModel) super.state();
     }
 
-    public EntityInstance newInstance(ModuleUnitOfWork uow, ModuleSpi moduleInstance, EntityState state )
+    public EntityInstance newInstance(ModuleUnitOfWork uow, ModuleSpi moduleInstance, EntityState state)
     {
-        return new EntityInstance( uow, this, state );
+        return new EntityInstance(uow, this, state);
     }
 
     public Object[] newMixinHolder()
@@ -103,68 +104,68 @@ public final class EntityModel extends CompositeModel
         return mixinsModel.newMixinHolder();
     }
 
-    public Object newMixin( Object[] mixins,
-                            EntityStateInstance entityState,
-                            EntityInstance entityInstance,
-                            Method method
+    public Object newMixin(Object[] mixins,
+                           EntityStateInstance entityState,
+                           EntityInstance entityInstance,
+                           Method method
     )
     {
-        return ( (EntityMixinsModel) mixinsModel ).newMixin( entityInstance, entityState, mixins, method );
+        return ((EntityMixinsModel) mixinsModel).newMixin(entityInstance, entityState, mixins, method);
     }
 
-    public EntityState newEntityState( EntityStoreUnitOfWork store, EntityReference reference )
+    public EntityState newEntityState(EntityStoreUnitOfWork store, EntityReference reference)
         throws ConstraintViolationException, EntityStoreException
     {
         try
         {
             // New EntityState
-            EntityState entityState = store.newEntityState( reference, this );
+            EntityState entityState = store.newEntityState(reference, this);
 
             // Set reference property
-            PropertyDescriptor persistentPropertyDescriptor = state().propertyModelFor( IDENTITY_METHOD );
-            entityState.setPropertyValue( persistentPropertyDescriptor.qualifiedName(), reference.identity() );
+            PropertyDescriptor persistentPropertyDescriptor = state().propertyModelFor(IDENTITY_METHOD);
+            entityState.setPropertyValue(persistentPropertyDescriptor.qualifiedName(), reference.identity());
 
             return entityState;
         }
-        catch( EntityAlreadyExistsException e )
+        catch(EntityAlreadyExistsException e)
         {
-            throw new EntityCompositeAlreadyExistsException( reference );
+            throw new EntityCompositeAlreadyExistsException(reference);
         }
-        catch( EntityStoreException e )
+        catch(EntityStoreException e)
         {
-            throw new ConstructionException( "Could not create new entity in store", e );
+            throw new ConstructionException("Could not create new entity in store", e);
         }
-        catch( ConstraintViolationException e )
+        catch(ConstraintViolationException e)
         {
-            e.setCompositeDescriptor( this );
-            e.setIdentity( reference.identity() );
+            e.setCompositeDescriptor(this);
+            e.setIdentity(reference.identity());
             throw e;
         }
     }
 
-    public void initState( ModuleDescriptor module, EntityState entityState )
+    public void initState(ModuleDescriptor module, EntityState entityState)
     {
         // Set new properties to default value
         state().properties().forEach(
-            propertyDescriptor -> entityState.setPropertyValue( propertyDescriptor.qualifiedName(),
-                                                                propertyDescriptor.resolveInitialValue( module ) ) );
+            propertyDescriptor -> entityState.setPropertyValue(propertyDescriptor.qualifiedName(),
+                propertyDescriptor.resolveInitialValue(module)));
 
         // Set new associations to null
         state().associations().forEach(
-            associationDescriptor -> entityState.setAssociationValue( associationDescriptor.qualifiedName(),
-                                                                      null ) );
+            associationDescriptor -> entityState.setAssociationValue(associationDescriptor.qualifiedName(),
+                null));
 
         // Set new many-associations to empty
         state().manyAssociations().forEach(
-            associationDescriptor -> entityState.manyAssociationValueOf( associationDescriptor.qualifiedName() ) );
+            associationDescriptor -> entityState.manyAssociationValueOf(associationDescriptor.qualifiedName()));
 
         // Set new named-associations to empty
         state().namedAssociations().forEach(
-            associationDescriptor -> entityState.namedAssociationValueOf( associationDescriptor.qualifiedName() ) );
+            associationDescriptor -> entityState.namedAssociationValueOf(associationDescriptor.qualifiedName()));
     }
 
-    public void invokeLifecycle( boolean create, Object[] mixins, CompositeInstance instance, StateHolder state )
+    public void invokeLifecycle(boolean create, Object[] mixins, CompositeInstance instance, StateHolder state)
     {
-        ( (EntityMixinsModel) mixinsModel ).invokeLifecycle( create, mixins, instance, state );
+        ((EntityMixinsModel) mixinsModel).invokeLifecycle(create, mixins, instance, state);
     }
 }

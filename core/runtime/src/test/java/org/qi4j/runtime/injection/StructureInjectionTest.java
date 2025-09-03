@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.composite.TransientBuilderFactory;
 import org.qi4j.api.composite.TransientComposite;
@@ -33,7 +34,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.spi.Qi4jSPI;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -45,10 +45,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class StructureInjectionTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( StructureInjectionComposite.class );
+        module.transients(StructureInjectionComposite.class);
     }
 
     /**
@@ -57,8 +57,8 @@ public class StructureInjectionTest
     @Test
     public void injectedStructureForCompositeBuilderFactory()
     {
-        StructureInjectionComposite sic = transientBuilderFactory.newTransient( StructureInjectionComposite.class );
-        assertThat( "Injected CompositeBuilderFactory", sic.getCompositeBuilderFactory(), is( notNullValue() ) );
+        StructureInjectionComposite sic = transientBuilderFactory.newTransient(StructureInjectionComposite.class);
+        assertThat("Injected CompositeBuilderFactory", sic.getCompositeBuilderFactory(), is(notNullValue()));
     }
 
     /**
@@ -67,8 +67,8 @@ public class StructureInjectionTest
     @Test
     public void injectedStructureForObjectBuilderFactory()
     {
-        StructureInjectionComposite sic = transientBuilderFactory.newTransient( StructureInjectionComposite.class );
-        assertThat( "Injected ObjectBuilderFactory", sic.getObjectFactory(), is( notNullValue() ) );
+        StructureInjectionComposite sic = transientBuilderFactory.newTransient(StructureInjectionComposite.class);
+        assertThat("Injected ObjectBuilderFactory", sic.getObjectFactory(), is(notNullValue()));
     }
 
     /**
@@ -77,8 +77,8 @@ public class StructureInjectionTest
     @Test
     public void injectedStructureForUnitOfWorkFactory()
     {
-        StructureInjectionComposite sic = transientBuilderFactory.newTransient( StructureInjectionComposite.class );
-        assertThat( "Injected UnitOfWorkFactory", sic.getUnitOfWorkFactory(), is( notNullValue() ) );
+        StructureInjectionComposite sic = transientBuilderFactory.newTransient(StructureInjectionComposite.class);
+        assertThat("Injected UnitOfWorkFactory", sic.getUnitOfWorkFactory(), is(notNullValue()));
     }
 
     /**
@@ -87,8 +87,8 @@ public class StructureInjectionTest
     @Test
     public void injectedStructureForServiceLocator()
     {
-        StructureInjectionComposite sic = transientBuilderFactory.newTransient( StructureInjectionComposite.class );
-        assertThat( "Injected ServiceLocator", sic.getServiceLocator(), is( notNullValue() ) );
+        StructureInjectionComposite sic = transientBuilderFactory.newTransient(StructureInjectionComposite.class);
+        assertThat("Injected ServiceLocator", sic.getServiceLocator(), is(notNullValue()));
     }
 
     /**
@@ -97,8 +97,8 @@ public class StructureInjectionTest
     @Test
     public void injectedStructureForModuleBinding()
     {
-        StructureInjectionComposite sic = transientBuilderFactory.newTransient( StructureInjectionComposite.class );
-        assertThat( "Injected Module", sic.getModule(), is( notNullValue() ) );
+        StructureInjectionComposite sic = transientBuilderFactory.newTransient(StructureInjectionComposite.class);
+        assertThat("Injected Module", sic.getModule(), is(notNullValue()));
     }
 
     /**
@@ -107,8 +107,8 @@ public class StructureInjectionTest
     @Test
     public void injectedStructureForQi4j()
     {
-        StructureInjectionComposite sic = transientBuilderFactory.newTransient( StructureInjectionComposite.class );
-        assertThat( "Injected Qi4j", sic.getQi4j(), is( notNullValue() ) );
+        StructureInjectionComposite sic = transientBuilderFactory.newTransient(StructureInjectionComposite.class);
+        assertThat("Injected Qi4j", sic.getQi4j(), is(notNullValue()));
     }
 
     /**
@@ -117,11 +117,11 @@ public class StructureInjectionTest
     @Test
     public void injectedStructureForQi4jSpi()
     {
-        StructureInjectionComposite sic = transientBuilderFactory.newTransient( StructureInjectionComposite.class );
-        assertThat( "Injected Qi4jSPI", sic.getQi4jSpi(), is( notNullValue() ) );
+        StructureInjectionComposite sic = transientBuilderFactory.newTransient(StructureInjectionComposite.class);
+        assertThat("Injected Qi4jSPI", sic.getQi4jSpi(), is(notNullValue()));
     }
 
-    @Mixins( StructureInjectionMixin.class )
+    @Mixins(StructureInjectionMixin.class)
     public interface StructureInjectionComposite
         extends TransientComposite
     {

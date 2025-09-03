@@ -31,12 +31,10 @@ public interface ApplicationAssemblyFactory
      * Create a new application with one layer and one module.
      *
      * @param assembler the assembler for the single module
-     *
      * @return the application instance
-     *
      * @throws AssemblyException if the application could not be assembled
      */
-    ApplicationAssembly newApplicationAssembly( Assembler assembler )
+    ApplicationAssembly newApplicationAssembly(Assembler assembler)
         throws AssemblyException;
 
     /**
@@ -46,12 +44,10 @@ public interface ApplicationAssemblyFactory
      * a simple way to create "pancake" layered applications.
      *
      * @param assemblers the set of assemblers for the application
-     *
      * @return the application instance
-     *
      * @throws AssemblyException if the application could not be assembled
      */
-    ApplicationAssembly newApplicationAssembly( Assembler[][][] assemblers )
+    ApplicationAssembly newApplicationAssembly(Assembler[][][] assemblers)
         throws AssemblyException;
 
     /**

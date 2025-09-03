@@ -33,7 +33,7 @@ import org.qi4j.api.property.PropertyMixin;
  * Properties and associations are handled by default.
  * </p>
  */
-@Mixins( { PropertyMixin.class } )
+@Mixins({PropertyMixin.class})
 public interface Composite
 {
 }

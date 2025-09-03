@@ -19,7 +19,7 @@
  */
 package org.qi4j.constraints;
 
-import java.util.Collection;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.constraint.ConstraintViolationException;
@@ -32,41 +32,42 @@ import org.qi4j.library.constraints.MinLengthConstraint;
 import org.qi4j.library.constraints.annotation.Matches;
 import org.qi4j.library.constraints.annotation.MinLength;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.Collection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class PropertyConstraintTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
     @Test
     public void givenConstraintOnPropertyWhenInvalidValueThenThrowException()
         throws Throwable
     {
-        TransientBuilder<TestType> builder = transientBuilderFactory.newTransientBuilder( TestType.class );
-        builder.prototype().test().set( "XXXXXX" );
+        TransientBuilder<TestType> builder = transientBuilderFactory.newTransientBuilder(TestType.class);
+        builder.prototype().test().set("XXXXXX");
         TestType test = builder.newInstance();
         try
         {
-            test.test().set( "YY" );
-            fail( "Should have thrown a ConstraintViolationException." );
+            test.test().set("YY");
+            fail("Should have thrown a ConstraintViolationException.");
         }
-        catch( ConstraintViolationException e )
+        catch(ConstraintViolationException e)
         {
             Collection<ValueConstraintViolation> violations = e.constraintViolations();
-            assertThat( violations.size(), equalTo( 2 ) );
+            assertThat(violations.size(), equalTo(2));
         }
     }
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestComposite.class );
+        module.transients(TestComposite.class);
     }
 
-    @Constraints( { MinLengthConstraint.class } )
+    @Constraints({MinLengthConstraint.class})
     public interface TestComposite
         extends TestType, TransientComposite
     {
@@ -74,8 +75,8 @@ public class PropertyConstraintTest
 
     public interface TestType
     {
-        @MinLength( 3 )
-        @Matches( "X*" )
+        @MinLength(3)
+        @Matches("X*")
         Property<String> test();
     }
 }

@@ -24,8 +24,8 @@ package org.qi4j.api.composite;
  */
 public class InvalidValueCompositeException extends RuntimeException
 {
-    public InvalidValueCompositeException( String message )
+    public InvalidValueCompositeException(String message)
     {
-        super( message );
+        super(message);
     }
 }

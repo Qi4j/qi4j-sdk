@@ -19,42 +19,43 @@
  */
 package org.qi4j.bootstrap;
 
-import java.util.Map;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.property.Property;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 
 public class ErrorReportingTest extends AbstractQi4jTest
 {
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.values( Person.class );
-        module.values( Pet.class );
+        module.values(Person.class);
+        module.values(Pet.class);
     }
 
     @Override
-    protected void assemblyException( AssemblyException exception )
+    protected void assemblyException(AssemblyException exception)
     {
-        assertThat( exception.getMessage(), containsString( "Composition Problems Report:" + NL ) );
-        assertThat( exception.getMessage(), containsString( "    message: No implementation found for method" + NL
-                                                            + "    method: Map doAnotherThing(String name, int value)" + NL
-                                                            + "    types: [Person,ValueComposite]" + NL ) );
+        assertThat(exception.getMessage(), containsString("Composition Problems Report:" + NL));
+        assertThat(exception.getMessage(), containsString("    message: No implementation found for method" + NL
+            + "    method: Map doAnotherThing(String name, int value)" + NL
+            + "    types: [Person,ValueComposite]" + NL));
 
-        assertThat( exception.getMessage(), containsString( "    message: No implementation found for method" + NL
-                                                            + "    method: void doOneThing()" + NL
-                                                            + "    types: [Person,ValueComposite]" + NL ) );
+        assertThat(exception.getMessage(), containsString("    message: No implementation found for method" + NL
+            + "    method: void doOneThing()" + NL
+            + "    types: [Person,ValueComposite]" + NL));
 
-        assertThat( exception.getMessage(), containsString( "    message: No implementation found for method" + NL
-                                                            + "    method: void goForWalk(int minutes)" + NL
-                                                            + "    types: [Pet,ValueComposite]" + NL ) );
+        assertThat(exception.getMessage(), containsString("    message: No implementation found for method" + NL
+            + "    method: void goForWalk(int minutes)" + NL
+            + "    types: [Pet,ValueComposite]" + NL));
     }
 
     @Test
@@ -67,7 +68,7 @@ public class ErrorReportingTest extends AbstractQi4jTest
     {
         void doOneThing();
 
-        Map<String, Integer> doAnotherThing( String name, int value );
+        Map<String, Integer> doAnotherThing(String name, int value);
 
         Property<String> name();
 
@@ -78,6 +79,6 @@ public class ErrorReportingTest extends AbstractQi4jTest
 
     public interface Pet
     {
-        void goForWalk( int minutes );
+        void goForWalk(int minutes);
     }
 }

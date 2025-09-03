@@ -20,66 +20,63 @@
 
 package org.qi4j.api.metrics;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.concern.ConcernOf;
 import org.qi4j.api.injection.scope.Invocation;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.structure.Module;
-import org.qi4j.api.injection.scope.Invocation;
-import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.structure.Module;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 public class TimingCaptureAllConcern extends ConcernOf<InvocationHandler>
     implements InvocationHandler
 {
     private final MetricsTimer timer;
 
-    public TimingCaptureAllConcern( @Structure Module module,
-                                    @Service @Optional MetricsProvider metrics,
-                                    @Invocation Method method
+    public TimingCaptureAllConcern(@Structure Module module,
+                                   @Service @Optional MetricsProvider metrics,
+                                   @Invocation Method method
     )
     {
-        if( metrics == null )
+        if(metrics == null)
         {
             timer = null;
         }
         else
         {
-            MetricsTimerFactory factory = metrics.createFactory( MetricsTimerFactory.class );
-            TimingCapture capture = method.getAnnotation( TimingCapture.class );
+            MetricsTimerFactory factory = metrics.createFactory(MetricsTimerFactory.class);
+            TimingCapture capture = method.getAnnotation(TimingCapture.class);
             String timerName;
-            if( capture == null || "".equals( capture.value() ) )
+            if(capture == null || "".equals(capture.value()))
             {
-                timerName = MetricNames.nameFor( module, method );
+                timerName = MetricNames.nameFor(module, method);
             }
             else
             {
                 timerName = capture.value();
             }
-            timer = factory.createTimer( timerName );
+            timer = factory.createTimer(timerName);
         }
     }
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
         MetricsTimer.Context timing = null;
-        if( timer != null )
+        if(timer != null)
         {
             timing = timer.start();
         }
         try
         {
-            return next.invoke( proxy, method, args );
+            return next.invoke(proxy, method, args);
         }
         finally
         {
-            if( timing != null )
+            if(timing != null)
             {
                 timing.stop();
             }

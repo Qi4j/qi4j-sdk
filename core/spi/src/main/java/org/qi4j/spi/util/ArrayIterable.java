@@ -29,11 +29,11 @@ public class ArrayIterable implements Iterable<Object>
 {
     private final Object array;
 
-    public ArrayIterable( final Object array )
+    public ArrayIterable(final Object array)
     {
-        if( !array.getClass().isArray() )
+        if(!array.getClass().isArray())
         {
-            throw new IllegalArgumentException( array + " is not an array" );
+            throw new IllegalArgumentException(array + " is not an array");
         }
         this.array = array;
     }
@@ -41,7 +41,7 @@ public class ArrayIterable implements Iterable<Object>
     @Override
     public Iterator<Object> iterator()
     {
-        return new ArrayIterator( array );
+        return new ArrayIterator(array);
     }
 
     private class ArrayIterator implements Iterator<Object>
@@ -49,7 +49,7 @@ public class ArrayIterable implements Iterable<Object>
         private final Object array;
         private int currentIndex = 0;
 
-        private ArrayIterator( Object array )
+        private ArrayIterator(Object array)
         {
             this.array = array;
         }
@@ -57,19 +57,19 @@ public class ArrayIterable implements Iterable<Object>
         @Override
         public boolean hasNext()
         {
-            return currentIndex < Array.getLength( array );
+            return currentIndex < Array.getLength(array);
         }
 
         @Override
         public Object next()
         {
-            return Array.get( array, currentIndex++ );
+            return Array.get(array, currentIndex++);
         }
 
         @Override
         public void remove()
         {
-            throw new UnsupportedOperationException( "cannot remove items from an array" );
+            throw new UnsupportedOperationException("cannot remove items from an array");
         }
     }
 }

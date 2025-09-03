@@ -33,18 +33,18 @@ public class UnitOfWorkCompletionException
     {
     }
 
-    public UnitOfWorkCompletionException( String string )
+    public UnitOfWorkCompletionException(String string)
     {
-        super( string );
+        super(string);
     }
 
-    public UnitOfWorkCompletionException( String string, Throwable throwable )
+    public UnitOfWorkCompletionException(String string, Throwable throwable)
     {
-        super( string, throwable );
+        super(string, throwable);
     }
 
-    public UnitOfWorkCompletionException( Throwable throwable )
+    public UnitOfWorkCompletionException(Throwable throwable)
     {
-        super( throwable );
+        super(throwable);
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.visibility;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.identity.StringIdentity;
@@ -30,31 +31,26 @@ import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.Energy4Java;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.bootstrap.*;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 public class VisibilityInUnitOfWorkTest
 {
 
-    public static final Identity TEST_IDENTITY1 = StringIdentity.identityOf( "123" );
-    public static final Identity TEST_IDENTITY2 = StringIdentity.identityOf( "345" );
+    public static final Identity TEST_IDENTITY1 = StringIdentity.identityOf("123");
+    public static final Identity TEST_IDENTITY2 = StringIdentity.identityOf("345");
 
     @Test
     public void givenTwoModulesWithServiceAndEntityInOneAndEntityInOtherWhenOtherEntityAccessServiceWhichUsesItsEntityExpectServiceToHaveVisibility()
         throws Exception
     {
         Application underTest = createApplication();
-        Module module = underTest.findModule( "layer1", "My Module" );
-        ServiceReference<MyService> service = module.findService( MyService.class );
+        Module module = underTest.findModule("layer1", "My Module");
+        ServiceReference<MyService> service = module.findService(MyService.class);
         service.get().create();
     }
 
-    @Mixins( YourService.Mixin.class )
+    @Mixins(YourService.Mixin.class)
     public interface YourService
     {
         void create();
@@ -71,14 +67,14 @@ public class VisibilityInUnitOfWorkTest
             public void create()
             {
                 UnitOfWork uow = uowf.currentUnitOfWork();
-                YourEntity entity = uow.newEntity( YourEntity.class, TEST_IDENTITY2);
+                YourEntity entity = uow.newEntity(YourEntity.class, TEST_IDENTITY2);
             }
 
             @Override
             public YourEntity get()
             {
                 UnitOfWork uow = uowf.currentUnitOfWork();
-                return uow.get( YourEntity.class, TEST_IDENTITY2);
+                return uow.get(YourEntity.class, TEST_IDENTITY2);
             }
         }
     }
@@ -87,7 +83,7 @@ public class VisibilityInUnitOfWorkTest
     {
     }
 
-    @Mixins( MyEntity.Mixin.class )
+    @Mixins(MyEntity.Mixin.class)
     public interface MyEntity
     {
         void logic();
@@ -106,7 +102,7 @@ public class VisibilityInUnitOfWorkTest
         }
     }
 
-    @Mixins( MyService.Mixin.class )
+    @Mixins(MyService.Mixin.class)
     public interface MyService
     {
         void create();
@@ -124,10 +120,10 @@ public class VisibilityInUnitOfWorkTest
             @Override
             public void create()
             {
-                try (UnitOfWork uow = uowf.newUnitOfWork())
+                try(UnitOfWork uow = uowf.newUnitOfWork())
                 {
-                    uow.newEntity( MyEntity.class, TEST_IDENTITY1 );
-                    MyEntity entity1 = uow.get( MyEntity.class, TEST_IDENTITY1 );
+                    uow.newEntity(MyEntity.class, TEST_IDENTITY1);
+                    MyEntity entity1 = uow.get(MyEntity.class, TEST_IDENTITY1);
                     service.create();
                     YourEntity entity2 = service.get();
                 }
@@ -139,18 +135,18 @@ public class VisibilityInUnitOfWorkTest
         throws AssemblyException
     {
         Energy4Java qi4j = new Energy4Java();
-        return qi4j.newApplication( appFactory -> {
+        return qi4j.newApplication(appFactory -> {
             ApplicationAssembly appAssembly = appFactory.newApplicationAssembly();
-            LayerAssembly layer1 = appAssembly.layer( "layer1" );
-            ModuleAssembly myModule = layer1.module( "My Module" );
-            ModuleAssembly yourModule = layer1.module( "Your Module" );
-            ModuleAssembly infraModule = layer1.module( "Infra Module" );
-            myModule.services( MyService.class );
-            myModule.entities( MyEntity.class );
-            yourModule.entities( YourEntity.class );
-            yourModule.services( YourService.class ).visibleIn( Visibility.layer );
-            new EntityTestAssembler().visibleIn( Visibility.layer ).assemble( infraModule );
+            LayerAssembly layer1 = appAssembly.layer("layer1");
+            ModuleAssembly myModule = layer1.module("My Module");
+            ModuleAssembly yourModule = layer1.module("Your Module");
+            ModuleAssembly infraModule = layer1.module("Infra Module");
+            myModule.services(MyService.class);
+            myModule.entities(MyEntity.class);
+            yourModule.entities(YourEntity.class);
+            yourModule.services(YourService.class).visibleIn(Visibility.layer);
+            new EntityTestAssembler().visibleIn(Visibility.layer).assemble(infraModule);
             return appAssembly;
-        } );
+        });
     }
 }

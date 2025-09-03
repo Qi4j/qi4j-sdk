@@ -19,12 +19,7 @@
  */
 package org.qi4j.runtime.service;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.ParameterizedType;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
+import org.qi4j.api.activation.ActivatorDescriptor;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.configuration.Configuration;
@@ -38,22 +33,19 @@ import org.qi4j.api.util.Classes;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.runtime.activation.ActivatorsInstance;
 import org.qi4j.runtime.activation.ActivatorsModel;
-import org.qi4j.runtime.composite.CompositeMethodsModel;
-import org.qi4j.runtime.composite.CompositeModel;
-import org.qi4j.runtime.composite.MixinModel;
-import org.qi4j.runtime.composite.MixinsModel;
-import org.qi4j.runtime.composite.StateModel;
-import org.qi4j.runtime.composite.TransientStateInstance;
-import org.qi4j.runtime.composite.UsesInstance;
-import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.InjectionContext;
-import org.qi4j.runtime.property.PropertyInstance;
-import org.qi4j.runtime.activation.ActivatorsInstance;
-import org.qi4j.runtime.activation.ActivatorsModel;
 import org.qi4j.runtime.composite.*;
 import org.qi4j.runtime.injection.DependencyModel;
 import org.qi4j.runtime.injection.InjectionContext;
 import org.qi4j.runtime.property.PropertyInstance;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.ParameterizedType;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * JAVADOC
@@ -66,19 +58,19 @@ public final class ServiceModel extends CompositeModel
     private final ActivatorsModel<?> activatorsModel;
     private final Class configurationType;
 
-    public ServiceModel( ModuleDescriptor module,
-                         List<Class<?>> types,
-                         Visibility visibility,
-                         MetaInfo metaInfo,
-                         ActivatorsModel<?> activatorsModel,
-                         MixinsModel mixinsModel,
-                         StateModel stateModel,
-                         CompositeMethodsModel compositeMethodsModel,
-                         Identity identity,
-                         boolean instantiateOnStartup
-                       )
+    public ServiceModel(ModuleDescriptor module,
+                        List<Class<?>> types,
+                        Visibility visibility,
+                        MetaInfo metaInfo,
+                        ActivatorsModel<?> activatorsModel,
+                        MixinsModel mixinsModel,
+                        StateModel stateModel,
+                        CompositeMethodsModel compositeMethodsModel,
+                        Identity identity,
+                        boolean instantiateOnStartup
+    )
     {
-        super( module, types, visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel );
+        super(module, types, visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel);
 
         this.identity = identity;
         this.instantiateOnStartup = instantiateOnStartup;
@@ -100,67 +92,73 @@ public final class ServiceModel extends CompositeModel
         return identity;
     }
 
-    @SuppressWarnings( { "raw", "unchecked" } )
-    public ActivatorsInstance<?> newActivatorsInstance(ModuleDescriptor module )
+    @SuppressWarnings({"raw", "unchecked"})
+    public ActivatorsInstance<?> newActivatorsInstance(ModuleDescriptor module)
         throws Exception
     {
-        return new ActivatorsInstance( activatorsModel.newInstances( module ) );
+        return new ActivatorsInstance(activatorsModel.newInstances(module));
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public <T> Class<T> configurationType()
     {
         return configurationType;
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public Stream<? extends ActivatorDescriptor> activators()
+    {
+        return StreamSupport.stream(activatorsModel.models().spliterator(), false);
+    }
+
+    @Override
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            if( activatorsModel.accept( visitor ) )
+            if(activatorsModel.accept(visitor))
             {
-                if( compositeMethodsModel.accept( visitor ) )
+                if(compositeMethodsModel.accept(visitor))
                 {
-                    if( stateModel.accept( visitor ) )
+                    if(stateModel.accept(visitor))
                     {
-                        mixinsModel.accept( visitor );
+                        mixinsModel.accept(visitor);
                     }
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
-    public ServiceInstance newInstance( final ModuleDescriptor module )
+    public ServiceInstance newInstance(final ModuleDescriptor module)
     {
         Object[] mixins = mixinsModel.newMixinHolder();
 
         Map<AccessibleObject, Property<?>> properties = new HashMap<>();
-        stateModel.properties().forEach( propertyModel ->
-                                         {
-                                             Object initialValue = propertyModel.resolveInitialValue( module );
-                                             if( propertyModel.accessor().equals( HasIdentity.IDENTITY_METHOD ) )
-                                             {
-                                                 initialValue = identity;
-                                             }
+        stateModel.properties().forEach(propertyModel ->
+        {
+            Object initialValue = propertyModel.resolveInitialValue(module);
+            if(propertyModel.accessor().equals(HasIdentity.IDENTITY_METHOD))
+            {
+                initialValue = identity;
+            }
 
-                                             Property<?> property = new PropertyInstance<>( propertyModel, initialValue );
-                                             properties.put( propertyModel.accessor(), property );
-                                         } );
+            Property<?> property = new PropertyInstance<>(propertyModel, initialValue);
+            properties.put(propertyModel.accessor(), property);
+        });
 
-        TransientStateInstance state = new TransientStateInstance( properties );
-        ServiceInstance compositeInstance = new ServiceInstance( this, mixins, state );
+        TransientStateInstance state = new TransientStateInstance(properties);
+        ServiceInstance compositeInstance = new ServiceInstance(this, mixins, state);
 
         // Instantiate all mixins
         int i = 0;
-        UsesInstance uses = UsesInstance.EMPTY_USES.use( this );
-        InjectionContext injectionContext = new InjectionContext( compositeInstance, uses, state );
-        for( MixinModel mixinModel : mixinsModel.mixinModels() )
+        UsesInstance uses = UsesInstance.EMPTY_USES.use(this);
+        InjectionContext injectionContext = new InjectionContext(compositeInstance, uses, state);
+        for(MixinModel mixinModel : mixinsModel.mixinModels())
         {
-            mixins[ i++ ] = mixinModel.newInstance( injectionContext );
+            mixins[i++] = mixinModel.newInstance(injectionContext);
         }
 
         return compositeInstance;
@@ -172,30 +170,30 @@ public final class ServiceModel extends CompositeModel
         return super.toString() + ":" + identity;
     }
 
-    @SuppressWarnings( { "raw", "unchecked" } )
+    @SuppressWarnings({"raw", "unchecked"})
     public Class calculateConfigurationType()
     {
-        DependencyModel.ScopeSpecification thisSpec = new DependencyModel.ScopeSpecification( This.class );
-        Predicate<DependencyModel> configurationCheck = item -> item.rawInjectionType().equals( Configuration.class );
+        DependencyModel.ScopeSpecification thisSpec = new DependencyModel.ScopeSpecification(This.class);
+        Predicate<DependencyModel> configurationCheck = item -> item.rawInjectionType().equals(Configuration.class);
         return dependencies()
-            .filter( thisSpec.and( configurationCheck ) )
-            .filter( dependencyModel -> dependencyModel.rawInjectionType().equals( Configuration.class ) )
-            .filter( dependencyModel -> dependencyModel.injectionType() instanceof ParameterizedType )
-            .map( dependencyModel -> Classes.RAW_CLASS.apply( ( (ParameterizedType) dependencyModel.injectionType() ).getActualTypeArguments()[ 0 ] ) )
-            .reduce( null, ( injectionClass, type ) ->
+            .filter(thisSpec.and(configurationCheck))
+            .filter(dependencyModel -> dependencyModel.rawInjectionType().equals(Configuration.class))
+            .filter(dependencyModel -> dependencyModel.injectionType() instanceof ParameterizedType)
+            .map(dependencyModel -> Classes.RAW_CLASS.apply(((ParameterizedType) dependencyModel.injectionType()).getActualTypeArguments()[0]))
+            .reduce(null, (injectionClass, type) ->
             {
-                if( injectionClass == null )
+                if(injectionClass == null)
                 {
                     injectionClass = type;
                 }
                 else
                 {
-                    if( injectionClass.isAssignableFrom( type ) )
+                    if(injectionClass.isAssignableFrom(type))
                     {
                         injectionClass = type;
                     }
                 }
                 return injectionClass;
-            } );
+            });
     }
 }

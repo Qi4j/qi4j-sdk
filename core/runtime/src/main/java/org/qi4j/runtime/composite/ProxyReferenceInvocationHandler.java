@@ -19,12 +19,9 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.UndeclaredThrowableException;
 import org.qi4j.api.composite.CompositeInvoker;
+
+import java.lang.reflect.*;
 
 public final class ProxyReferenceInvocationHandler
     implements InvocationHandler, CompositeInvoker
@@ -36,7 +33,7 @@ public final class ProxyReferenceInvocationHandler
         return proxy;
     }
 
-    public void setProxy( Object proxy )
+    public void setProxy(Object proxy)
     {
         this.proxy = proxy;
     }
@@ -47,38 +44,38 @@ public final class ProxyReferenceInvocationHandler
     }
 
     @Override
-    public Object invokeComposite( Method method, Object[] args )
+    public Object invokeComposite(Method method, Object[] args)
         throws Throwable
     {
         try
         {
-            InvocationHandler invocationHandler = Proxy.getInvocationHandler( this.proxy );
-            return invocationHandler.invoke( this.proxy, method, args );
+            InvocationHandler invocationHandler = Proxy.getInvocationHandler(this.proxy);
+            return invocationHandler.invoke(this.proxy, method, args);
         }
-        catch( InvocationTargetException e )
+        catch(InvocationTargetException e)
         {
             throw e.getTargetException();
         }
-        catch( UndeclaredThrowableException e )
+        catch(UndeclaredThrowableException e)
         {
             throw e.getUndeclaredThrowable();
         }
     }
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
         try
         {
-            InvocationHandler invocationHandler = Proxy.getInvocationHandler( this.proxy );
-            return invocationHandler.invoke( this.proxy, method, args );
+            InvocationHandler invocationHandler = Proxy.getInvocationHandler(this.proxy);
+            return invocationHandler.invoke(this.proxy, method, args);
         }
-        catch( InvocationTargetException e )
+        catch(InvocationTargetException e)
         {
             throw e.getTargetException();
         }
-        catch( UndeclaredThrowableException e )
+        catch(UndeclaredThrowableException e)
         {
             throw e.getUndeclaredThrowable();
         }

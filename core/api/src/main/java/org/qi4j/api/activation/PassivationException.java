@@ -25,7 +25,7 @@ import java.util.List;
 
 /**
  * Thrown when unable to passivate.
- *
+ * <p>
  * Printed StackTrace contains all causes in order as suppressed exceptions.
  */
 public final class PassivationException
@@ -35,13 +35,14 @@ public final class PassivationException
 
     /**
      * Create new PassivationException.
+     *
      * @param exceptions All exceptions encountered during passivation, in order
      */
-    public PassivationException( Collection<Exception> exceptions )
+    public PassivationException(Collection<Exception> exceptions)
     {
-        super( "Passivation Exception - [has " + exceptions.size() + " cause(s)]" );
-        exceptions.forEach( this::addSuppressed );
-        this.causes = new ArrayList<>( exceptions );
+        super("Passivation Exception - [has " + exceptions.size() + " cause(s)]");
+        exceptions.forEach(this::addSuppressed);
+        this.causes = new ArrayList<>(exceptions);
     }
 
     /**

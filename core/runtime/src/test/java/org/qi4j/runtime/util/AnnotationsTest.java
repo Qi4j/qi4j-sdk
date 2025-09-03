@@ -19,12 +19,13 @@
  */
 package org.qi4j.runtime.util;
 
-import java.lang.reflect.Type;
-import java.util.Collection;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.sideeffect.SideEffects;
 import org.qi4j.api.util.Annotations;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -32,7 +33,7 @@ import static org.hamcrest.core.IsNull.nullValue;
 
 public class AnnotationsTest
 {
-    @Mixins( value = AnnotatedClass.class )
+    @Mixins(value = AnnotatedClass.class)
     interface AnnotatedClass<T>
     {
         Collection<T> list();
@@ -42,11 +43,11 @@ public class AnnotationsTest
     public void getAnnotationOrNull()
         throws NoSuchMethodException
     {
-        assertThat( "Mixins annotation found", Annotations.annotationOn( AnnotatedClass.class, Mixins.class ), notNullValue() );
+        assertThat("Mixins annotation found", Annotations.annotationOn(AnnotatedClass.class, Mixins.class), notNullValue());
 
-        assertThat( "No SideEffects annotation found", Annotations.annotationOn( AnnotatedClass.class, SideEffects.class ), nullValue() );
+        assertThat("No SideEffects annotation found", Annotations.annotationOn(AnnotatedClass.class, SideEffects.class), nullValue());
 
-        final Type returnType = AnnotatedClass.class.getDeclaredMethod( "list" ).getGenericReturnType();
-        assertThat( "Null on no class type", Annotations.annotationOn( returnType, Mixins.class ), nullValue() );
+        final Type returnType = AnnotatedClass.class.getDeclaredMethod("list").getGenericReturnType();
+        assertThat("Null on no class type", Annotations.annotationOn(returnType, Mixins.class), nullValue());
     }
 }

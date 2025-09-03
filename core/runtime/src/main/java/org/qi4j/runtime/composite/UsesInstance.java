@@ -35,40 +35,40 @@ public final class UsesInstance
 
     static
     {
-        EMPTY_USES = new UsesInstance( new HashSet<>() );
+        EMPTY_USES = new UsesInstance(new HashSet<>());
     }
 
-    private UsesInstance( HashSet<Object> uses )
+    private UsesInstance(HashSet<Object> uses)
     {
-        this.uses = Collections.unmodifiableSet( uses );
+        this.uses = Collections.unmodifiableSet(uses);
     }
 
-    public UsesInstance use( Object... objects )
+    public UsesInstance use(Object... objects)
     {
         // There is some case where we get here with only partially initialized composite as "objects". That fails with NPE in useObjects.addAll() below. Should be figured out when this happens and prevent it.
         HashSet<Object> useObjects = new HashSet<>();
-        if( !uses.isEmpty() )
+        if(!uses.isEmpty())
         {
-            useObjects.addAll( uses );
-            for( Object object : objects )
+            useObjects.addAll(uses);
+            for(Object object : objects)
             {
-                Object oldUseForType = useForType( object.getClass() );
-                if( oldUseForType != null )
+                Object oldUseForType = useForType(object.getClass());
+                if(oldUseForType != null)
                 {
-                    useObjects.remove( oldUseForType );
+                    useObjects.remove(oldUseForType);
                 }
             }
         }
-        useObjects.addAll( Arrays.asList( objects ) );
-        return new UsesInstance( useObjects );
+        useObjects.addAll(Arrays.asList(objects));
+        return new UsesInstance(useObjects);
     }
 
-    public Object useForType( Class<?> type )
+    public Object useForType(Class<?> type)
     {
         // Check instances first
-        for( Object use : uses )
+        for(Object use : uses)
         {
-            if( type.isInstance( use ) )
+            if(type.isInstance(use))
             {
                 return use;
             }
@@ -83,18 +83,18 @@ public final class UsesInstance
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
         UsesInstance that = (UsesInstance) o;
-        return uses.equals( that.uses );
+        return uses.equals(that.uses);
     }
 
     @Override
@@ -107,7 +107,7 @@ public final class UsesInstance
     public String toString()
     {
         return "UsesInstance{" +
-               "uses=" + uses +
-               '}';
+            "uses=" + uses +
+            '}';
     }
 }

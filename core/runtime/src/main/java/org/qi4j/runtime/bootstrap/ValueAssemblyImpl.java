@@ -19,7 +19,6 @@
  */
 package org.qi4j.runtime.bootstrap;
 
-import org.qi4j.api.common.InvalidApplicationException;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.StateDeclarations;
@@ -30,12 +29,6 @@ import org.qi4j.runtime.association.NamedAssociationsModel;
 import org.qi4j.runtime.composite.StateModel;
 import org.qi4j.runtime.value.ValueModel;
 import org.qi4j.runtime.value.ValueStateModel;
-import org.qi4j.bootstrap.StateDeclarations;
-import org.qi4j.bootstrap.ValueAssembly;
-import org.qi4j.runtime.association.AssociationsModel;
-import org.qi4j.runtime.association.ManyAssociationsModel;
-import org.qi4j.runtime.association.NamedAssociationsModel;
-import org.qi4j.runtime.composite.StateModel;
 
 /**
  * Declaration of a ValueComposite.
@@ -48,33 +41,33 @@ public final class ValueAssemblyImpl
     private ManyAssociationsModel manyAssociationsModel;
     private NamedAssociationsModel namedAssociationsModel;
 
-    public ValueAssemblyImpl( Class<?> compositeType )
+    public ValueAssemblyImpl(Class<?> compositeType)
     {
-        super( compositeType );
+        super(compositeType);
         // The composite must always implement ValueComposite, as a marker interface
-        if( !ValueComposite.class.isAssignableFrom( compositeType ) )
+        if(!ValueComposite.class.isAssignableFrom(compositeType))
         {
-            types.add( ValueComposite.class );
+            types.add(ValueComposite.class);
         }
     }
 
     @Override
     protected StateModel createStateModel()
     {
-        return new ValueStateModel( propertiesModel, associationsModel, manyAssociationsModel, namedAssociationsModel );
+        return new ValueStateModel(propertiesModel, associationsModel, manyAssociationsModel, namedAssociationsModel);
     }
 
-    ValueModel newValueModel( ModuleDescriptor module,
-                              StateDeclarations stateDeclarations,
-                              AssemblyHelper helper
+    ValueModel newValueModel(ModuleDescriptor module,
+                             StateDeclarations stateDeclarations,
+                             AssemblyHelper helper
     )
     {
         associationsModel = new AssociationsModel();
         manyAssociationsModel = new ManyAssociationsModel();
         namedAssociationsModel = new NamedAssociationsModel();
-        buildComposite( helper, stateDeclarations );
+        buildComposite(helper, stateDeclarations);
         return new ValueModel(
-            module, types, visibility, metaInfo, mixinsModel, (ValueStateModel) stateModel, compositeMethodsModel );
+            module, types, visibility, metaInfo, mixinsModel, (ValueStateModel) stateModel, compositeMethodsModel);
     }
 
     protected AssociationsModel associationsModel()

@@ -17,17 +17,18 @@
  */
 package org.qi4j.serialization.jakartajson;
 
+import org.qi4j.api.type.ValueType;
+import org.qi4j.spi.serialization.SerializationSettings;
+
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.qi4j.api.type.ValueType;
-import org.qi4j.spi.serialization.SerializationSettings;
 
 public class JakartaJsonSettings extends SerializationSettings<JakartaJsonSettings>
 {
     public static final JakartaJsonSettings DEFAULT = new JakartaJsonSettings();
 
-    public static JakartaJsonSettings orDefault(JakartaJsonSettings settings )
+    public static JakartaJsonSettings orDefault(JakartaJsonSettings settings)
     {
         return settings != null ? settings : DEFAULT;
     }
@@ -42,7 +43,7 @@ public class JakartaJsonSettings extends SerializationSettings<JakartaJsonSettin
     {
         jsonParserProperties = new HashMap<String, Object>()
         {{
-            put( "org.apache.johnzon.supports-comments", true );
+            put("org.apache.johnzon.supports-comments", true);
         }};
         jsonGeneratorProperties = new HashMap<>();
         typeInfoPropertyName = "_type";
@@ -54,7 +55,7 @@ public class JakartaJsonSettings extends SerializationSettings<JakartaJsonSettin
         return jsonProviderClassName;
     }
 
-    public void setJsonProviderClassName( String jsonProviderClassName )
+    public void setJsonProviderClassName(String jsonProviderClassName)
     {
         this.jsonProviderClassName = jsonProviderClassName;
     }
@@ -64,7 +65,7 @@ public class JakartaJsonSettings extends SerializationSettings<JakartaJsonSettin
         return jsonParserProperties;
     }
 
-    public void setJsonParserProperties( Map<String, Object> jsonParserProperties )
+    public void setJsonParserProperties(Map<String, Object> jsonParserProperties)
     {
         this.jsonParserProperties = jsonParserProperties;
     }
@@ -74,7 +75,7 @@ public class JakartaJsonSettings extends SerializationSettings<JakartaJsonSettin
         return jsonGeneratorProperties;
     }
 
-    public void setJsonGeneratorProperties( Map<String, Object> jsonGeneratorProperties )
+    public void setJsonGeneratorProperties(Map<String, Object> jsonGeneratorProperties)
     {
         this.jsonGeneratorProperties = jsonGeneratorProperties;
     }
@@ -84,7 +85,7 @@ public class JakartaJsonSettings extends SerializationSettings<JakartaJsonSettin
         return typeInfoPropertyName;
     }
 
-    public void setTypeInfoPropertyName( String typeInfoPropertyName )
+    public void setTypeInfoPropertyName(String typeInfoPropertyName)
     {
         this.typeInfoPropertyName = typeInfoPropertyName;
     }
@@ -94,20 +95,20 @@ public class JakartaJsonSettings extends SerializationSettings<JakartaJsonSettin
         return adapters;
     }
 
-    public JakartaJsonSettings withTypeInfoPropertyName(String typeInfoPropertyName )
+    public JakartaJsonSettings withTypeInfoPropertyName(String typeInfoPropertyName)
     {
         this.typeInfoPropertyName = typeInfoPropertyName;
         return this;
     }
 
-    public JakartaJsonSettings withJsonAdapter(ValueType valueType, JakartaJsonAdapter<?> adapter )
+    public JakartaJsonSettings withJsonAdapter(ValueType valueType, JakartaJsonAdapter<?> adapter)
     {
-        adapters.put( valueType, adapter );
+        adapters.put(valueType, adapter);
         return this;
     }
 
-    public JakartaJsonSettings withJsonAdapter(JakartaJsonAdapter<?> adapter )
+    public JakartaJsonSettings withJsonAdapter(JakartaJsonAdapter<?> adapter)
     {
-        return withJsonAdapter( ValueType.of( adapter.type() ), adapter );
+        return withJsonAdapter(ValueType.of(adapter.type()), adapter);
     }
 }

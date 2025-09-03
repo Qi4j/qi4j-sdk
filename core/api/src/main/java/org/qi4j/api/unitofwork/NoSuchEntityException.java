@@ -19,9 +19,10 @@
  */
 package org.qi4j.api.unitofwork;
 
-import java.util.stream.Stream;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.usecase.Usecase;
+
+import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
 
@@ -36,25 +37,25 @@ public class NoSuchEntityException
     private final Usecase usecase;
     private final Class<?>[] mixinTypes;
 
-    public NoSuchEntityException(EntityReference reference, Class<?> mixinType, Usecase usecase )
+    public NoSuchEntityException(EntityReference reference, Class<?> mixinType, Usecase usecase)
     {
-        super( "Could not find entity (" + reference + ") of type " + mixinType.getName() + " in usecase '" + usecase.name() + "'" );
+        super("Could not find entity (" + reference + ") of type " + mixinType.getName() + " in usecase '" + usecase.name() + "'");
         this.reference = reference;
         this.usecase = usecase;
-        this.mixinTypes = new Class<?>[]{ mixinType };
+        this.mixinTypes = new Class<?>[]{mixinType};
     }
 
-    public NoSuchEntityException(EntityReference reference, Class<?>[] mixinTypes, Usecase usecase )
+    public NoSuchEntityException(EntityReference reference, Class<?>[] mixinTypes, Usecase usecase)
     {
-        super( "Could not find entity (" + reference + ") of type " + toString( mixinTypes ) + " in usecase '" + usecase.name() + "'" );
+        super("Could not find entity (" + reference + ") of type " + toString(mixinTypes) + " in usecase '" + usecase.name() + "'");
         this.reference = reference;
         this.mixinTypes = mixinTypes;
         this.usecase = usecase;
     }
 
-    public NoSuchEntityException(EntityReference reference, Stream<Class<?>> types, Usecase usecase )
+    public NoSuchEntityException(EntityReference reference, Stream<Class<?>> types, Usecase usecase)
     {
-        this(reference, types.toArray( Class[]::new ), usecase );
+        this(reference, types.toArray(Class[]::new), usecase);
     }
 
     public EntityReference reference()
@@ -72,9 +73,9 @@ public class NoSuchEntityException
         return usecase;
     }
 
-    private static String toString( Class<?>[] mixinTypes )
+    private static String toString(Class<?>[] mixinTypes)
     {
-        String reduced = stream( mixinTypes ).map( Class::getName ).reduce( "", ( ret, name ) -> ret + "," + name );
-        return "[" + reduced.substring( 1 ) + "]";
+        String reduced = stream(mixinTypes).map(Class::getName).reduce("", (ret, name) -> ret + "," + name);
+        return "[" + reduced.substring(1) + "]";
     }
 }

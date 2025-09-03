@@ -20,7 +20,7 @@
 
 package org.qi4j.runtime.service;
 
-import java.util.stream.StreamSupport;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Uses;
@@ -31,14 +31,12 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
 
-import static org.qi4j.api.service.qualifier.ServiceQualifier.withId;
+import java.util.stream.StreamSupport;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.qi4j.api.service.qualifier.ServiceQualifier.withId;
 
 /**
  * JAVADOC
@@ -51,31 +49,31 @@ public class ServiceIdSelectorTest
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.objects( ServiceConsumer.class );
-                module.services( TestServiceComposite1.class,
-                                 TestServiceComposite2.class );
+                module.objects(ServiceConsumer.class);
+                module.services(TestServiceComposite1.class,
+                    TestServiceComposite2.class);
             }
         };
 
         ObjectFactory obf = assembler.module();
-        ServiceConsumer consumer = obf.newObject( ServiceConsumer.class, TestServiceComposite2.class.getSimpleName() );
+        ServiceConsumer consumer = obf.newObject(ServiceConsumer.class, TestServiceComposite2.class.getSimpleName());
         TestService service = consumer.getService();
 
-        assertThat( "service is selected one", service.test(), equalTo( "mixin2" ) );
+        assertThat("service is selected one", service.test(), equalTo("mixin2"));
     }
 
     public static class ServiceConsumer
     {
         private TestService service;
 
-        public ServiceConsumer( @Uses String serviceId, @Service Iterable<ServiceReference<TestService>> serviceRefs )
+        public ServiceConsumer(@Uses String serviceId, @Service Iterable<ServiceReference<TestService>> serviceRefs)
         {
-            service = StreamSupport.stream( serviceRefs.spliterator(), false )
-                                   .filter( withId( serviceId ) )
-                                   .findFirst().map( ServiceReference::get ).orElse( null );
+            service = StreamSupport.stream(serviceRefs.spliterator(), false)
+                .filter(withId(serviceId))
+                .findFirst().map(ServiceReference::get).orElse(null);
         }
 
         public TestService getService()
@@ -84,13 +82,13 @@ public class ServiceIdSelectorTest
         }
     }
 
-    @Mixins( TestMixin1.class )
+    @Mixins(TestMixin1.class)
     public interface TestServiceComposite1
         extends TestService, ServiceComposite
     {
     }
 
-    @Mixins( TestMixin2.class )
+    @Mixins(TestMixin2.class)
     public interface TestServiceComposite2
         extends TestService, ServiceComposite
     {

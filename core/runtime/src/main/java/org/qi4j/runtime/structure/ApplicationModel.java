@@ -19,12 +19,9 @@
  */
 package org.qi4j.runtime.structure;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.activation.ActivationException;
+import org.qi4j.api.activation.ActivatorDescriptor;
 import org.qi4j.api.common.InvalidApplicationException;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.structure.Application;
@@ -36,6 +33,13 @@ import org.qi4j.runtime.activation.ActivatorsInstance;
 import org.qi4j.runtime.activation.ActivatorsModel;
 import org.qi4j.runtime.injection.InjectionProviderFactory;
 import org.qi4j.runtime.injection.provider.InjectionProviderFactoryStrategy;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * JAVADOC
@@ -51,12 +55,12 @@ public final class ApplicationModel
     private final List<LayerModel> layers;
     private final InjectionProviderFactory ipf;
 
-    public ApplicationModel( String name,
-                             String version,
-                             Application.Mode mode,
-                             MetaInfo metaInfo,
-                             ActivatorsModel<Application> activatorsModel,
-                             List<LayerModel> layers
+    public ApplicationModel(String name,
+                            String version,
+                            Application.Mode mode,
+                            MetaInfo metaInfo,
+                            ActivatorsModel<Application> activatorsModel,
+                            List<LayerModel> layers
     )
     {
         this.name = name;
@@ -65,7 +69,7 @@ public final class ApplicationModel
         this.metaInfo = metaInfo;
         this.activatorsModel = activatorsModel;
         this.layers = layers;
-        ipf = new InjectionProviderFactoryStrategy( metaInfo );
+        ipf = new InjectionProviderFactoryStrategy(metaInfo);
     }
 
     @Override
@@ -92,70 +96,80 @@ public final class ApplicationModel
     public ActivatorsInstance<Application> newActivatorsInstance()
         throws ActivationException
     {
-        return new ActivatorsInstance<>( activatorsModel.newInstances() );
+        return new ActivatorsInstance<>(activatorsModel.newInstances());
     }
 
     // SPI
+    public Stream<LayerModel> layers()
+    {
+        return layers.stream();
+    }
+
+    public Stream<? extends ActivatorDescriptor> activators()
+    {
+        return StreamSupport.stream(activatorsModel.models().spliterator(), false);
+    }
+
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            if( activatorsModel.accept( visitor ) )
+            if(activatorsModel.accept(visitor))
             {
-                for( LayerModel layer : layers )
+                for(LayerModel layer : layers)
                 {
-                    if( !layer.accept( visitor ) )
+                    if(!layer.accept(visitor))
                     {
                         break;
                     }
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
     @Override
-    public ApplicationInstance newInstance( Qi4jAPI runtime, Object... importedServiceInstances )
+    public ApplicationInstance newInstance(Qi4jAPI runtime, Object... importedServiceInstances)
         throws InvalidApplicationException
     {
-        MetaInfo instanceMetaInfo = new MetaInfo( metaInfo );
-        for( Object importedServiceInstance : importedServiceInstances )
+        MetaInfo instanceMetaInfo = new MetaInfo(metaInfo);
+        for(Object importedServiceInstance : importedServiceInstances)
         {
-            instanceMetaInfo.set( importedServiceInstance );
+            instanceMetaInfo.set(importedServiceInstance);
         }
 
-        ApplicationInstance applicationInstance = new ApplicationInstance( this, (Qi4jRuntime) runtime, instanceMetaInfo );
+        ApplicationInstance applicationInstance = new ApplicationInstance(this, (Qi4jRuntime) runtime, instanceMetaInfo);
 
         // Create layer instances
         Map<LayerDescriptor, LayerDescriptor> layerInstanceMap = new HashMap<>();
         Map<LayerDescriptor, List<LayerDescriptor>> usedLayers = new HashMap<>();
-        for( LayerModel layer : layers )
+        for(LayerModel layer : layers)
         {
             List<LayerDescriptor> usedLayerInstances = new ArrayList<>();
-            usedLayers.put( layer, usedLayerInstances );
-            UsedLayersInstance usedLayersInstance = layer.usedLayers().newInstance( usedLayerInstances );
-            LayerInstance layerInstance = layer.newInstance( applicationInstance );
-            applicationInstance.addLayer( layerInstance );
-            layerInstanceMap.put( layer, layerInstance.descriptor() );
+            usedLayers.put(layer, usedLayerInstances);
+            UsedLayersInstance usedLayersInstance = layer.usedLayers().newInstance(usedLayerInstances);
+            LayerInstance layerInstance = layer.newInstance(applicationInstance);
+            applicationInstance.addLayer(layerInstance);
+            layerInstanceMap.put(layer, layerInstance.descriptor());
         }
 
         // Resolve used layer instances
-        for( LayerModel layer : layers )
+        for(LayerModel layer : layers)
         {
-            List<LayerDescriptor> usedLayerInstances = usedLayers.get( layer );
+            List<LayerDescriptor> usedLayerInstances = usedLayers.get(layer);
             layer.usedLayers().layers().forEach(
                 usedLayer ->
                 {
-                    LayerDescriptor layerDescriptor = layerInstanceMap.get( usedLayer );
-                    if( layerDescriptor == null )
+                    LayerDescriptor layerDescriptor = layerInstanceMap.get(usedLayer);
+                    if(layerDescriptor == null)
                     {
-                        throw new InvalidApplicationException( "Could not find used layer:" + usedLayer
-                            .name() );
+                        throw new InvalidApplicationException("Could not find used layer:" + usedLayer
+                            .name());
                     }
-                    usedLayerInstances.add( layerDescriptor );
-                } );
+                    usedLayerInstances.add(layerDescriptor);
+                });
         }
 
         return applicationInstance;
@@ -170,9 +184,9 @@ public final class ApplicationModel
     public String toString()
     {
         return "ApplicationModel" +
-               "{name='" + name + '\'' +
-               ", version='" + version + '\'' +
-               ", mode=" + mode +
-               '}';
+            "{name='" + name + '\'' +
+            ", version='" + version + '\'' +
+            ", mode=" + mode +
+            '}';
     }
 }

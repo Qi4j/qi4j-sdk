@@ -26,9 +26,6 @@ import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.bootstrap.StateDeclarations;
 import org.qi4j.bootstrap.TransientAssembly;
 import org.qi4j.runtime.composite.TransientModel;
-import org.qi4j.bootstrap.StateDeclarations;
-import org.qi4j.bootstrap.TransientAssembly;
-import org.qi4j.runtime.composite.TransientModel;
 
 /**
  * Declaration of a TransientComposite.
@@ -36,20 +33,20 @@ import org.qi4j.runtime.composite.TransientModel;
 public final class TransientAssemblyImpl extends CompositeAssemblyImpl
     implements TransientAssembly
 {
-    public TransientAssemblyImpl( Class<?> transientType )
+    public TransientAssemblyImpl(Class<?> transientType)
     {
-        super( transientType );
+        super(transientType);
 
         // The composite must always implement TransientComposite, as a marker interface
-        if( !TransientComposite.class.isAssignableFrom( transientType ) )
+        if(!TransientComposite.class.isAssignableFrom(transientType))
         {
-            types.add( TransientComposite.class );
+            types.add(TransientComposite.class);
         }
 
         // If type is a class, register it as a mixin
-        if( !transientType.isInterface() )
+        if(!transientType.isInterface())
         {
-            mixins.add( transientType );
+            mixins.add(transientType);
         }
     }
 
@@ -60,13 +57,13 @@ public final class TransientAssemblyImpl extends CompositeAssemblyImpl
     {
         try
         {
-            buildComposite( helper, stateDeclarations );
+            buildComposite(helper, stateDeclarations);
             return new TransientModel(
-                module, types, visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel );
+                module, types, visibility, metaInfo, mixinsModel, stateModel, compositeMethodsModel);
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new InvalidApplicationException( "Could not register " + types, e );
+            throw new InvalidApplicationException("Could not register " + types, e);
         }
     }
 }

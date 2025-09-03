@@ -17,62 +17,24 @@
  */
 package org.qi4j.spi.serialization;
 
-import java.util.function.Function;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.serialization.Serializer;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.w3c.dom.Document;
+
+import java.util.function.Function;
+
+import static org.qi4j.api.serialization.Serialization.Options;
 
 /**
  * {@literal javax.xml} serializer.
  */
 public interface XmlSerializer extends Serializer
 {
-    <T> Function<T, Document> toXmlFunction( Options options );
+    <T> Function<T, Document> toXmlFunction(ModuleDescriptor module, Options options);
 
-    default <T> Function<T, Document> toXmlFunction()
+    default Document toXml(ModuleDescriptor module, Options options, @Optional Object object)
     {
-        return object -> toXmlFunction( Options.DEFAULT ).apply( object );
-    }
-
-    default Document toXml( Options options, @Optional Object object )
-    {
-        return toXmlFunction( options ).apply( object );
-    }
-
-    default Document toXml( @Optional Object object )
-    {
-        return toXmlFunction( Options.DEFAULT ).apply( object );
-    }
-
-    default <T> Stream<Document> toXmlEach( Options options, Stream<T> objects )
-    {
-        return objects.map( toXmlFunction( options ) );
-    }
-
-    default <T> Stream<Document> toXmlEach( Options options, Iterable<T> objects )
-    {
-        return toXmlEach( options, StreamSupport.stream( objects.spliterator(), false ) );
-    }
-
-    default <T> Stream<Document> toXmlEach( Options options, Object... objects )
-    {
-        return toXmlEach( options, Stream.of( objects ) );
-    }
-
-    default <T> Stream<Document> toXmlEach( Stream<T> objects )
-    {
-        return objects.map( toXmlFunction( Options.DEFAULT ) );
-    }
-
-    default <T> Stream<Document> toXmlEach( Iterable<T> objects )
-    {
-        return toXmlEach( Options.DEFAULT, StreamSupport.stream( objects.spliterator(), false ) );
-    }
-
-    default <T> Stream<Document> toXmlEach( Object... objects )
-    {
-        return toXmlEach( Options.DEFAULT, Stream.of( objects ) );
+        return toXmlFunction(module, options).apply(object);
     }
 }

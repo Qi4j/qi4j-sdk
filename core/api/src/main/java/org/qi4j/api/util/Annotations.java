@@ -32,25 +32,22 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.qi4j.api.util.Classes.interfacesOf;
-import static org.qi4j.api.util.Classes.typeOf;
-
 /**
  * Useful methods for handling Annotations.
  */
 public final class Annotations
 {
     public static final Function<Type, Stream<Annotation>> ANNOTATIONS_OF =
-        Classes.forTypes( type -> Arrays.stream( Classes.RAW_CLASS.apply( type ).getAnnotations() ) );
+        Classes.forTypes(type -> Arrays.stream(Classes.RAW_CLASS.apply(type).getAnnotations()));
 
-    public static Predicate<Annotation> typeHasAnnotation( Class<? extends Annotation> annotationType )
+    public static Predicate<Annotation> typeHasAnnotation(Class<? extends Annotation> annotationType)
     {
-        return element -> hasAnnotation( annotationType ).test( type().apply( element ) );
+        return element -> hasAnnotation(annotationType).test(type().apply(element));
     }
 
-    public static Predicate<AnnotatedElement> hasAnnotation( final Class<? extends Annotation> annotationType )
+    public static Predicate<AnnotatedElement> hasAnnotation(final Class<? extends Annotation> annotationType)
     {
-        return element -> element.getAnnotation( annotationType ) != null;
+        return element -> element.getAnnotation(annotationType) != null;
     }
 
     public static Function<Annotation, Class<? extends Annotation>> type()
@@ -58,20 +55,21 @@ public final class Annotations
         return Annotation::annotationType;
     }
 
-    public static Predicate<Annotation> isType( final Class<? extends Annotation> annotationType )
+    public static Predicate<Annotation> isType(final Class<? extends Annotation> annotationType)
     {
-        return annotation -> annotation.annotationType().equals( annotationType );
+        return annotation -> annotation.annotationType().equals(annotationType);
     }
 
-    public static <T extends Annotation> T annotationOn( Type type, Class<T> annotationType )
+    public static <T extends Annotation> T annotationOn(Type type, Class<T> annotationType)
     {
-        return annotationType.cast( Classes.RAW_CLASS.apply( type ).getAnnotation( annotationType ) );
+        return annotationType.cast(Classes.RAW_CLASS.apply(type).getAnnotation(annotationType));
     }
 
-    public static List<Annotation> findAccessorAndTypeAnnotationsIn(AccessibleObject accessor) {
+    public static List<Annotation> findAccessorAndTypeAnnotationsIn(AccessibleObject accessor)
+    {
         Stream<Annotation> stream = Stream.concat(
-                Arrays.stream(accessor.getAnnotations()),
-                Classes.interfacesOf(Classes.typeOf(accessor)).flatMap(ANNOTATIONS_OF)
+            Arrays.stream(accessor.getAnnotations()),
+            Classes.interfacesOf(Classes.typeOf(accessor)).flatMap(ANNOTATIONS_OF)
         );
         Collector<Annotation, ?, List<Annotation>> collector = Collectors.toList();
         return stream.collect(collector);

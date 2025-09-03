@@ -17,20 +17,6 @@
  */
 package org.qi4j.spi.entitystore.helpers;
 
-import java.io.BufferedReader;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonReader;
@@ -50,20 +36,23 @@ import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.unitofwork.NoSuchEntityTypeException;
 import org.qi4j.api.usecase.Usecase;
+import org.qi4j.entitystore.memory.MemoryMapEntityStoreMixin;
 import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.cache.Cache;
 import org.qi4j.spi.cache.CachePool;
 import org.qi4j.spi.cache.NullCache;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
-import org.qi4j.spi.entitystore.DefaultEntityStoreUnitOfWork;
-import org.qi4j.spi.entitystore.EntityStore;
-import org.qi4j.spi.entitystore.EntityStoreException;
-import org.qi4j.spi.entitystore.EntityStoreSPI;
-import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
-import org.qi4j.spi.entitystore.StateCommitter;
+import org.qi4j.spi.entitystore.*;
 import org.qi4j.spi.serialization.JsonSerialization;
-import org.qi4j.entitystore.memory.MemoryMapEntityStoreMixin;
+
+import java.io.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
 
@@ -119,9 +108,9 @@ public class JSONMapEntityStoreMixin
         throws Exception
     {
         uuid = descriptor.identity() + "-" + UUID.randomUUID().toString();
-        if( caching != null )
+        if(caching != null)
         {
-            cache = caching.fetchCache( uuid, CacheState.class );
+            cache = caching.fetchCache(uuid, CacheState.class);
         }
         else
         {
@@ -133,9 +122,9 @@ public class JSONMapEntityStoreMixin
     public void tearDownJSONMapES()
         throws Exception
     {
-        if( caching != null )
+        if(caching != null)
         {
-            caching.returnCache( cache );
+            caching.returnCache(cache);
             cache = null;
         }
     }
@@ -143,106 +132,106 @@ public class JSONMapEntityStoreMixin
     // EntityStore
 
     @Override
-    public EntityStoreUnitOfWork newUnitOfWork( ModuleDescriptor module, Usecase usecase, Instant currentTime )
+    public EntityStoreUnitOfWork newUnitOfWork(ModuleDescriptor module, Usecase usecase, Instant currentTime)
     {
-        return new DefaultEntityStoreUnitOfWork( module, entityStoreSpi, newUnitOfWorkId(), usecase, currentTime );
+        return new DefaultEntityStoreUnitOfWork(module, entityStoreSpi, newUnitOfWorkId(), usecase, currentTime);
     }
 
     // EntityStoreSPI
 
     @Override
-    public EntityState newEntityState( EntityStoreUnitOfWork uow,
-                                       EntityReference reference,
-                                       EntityDescriptor entityDescriptor
+    public EntityState newEntityState(EntityStoreUnitOfWork uow,
+                                      EntityReference reference,
+                                      EntityDescriptor entityDescriptor
     )
     {
         try
         {
             JsonObjectBuilder builder = jsonFactories.builderFactory().createObjectBuilder();
-            builder.add( JSONKeys.IDENTITY, reference.identity().toString() );
-            builder.add( JSONKeys.APPLICATION_VERSION, application.version() );
-            builder.add( JSONKeys.TYPE, entityDescriptor.types().findFirst().get().getName() );
-            builder.add( JSONKeys.VERSION, uow.identity().toString() );
-            builder.add( JSONKeys.MODIFIED, uow.currentTime().toEpochMilli() );
-            builder.add( JSONKeys.VALUE, jsonFactories.builderFactory().createObjectBuilder().build() );
+            builder.add(JSONKeys.IDENTITY, reference.identity().toString());
+            builder.add(JSONKeys.APPLICATION_VERSION, application.version());
+            builder.add(JSONKeys.TYPE, entityDescriptor.types().findFirst().get().getName());
+            builder.add(JSONKeys.VERSION, uow.identity().toString());
+            builder.add(JSONKeys.MODIFIED, uow.currentTime().toEpochMilli());
+            builder.add(JSONKeys.VALUE, jsonFactories.builderFactory().createObjectBuilder().build());
             JsonObject state = builder.build();
-            return new JSONEntityState( entityDescriptor.module(), serialization, jsonFactories,
-                                        uow.identity().toString(), uow.currentTime(),
-                                        reference,
-                                        EntityStatus.NEW, entityDescriptor,
-                                        state );
+            return new JSONEntityState(entityDescriptor.module(), serialization, jsonFactories,
+                uow.identity().toString(), uow.currentTime(),
+                reference,
+                EntityStatus.NEW, entityDescriptor,
+                state);
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new EntityStoreException( e );
+            throw new EntityStoreException(e);
         }
     }
 
     @Override
-    public synchronized EntityState entityStateOf( EntityStoreUnitOfWork uow,
-                                                   ModuleDescriptor module,
-                                                   EntityReference reference )
+    public synchronized EntityState entityStateOf(EntityStoreUnitOfWork uow,
+                                                  ModuleDescriptor module,
+                                                  EntityReference reference)
     {
         try
         {
-            EntityState state = fetchCachedState( reference, module, uow.currentTime() );
-            if( state != null )
+            EntityState state = fetchCachedState(reference, module, uow.currentTime());
+            if(state != null)
             {
                 return state;
             }
             // Get state
-            try( Reader in = mapEntityStore.get( reference ) )
+            try(Reader in = mapEntityStore.get(reference))
             {
-                JSONEntityState loadedState = readEntityState( module, in );
-                if( loadedState.status() == EntityStatus.UPDATED )
+                JSONEntityState loadedState = readEntityState(module, in);
+                if(loadedState.status() == EntityStatus.UPDATED)
                 {
-                    List<JSONEntityState> migrated = new ArrayList<>( 1 );
-                    migrated.add( loadedState );
-                    synchMigratedEntities( migrated );
+                    List<JSONEntityState> migrated = new ArrayList<>(1);
+                    migrated.add(loadedState);
+                    synchMigratedEntities(migrated);
                 }
-                if( doCacheOnRead( uow ) )
+                if(doCacheOnRead(uow))
                 {
-                    cache.put( reference.identity().toString(), new CacheState( loadedState.state().toString() ) );
+                    cache.put(reference.identity().toString(), new CacheState(loadedState.state().toString()));
                 }
                 return loadedState;
             }
         }
-        catch( EntityStoreException ex )
+        catch(EntityStoreException ex)
         {
             throw ex;
         }
-        catch( Exception ex )
+        catch(Exception ex)
         {
-            throw new EntityStoreException( ex );
+            throw new EntityStoreException(ex);
         }
     }
 
     @Override
-    public synchronized String versionOf( EntityStoreUnitOfWork uow, EntityReference reference )
+    public synchronized String versionOf(EntityStoreUnitOfWork uow, EntityReference reference)
     {
-        CacheState cacheState = cache.get( reference.identity().toString() );
-        if( cacheState != null )
+        CacheState cacheState = cache.get(reference.identity().toString());
+        if(cacheState != null)
         {
-            return jsonFactories.readerFactory().createReader( new StringReader( cacheState.string ) ).readObject()
-                                .getString( JSONKeys.VERSION );
+            return jsonFactories.readerFactory().createReader(new StringReader(cacheState.string)).readObject()
+                .getString(JSONKeys.VERSION);
         }
         // Get state
-        try( JsonReader reader = jsonFactories.readerFactory().createReader( mapEntityStore.get( reference ) ) )
+        try(JsonReader reader = jsonFactories.readerFactory().createReader(mapEntityStore.get(reference)))
         {
-            return reader.readObject().getString( JSONKeys.VERSION );
+            return reader.readObject().getString(JSONKeys.VERSION);
         }
-        catch( EntityStoreException ex )
+        catch(EntityStoreException ex)
         {
             throw ex;
         }
-        catch( Exception ex )
+        catch(Exception ex)
         {
-            throw new EntityStoreException( ex );
+            throw new EntityStoreException(ex);
         }
     }
 
     @Override
-    public StateCommitter applyChanges( EntityStoreUnitOfWork uow, Iterable<EntityState> entityStates )
+    public StateCommitter applyChanges(EntityStoreUnitOfWork uow, Iterable<EntityState> entityStates)
         throws EntityStoreException
     {
         return new StateCommitter()
@@ -255,57 +244,57 @@ public class JSONMapEntityStoreMixin
                     mapEntityStore.applyChanges(
                         changer ->
                         {
-                            CacheOptions options = uow.usecase().metaInfo( CacheOptions.class );
-                            if( options == null )
+                            CacheOptions options = uow.usecase().metaInfo(CacheOptions.class);
+                            if(options == null)
                             {
                                 options = CacheOptions.ALWAYS;
                             }
 
-                            for( EntityState entityState : entityStates )
+                            for(EntityState entityState : entityStates)
                             {
                                 JSONEntityState state = (JSONEntityState) entityState;
                                 String newVersion = uow.identity().toString();
                                 Instant lastModified = uow.currentTime();
-                                if( state.status().equals( EntityStatus.NEW ) )
+                                if(state.status().equals(EntityStatus.NEW))
                                 {
-                                    try( Writer writer = changer.newEntity( state.entityReference(),
-                                                                            state.entityDescriptor() ) )
+                                    try(Writer writer = changer.newEntity(state.entityReference(),
+                                        state.entityDescriptor()))
                                     {
-                                        writeEntityState( state, writer, newVersion, lastModified );
+                                        writeEntityState(state, writer, newVersion, lastModified);
                                     }
-                                    if( options.cacheOnNew() )
+                                    if(options.cacheOnNew())
                                     {
-                                        cache.put( state.entityReference().identity().toString(),
-                                                   new CacheState( state.state().toString() ) );
+                                        cache.put(state.entityReference().identity().toString(),
+                                            new CacheState(state.state().toString()));
                                     }
                                 }
-                                else if( state.status().equals( EntityStatus.UPDATED ) )
+                                else if(state.status().equals(EntityStatus.UPDATED))
                                 {
                                     MapEntityStore.MapChange mapChange = new MapEntityStore.MapChange(
                                         state.entityReference(), state.entityDescriptor(),
                                         state.version(), newVersion, lastModified
                                     );
-                                    try( Writer writer = changer.updateEntity( mapChange ) )
+                                    try(Writer writer = changer.updateEntity(mapChange))
                                     {
-                                        writeEntityState( state, writer, newVersion, lastModified );
+                                        writeEntityState(state, writer, newVersion, lastModified);
                                     }
-                                    if( options.cacheOnWrite() )
+                                    if(options.cacheOnWrite())
                                     {
-                                        cache.put( state.entityReference().identity().toString(),
-                                                   new CacheState( state.state().toString() ) );
+                                        cache.put(state.entityReference().identity().toString(),
+                                            new CacheState(state.state().toString()));
                                     }
                                 }
-                                else if( state.status().equals( EntityStatus.REMOVED ) )
+                                else if(state.status().equals(EntityStatus.REMOVED))
                                 {
-                                    changer.removeEntity( state.entityReference(), state.entityDescriptor() );
-                                    cache.remove( state.entityReference().identity().toString() );
+                                    changer.removeEntity(state.entityReference(), state.entityDescriptor());
+                                    cache.remove(state.entityReference().identity().toString());
                                 }
                             }
-                        } );
+                        });
                 }
-                catch( Exception e )
+                catch(Exception e)
                 {
-                    throw new EntityStoreException( e );
+                    throw new EntityStoreException(e);
                 }
             }
 
@@ -317,7 +306,7 @@ public class JSONMapEntityStoreMixin
     }
 
     @Override
-    public Stream<EntityState> entityStates( ModuleDescriptor module )
+    public Stream<EntityState> entityStates(ModuleDescriptor module)
     {
         try
         {
@@ -325,14 +314,14 @@ public class JSONMapEntityStoreMixin
             List<JSONEntityState> migrated = new ArrayList<>();
             Function<Reader, EntityState> function = reader ->
             {
-                JSONEntityState entity = readEntityState( module, reader );
-                if( entity.status() == EntityStatus.UPDATED )
+                JSONEntityState entity = readEntityState(module, reader);
+                if(entity.status() == EntityStatus.UPDATED)
                 {
-                    migrated.add( entity );
+                    migrated.add(entity);
                     // Synch back 100 at a time
-                    if( migrated.size() > 100 )
+                    if(migrated.size() > 100)
                     {
-                        synchMigratedEntities( migrated );
+                        synchMigratedEntities(migrated);
                     }
                 }
                 return entity;
@@ -340,31 +329,31 @@ public class JSONMapEntityStoreMixin
             Runnable closer = () ->
             {
                 // Synch any remaining migrated entities
-                if( !migrated.isEmpty() )
+                if(!migrated.isEmpty())
                 {
-                    synchMigratedEntities( migrated );
+                    synchMigratedEntities(migrated);
                 }
             };
-            return stateStream.map( function ).onClose( closer );
+            return stateStream.map(function).onClose(closer);
         }
-        catch( EntityStoreException ex )
+        catch(EntityStoreException ex)
         {
             throw ex;
         }
-        catch( Exception ex )
+        catch(Exception ex)
         {
-            throw new EntityStoreException( ex );
+            throw new EntityStoreException(ex);
         }
     }
 
-    private void synchMigratedEntities( List<JSONEntityState> migratedEntities )
+    private void synchMigratedEntities(List<JSONEntityState> migratedEntities)
     {
         try
         {
             mapEntityStore.applyChanges(
                 changer ->
                 {
-                    for( JSONEntityState state : migratedEntities )
+                    for(JSONEntityState state : migratedEntities)
                     {
                         Instant lastModified = state.lastModified();
                         String version = state.version();
@@ -372,153 +361,153 @@ public class JSONMapEntityStoreMixin
                             state.entityReference(), state.entityDescriptor(),
                             version, version, lastModified
                         );
-                        try( Writer writer = changer.updateEntity( changeInfo ) )
+                        try(Writer writer = changer.updateEntity(changeInfo))
                         {
-                            writeEntityState( state, writer, version, lastModified );
+                            writeEntityState(state, writer, version, lastModified);
                         }
                     }
-                } );
+                });
             migratedEntities.clear();
         }
-        catch( EntityStoreException ex )
+        catch(EntityStoreException ex)
         {
             throw ex;
         }
-        catch( Exception ex )
+        catch(Exception ex)
         {
-            throw new EntityStoreException( "Synchronization of Migrated Entities failed.", ex );
+            throw new EntityStoreException("Synchronization of Migrated Entities failed.", ex);
         }
     }
 
     protected Identity newUnitOfWorkId()
     {
-        return identityGenerator.generate( EntityStore.class );
+        return identityGenerator.generate(EntityStore.class);
     }
 
-    protected void writeEntityState( JSONEntityState state, Writer writer, String version, Instant lastModified )
+    protected void writeEntityState(JSONEntityState state, Writer writer, String version, Instant lastModified)
         throws EntityStoreException
     {
         try
         {
-            state.stateCloneWithVersionAndModified( version, lastModified );
-            writer.append( state.state().toString() );
+            state.stateCloneWithVersionAndModified(version, lastModified);
+            writer.append(state.state().toString());
         }
-        catch( IOException e )
+        catch(IOException e)
         {
-            throw new EntityStoreException( "Could not store EntityState", e );
+            throw new EntityStoreException("Could not store EntityState", e);
         }
     }
 
-    protected JSONEntityState readEntityState( ModuleDescriptor module, Reader entityState )
+    protected JSONEntityState readEntityState(ModuleDescriptor module, Reader entityState)
         throws EntityStoreException
     {
-        try( JsonReader reader = jsonFactories.readerFactory().createReader( entityState ) )
+        try(JsonReader reader = jsonFactories.readerFactory().createReader(entityState))
         {
             JsonObject parsedState = reader.readObject();
-            JsonObjectBuilder jsonStateBuilder = jsonFactories.cloneBuilder( parsedState );
+            JsonObjectBuilder jsonStateBuilder = jsonFactories.cloneBuilder(parsedState);
             EntityStatus status = EntityStatus.LOADED;
 
-            String version = parsedState.getString( JSONKeys.VERSION );
-            Instant modified = Instant.ofEpochMilli( parsedState.getJsonNumber( JSONKeys.MODIFIED ).longValueExact() );
-            Identity identity = StringIdentity.identityOf( parsedState.getString( JSONKeys.IDENTITY ) );
+            String version = parsedState.getString(JSONKeys.VERSION);
+            Instant modified = Instant.ofEpochMilli(parsedState.getJsonNumber(JSONKeys.MODIFIED).longValueExact());
+            Identity identity = StringIdentity.identityOf(parsedState.getString(JSONKeys.IDENTITY));
 
             // Check if version is correct
             JsonObject state;
-            String currentAppVersion = parsedState.getString( JSONKeys.APPLICATION_VERSION, "0.0" );
-            if( currentAppVersion.equals( application.version() ) )
+            String currentAppVersion = parsedState.getString(JSONKeys.APPLICATION_VERSION, "0.0");
+            if(currentAppVersion.equals(application.version()))
             {
                 state = jsonStateBuilder.build();
             }
             else
             {
-                if( migration != null )
+                if(migration != null)
                 {
-                    state = migration.migrate( jsonStateBuilder.build(), application.version(), this );
+                    state = migration.migrate(module, jsonStateBuilder.build(), application.version(), this);
                 }
                 else
                 {
                     // Do nothing - set version to be correct
-                    jsonStateBuilder.add( JSONKeys.APPLICATION_VERSION, application.version() );
+                    jsonStateBuilder.add(JSONKeys.APPLICATION_VERSION, application.version());
                     state = jsonStateBuilder.build();
                 }
                 // State changed
                 status = EntityStatus.UPDATED;
             }
 
-            String type = state.getString( JSONKeys.TYPE );
+            String type = state.getString(JSONKeys.TYPE);
 
-            EntityDescriptor entityDescriptor = module.entityDescriptor( type );
-            if( entityDescriptor == null )
+            EntityDescriptor entityDescriptor = module.entityDescriptor(type);
+            if(entityDescriptor == null)
             {
-                throw new NoSuchEntityTypeException( type, module );
+                throw new NoSuchEntityTypeException(type, module);
             }
 
-            return new JSONEntityState( entityDescriptor.module(), serialization, jsonFactories,
-                                        version, modified,
-                                        EntityReference.create( identity ),
-                                        status, entityDescriptor,
-                                        state
+            return new JSONEntityState(entityDescriptor.module(), serialization, jsonFactories,
+                version, modified,
+                EntityReference.create(identity),
+                status, entityDescriptor,
+                state
             );
         }
-        catch( EntityStoreException ex )
+        catch(EntityStoreException ex)
         {
             throw ex;
         }
-        catch( Exception ex )
+        catch(Exception ex)
         {
-            throw new EntityStoreException( ex );
+            throw new EntityStoreException(ex);
         }
     }
 
     @Override
-    public JsonObject jsonStateOf( String id )
+    public JsonObject jsonStateOf(String id)
     {
-        try( JsonReader jsonReader = jsonFactories
-            .readerFactory().createReader( mapEntityStore.get( EntityReference.parseEntityReference( id ) ) ) )
+        try(JsonReader jsonReader = jsonFactories
+            .readerFactory().createReader(mapEntityStore.get(EntityReference.parseEntityReference(id))))
         {
             return jsonReader.readObject();
         }
-        catch( EntityStoreException ex )
+        catch(EntityStoreException ex)
         {
             throw ex;
         }
-        catch( Exception ex )
+        catch(Exception ex)
         {
-            throw new EntityStoreException( ex );
+            throw new EntityStoreException(ex);
         }
     }
 
-    private EntityState fetchCachedState( EntityReference reference, ModuleDescriptor module, Instant currentTime )
+    private EntityState fetchCachedState(EntityReference reference, ModuleDescriptor module, Instant currentTime)
     {
-        CacheState cacheState = cache.get( reference.identity().toString() );
-        if( cacheState != null )
+        CacheState cacheState = cache.get(reference.identity().toString());
+        if(cacheState != null)
         {
-            JsonObject state = jsonFactories.readerFactory().createReader( new StringReader( cacheState.string ) )
-                                            .readObject();
+            JsonObject state = jsonFactories.readerFactory().createReader(new StringReader(cacheState.string))
+                .readObject();
             try
             {
-                String type = state.getString( JSONKeys.TYPE );
-                EntityDescriptor entityDescriptor = module.entityDescriptor( type );
-                String version = state.getString( JSONKeys.VERSION );
-                Instant modified = Instant.ofEpochMilli( state.getJsonNumber( JSONKeys.MODIFIED ).longValueExact() );
-                return new JSONEntityState( entityDescriptor.module(), serialization, jsonFactories,
-                                            version, modified,
-                                            reference,
-                                            EntityStatus.LOADED, entityDescriptor,
-                                            state );
+                String type = state.getString(JSONKeys.TYPE);
+                EntityDescriptor entityDescriptor = module.entityDescriptor(type);
+                String version = state.getString(JSONKeys.VERSION);
+                Instant modified = Instant.ofEpochMilli(state.getJsonNumber(JSONKeys.MODIFIED).longValueExact());
+                return new JSONEntityState(entityDescriptor.module(), serialization, jsonFactories,
+                    version, modified,
+                    reference,
+                    EntityStatus.LOADED, entityDescriptor,
+                    state);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
                 // Should not be able to happen, unless internal error in the cache system.
-                throw new EntityStoreException( e );
+                throw new EntityStoreException(e);
             }
         }
         return null;
     }
 
-    private boolean doCacheOnRead( EntityStoreUnitOfWork unitOfWork )
+    private boolean doCacheOnRead(EntityStoreUnitOfWork unitOfWork)
     {
-        CacheOptions cacheOptions = unitOfWork.usecase().metaInfo( CacheOptions.class );
+        CacheOptions cacheOptions = unitOfWork.usecase().metaInfo(CacheOptions.class);
         return cacheOptions == null || cacheOptions.cacheOnRead();
     }
 
@@ -531,25 +520,25 @@ public class JSONMapEntityStoreMixin
         {
         }
 
-        private CacheState( String string )
+        private CacheState(String string)
         {
             this.string = string;
         }
 
         @Override
-        public void writeExternal( ObjectOutput out )
+        public void writeExternal(ObjectOutput out)
             throws IOException
         {
-            out.writeUTF( string );
+            out.writeUTF(string);
         }
 
         @Override
-        public void readExternal( ObjectInput in )
+        public void readExternal(ObjectInput in)
             throws IOException, ClassNotFoundException
         {
-            try( BufferedReader reader = new BufferedReader( new StringReader( in.readUTF() ) ) )
+            try(BufferedReader reader = new BufferedReader(new StringReader(in.readUTF())))
             {
-                string = reader.lines().collect( joining( "\n" ) );
+                string = reader.lines().collect(joining("\n"));
             }
         }
     }

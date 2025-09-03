@@ -20,7 +20,8 @@
 package org.qi4j.api.mixin;
 
 // START SNIPPET: mixin
-@Mixins( { StartMixin.class, VehicleMixin.class } )
+@Mixins({StartMixin.class, VehicleMixin.class})
 public interface Car extends Startable, Vehicle
-{}
+{
+}
 // END SNIPPET: mixin

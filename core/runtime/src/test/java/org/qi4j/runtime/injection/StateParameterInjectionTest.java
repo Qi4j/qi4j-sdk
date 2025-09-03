@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.State;
@@ -28,7 +29,6 @@ import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -38,12 +38,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test the @State annotation when used for parameters
  */
 public class StateParameterInjectionTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( PropertyParameterInjectionComposite.class );
+        module.transients(PropertyParameterInjectionComposite.class);
     }
 
     /**
@@ -56,15 +56,15 @@ public class StateParameterInjectionTest
         throws Exception
     {
         TransientBuilder<PropertyParameterInjectionComposite> pficBuilder =
-            transientBuilderFactory.newTransientBuilder( PropertyParameterInjectionComposite.class );
-        pficBuilder.prototype().testField().set( "X" );
-        pficBuilder.prototype().namedField().set( "Y" );
+            transientBuilderFactory.newTransientBuilder(PropertyParameterInjectionComposite.class);
+        pficBuilder.prototype().testField().set("X");
+        pficBuilder.prototype().namedField().set("Y");
         PropertyParameterInjectionComposite pfic = pficBuilder.newInstance();
-        assertThat( "Test field", pfic.testField().get(), is( equalTo( "X" ) ) );
-        assertThat( "Named field", pfic.namedField().get(), is( equalTo( "Y" ) ) );
+        assertThat("Test field", pfic.testField().get(), is(equalTo("X")));
+        assertThat("Named field", pfic.namedField().get(), is(equalTo("Y")));
     }
 
-    @Mixins( PropertyParameterInjectionMixin.class )
+    @Mixins(PropertyParameterInjectionMixin.class)
     public interface PropertyParameterInjectionComposite
         extends TransientComposite
     {
@@ -79,12 +79,12 @@ public class StateParameterInjectionTest
         Property<String> testField;
         Property<String> namedField;
 
-        public PropertyParameterInjectionMixin( @State( "testField" ) Property<String> testField )
+        public PropertyParameterInjectionMixin(@State("testField") Property<String> testField)
         {
             this.testField = testField;
         }
 
-        void init( @State( "namedField" ) Property<String> namedField )
+        void init(@State("namedField") Property<String> namedField)
         {
             this.namedField = namedField;
         }

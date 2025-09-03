@@ -25,6 +25,7 @@ import org.qi4j.api.property.Property;
 public interface CargoState
 {
     Property<String> origin();
+
     Property<String> destination();
 }
 

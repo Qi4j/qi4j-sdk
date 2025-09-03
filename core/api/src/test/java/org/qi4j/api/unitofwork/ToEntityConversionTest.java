@@ -19,9 +19,7 @@
  */
 package org.qi4j.api.unitofwork;
 
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.ManyAssociation;
@@ -44,7 +42,10 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.spi.Qi4jSPI;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
+
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -53,33 +54,33 @@ public class ToEntityConversionTest
     extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( SomeType.class );
-        module.values( SomeType.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(SomeType.class);
+        module.values(SomeType.class);
     }
 
     @Test
     public void testPropertyConversionToEntity()
         throws Exception
     {
-        Identity identity = StringIdentity.identityOf( "Niclas" );
-        ValueBuilder<SomeType> vb = valueBuilderFactory.newValueBuilder( SomeType.class );
+        Identity identity = StringIdentity.identityOf("Niclas");
+        ValueBuilder<SomeType> vb = valueBuilderFactory.newValueBuilder(SomeType.class);
         SomeType prototype = vb.prototype();
-        prototype.identity().set( identity );
-        prototype.name().set( "Niclas" );
+        prototype.identity().set(identity);
+        prototype.name().set("Niclas");
         SomeType value = vb.newInstance();
 
-        Usecase usecase = UsecaseBuilder.buildUsecase( "test case" )
-                                        .withMetaInfo( new SomeEntityConverter() )
-                                        .newUsecase();
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(usecase) )
+        Usecase usecase = UsecaseBuilder.buildUsecase("test case")
+            .withMetaInfo(new SomeEntityConverter())
+            .newUsecase();
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(usecase))
         {
-            SomeType entity = uow.toEntity( SomeType.class, value );
-            assertThat( entity.identity().get(), equalTo( identity ) );
-            assertThat( entity.name().get(), equalTo( "[Niclas]" ) );
+            SomeType entity = uow.toEntity(SomeType.class, value);
+            assertThat(entity.identity().get(), equalTo(identity));
+            assertThat(entity.name().get(), equalTo("[Niclas]"));
             uow.complete();
         }
     }
@@ -105,13 +106,13 @@ public class ToEntityConversionTest
         private Qi4jSPI spi;
 
         @Override
-        public Function<PropertyDescriptor, Object> properties( Object entityComposite, Function<PropertyDescriptor, Object> defaultFn )
+        public Function<PropertyDescriptor, Object> properties(Object entityComposite, Function<PropertyDescriptor, Object> defaultFn)
         {
             return descriptor ->
             {
-                QualifiedName name = QualifiedName.fromClass( SomeType.class, "name" );
-                Object value = defaultFn.apply( descriptor );
-                if( descriptor.qualifiedName().equals( name ) )
+                QualifiedName name = QualifiedName.fromClass(SomeType.class, "name");
+                Object value = defaultFn.apply(descriptor);
+                if(descriptor.qualifiedName().equals(name))
                 {
                     return "[" + value + "]";
                 }
@@ -120,19 +121,19 @@ public class ToEntityConversionTest
         }
 
         @Override
-        public Function<AssociationDescriptor, EntityReference> associations( Object entityComposite, Function<AssociationDescriptor, EntityReference> defaultFn )
+        public Function<AssociationDescriptor, EntityReference> associations(Object entityComposite, Function<AssociationDescriptor, EntityReference> defaultFn)
         {
             return defaultFn;
         }
 
         @Override
-        public Function<AssociationDescriptor, Stream<EntityReference>> manyAssociations( Object entityComposite, Function<AssociationDescriptor, Stream<EntityReference>> defaultFn )
+        public Function<AssociationDescriptor, Stream<EntityReference>> manyAssociations(Object entityComposite, Function<AssociationDescriptor, Stream<EntityReference>> defaultFn)
         {
             return defaultFn;
         }
 
         @Override
-        public Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociations( Object entityComposite, Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> defaultFn )
+        public Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociations(Object entityComposite, Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> defaultFn)
         {
             return defaultFn;
         }

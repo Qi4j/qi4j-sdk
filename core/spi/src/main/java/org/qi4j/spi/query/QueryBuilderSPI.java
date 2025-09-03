@@ -26,5 +26,5 @@ import org.qi4j.api.query.Query;
  */
 public interface QueryBuilderSPI<T>
 {
-    Query<T> newQuery( QuerySource querySource );
+    Query<T> newQuery(QuerySource querySource);
 }

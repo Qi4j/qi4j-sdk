@@ -19,21 +19,17 @@
  */
 package org.qi4j.runtime.composite;
 
+import org.qi4j.api.common.ConstructionException;
+import org.qi4j.api.structure.ModuleDescriptor;
+import org.qi4j.api.util.HierarchicalVisitor;
+import org.qi4j.api.util.VisitableHierarchy;
+import org.qi4j.runtime.injection.*;
+
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.stream.Stream;
-import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.util.HierarchicalVisitor;
-import org.qi4j.api.util.VisitableHierarchy;
-import org.qi4j.runtime.injection.Dependencies;
-import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.InjectedFieldsModel;
-import org.qi4j.runtime.injection.InjectedMethodsModel;
-import org.qi4j.runtime.injection.InjectionContext;
-import org.qi4j.runtime.injection.*;
 
 import static org.qi4j.api.util.Classes.RAW_CLASS;
 import static org.qi4j.api.util.Classes.interfacesOf;
@@ -52,18 +48,18 @@ public abstract class AbstractModifierModel
 
     private final Class<Class<?>>[] nextInterfaces;
 
-    @SuppressWarnings( "unchecked" )
-    public AbstractModifierModel( Class<?> declaredModifierClass, Class<?> instantiationClass )
+    @SuppressWarnings("unchecked")
+    public AbstractModifierModel(Class<?> declaredModifierClass, Class<?> instantiationClass)
     {
         this.modifierClass = instantiationClass;
-        constructorsModel = new ConstructorsModel( modifierClass );
-        injectedFieldsModel = new InjectedFieldsModel( declaredModifierClass );
-        injectedMethodsModel = new InjectedMethodsModel( declaredModifierClass );
-        Class<Class<?>> componentType = (Class<Class<?>>) Class.class.cast( Class.class );
-        nextInterfaces = interfacesOf( declaredModifierClass )
-            .map( RAW_CLASS )
+        constructorsModel = new ConstructorsModel(modifierClass);
+        injectedFieldsModel = new InjectedFieldsModel(declaredModifierClass);
+        injectedMethodsModel = new InjectedMethodsModel(declaredModifierClass);
+        Class<Class<?>> componentType = (Class<Class<?>>) Class.class.cast(Class.class);
+        nextInterfaces = interfacesOf(declaredModifierClass)
+            .map(RAW_CLASS)
             .distinct()
-            .toArray( size -> (Class<Class<?>>[]) Array.newInstance( componentType, size ) );
+            .toArray(size -> (Class<Class<?>>[]) Array.newInstance(componentType, size));
     }
 
     public Class<?> modifierClass()
@@ -72,63 +68,63 @@ public abstract class AbstractModifierModel
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public Stream<DependencyModel> dependencies()
     {
-        Stream<? extends Dependencies> models = Stream.of( this.constructorsModel, injectedFieldsModel, injectedMethodsModel );
-        return models.flatMap( Dependencies::dependencies );
+        Stream<? extends Dependencies> models = Stream.of(this.constructorsModel, injectedFieldsModel, injectedMethodsModel);
+        return models.flatMap(Dependencies::dependencies);
     }
 
     public boolean isGeneric()
     {
-        return InvocationHandler.class.isAssignableFrom( modifierClass );
+        return InvocationHandler.class.isAssignableFrom(modifierClass);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            if( constructorsModel.accept( visitor ) )
+            if(constructorsModel.accept(visitor))
             {
-                if( injectedFieldsModel.accept( visitor ) )
+                if(injectedFieldsModel.accept(visitor))
                 {
-                    injectedMethodsModel.accept( visitor );
+                    injectedMethodsModel.accept(visitor);
                 }
             }
         }
 
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
     // Context
-    public InvocationHandler newInstance( ModuleDescriptor module,
-                                          InvocationHandler next,
-                                          ProxyReferenceInvocationHandler proxyHandler,
-                                          Method method
+    public InvocationHandler newInstance(ModuleDescriptor module,
+                                         InvocationHandler next,
+                                         ProxyReferenceInvocationHandler proxyHandler,
+                                         Method method
     )
     {
-        InjectionContext injectionContext = new InjectionContext( module, wrapNext( next ), proxyHandler );
+        InjectionContext injectionContext = new InjectionContext(module, wrapNext(next), proxyHandler);
 
-        Object modifier = constructorsModel.newInstance( injectionContext );
+        Object modifier = constructorsModel.newInstance(injectionContext);
 
         try
         {
-            if( FragmentClassLoader.isGenerated( modifier ) )
+            if(FragmentClassLoader.isGenerated(modifier))
             {
-                modifier.getClass().getField( "_instance" ).set( modifier, proxyHandler );
+                modifier.getClass().getField("_instance").set(modifier, proxyHandler);
             }
         }
-        catch( IllegalAccessException | NoSuchFieldException e )
+        catch(IllegalAccessException | NoSuchFieldException e)
         {
             e.printStackTrace();
         }
 
-        injectedFieldsModel.inject( injectionContext, modifier );
-        injectedMethodsModel.inject( injectionContext, modifier );
+        injectedFieldsModel.inject(injectionContext, modifier);
+        injectedMethodsModel.inject(injectionContext, modifier);
 
-        if( isGeneric() )
+        if(isGeneric())
         {
             return (InvocationHandler) modifier;
         }
@@ -136,44 +132,44 @@ public abstract class AbstractModifierModel
         {
             try
             {
-                Method invocationMethod = modifierClass.getMethod( "_" + method.getName(), method.getParameterTypes() );
+                Method invocationMethod = modifierClass.getMethod("_" + method.getName(), method.getParameterTypes());
                 TypedModifierInvocationHandler handler = new TypedModifierInvocationHandler();
-                handler.setFragment( modifier );
-                handler.setMethod( invocationMethod );
+                handler.setFragment(modifier);
+                handler.setMethod(invocationMethod);
                 return handler;
             }
-            catch( NoSuchMethodException e )
+            catch(NoSuchMethodException e)
             {
-                throw new ConstructionException( "Could not find modifier method", e );
+                throw new ConstructionException("Could not find modifier method", e);
             }
         }
     }
 
-    private Object wrapNext( InvocationHandler next )
+    private Object wrapNext(InvocationHandler next)
     {
-        if( isGeneric() )
+        if(isGeneric())
         {
             return next;
         }
         else
         {
-            return Proxy.newProxyInstance( modifierClass.getClassLoader(), nextInterfaces, next );
+            return Proxy.newProxyInstance(modifierClass.getClassLoader(), nextInterfaces, next);
         }
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
         AbstractModifierModel that = (AbstractModifierModel) o;
-        return modifierClass.equals( that.modifierClass );
+        return modifierClass.equals(that.modifierClass);
     }
 
     @Override

@@ -20,14 +20,14 @@
 
 package org.qi4j.runtime.structure;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.structure.Application;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
 import org.qi4j.test.AbstractQi4jTest;
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,7 +35,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class ApplicationModeTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
 
@@ -45,7 +45,7 @@ public class ApplicationModeTest
     public void testApplicationModeNotSet()
     {
         // mode is set to test in AbstractQi4jTest
-        assertThat( "mode set to default", application.mode(), equalTo( Application.Mode.test ) );
+        assertThat("mode set to default", application.mode(), equalTo(Application.Mode.test));
     }
 
     @Test
@@ -54,14 +54,14 @@ public class ApplicationModeTest
     {
         Application.Mode mode = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.layer().application().setMode( Application.Mode.test );
+                module.layer().application().setMode(Application.Mode.test);
             }
         }.application().mode();
 
-        assertThat( "mode set to given value", mode, CoreMatchers.equalTo( Application.Mode.test ) );
+        assertThat("mode set to given value", mode, CoreMatchers.equalTo(Application.Mode.test));
     }
 
     @Test
@@ -70,14 +70,14 @@ public class ApplicationModeTest
     {
         Application.Mode mode = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.layer().application().setMode( Application.Mode.staging );
+                module.layer().application().setMode(Application.Mode.staging);
             }
         }.application().mode();
 
-        assertThat( "mode set to given value", mode, CoreMatchers.equalTo( Application.Mode.staging ) );
+        assertThat("mode set to given value", mode, CoreMatchers.equalTo(Application.Mode.staging));
     }
 
     @Test
@@ -86,14 +86,14 @@ public class ApplicationModeTest
     {
         Application.Mode mode = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.layer().application().setMode( Application.Mode.development );
+                module.layer().application().setMode(Application.Mode.development);
             }
         }.application().mode();
 
-        assertThat( "mode set to given value", mode, CoreMatchers.equalTo( Application.Mode.development ) );
+        assertThat("mode set to given value", mode, CoreMatchers.equalTo(Application.Mode.development));
     }
 
     @Test
@@ -102,13 +102,13 @@ public class ApplicationModeTest
     {
         Application.Mode mode = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.layer().application().setMode( Application.Mode.production );
+                module.layer().application().setMode(Application.Mode.production);
             }
         }.application().mode();
 
-        assertThat( "mode set to given value", mode, CoreMatchers.equalTo( Application.Mode.production ) );
+        assertThat("mode set to given value", mode, CoreMatchers.equalTo(Application.Mode.production));
     }
 }

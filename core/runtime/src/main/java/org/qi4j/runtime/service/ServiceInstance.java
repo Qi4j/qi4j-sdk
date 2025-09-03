@@ -29,8 +29,6 @@ import org.qi4j.api.service.Availability;
 import org.qi4j.api.util.Classes;
 import org.qi4j.runtime.composite.TransientInstance;
 import org.qi4j.runtime.composite.TransientStateInstance;
-import org.qi4j.runtime.composite.TransientInstance;
-import org.qi4j.runtime.composite.TransientStateInstance;
 
 /**
  * JAVADOC
@@ -41,16 +39,16 @@ public class ServiceInstance extends TransientInstance
     private final boolean implementsServiceAvailable;
     private final boolean hasEnabledConfiguration;
 
-    public ServiceInstance( ServiceModel compositeModel,
-                            Object[] mixins,
-                            TransientStateInstance state
+    public ServiceInstance(ServiceModel compositeModel,
+                           Object[] mixins,
+                           TransientStateInstance state
     )
     {
-        super( compositeModel, mixins, state );
+        super(compositeModel, mixins, state);
 
-        implementsServiceAvailable = Classes.assignableTypeSpecification( Availability.class ).test( descriptor() );
+        implementsServiceAvailable = Classes.assignableTypeSpecification(Availability.class).test(descriptor());
         hasEnabledConfiguration = compositeModel.configurationType() != null
-                                  && Enabled.class.isAssignableFrom( compositeModel.configurationType() );
+            && Enabled.class.isAssignableFrom(compositeModel.configurationType());
     }
 
     @Override
@@ -67,16 +65,16 @@ public class ServiceInstance extends TransientInstance
         // NOOP
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public boolean isAvailable()
     {
         // Check Enabled in configuration first
-        if( hasEnabledConfiguration && !( (Configuration<Enabled>) proxy() ).get().enabled().get() )
+        if(hasEnabledConfiguration && !((Configuration<Enabled>) proxy()).get().enabled().get())
         {
             return false;
         }
 
         // Ask service if it's available
-        return !implementsServiceAvailable || ( (Availability) proxy() ).isAvailable();
+        return !implementsServiceAvailable || ((Availability) proxy()).isAvailable();
     }
 }

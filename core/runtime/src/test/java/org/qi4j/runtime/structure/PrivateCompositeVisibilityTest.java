@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.structure;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.NoSuchTransientTypeException;
 import org.qi4j.api.composite.TransientBuilderFactory;
@@ -27,12 +28,6 @@ import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.structure.Application;
-import org.qi4j.bootstrap.ApplicationAssemblerAdapter;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.Energy4Java;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.*;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -46,47 +41,47 @@ public class PrivateCompositeVisibilityTest
     public void testPrivateCompositeVisibility()
         throws Exception
     {
-        assertThrows( NoSuchTransientTypeException.class, () -> {
+        assertThrows(NoSuchTransientTypeException.class, () -> {
             Energy4Java qi4j = new Energy4Java();
             Assembler[][][] assemblers = new Assembler[][][]
                 {
                     { // Layer
-                      {
-                          new AssemblerA()
-                      },
-                      {
-                          new AssemblerB()
-                      }
+                        {
+                            new AssemblerA()
+                        },
+                        {
+                            new AssemblerB()
+                        }
                     }
                 };
-            Application app = qi4j.newApplication( new ApplicationAssemblerAdapter( assemblers )
+            Application app = qi4j.newApplication(new ApplicationAssemblerAdapter(assemblers)
             {
-            } );
+            });
             app.activate();
-            ObjectA object = app.findModule( "Layer 1", "Module A" ).newObject( ObjectA.class );
+            ObjectA object = app.findModule("Layer 1", "Module A").newObject(ObjectA.class);
             object.test();
-        } );
+        });
     }
 
     class AssemblerA
         implements Assembler
     {
-        public void assemble( ModuleAssembly module )
+        public void assemble(ModuleAssembly module)
             throws AssemblyException
         {
-            module.setName( "Module A" );
-            module.objects( ObjectA.class );
+            module.setName("Module A");
+            module.objects(ObjectA.class);
         }
     }
 
     class AssemblerB
         implements Assembler
     {
-        public void assemble( ModuleAssembly module )
+        public void assemble(ModuleAssembly module)
             throws AssemblyException
         {
-            module.setName( "Module B" );
-            module.transients( CompositeB.class ).visibleIn( Visibility.module );
+            module.setName("Module B");
+            module.transients(CompositeB.class).visibleIn(Visibility.module);
         }
     }
 
@@ -97,12 +92,12 @@ public class PrivateCompositeVisibilityTest
 
         String test()
         {
-            CompositeB instance = cbf.newTransient( CompositeB.class );
+            CompositeB instance = cbf.newTransient(CompositeB.class);
             return instance.test();
         }
     }
 
-    @Mixins( MixinB.class )
+    @Mixins(MixinB.class)
     public interface CompositeB
         extends TransientComposite
     {

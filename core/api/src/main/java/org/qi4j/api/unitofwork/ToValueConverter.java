@@ -19,15 +19,15 @@
  */
 package org.qi4j.api.unitofwork;
 
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.identity.HasIdentity;
 import org.qi4j.api.property.PropertyDescriptor;
 import org.qi4j.api.usecase.Usecase;
-import org.qi4j.api.association.AssociationDescriptor;
+
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * MetaInfo holder for entity-to-value conversion in {@link UnitOfWork#toValue(Class, HasIdentity)}
@@ -65,8 +65,8 @@ public interface ToValueConverter
      *                        return to do all the conversions
      * @return The function to do the conversion. It MUST NOT return null, and if no conversion is wanted, return the defaultFn.
      */
-    Function<PropertyDescriptor, Object> properties( Object entityComposite,
-                                                     Function<PropertyDescriptor, Object> defaultFn );
+    Function<PropertyDescriptor, Object> properties(Object entityComposite,
+                                                    Function<PropertyDescriptor, Object> defaultFn);
 
     /**
      * Returns the Function to convert each of the associations of the entities into the value.
@@ -77,7 +77,7 @@ public interface ToValueConverter
      * @return The function to do the conversion. It MUST NOT return null, and if no conversion is wanted, return the defaultFn.
      */
     Function<AssociationDescriptor, EntityReference> associations(Object entityComposite,
-                                                                  Function<AssociationDescriptor, EntityReference> defaultFn );
+                                                                  Function<AssociationDescriptor, EntityReference> defaultFn);
 
     /**
      * Returns the Function to convert each of the manyAssociations of the entities into the value.
@@ -87,8 +87,8 @@ public interface ToValueConverter
      *                        return to do all the conversions
      * @return The function to do the conversion. It MUST NOT return null, and if no conversion is wanted, return the defaultFn.
      */
-    Function<AssociationDescriptor, Stream<EntityReference>> manyAssociations( Object entityComposite,
-                                                                               Function<AssociationDescriptor, Stream<EntityReference>> defaultFn );
+    Function<AssociationDescriptor, Stream<EntityReference>> manyAssociations(Object entityComposite,
+                                                                              Function<AssociationDescriptor, Stream<EntityReference>> defaultFn);
 
     /**
      * Returns the Function to convert each of the NamedAssociations of the entities into the value.
@@ -98,6 +98,6 @@ public interface ToValueConverter
      *                        return to do all the conversions
      * @return The function to do the conversion. It MUST NOT return null, and if no conversion is wanted, return the defaultFn.
      */
-    Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociations( Object entityComposite,
-                                                                                                   Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> defaultFn );
+    Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociations(Object entityComposite,
+                                                                                                  Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> defaultFn);
 }

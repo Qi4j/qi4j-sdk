@@ -17,19 +17,20 @@
  */
 package org.qi4j.runtime.composite;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/** Regression test
+/**
+ * Regression test
  */
 public class CompositeMethodInvocationTest extends AbstractQi4jTest
 {
@@ -38,13 +39,17 @@ public class CompositeMethodInvocationTest extends AbstractQi4jTest
     MyService srv;
 
     @Test
-    public void corruptedMethodInvocation() throws InterruptedException {
+    public void corruptedMethodInvocation()
+        throws InterruptedException
+    {
         srv.dummy(); // to avoid concurrent activation (it can have own issues)
 
         ExecutorService exe = Executors.newFixedThreadPool(10);
-        for (int i = 0; i < 10; i++) {
+        for(int i = 0; i < 10; i++)
+        {
             exe.execute(() -> {
-                while (true) {
+                while(true)
+                {
                     srv.dummy();
                 }
             });
@@ -53,18 +58,23 @@ public class CompositeMethodInvocationTest extends AbstractQi4jTest
     }
 
     @Override
-    public void assemble(ModuleAssembly module) throws AssemblyException {
+    public void assemble(ModuleAssembly module)
+        throws AssemblyException
+    {
         module.services(MyService.class);
     }
 
     @Mixins(Impl.class)
-    public interface MyService extends ServiceComposite {
+    public interface MyService extends ServiceComposite
+    {
         void dummy();
     }
 
-    public abstract static class Impl implements MyService {
+    public abstract static class Impl implements MyService
+    {
         @Override
-        public void dummy() {
+        public void dummy()
+        {
         }
     }
 

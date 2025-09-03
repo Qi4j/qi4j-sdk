@@ -19,9 +19,6 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.property.PropertyDescriptor;
@@ -29,6 +26,10 @@ import org.qi4j.runtime.entity.EntityModel;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.entity.NamedAssociationState;
+
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Function based StateResolver.
@@ -41,10 +42,10 @@ public class FunctionStateResolver
     private final Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction;
     private final Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction;
 
-    public FunctionStateResolver( Function<PropertyDescriptor, Object> propertyFunction,
-                                  Function<AssociationDescriptor, EntityReference> associationFunction,
-                                  Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
-                                  Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction )
+    public FunctionStateResolver(Function<PropertyDescriptor, Object> propertyFunction,
+                                 Function<AssociationDescriptor, EntityReference> associationFunction,
+                                 Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
+                                 Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction)
     {
         this.propertyFunction = propertyFunction;
         this.associationFunction = associationFunction;
@@ -53,61 +54,61 @@ public class FunctionStateResolver
     }
 
     @Override
-    public Object getPropertyState( PropertyDescriptor descriptor )
+    public Object getPropertyState(PropertyDescriptor descriptor)
     {
-        return propertyFunction.apply( descriptor );
+        return propertyFunction.apply(descriptor);
     }
 
     @Override
-    public EntityReference getAssociationState( AssociationDescriptor descriptor )
+    public EntityReference getAssociationState(AssociationDescriptor descriptor)
     {
-        return associationFunction.apply( descriptor );
+        return associationFunction.apply(descriptor);
     }
 
     @Override
-    public Stream<EntityReference> getManyAssociationState( AssociationDescriptor descriptor )
+    public Stream<EntityReference> getManyAssociationState(AssociationDescriptor descriptor)
     {
-        return manyAssociationFunction.apply( descriptor );
+        return manyAssociationFunction.apply(descriptor);
     }
 
     @Override
-    public Stream<Map.Entry<String, EntityReference>> getNamedAssociationState( AssociationDescriptor descriptor )
+    public Stream<Map.Entry<String, EntityReference>> getNamedAssociationState(AssociationDescriptor descriptor)
     {
-        return namedAssociationFunction.apply( descriptor );
+        return namedAssociationFunction.apply(descriptor);
     }
 
-    public void populateState( EntityModel model, EntityState state )
+    public void populateState(EntityModel model, EntityState state)
     {
         model.state().properties().forEach(
             propDesc ->
             {
-                Object value = getPropertyState( propDesc );
-                state.setPropertyValue( propDesc.qualifiedName(), value );
-            } );
+                Object value = getPropertyState(propDesc);
+                state.setPropertyValue(propDesc.qualifiedName(), value);
+            });
         model.state().associations().forEach(
             assDesc ->
             {
-                EntityReference ref = getAssociationState( assDesc );
-                state.setAssociationValue( assDesc.qualifiedName(), ref );
-            } );
+                EntityReference ref = getAssociationState(assDesc);
+                state.setAssociationValue(assDesc.qualifiedName(), ref);
+            });
         model.state().manyAssociations().forEach(
             manyAssDesc ->
             {
-                ManyAssociationState associationState = state.manyAssociationValueOf( manyAssDesc.qualifiedName() );
+                ManyAssociationState associationState = state.manyAssociationValueOf(manyAssDesc.qualifiedName());
                 // First clear existing ones
                 associationState.clear();
                 // then add the new ones.
-                getManyAssociationState( manyAssDesc ).forEach( ref -> associationState.add( 0, ref ) );
-            } );
+                getManyAssociationState(manyAssDesc).forEach(ref -> associationState.add(0, ref));
+            });
         model.state().namedAssociations().forEach(
             namedAssDesc ->
             {
-                NamedAssociationState associationState = state.namedAssociationValueOf( namedAssDesc.qualifiedName() );
+                NamedAssociationState associationState = state.namedAssociationValueOf(namedAssDesc.qualifiedName());
                 // First clear existing ones
                 associationState.clear();
                 // then add the new ones.
-                getNamedAssociationState( namedAssDesc )
-                    .forEach( entry -> associationState.put( entry.getKey(), entry.getValue() ) );
-            } );
+                getNamedAssociationState(namedAssDesc)
+                    .forEach(entry -> associationState.put(entry.getKey(), entry.getValue()));
+            });
     }
 }

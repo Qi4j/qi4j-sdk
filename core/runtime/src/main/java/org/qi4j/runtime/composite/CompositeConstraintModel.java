@@ -20,9 +20,10 @@
 
 package org.qi4j.runtime.composite;
 
-import java.lang.annotation.Annotation;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.constraint.Constraint;
+
+import java.lang.annotation.Annotation;
 
 /**
  * JAVADOC
@@ -32,25 +33,25 @@ public final class CompositeConstraintModel
 {
     private final ValueConstraintsModel constraintsModel;
 
-    public CompositeConstraintModel( Annotation annotation, ValueConstraintsModel constraintsModel )
+    public CompositeConstraintModel(Annotation annotation, ValueConstraintsModel constraintsModel)
     {
-        super( annotation );
+        super(annotation);
         this.constraintsModel = constraintsModel;
     }
 
     @Override
-    @SuppressWarnings( {"raw", "unchecked"} )
+    @SuppressWarnings({"raw", "unchecked"})
     public ConstraintInstance<?, ?> newInstance()
     {
         try
         {
             ValueConstraintsInstance compositeConstraintsInstance = constraintsModel.newInstance();
-            Constraint<?, ?> constraint = new CompositeConstraintInstance( compositeConstraintsInstance );
-            return new ConstraintInstance( constraint, annotation );
+            Constraint<?, ?> constraint = new CompositeConstraintInstance(compositeConstraintsInstance);
+            return new ConstraintInstance(constraint, annotation);
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new ConstructionException( "Could not instantiate constraint implementation", e );
+            throw new ConstructionException("Could not instantiate constraint implementation", e);
         }
     }
 
@@ -59,16 +60,16 @@ public final class CompositeConstraintModel
     {
         private final ValueConstraintsInstance valueConstraintsInstance;
 
-        private CompositeConstraintInstance( ValueConstraintsInstance valueConstraintsInstance )
+        private CompositeConstraintInstance(ValueConstraintsInstance valueConstraintsInstance)
         {
             this.valueConstraintsInstance = valueConstraintsInstance;
         }
 
         @Override
-        public boolean isValid( Annotation annotation, Object value )
+        public boolean isValid(Annotation annotation, Object value)
             throws NullPointerException
         {
-            return valueConstraintsInstance.checkConstraints( value ).isEmpty();
+            return valueConstraintsInstance.checkConstraints(value).isEmpty();
         }
     }
 }

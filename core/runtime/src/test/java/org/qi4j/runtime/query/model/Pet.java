@@ -28,10 +28,10 @@ import org.qi4j.api.mixin.Mixins;
 /**
  * Test traversal over internal interfaces.
  */
-@Mixins( Pet.PetMixin.class )
+@Mixins(Pet.PetMixin.class)
 public interface Pet
 {
-    void changeOwner( Person owner );
+    void changeOwner(Person owner);
 
     interface PetState
     {
@@ -45,9 +45,9 @@ public interface Pet
         @This
         PetState state;
 
-        public void changeOwner( Person owner )
+        public void changeOwner(Person owner)
         {
-            state.owner().set( owner );
+            state.owner().set(owner);
         }
     }
 }

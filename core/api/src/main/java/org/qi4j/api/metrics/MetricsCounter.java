@@ -27,9 +27,9 @@ public interface MetricsCounter extends Metric
 {
     void increment();
 
-    void increment( int steps );
+    void increment(int steps);
 
     void decrement();
 
-    void decrement( int steps );
+    void decrement(int steps);
 }

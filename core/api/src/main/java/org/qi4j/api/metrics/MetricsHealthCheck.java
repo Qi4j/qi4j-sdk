@@ -34,38 +34,44 @@ public interface MetricsHealthCheck extends Metric
         private final String message;
         private final Throwable exception;
 
-        private Result( boolean isHealthy, String message, Throwable exception )
+        private Result(boolean isHealthy, String message, Throwable exception)
         {
             healthy = isHealthy;
             this.message = message;
             this.exception = exception;
         }
 
-        /** Factory method for reporting an Ok health.
+        /**
+         * Factory method for reporting an Ok health.
          *
          * @return A healthy result.
          */
-        public static Result healthOk() {
-            return new Result( true, "", null );
+        public static Result healthOk()
+        {
+            return new Result(true, "", null);
         }
 
-        /** Factory method for reporting an unhealthy state.
+        /**
+         * Factory method for reporting an unhealthy state.
          *
          * @param message The message to relay in the result.
          * @return An unhealthy result.
          */
-        public static Result unhealthy(String message) {
-            return new Result( false, message, null );
+        public static Result unhealthy(String message)
+        {
+            return new Result(false, message, null);
         }
 
-        /** Factory method for reporting a state where an exception has occurred.
+        /**
+         * Factory method for reporting a state where an exception has occurred.
          *
-         * @param message The message to relay in the result.
+         * @param message   The message to relay in the result.
          * @param exception the exception that has occurred.
          * @return A failing health state.
          */
-        public static Result exception(String message, Throwable exception) {
-            return new Result( false, message, exception );
+        public static Result exception(String message, Throwable exception)
+        {
+            return new Result(false, message, exception);
         }
 
         public boolean isHealthy()

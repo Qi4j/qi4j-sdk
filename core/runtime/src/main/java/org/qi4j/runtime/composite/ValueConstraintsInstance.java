@@ -20,15 +20,16 @@
 
 package org.qi4j.runtime.composite;
 
+import org.qi4j.api.common.Optional;
+import org.qi4j.api.constraint.ConstraintViolationException;
+import org.qi4j.api.constraint.ValueConstraintViolation;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.qi4j.api.common.Optional;
-import org.qi4j.api.constraint.ValueConstraintViolation;
-import org.qi4j.api.constraint.ConstraintViolationException;
 
 public final class ValueConstraintsInstance
 {
@@ -43,93 +44,93 @@ public final class ValueConstraintsInstance
     private String name;
     private boolean optional;
 
-    public ValueConstraintsInstance( List<AbstractConstraintModel> constraintModels, String name, boolean optional )
+    public ValueConstraintsInstance(List<AbstractConstraintModel> constraintModels, String name, boolean optional)
     {
         this.name = name;
         this.optional = optional;
         constraints = new ArrayList<>();
-        for( AbstractConstraintModel constraintModel : constraintModels )
+        for(AbstractConstraintModel constraintModel : constraintModels)
         {
-            constraints.add( constraintModel.newInstance() );
+            constraints.add(constraintModel.newInstance());
         }
     }
 
-    @SuppressWarnings( { "raw", "unchecked" } )
-    public List<ValueConstraintViolation> checkConstraints( Object value )
+    @SuppressWarnings({"raw", "unchecked"})
+    public List<ValueConstraintViolation> checkConstraints(Object value)
     {
         List<ValueConstraintViolation> violations = null;
 
         // Check optional first - this avoids NPE's in constraints
-        if( optional )
+        if(optional)
         {
-            if( value == null )
+            if(value == null)
             {
                 violations = Collections.emptyList();
             }
         }
         else
         {
-            if( value == null )
+            if(value == null)
             {
                 violations = new ArrayList<>();
-                violations.add( new ValueConstraintViolation( name, OPTIONAL, null ) );
+                violations.add(new ValueConstraintViolation(name, OPTIONAL, null));
             }
         }
 
-        if( violations == null )
+        if(violations == null)
         {
-            for( ConstraintInstance constraint : constraints )
+            for(ConstraintInstance constraint : constraints)
             {
                 boolean valid;
                 try
                 {
-                    valid = constraint.isValid( value );
+                    valid = constraint.isValid(value);
                 }
-                catch( NullPointerException e )
+                catch(NullPointerException e)
                 {
                     // A NPE is the same as a failing constraint
                     valid = false;
                 }
 
-                if( !valid )
+                if(!valid)
                 {
-                    if( violations == null )
+                    if(violations == null)
                     {
                         violations = new ArrayList<>();
                     }
-                    ValueConstraintViolation violation = new ValueConstraintViolation( name, constraint.annotation(), value );
-                    violations.add( violation );
+                    ValueConstraintViolation violation = new ValueConstraintViolation(name, constraint.annotation(), value);
+                    violations.add(violation);
                 }
             }
         }
-        if( violations == null )
+        if(violations == null)
         {
             violations = Collections.emptyList();
         }
         return violations;
     }
 
-    public void checkConstraints( Object value, AccessibleObject accessor )
+    public void checkConstraints(Object value, AccessibleObject accessor)
     {
-        List<ValueConstraintViolation> violations = checkConstraints( value );
-        if( !violations.isEmpty() )
+        List<ValueConstraintViolation> violations = checkConstraints(value);
+        if(!violations.isEmpty())
         {
-            for( ValueConstraintViolation violation : violations )
+            for(ValueConstraintViolation violation : violations)
             {
-                if( accessor instanceof Member )
+                if(accessor instanceof Member)
                 {
                     Member member = (Member) accessor;
-                    String methodName =  member.getName();
-                    violation.setMixinType( member.getDeclaringClass() );
-                    violation.setMethodName( methodName );
+                    String methodName = member.getName();
+                    violation.setMixinType(member.getDeclaringClass());
+                    violation.setMethodName(methodName);
                 }
 
             }
-            throw new ConstraintViolationException( violations );
+            throw new ConstraintViolationException(violations);
         }
     }
 
-    @SuppressWarnings( "AnnotationAsSuperInterface" )
+    @SuppressWarnings("AnnotationAsSuperInterface")
     private static class OptionalDummy
         implements Optional
     {

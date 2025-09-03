@@ -19,8 +19,7 @@
  */
 package org.qi4j.runtime.concerns;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.ConcernOf;
 import org.qi4j.api.concern.Concerns;
@@ -29,7 +28,9 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.AssemblyReportException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -42,28 +43,28 @@ public class PropertyInheritanceTest extends AbstractQi4jTest
     private boolean failed;
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( Audit.class );
+        module.transients(Audit.class);
     }
 
     @Override
-    protected void assemblyException( AssemblyException exception )
+    protected void assemblyException(AssemblyException exception)
         throws AssemblyException
     {
-        if( exception instanceof AssemblyReportException)
+        if(exception instanceof AssemblyReportException)
         {
             failed = true;
             return;
         }
-        super.assemblyException( exception );
+        super.assemblyException(exception);
     }
 
     @Test
     public void givenConcernOnInheritedPropertyWhenAccessingPropertyExpectConcernToBeCalled()
     {
-        assertThat( failed, equalTo( true ) );
+        assertThat(failed, equalTo(true));
 
 // TODO: The following test code is testing the feature once it has been implemented. The @Test is needed to ensure check for the right Exception.
 //        List<String> data = new ArrayList<String>();
@@ -83,20 +84,20 @@ public class PropertyInheritanceTest extends AbstractQi4jTest
     {
 
         @Override
-        public void set( List<String> newValue )
+        public void set(List<String> newValue)
             throws IllegalArgumentException, IllegalStateException
         {
             List<String> markedUp = new ArrayList<String>();
             int counter = 0;
-            for( String value : newValue )
+            for(String value : newValue)
             {
-                markedUp.add( counter++ + ": " + value );
+                markedUp.add(counter++ + ": " + value);
             }
-            next.set( markedUp );
+            next.set(markedUp);
         }
     }
 
-    @Concerns( AuditTrailMarkupConcern.class )
+    @Concerns(AuditTrailMarkupConcern.class)
     public interface AuditTrail extends Property<List<String>>
     {
     }

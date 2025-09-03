@@ -26,6 +26,6 @@ import org.qi4j.bootstrap.ModuleAssembly;
 @FunctionalInterface
 public interface ModuleAssembler
 {
-    ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
         throws AssemblyException;
 }

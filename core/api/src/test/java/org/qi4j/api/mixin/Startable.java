@@ -23,6 +23,7 @@ package org.qi4j.api.mixin;
 public interface Startable
 {
     boolean start();
+
     void stop();
 }
 

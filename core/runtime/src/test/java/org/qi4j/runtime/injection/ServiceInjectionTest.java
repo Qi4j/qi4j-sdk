@@ -20,10 +20,7 @@
 
 package org.qi4j.runtime.injection;
 
-import java.io.Serializable;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.function.Predicate;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.common.Optional;
@@ -38,19 +35,18 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.service.qualifier.AnnotationQualifier;
 import org.qi4j.api.service.qualifier.IdentifiedBy;
 import org.qi4j.api.service.qualifier.Qualifier;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.ServiceDeclaration;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.*;
 
-import static org.qi4j.api.common.Visibility.application;
-import static org.qi4j.api.common.Visibility.layer;
+import java.io.Serializable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.function.Predicate;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.qi4j.api.common.Visibility.application;
+import static org.qi4j.api.common.Visibility.layer;
 
 /**
  * Test the @Service injection annotation
@@ -63,33 +59,33 @@ public class ServiceInjectionTest
     {
         SingletonAssembler assembly = new SingletonAssembler(
             module -> {
-                module.services( MyServiceComposite.class )
-                      .identifiedBy( "Foo" )
-                      .setMetaInfo( new ServiceName( "Foo" ) );
-                module.services( MyServiceComposite2.class )
-                      .identifiedBy( "Bar" )
-                      .setMetaInfo( new ServiceName( "Bar" ) );
-                module.services( StringService.class, LongService.class );
-                module.objects( ServiceUser.class );
+                module.services(MyServiceComposite.class)
+                    .identifiedBy("Foo")
+                    .setMetaInfo(new ServiceName("Foo"));
+                module.services(MyServiceComposite2.class)
+                    .identifiedBy("Bar")
+                    .setMetaInfo(new ServiceName("Bar"));
+                module.services(StringService.class, LongService.class);
+                module.objects(ServiceUser.class);
             }
         );
 
-        testInjection( assembly );
+        testInjection(assembly);
     }
 
-    private void testInjection( SingletonAssembler assembly )
+    private void testInjection(SingletonAssembler assembly)
     {
         ObjectFactory factory = assembly.module();
-        ServiceUser user = factory.newObject( ServiceUser.class );
+        ServiceUser user = factory.newObject(ServiceUser.class);
 
-        assertThat( user.testSingle(), equalTo( "X" ) );
-        assertThat( user.testIdentity(), equalTo( StringIdentity.identityOf( "Foo" ) ) );
-        assertThat( user.testServiceReference(), equalTo( "FooX" ) );
-        assertThat( user.testQualifier(), equalTo( "Bar" ) );
-        assertThat( user.testStringIterable(), equalTo( "A" ) );
-        assertThat( user.testLongIterable(), equalTo( 1L ) );
-        assertThat( user.testIterableServiceReferences(), equalTo( "FooXBarX" ) );
-        assertThat( user.testIterable(), equalTo( "XX" ) );
+        assertThat(user.testSingle(), equalTo("X"));
+        assertThat(user.testIdentity(), equalTo(StringIdentity.identityOf("Foo")));
+        assertThat(user.testServiceReference(), equalTo("FooX"));
+        assertThat(user.testQualifier(), equalTo("Bar"));
+        assertThat(user.testStringIterable(), equalTo("A"));
+        assertThat(user.testLongIterable(), equalTo(1L));
+        assertThat(user.testIterableServiceReferences(), equalTo("FooXBarX"));
+        assertThat(user.testIterable(), equalTo("XX"));
     }
 
     @Test
@@ -98,22 +94,22 @@ public class ServiceInjectionTest
     {
         SingletonAssembler assembly = new SingletonAssembler(
             module -> {
-                module.services( MyServiceComposite.class )
-                      .identifiedBy( "Foo" )
-                      .setMetaInfo( new ServiceName( "Foo" ) );
-                module.services( StringService.class, LongService.class );
-                module.objects( ServiceUser.class );
+                module.services(MyServiceComposite.class)
+                    .identifiedBy("Foo")
+                    .setMetaInfo(new ServiceName("Foo"));
+                module.services(StringService.class, LongService.class);
+                module.objects(ServiceUser.class);
 
-                ModuleAssembly module2 = module.layer().module( "Other module" );
-                ServiceDeclaration service2Decl = module2.services( MyServiceComposite.class );
-                service2Decl.identifiedBy( "Bar" ).setMetaInfo( new ServiceName( "Bar" ) ).visibleIn( layer );
+                ModuleAssembly module2 = module.layer().module("Other module");
+                ServiceDeclaration service2Decl = module2.services(MyServiceComposite.class);
+                service2Decl.identifiedBy("Bar").setMetaInfo(new ServiceName("Bar")).visibleIn(layer);
 
-                ServiceDeclaration service3Decl = module2.services( MyServiceComposite2.class );
-                service3Decl.identifiedBy( "Boo" ).setMetaInfo( new ServiceName( "Boo" ) );
+                ServiceDeclaration service3Decl = module2.services(MyServiceComposite2.class);
+                service3Decl.identifiedBy("Boo").setMetaInfo(new ServiceName("Boo"));
             }
         );
 
-        testInjection( assembly );
+        testInjection(assembly);
     }
 
     @Test
@@ -122,39 +118,39 @@ public class ServiceInjectionTest
     {
         SingletonAssembler assembly = new SingletonAssembler(
             module -> {
-                module.services( MyServiceComposite.class )
-                      .identifiedBy( "Foo" )
-                      .setMetaInfo( new ServiceName( "Foo" ) );
-                module.services( StringService.class, LongService.class );
+                module.services(MyServiceComposite.class)
+                    .identifiedBy("Foo")
+                    .setMetaInfo(new ServiceName("Foo"));
+                module.services(StringService.class, LongService.class);
                 LayerAssembly layerAssembly = module.layer();
-                module.objects( ServiceUser.class );
+                module.objects(ServiceUser.class);
 
                 ApplicationAssembly applicationAssembly = layerAssembly.application();
-                LayerAssembly layer2Assembly = applicationAssembly.layer( "Other layer" );
-                layerAssembly.uses( layer2Assembly );
+                LayerAssembly layer2Assembly = applicationAssembly.layer("Other layer");
+                layerAssembly.uses(layer2Assembly);
 
-                ModuleAssembly module2 = layer2Assembly.module( "Other module" );
+                ModuleAssembly module2 = layer2Assembly.module("Other module");
 
-                ServiceDeclaration service2Decl = module2.services( MyServiceComposite2.class );
-                service2Decl.identifiedBy( "Bar" ).setMetaInfo( new ServiceName( "Bar" ) ).visibleIn( application );
+                ServiceDeclaration service2Decl = module2.services(MyServiceComposite2.class);
+                service2Decl.identifiedBy("Bar").setMetaInfo(new ServiceName("Bar")).visibleIn(application);
             }
         );
 
-        testInjection( assembly );
+        testInjection(assembly);
     }
 
     @Test
     public void testMissingServiceDependency()
         throws ActivationException
     {
-        assertThrows( ConstructionException.class, () -> {
+        assertThrows(ConstructionException.class, () -> {
             // No service fulfils the dependency injection -> fail to create application
-            new SingletonAssembler( module -> module.objects( ServiceUser.class ) )
-                .module().newObject( ServiceUser.class );
-        } );
+            new SingletonAssembler(module -> module.objects(ServiceUser.class))
+                .module().newObject(ServiceUser.class);
+        });
     }
 
-    @Mixins( MyServiceMixin.class )
+    @Mixins(MyServiceMixin.class)
     public interface MyServiceComposite
         extends MyService, ServiceComposite
     {
@@ -203,11 +199,11 @@ public class ServiceInjectionTest
         Iterable<ServiceReference<MyService>> serviceRefs;
 
         @Service
-        @IdentifiedBy( "Bar" )
+        @IdentifiedBy("Bar")
         ServiceReference<MyService> qualifiedService;
 
         @Service
-        @IdentifiedBy( "Bar" )
+        @IdentifiedBy("Bar")
         Iterable<ServiceReference<MyService>> qualifiedServiceRefs;
 
         @Optional
@@ -233,7 +229,7 @@ public class ServiceInjectionTest
         public String testIterable()
         {
             String str = "";
-            for( MyService myService : services )
+            for(MyService myService : services)
             {
                 str += myService.doStuff();
             }
@@ -243,7 +239,7 @@ public class ServiceInjectionTest
         public String testServiceReference()
             throws ServiceImporterException
         {
-            ServiceName info = serviceRef.metaInfo( ServiceName.class );
+            ServiceName info = serviceRef.metaInfo(ServiceName.class);
             return info.getName() + serviceRef.get().doStuff();
         }
 
@@ -251,9 +247,9 @@ public class ServiceInjectionTest
             throws ServiceImporterException
         {
             String str = "";
-            for( ServiceReference<MyService> serviceReference : serviceRefs )
+            for(ServiceReference<MyService> serviceReference : serviceRefs)
             {
-                str += serviceReference.metaInfo( ServiceName.class ).getName();
+                str += serviceReference.metaInfo(ServiceName.class).getName();
                 str += serviceReference.get().doStuff();
             }
             return str;
@@ -261,15 +257,15 @@ public class ServiceInjectionTest
 
         public String testQualifier()
         {
-            return qualifiedService.metaInfo( ServiceName.class ).getName();
+            return qualifiedService.metaInfo(ServiceName.class).getName();
         }
 
         public String testQualifiedServices()
         {
             String str = "";
-            for( ServiceReference<MyService> qualifiedServiceRef : qualifiedServiceRefs )
+            for(ServiceReference<MyService> qualifiedServiceRef : qualifiedServiceRefs)
             {
-                str += qualifiedServiceRef.metaInfo( ServiceName.class ).getName();
+                str += qualifiedServiceRef.metaInfo(ServiceName.class).getName();
             }
             return str;
         }
@@ -285,8 +281,8 @@ public class ServiceInjectionTest
         }
     }
 
-    @Qualifier( NamedSelector.class )
-    @Retention( RetentionPolicy.RUNTIME )
+    @Qualifier(NamedSelector.class)
+    @Retention(RetentionPolicy.RUNTIME)
     public @interface Named
     {
         String value();
@@ -295,14 +291,14 @@ public class ServiceInjectionTest
     public static final class NamedSelector
         implements AnnotationQualifier<Named>
     {
-        public <T> Predicate<ServiceReference<?>> qualifier( final Named named )
+        public <T> Predicate<ServiceReference<?>> qualifier(final Named named)
         {
             return new Predicate<ServiceReference<?>>()
             {
-                public boolean test( ServiceReference<?> service )
+                public boolean test(ServiceReference<?> service)
                 {
-                    ServiceName serviceName = service.metaInfo( ServiceName.class );
-                    return ( serviceName != null && serviceName.getName().equals( named.value() ) );
+                    ServiceName serviceName = service.metaInfo(ServiceName.class);
+                    return (serviceName != null && serviceName.getName().equals(named.value()));
                 }
             };
         }
@@ -313,7 +309,7 @@ public class ServiceInjectionTest
     {
         private String name;
 
-        public ServiceName( String name )
+        public ServiceName(String name)
         {
             this.name = name;
         }
@@ -329,7 +325,7 @@ public class ServiceInjectionTest
         T get();
     }
 
-    @Mixins( StringService.Mixin.class )
+    @Mixins(StringService.Mixin.class)
     public interface StringService
         extends Foo<String>, ServiceComposite
     {
@@ -344,7 +340,7 @@ public class ServiceInjectionTest
         }
     }
 
-    @Mixins( LongService.Mixin.class )
+    @Mixins(LongService.Mixin.class)
     public interface LongService
         extends Foo<Long>, ServiceComposite
     {

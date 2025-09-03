@@ -19,13 +19,13 @@
  */
 package org.qi4j.constraints;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -33,19 +33,22 @@ public class ValueConstraintTest extends AbstractQi4jTest
 {
 
     @Test
-    public void testProhibitNewInstanceWithViolation() {
-        assertThrows( ConstraintViolationException.class, () -> {
-            ValueBuilder<Value1> builder = valueBuilderFactory.newValueBuilder( Value1.class );
+    public void testProhibitNewInstanceWithViolation()
+    {
+        assertThrows(ConstraintViolationException.class, () -> {
+            ValueBuilder<Value1> builder = valueBuilderFactory.newValueBuilder(Value1.class);
             builder.newInstance();
-        } );
+        });
     }
 
     public void assemble(ModuleAssembly module)
-        throws AssemblyException {
+        throws AssemblyException
+    {
         module.values(Value1.class);
     }
 
-    public interface Value1 {
+    public interface Value1
+    {
         Property<String> test();
     }
 }

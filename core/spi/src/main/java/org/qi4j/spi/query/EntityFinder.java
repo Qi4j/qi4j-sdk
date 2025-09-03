@@ -19,14 +19,15 @@
  */
 package org.qi4j.spi.query;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.query.grammar.OrderBy;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Entity Finder.
@@ -36,50 +37,50 @@ public interface EntityFinder
     /**
      * Find entities matching the query criterion.
      *
-     * @param resultType        Type that the entities must have.
-     * @param whereClause       Where clause specification.
-     * @param orderBySegments   Ordering
-     * @param firstResult       Index of the first returned entity.
-     * @param maxResults        Maximum returned entities.
-     * @param variables         Query variables
+     * @param resultType      Type that the entities must have.
+     * @param whereClause     Where clause specification.
+     * @param orderBySegments Ordering
+     * @param firstResult     Index of the first returned entity.
+     * @param maxResults      Maximum returned entities.
+     * @param variables       Query variables
      * @return Entities matching the query criterion.
      * @throws EntityFinderException on error
      */
-    Stream<EntityReference> findEntities( Class<?> resultType,
-                                          @Optional Predicate<Composite> whereClause,
-                                          @Optional List<OrderBy> orderBySegments,
-                                          @Optional Integer firstResult,
-                                          @Optional Integer maxResults,
-                                          Map<String, Object> variables )
+    Stream<EntityReference> findEntities(Class<?> resultType,
+                                         @Optional Predicate<Composite> whereClause,
+                                         @Optional List<OrderBy> orderBySegments,
+                                         @Optional Integer firstResult,
+                                         @Optional Integer maxResults,
+                                         Map<String, Object> variables)
         throws EntityFinderException;
 
     /**
      * Find a single entity matching the query criterion.
      *
-     * @param resultType    Type that the entity must have.
-     * @param whereClause   Where clause specification.
-     * @param variables     Query variables
+     * @param resultType  Type that the entity must have.
+     * @param whereClause Where clause specification.
+     * @param variables   Query variables
      * @return Single entity matching the query criterion.
      * @throws EntityFinderException on error
      */
-    EntityReference findEntity( Class<?> resultType,
-                                @Optional Predicate<Composite> whereClause,
-                                Map<String, Object> variables
+    EntityReference findEntity(Class<?> resultType,
+                               @Optional Predicate<Composite> whereClause,
+                               Map<String, Object> variables
     )
         throws EntityFinderException;
 
     /**
      * Count entities matching the query criterion.
      *
-     * @param resultType    Type that the entities must have.
-     * @param whereClause   Where clause specification.
-     * @param variables     Query variables
+     * @param resultType  Type that the entities must have.
+     * @param whereClause Where clause specification.
+     * @param variables   Query variables
      * @return Count entities matching the query criterion.
      * @throws EntityFinderException on error
      */
-    long countEntities( Class<?> resultType,
-                        @Optional Predicate<Composite> whereClause,
-                        Map<String, Object> variables
+    long countEntities(Class<?> resultType,
+                       @Optional Predicate<Composite> whereClause,
+                       Map<String, Object> variables
     )
         throws EntityFinderException;
 }

@@ -19,8 +19,6 @@
  */
 package org.qi4j.spi.entitystore.helpers;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonException;
 import jakarta.json.JsonValue;
@@ -28,6 +26,9 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.entitystore.EntityStoreException;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * JSON implementation of ManyAssociationState.
@@ -40,9 +41,9 @@ public final class JSONManyAssociationState
     private final JSONEntityState entityState;
     private final String stateName;
 
-    /* package */ JSONManyAssociationState( JakartaJsonFactories jsonFactories,
-                                            JSONEntityState entityState,
-                                            String stateName )
+    /* package */ JSONManyAssociationState(JakartaJsonFactories jsonFactories,
+                                           JSONEntityState entityState,
+                                           String stateName)
     {
         this.jsonFactories = jsonFactories;
         this.entityState = entityState;
@@ -51,8 +52,8 @@ public final class JSONManyAssociationState
 
     private JsonArray getReferences()
     {
-        JsonValue references = entityState.state().getJsonObject( JSONKeys.VALUE ).get( stateName );
-        if( references != null && references.getValueType() == JsonValue.ValueType.ARRAY )
+        JsonValue references = entityState.state().getJsonObject(JSONKeys.VALUE).get(stateName);
+        if(references != null && references.getValueType() == JsonValue.ValueType.ARRAY)
         {
             return (JsonArray) references;
         }
@@ -66,37 +67,37 @@ public final class JSONManyAssociationState
     }
 
     @Override
-    public boolean contains( EntityReference entityReference )
+    public boolean contains(EntityReference entityReference)
     {
-        return indexOfReference( entityReference.identity().toString() ) != -1;
+        return indexOfReference(entityReference.identity().toString()) != -1;
     }
 
     @Override
-    public boolean add( int idx, EntityReference entityReference )
+    public boolean add(int idx, EntityReference entityReference)
     {
         try
         {
-            if( indexOfReference( entityReference.identity().toString() ) != -1 )
+            if(indexOfReference(entityReference.identity().toString()) != -1)
             {
                 return false;
             }
-            entityState.stateCloneAddManyAssociation( idx, stateName, entityReference );
+            entityState.stateCloneAddManyAssociation(idx, stateName, entityReference);
             entityState.markUpdated();
             return true;
         }
-        catch( JsonException e )
+        catch(JsonException e)
         {
-            throw new EntityStoreException( e );
+            throw new EntityStoreException(e);
         }
     }
 
     @Override
-    public boolean remove( EntityReference entityReference )
+    public boolean remove(EntityReference entityReference)
     {
-        int refIndex = indexOfReference( entityReference.identity().toString() );
-        if( refIndex != -1 )
+        int refIndex = indexOfReference(entityReference.identity().toString());
+        if(refIndex != -1)
         {
-            entityState.stateCloneRemoveManyAssociation( stateName, entityReference );
+            entityState.stateCloneRemoveManyAssociation(stateName, entityReference);
             entityState.markUpdated();
             return true;
         }
@@ -106,18 +107,18 @@ public final class JSONManyAssociationState
     @Override
     public boolean clear()
     {
-        if( count() > 0 )
+        if(count() > 0)
         {
-            entityState.stateCloneClearManyAssociation( stateName );
+            entityState.stateCloneClearManyAssociation(stateName);
             entityState.markUpdated();
         }
         return false;
     }
 
     @Override
-    public EntityReference get( int i )
+    public EntityReference get(int i)
     {
-        return EntityReference.parseEntityReference( getReferences().getString( i ) );
+        return EntityReference.parseEntityReference(getReferences().getString(i));
     }
 
     @Override
@@ -138,11 +139,11 @@ public final class JSONManyAssociationState
             {
                 try
                 {
-                    EntityReference ref = EntityReference.parseEntityReference( getReferences().getString( idx ) );
+                    EntityReference ref = EntityReference.parseEntityReference(getReferences().getString(idx));
                     idx++;
                     return ref;
                 }
-                catch( JsonException e )
+                catch(JsonException e)
                 {
                     throw new NoSuchElementException();
                 }
@@ -151,7 +152,7 @@ public final class JSONManyAssociationState
             @Override
             public void remove()
             {
-                throw new UnsupportedOperationException( "remove() is not supported on ManyAssociation iterators." );
+                throw new UnsupportedOperationException("remove() is not supported on ManyAssociation iterators.");
             }
         };
     }
@@ -162,12 +163,12 @@ public final class JSONManyAssociationState
         return getReferences().toString();
     }
 
-    private int indexOfReference( String entityIdentityAsString )
+    private int indexOfReference(String entityIdentityAsString)
     {
         JsonArray references = getReferences();
-        for( int idx = 0; idx < references.size(); idx++ )
+        for(int idx = 0; idx < references.size(); idx++)
         {
-            if( entityIdentityAsString.equals( references.getString( idx, null ) ) )
+            if(entityIdentityAsString.equals(references.getString(idx, null)))
             {
                 return idx;
             }

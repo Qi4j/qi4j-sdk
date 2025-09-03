@@ -20,11 +20,7 @@
 
 package org.qi4j.api.constraint;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * This annotation is used by composites and mixins to declare what Constraints
@@ -33,8 +29,8 @@ import java.lang.annotation.Target;
  * Constraints implement the {@link Constraint} interface
  * </p>
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.TYPE } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE})
 @Documented
 public @interface Constraints
 {

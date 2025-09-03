@@ -19,10 +19,10 @@
  */
 package org.qi4j.bootstrap;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.mixin.NoopMixin;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,12 +35,12 @@ public class RuntimeMixinsTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.values( SayWhat.class ).withMixins( SayThisMixin.class, SayThatMixin.class )
+            module -> module.values(SayWhat.class).withMixins(SayThisMixin.class, SayThatMixin.class)
         );
 
-        SayWhat value = singletonAssembler.valueBuilderFactory().newValue( SayWhat.class );
-        assertThat( value.sayThis(), equalTo( "this" ) );
-        assertThat( value.sayThat(), equalTo( "that" ) );
+        SayWhat value = singletonAssembler.valueBuilderFactory().newValue(SayWhat.class);
+        assertThat(value.sayThis(), equalTo("this"));
+        assertThat(value.sayThat(), equalTo("that"));
     }
 
     @Test
@@ -48,11 +48,11 @@ public class RuntimeMixinsTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.values( SayWhere.class ).withMixins( SayHereMixin.class )
+            module -> module.values(SayWhere.class).withMixins(SayHereMixin.class)
         );
-        SayWhere value = singletonAssembler.valueBuilderFactory().newValue( SayWhere.class );
-        assertThat( value.sayHere(), equalTo( "here" ) );
-        assertThat( value.sayThere(), nullValue() );
+        SayWhere value = singletonAssembler.valueBuilderFactory().newValue(SayWhere.class);
+        assertThat(value.sayHere(), equalTo("here"));
+        assertThat(value.sayThere(), nullValue());
     }
 
     @Test
@@ -60,11 +60,11 @@ public class RuntimeMixinsTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.transients( SayWhat.class ).withMixins( SayThisMixin.class, SayThatMixin.class )
+            module -> module.transients(SayWhat.class).withMixins(SayThisMixin.class, SayThatMixin.class)
         );
-        SayWhat value = singletonAssembler.transientBuilderFactory().newTransient( SayWhat.class );
-        assertThat( value.sayThis(), equalTo( "this" ) );
-        assertThat( value.sayThat(), equalTo( "that" ) );
+        SayWhat value = singletonAssembler.transientBuilderFactory().newTransient(SayWhat.class);
+        assertThat(value.sayThis(), equalTo("this"));
+        assertThat(value.sayThat(), equalTo("that"));
     }
 
     @Test
@@ -72,11 +72,11 @@ public class RuntimeMixinsTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.transients( SayWhere.class ).withMixins( SayHereMixin.class )
+            module -> module.transients(SayWhere.class).withMixins(SayHereMixin.class)
         );
-        SayWhere value = singletonAssembler.transientBuilderFactory().newTransient( SayWhere.class );
-        assertThat( value.sayHere(), equalTo( "here" ) );
-        assertThat( value.sayThere(), nullValue() );
+        SayWhere value = singletonAssembler.transientBuilderFactory().newTransient(SayWhere.class);
+        assertThat(value.sayHere(), equalTo("here"));
+        assertThat(value.sayThere(), nullValue());
     }
 
     @Test
@@ -84,11 +84,11 @@ public class RuntimeMixinsTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.services( SayWhat.class ).withMixins( SayThisMixin.class, SayThatMixin.class )
+            module -> module.services(SayWhat.class).withMixins(SayThisMixin.class, SayThatMixin.class)
         );
-        SayWhat value = singletonAssembler.serviceFinder().findService( SayWhat.class ).get();
-        assertThat( value.sayThis(), equalTo( "this" ) );
-        assertThat( value.sayThat(), equalTo( "that" ) );
+        SayWhat value = singletonAssembler.serviceFinder().findService(SayWhat.class).get();
+        assertThat(value.sayThis(), equalTo("this"));
+        assertThat(value.sayThat(), equalTo("that"));
     }
 
     @Test
@@ -96,11 +96,11 @@ public class RuntimeMixinsTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.services( SayWhere.class ).withMixins( SayHereMixin.class )
+            module -> module.services(SayWhere.class).withMixins(SayHereMixin.class)
         );
-        SayWhere value = singletonAssembler.serviceFinder().findService( SayWhere.class ).get();
-        assertThat( value.sayHere(), equalTo( "here" ) );
-        assertThat( value.sayThere(), nullValue() );
+        SayWhere value = singletonAssembler.serviceFinder().findService(SayWhere.class).get();
+        assertThat(value.sayHere(), equalTo("here"));
+        assertThat(value.sayThere(), nullValue());
     }
 
     public interface SayWhat
@@ -110,7 +110,7 @@ public class RuntimeMixinsTest
         String sayThat();
     }
 
-    @Mixins( NoopMixin.class )
+    @Mixins(NoopMixin.class)
     public interface SayWhere
     {
         String sayHere();

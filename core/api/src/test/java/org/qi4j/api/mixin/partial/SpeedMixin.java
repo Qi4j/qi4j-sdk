@@ -21,11 +21,11 @@ package org.qi4j.api.mixin.partial;
 
 // START SNIPPET: partial
 public abstract class SpeedMixin
-        implements SpeedLocation
+    implements SpeedLocation
 {
     // state for speed
 
-    public void accelerate( float acceleration )
+    public void accelerate(float acceleration)
     {
         // logic
     }

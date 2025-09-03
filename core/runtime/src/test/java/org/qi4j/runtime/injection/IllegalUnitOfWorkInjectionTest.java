@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.State;
 import org.qi4j.api.mixin.Mixins;
@@ -28,7 +29,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -37,15 +37,15 @@ public class IllegalUnitOfWorkInjectionTest
 {
     private boolean failed = false;
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TrialTransient.class );
-        new EntityTestAssembler().assemble( module );
+        module.transients(TrialTransient.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Override
-    protected void assemblyException( AssemblyException exception )
+    protected void assemblyException(AssemblyException exception)
         throws AssemblyException
     {
         failed = true;
@@ -55,9 +55,9 @@ public class IllegalUnitOfWorkInjectionTest
     public void givenTransientCompositeWhenInjectingUnitOfWorkThenExpectAnInjectionException()
         throws Exception
     {
-        if( !failed )
+        if(!failed)
         {
-            fail( "Transients should not be allowed to have @State UnitOfWork injections." );
+            fail("Transients should not be allowed to have @State UnitOfWork injections.");
         }
     }
 
@@ -68,7 +68,7 @@ public class IllegalUnitOfWorkInjectionTest
         String usecaseName();
     }
 
-    @Mixins( TrialMixin.class )
+    @Mixins(TrialMixin.class)
     interface TrialTransient
         extends Trial, TransientComposite
     {

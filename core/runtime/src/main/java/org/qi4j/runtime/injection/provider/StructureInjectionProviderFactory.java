@@ -19,18 +19,13 @@
  */
 package org.qi4j.runtime.injection.provider;
 
-import java.lang.reflect.Type;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.composite.TransientBuilderFactory;
 import org.qi4j.api.object.ObjectFactory;
 import org.qi4j.api.query.QueryBuilderFactory;
 import org.qi4j.api.service.ServiceFinder;
-import org.qi4j.api.structure.Application;
-import org.qi4j.api.structure.ApplicationDescriptor;
-import org.qi4j.api.structure.Layer;
-import org.qi4j.api.structure.LayerDescriptor;
+import org.qi4j.api.structure.*;
 import org.qi4j.api.structure.Module;
-import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.api.value.ValueBuilderFactory;
 import org.qi4j.bootstrap.InvalidInjectionException;
@@ -41,14 +36,16 @@ import org.qi4j.runtime.injection.InjectionProviderFactory;
 import org.qi4j.runtime.model.Resolution;
 import org.qi4j.runtime.structure.ApplicationInstance;
 
+import java.lang.reflect.Type;
+
 public final class StructureInjectionProviderFactory
     implements InjectionProviderFactory
 {
     @Override
-    public InjectionProvider newInjectionProvider( Resolution resolution, DependencyModel dependencyModel )
+    public InjectionProvider newInjectionProvider(Resolution resolution, DependencyModel dependencyModel)
         throws InvalidInjectionException
     {
-        return new StructureInjectionProvider( dependencyModel );
+        return new StructureInjectionProvider(dependencyModel);
     }
 
     private static class StructureInjectionProvider
@@ -56,70 +53,70 @@ public final class StructureInjectionProviderFactory
     {
         private final DependencyModel dependencyModel;
 
-        private StructureInjectionProvider( DependencyModel dependencyModel )
+        private StructureInjectionProvider(DependencyModel dependencyModel)
         {
             this.dependencyModel = dependencyModel;
         }
 
         @Override
-        public Object provideInjection( InjectionContext context )
+        public Object provideInjection(InjectionContext context)
             throws InjectionProviderException
         {
             Type type1 = dependencyModel.injectionType();
-            if( !( type1 instanceof Class ) )
+            if(!(type1 instanceof Class))
             {
-                throw new InjectionProviderException( "Type [" + type1 + "] can not be injected from the @Structure injection scope: " + context );
+                throw new InjectionProviderException("Type [" + type1 + "] can not be injected from the @Structure injection scope: " + context);
             }
             Class clazz = (Class) type1;
-            if( clazz.equals( TransientBuilderFactory.class ) )
+            if(clazz.equals(TransientBuilderFactory.class))
             {
                 return context.module().instance();
             }
-            else if( clazz.equals( ObjectFactory.class ) )
+            else if(clazz.equals(ObjectFactory.class))
             {
                 return context.module().instance();
             }
-            else if( clazz.equals( ValueBuilderFactory.class ) )
+            else if(clazz.equals(ValueBuilderFactory.class))
             {
                 return context.module().instance();
             }
-            else if( clazz.equals( UnitOfWorkFactory.class ) )
+            else if(clazz.equals(UnitOfWorkFactory.class))
             {
                 return context.module().instance().unitOfWorkFactory();
             }
-            else if( clazz.equals( QueryBuilderFactory.class ) )
+            else if(clazz.equals(QueryBuilderFactory.class))
             {
                 return context.module().instance();
             }
-            else if( clazz.equals( ServiceFinder.class ) )
+            else if(clazz.equals(ServiceFinder.class))
             {
                 return context.module().instance();
             }
-            else if( Module.class.isAssignableFrom( clazz ) )
+            else if(Module.class.isAssignableFrom(clazz))
             {
                 return context.module().instance();
             }
-            else if( ModuleDescriptor.class.isAssignableFrom( clazz ) )
+            else if(ModuleDescriptor.class.isAssignableFrom(clazz))
             {
                 return context.module();
             }
-            else if( Layer.class.isAssignableFrom( clazz ) )
+            else if(Layer.class.isAssignableFrom(clazz))
             {
                 return context.module().layer().instance();
             }
-            else if( LayerDescriptor.class.isAssignableFrom( clazz ) )
+            else if(LayerDescriptor.class.isAssignableFrom(clazz))
             {
                 return context.module().layer();
             }
-            else if( Application.class.isAssignableFrom( clazz ) )
+            else if(Application.class.isAssignableFrom(clazz))
             {
                 return context.module().layer().instance().application();
             }
-            else if( ApplicationDescriptor.class.isAssignableFrom( clazz ) )
+            else if(ApplicationDescriptor.class.isAssignableFrom(clazz))
             {
                 return context.module().layer().instance().application().descriptor();
             }
-            else if( Qi4jAPI.class.isAssignableFrom( clazz ) )
+            else if(Qi4jAPI.class.isAssignableFrom(clazz))
             {
                 return ((ApplicationInstance) context.module().layer().instance().application()).runtime();
             }

@@ -30,7 +30,7 @@ import org.qi4j.api.identity.HasIdentity;
  * per service instance that uses each ConfigurationComposite, and the reference of the entity is the same as that
  * of the service.
  */
-@Queryable( false )
+@Queryable(false)
 public interface ConfigurationComposite
     extends HasIdentity, Composite
 {

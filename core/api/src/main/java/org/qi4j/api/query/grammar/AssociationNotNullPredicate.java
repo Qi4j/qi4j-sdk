@@ -21,8 +21,6 @@ package org.qi4j.api.query.grammar;
 
 import org.qi4j.api.association.Association;
 import org.qi4j.api.composite.Composite;
-import org.qi4j.api.association.Association;
-import org.qi4j.api.composite.Composite;
 
 /**
  * Association not null Specification.
@@ -32,7 +30,7 @@ public class AssociationNotNullPredicate<T>
 {
     private AssociationFunction<T> association;
 
-    public AssociationNotNullPredicate( AssociationFunction<T> association )
+    public AssociationNotNullPredicate(AssociationFunction<T> association)
     {
         this.association = association;
     }
@@ -43,20 +41,20 @@ public class AssociationNotNullPredicate<T>
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
         try
         {
-            Association<T> assoc = association.apply( item );
+            Association<T> assoc = association.apply(item);
 
-            if( assoc == null )
+            if(assoc == null)
             {
                 return false;
             }
 
             return assoc.get() != null;
         }
-        catch( IllegalArgumentException e )
+        catch(IllegalArgumentException e)
         {
             return false;
         }

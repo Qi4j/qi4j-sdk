@@ -20,14 +20,15 @@
 
 package org.qi4j.api.service.qualifier;
 
+import org.qi4j.api.service.ServiceReference;
+
 import java.lang.annotation.Annotation;
 import java.util.function.Predicate;
-import org.qi4j.api.service.ServiceReference;
 
 /**
  * Constructs a Specification for a given qualifier annotation
  */
 public interface AnnotationQualifier<QUALIFIER extends Annotation>
 {
-    <T> Predicate<ServiceReference<?>> qualifier( QUALIFIER qualifier );
+    <T> Predicate<ServiceReference<?>> qualifier(QUALIFIER qualifier);
 }

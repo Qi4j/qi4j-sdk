@@ -36,8 +36,7 @@ public interface Constraint<ANNOTATION extends Annotation, TYPE>
      *
      * @param annotation the annotation to match
      * @param value      the value to be checked
-     *
      * @return true if valid, false if invalid
      */
-    boolean isValid( ANNOTATION annotation, TYPE value );
+    boolean isValid(ANNOTATION annotation, TYPE value);
 }

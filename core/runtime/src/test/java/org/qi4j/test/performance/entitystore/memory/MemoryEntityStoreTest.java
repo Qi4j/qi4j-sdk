@@ -20,17 +20,12 @@
 
 package org.qi4j.test.performance.entitystore.memory;
 
-import org.qi4j.bootstrap.AssemblyException;
+import org.qi4j.bootstrap.ImportedServiceDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entitystore.StateChangeListener;
 import org.qi4j.test.entity.AbstractEntityStoreTest;
-import org.qi4j.bootstrap.ImportedServiceDeclaration;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.test.entity.AbstractEntityStoreTest;
-
-import static org.qi4j.bootstrap.ImportedServiceDeclaration.NEW_OBJECT;
 
 /**
  * Test of MemoryEntityStoreService
@@ -39,14 +34,14 @@ public class MemoryEntityStoreTest
     extends AbstractEntityStoreTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws Exception
     {
-        super.assemble( module );
+        super.assemble(module);
 
-        module.services( MemoryEntityStoreService.class );
-        module.importedServices( StatePrinter.class ).importedBy( ImportedServiceDeclaration.NEW_OBJECT );
-        module.objects( StatePrinter.class );
+        module.services(MemoryEntityStoreService.class);
+        module.importedServices(StatePrinter.class).importedBy(ImportedServiceDeclaration.NEW_OBJECT);
+        module.objects(StatePrinter.class);
 
         module.defaultServices();
     }
@@ -54,11 +49,11 @@ public class MemoryEntityStoreTest
     private static class StatePrinter
         implements StateChangeListener
     {
-        public void notifyChanges( Iterable<EntityState> changedStates )
+        public void notifyChanges(Iterable<EntityState> changedStates)
         {
-            for( EntityState changedState : changedStates )
+            for(EntityState changedState : changedStates)
             {
-                System.out.println( changedState.status().name() + ":" + changedState.entityReference() );
+                System.out.println(changedState.status().name() + ":" + changedState.entityReference());
             }
         }
     }

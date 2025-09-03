@@ -20,11 +20,6 @@
 
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.injection.scope.This;
@@ -34,12 +29,13 @@ import org.qi4j.api.mixin.MixinDescriptor;
 import org.qi4j.api.property.StateHolder;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
-import org.qi4j.runtime.injection.Dependencies;
-import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.InjectedFieldsModel;
-import org.qi4j.runtime.injection.InjectedMethodsModel;
-import org.qi4j.runtime.injection.InjectionContext;
 import org.qi4j.runtime.injection.*;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -54,14 +50,14 @@ public final class MixinModel
     private final InjectedMethodsModel injectedMethodsModel;
     private final List<Class<?>> thisMixinTypes;
 
-    public MixinModel( Class<?> declaredMixinClass, Class<?> instantiationClass )
+    public MixinModel(Class<?> declaredMixinClass, Class<?> instantiationClass)
     {
-        injectedFieldsModel = new InjectedFieldsModel( declaredMixinClass );
-        injectedMethodsModel = new InjectedMethodsModel( declaredMixinClass );
+        injectedFieldsModel = new InjectedFieldsModel(declaredMixinClass);
+        injectedMethodsModel = new InjectedMethodsModel(declaredMixinClass);
 
         this.mixinClass = declaredMixinClass;
         this.instantiationClass = instantiationClass;
-        constructorsModel = new ConstructorsModel( instantiationClass );
+        constructorsModel = new ConstructorsModel(instantiationClass);
 
         thisMixinTypes = buildThisMixinTypes();
     }
@@ -79,72 +75,72 @@ public final class MixinModel
 
     public boolean isGeneric()
     {
-        return InvocationHandler.class.isAssignableFrom( mixinClass );
+        return InvocationHandler.class.isAssignableFrom(mixinClass);
     }
 
     public Stream<DependencyModel> dependencies()
     {
-        Stream<? extends Dependencies> models = Stream.of( constructorsModel, injectedFieldsModel, injectedMethodsModel );
-        return models.flatMap( Dependencies::dependencies );
+        Stream<? extends Dependencies> models = Stream.of(constructorsModel, injectedFieldsModel, injectedMethodsModel);
+        return models.flatMap(Dependencies::dependencies);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            if( constructorsModel.accept( visitor ) )
+            if(constructorsModel.accept(visitor))
             {
-                if( injectedFieldsModel.accept( visitor ) )
+                if(injectedFieldsModel.accept(visitor))
                 {
-                    injectedMethodsModel.accept( visitor );
+                    injectedMethodsModel.accept(visitor);
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
     // Context
-    public Object newInstance( CompositeInstance compositeInstance, StateHolder state, UsesInstance uses )
+    public Object newInstance(CompositeInstance compositeInstance, StateHolder state, UsesInstance uses)
     {
-        InjectionContext injectionContext = new InjectionContext( compositeInstance, uses, state );
-        return newInstance( injectionContext );
+        InjectionContext injectionContext = new InjectionContext(compositeInstance, uses, state);
+        return newInstance(injectionContext);
     }
 
-    public Object newInstance( InjectionContext injectionContext )
+    public Object newInstance(InjectionContext injectionContext)
     {
         Object mixin;
         CompositeInstance compositeInstance = injectionContext.compositeInstance();
 
-        mixin = constructorsModel.newInstance( injectionContext );
+        mixin = constructorsModel.newInstance(injectionContext);
 
-        if( FragmentClassLoader.isGenerated( instantiationClass ) )
+        if(FragmentClassLoader.isGenerated(instantiationClass))
         {
             try
             {
-                instantiationClass.getDeclaredField( "_instance" ).set( mixin,
-                                                                        injectionContext.compositeInstance() );
+                instantiationClass.getDeclaredField("_instance").set(mixin,
+                    injectionContext.compositeInstance());
             }
-            catch( IllegalAccessException | NoSuchFieldException e )
+            catch(IllegalAccessException | NoSuchFieldException e)
             {
                 e.printStackTrace();
             }
         }
 
-        injectedFieldsModel.inject( injectionContext, mixin );
-        injectedMethodsModel.inject( injectionContext, mixin );
-        if( mixin instanceof Initializable )
+        injectedFieldsModel.inject(injectionContext, mixin);
+        injectedMethodsModel.inject(injectionContext, mixin);
+        if(mixin instanceof Initializable)
         {
             try
             {
-                ( (Initializable) mixin ).initialize();
+                ((Initializable) mixin).initialize();
             }
-            catch( Exception e )
+            catch(Exception e)
             {
-                List<Class<?>> compositeType = compositeInstance.types().collect( Collectors.toList() );
+                List<Class<?>> compositeType = compositeInstance.types().collect(Collectors.toList());
                 String message = "Unable to initialize " + mixinClass + " in composite " + compositeType;
-                throw new ConstructionException( new InitializationException( message, e ) );
+                throw new ConstructionException(new InitializationException(message, e));
             }
         }
         return mixin;
@@ -158,16 +154,16 @@ public final class MixinModel
     private List<Class<?>> buildThisMixinTypes()
     {
         return dependencies()
-            .filter( new DependencyModel.ScopeSpecification( This.class ) )
+            .filter(new DependencyModel.ScopeSpecification(This.class))
             .distinct()
-            .map( DependencyModel::rawInjectionType )
-            .collect( Collectors.toList() );
+            .map(DependencyModel::rawInjectionType)
+            .collect(Collectors.toList());
     }
 
-    protected FragmentInvocationHandler newInvocationHandler( Method method )
+    protected FragmentInvocationHandler newInvocationHandler(Method method)
     {
-        if( InvocationHandler.class.isAssignableFrom( mixinClass )
-            && !method.getDeclaringClass().isAssignableFrom( mixinClass ) )
+        if(InvocationHandler.class.isAssignableFrom(mixinClass)
+            && !method.getDeclaringClass().isAssignableFrom(mixinClass))
         {
             return new GenericFragmentInvocationHandler();
         }

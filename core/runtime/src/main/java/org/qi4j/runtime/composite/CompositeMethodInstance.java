@@ -35,9 +35,9 @@ public final class CompositeMethodInstance
 
     private CompositeMethodInstance next;
 
-    public CompositeMethodInstance( InvocationHandler invoker,
-                                    FragmentInvocationHandler mixinInvoker,
-                                    Method method, int methodIdx
+    public CompositeMethodInstance(InvocationHandler invoker,
+                                   FragmentInvocationHandler mixinInvoker,
+                                   Method method, int methodIdx
     )
     {
         this.invoker = invoker;
@@ -51,23 +51,23 @@ public final class CompositeMethodInstance
         return method;
     }
 
-    public Object getMixinFrom( Object[] mixins )
+    public Object getMixinFrom(Object[] mixins)
     {
-        return mixins[ methodIdx ];
+        return mixins[methodIdx];
     }
 
-    public Object invoke( Object composite, Object[] params, Object mixin )
+    public Object invoke(Object composite, Object[] params, Object mixin)
         throws Throwable
     {
-        mixinInvoker.setFragment( mixin );
+        mixinInvoker.setFragment(mixin);
 
         try
         {
-            return invoker.invoke( composite, method, params );
+            return invoker.invoke(composite, method, params);
         }
         finally
         {
-            mixinInvoker.setFragment( null );
+            mixinInvoker.setFragment(null);
         }
     }
 
@@ -76,7 +76,7 @@ public final class CompositeMethodInstance
         return next;
     }
 
-    public void setNext( CompositeMethodInstance next )
+    public void setNext(CompositeMethodInstance next)
     {
         this.next = next;
     }

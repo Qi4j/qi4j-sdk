@@ -20,6 +20,12 @@
 
 package org.qi4j.runtime.injection;
 
+import org.qi4j.api.injection.InjectionScope;
+import org.qi4j.api.util.Classes;
+import org.qi4j.api.util.Fields;
+import org.qi4j.api.util.HierarchicalVisitor;
+import org.qi4j.api.util.VisitableHierarchy;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -30,11 +36,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
-import org.qi4j.api.injection.InjectionScope;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.util.Fields;
-import org.qi4j.api.util.HierarchicalVisitor;
-import org.qi4j.api.util.VisitableHierarchy;
 
 import static org.qi4j.api.util.Annotations.typeHasAnnotation;
 
@@ -46,72 +47,72 @@ public final class InjectedFieldsModel
 {
     private final List<InjectedFieldModel> fields = new ArrayList<>();
 
-    public InjectedFieldsModel( Class fragmentClass )
+    public InjectedFieldsModel(Class fragmentClass)
     {
-        Fields.fieldsOf( fragmentClass ).forEach( field ->
-            Arrays.stream( field.getAnnotations() )
-                  .filter( typeHasAnnotation( InjectionScope.class ) )
-                  .filter( Objects::nonNull )
-                  .forEach( injectionAnnotation ->  addModel( fragmentClass, field, injectionAnnotation )
-            )
+        Fields.fieldsOf(fragmentClass).forEach(field ->
+            Arrays.stream(field.getAnnotations())
+                .filter(typeHasAnnotation(InjectionScope.class))
+                .filter(Objects::nonNull)
+                .forEach(injectionAnnotation -> addModel(fragmentClass, field, injectionAnnotation)
+                )
         );
     }
 
-    private void addModel( Class fragmentClass, Field field, Annotation injectionAnnotation )
+    private void addModel(Class fragmentClass, Field field, Annotation injectionAnnotation)
     {
         Type genericType = field.getGenericType();
-        if( genericType instanceof ParameterizedType )
+        if(genericType instanceof ParameterizedType)
         {
-            Type[] actualTypeArguments = ( (ParameterizedType) genericType ).getActualTypeArguments();
-            Type rawType = ( (ParameterizedType) genericType ).getRawType();
-            Type ownerType = ( (ParameterizedType) genericType ).getOwnerType();
-            genericType = new ParameterizedTypeInstance( actualTypeArguments, rawType, ownerType );
+            Type[] actualTypeArguments = ((ParameterizedType) genericType).getActualTypeArguments();
+            Type rawType = ((ParameterizedType) genericType).getRawType();
+            Type ownerType = ((ParameterizedType) genericType).getOwnerType();
+            genericType = new ParameterizedTypeInstance(actualTypeArguments, rawType, ownerType);
 
-            for( int i = 0; i < actualTypeArguments.length; i++ )
+            for(int i = 0; i < actualTypeArguments.length; i++)
             {
-                Type type = actualTypeArguments[ i ];
-                if( type instanceof TypeVariable )
+                Type type = actualTypeArguments[i];
+                if(type instanceof TypeVariable)
                 {
-                    type = Classes.resolveTypeVariable( (TypeVariable) type, field.getDeclaringClass(), fragmentClass );
-                    actualTypeArguments[ i ] = type;
+                    type = Classes.resolveTypeVariable((TypeVariable) type, field.getDeclaringClass(), fragmentClass);
+                    actualTypeArguments[i] = type;
                 }
             }
         }
 
-        boolean optional = DependencyModel.isOptional( injectionAnnotation, field.getAnnotations() );
-        DependencyModel dependencyModel = new DependencyModel( injectionAnnotation, genericType, fragmentClass, optional, field.getAnnotations() );
-        InjectedFieldModel injectedFieldModel = new InjectedFieldModel( field, dependencyModel );
-        this.fields.add( injectedFieldModel );
+        boolean optional = DependencyModel.isOptional(injectionAnnotation, field.getAnnotations());
+        DependencyModel dependencyModel = new DependencyModel(injectionAnnotation, genericType, fragmentClass, optional, field.getAnnotations());
+        InjectedFieldModel injectedFieldModel = new InjectedFieldModel(field, dependencyModel);
+        this.fields.add(injectedFieldModel);
     }
 
     @Override
     public Stream<DependencyModel> dependencies()
     {
-        return fields.stream().flatMap( Dependencies::dependencies );
+        return fields.stream().flatMap(Dependencies::dependencies);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            for( InjectedFieldModel field : fields )
+            for(InjectedFieldModel field : fields)
             {
-                if( !field.accept( modelVisitor ) )
+                if(!field.accept(modelVisitor))
                 {
                     break;
                 }
             }
         }
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
 
-    public void inject( InjectionContext context, Object instance )
+    public void inject(InjectionContext context, Object instance)
     {
-        for( InjectedFieldModel field : fields )
+        for(InjectedFieldModel field : fields)
         {
-            field.inject( context, instance );
+            field.inject(context, instance);
         }
     }
 }

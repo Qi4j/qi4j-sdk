@@ -27,6 +27,6 @@ import org.qi4j.api.constraint.ConstraintViolationException;
  */
 public interface ConstraintsCheck
 {
-    void checkConstraints( Object value )
+    void checkConstraints(Object value)
         throws ConstraintViolationException;
 }

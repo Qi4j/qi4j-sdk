@@ -20,33 +20,28 @@
 
 package org.qi4j.api.service;
 
-import java.util.stream.Collectors;
+import org.qi4j.api.composite.CompositeDescriptor;
+import org.qi4j.api.composite.NoSuchCompositeTypeException;
+import org.qi4j.api.structure.ModuleDescriptor;
+import org.qi4j.api.structure.TypeLookup;
+
 import java.util.stream.Stream;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.composite.ModelDescriptor;
-import org.qi4j.api.composite.NoSuchCompositeTypeException;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.structure.TypeLookup;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.composite.NoSuchCompositeTypeException;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.structure.TypeLookup;
 
 /**
  * Thrown when no visible service of the requested type is found.
  */
 public class NoSuchServiceTypeException extends NoSuchCompositeTypeException
 {
-    public NoSuchServiceTypeException( String typeName, ModuleDescriptor module )
+    public NoSuchServiceTypeException(String typeName, ModuleDescriptor module)
     {
-        super( "ServiceComposite", typeName, module );
+        super("ServiceComposite", typeName, module);
     }
 
     @Override
-    protected Stream<? extends CompositeDescriptor> descriptors(TypeLookup typeLookup )
+    protected Stream<? extends CompositeDescriptor> descriptors(TypeLookup typeLookup)
     {
         return typeLookup.allServices()
-                         .filter( descriptor -> descriptor instanceof ServiceDescriptor )
-                         .map( descriptor -> (ServiceDescriptor) descriptor );
+            .filter(descriptor -> descriptor instanceof ServiceDescriptor)
+            .map(descriptor -> (ServiceDescriptor) descriptor);
     }
 }

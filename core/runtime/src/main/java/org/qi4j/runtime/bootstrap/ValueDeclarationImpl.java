@@ -22,7 +22,6 @@ package org.qi4j.runtime.bootstrap;
 
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.ValueDeclaration;
-import org.qi4j.bootstrap.ValueDeclaration;
 
 import static java.util.Arrays.asList;
 
@@ -34,25 +33,25 @@ public final class ValueDeclarationImpl
 {
     private final Iterable<ValueAssemblyImpl> assemblies;
 
-    public ValueDeclarationImpl( Iterable<ValueAssemblyImpl> assemblies )
+    public ValueDeclarationImpl(Iterable<ValueAssemblyImpl> assemblies)
     {
         this.assemblies = assemblies;
     }
 
     @Override
-    public ValueDeclaration setMetaInfo( Object info )
+    public ValueDeclaration setMetaInfo(Object info)
     {
-        for( ValueAssemblyImpl assembly : assemblies )
+        for(ValueAssemblyImpl assembly : assemblies)
         {
-            assembly.metaInfo.set( info );
+            assembly.metaInfo.set(info);
         }
         return this;
     }
 
     @Override
-    public ValueDeclaration visibleIn( Visibility visibility )
+    public ValueDeclaration visibleIn(Visibility visibility)
     {
-        for( ValueAssemblyImpl assembly : assemblies )
+        for(ValueAssemblyImpl assembly : assemblies)
         {
             assembly.visibility = visibility;
         }
@@ -60,41 +59,41 @@ public final class ValueDeclarationImpl
     }
 
     @Override
-    public ValueDeclaration withConcerns( Class<?>... concerns )
+    public ValueDeclaration withConcerns(Class<?>... concerns)
     {
-        for( ValueAssemblyImpl assembly : assemblies )
+        for(ValueAssemblyImpl assembly : assemblies)
         {
-            assembly.concerns.addAll( asList( concerns ) );
+            assembly.concerns.addAll(asList(concerns));
         }
         return this;
     }
 
     @Override
-    public ValueDeclaration withSideEffects( Class<?>... sideEffects )
+    public ValueDeclaration withSideEffects(Class<?>... sideEffects)
     {
-        for( ValueAssemblyImpl assembly : assemblies )
+        for(ValueAssemblyImpl assembly : assemblies)
         {
-            assembly.sideEffects.addAll( asList( sideEffects ) );
+            assembly.sideEffects.addAll(asList(sideEffects));
         }
         return this;
     }
 
     @Override
-    public ValueDeclaration withMixins( Class<?>... mixins )
+    public ValueDeclaration withMixins(Class<?>... mixins)
     {
-        for( ValueAssemblyImpl assembly : assemblies )
+        for(ValueAssemblyImpl assembly : assemblies)
         {
-            assembly.mixins.addAll( asList( mixins ) );
+            assembly.mixins.addAll(asList(mixins));
         }
         return this;
     }
 
     @Override
-    public ValueDeclaration withTypes( Class<?>... types )
+    public ValueDeclaration withTypes(Class<?>... types)
     {
-        for( ValueAssemblyImpl assembly : assemblies )
+        for(ValueAssemblyImpl assembly : assemblies)
         {
-            assembly.types.addAll( asList( types ) );
+            assembly.types.addAll(asList(types));
         }
         return this;
     }

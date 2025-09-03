@@ -19,13 +19,13 @@
  */
 package org.qi4j.runtime.instantiation;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -33,22 +33,22 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class TransientInstantiationTests
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( MyTransient.class );
+        module.transients(MyTransient.class);
     }
 
     @Test
     public void whenCreatingServiceCompositeGivenAServiceCompositeThenSucceed()
         throws Exception
     {
-        TransientBuilder<My> builder = transientBuilderFactory.newTransientBuilder( My.class );
+        TransientBuilder<My> builder = transientBuilderFactory.newTransientBuilder(My.class);
         My my = builder.newInstance();
-        assertThat( my.doSomething(), equalTo( "Niclas" ) );
+        assertThat(my.doSomething(), equalTo("Niclas"));
     }
 
-    @Mixins( MyMixin.class )
+    @Mixins(MyMixin.class)
     public interface MyTransient
         extends TransientComposite, My
     {

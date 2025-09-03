@@ -19,9 +19,10 @@
  */
 package org.qi4j.api.injection.scope;
 
-import java.lang.annotation.Annotation;
-import org.qi4j.api.common.Optional;
 import org.junit.jupiter.api.Test;
+import org.qi4j.api.common.Optional;
+
+import java.lang.annotation.Annotation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -38,10 +39,10 @@ public class ThisTest
     public void retention()
         throws NoSuchFieldException
     {
-        Annotation[] annotations = Annotated.class.getDeclaredField( "uses" ).getDeclaredAnnotations();
-        assertThat( "annotations should not be null", annotations, notNullValue() );
-        assertThat( "number of annotations", annotations.length, equalTo( 1 ) );
-        assertThat( "annotation type", annotations[ 0 ].annotationType(), equalTo( This.class ) );
+        Annotation[] annotations = Annotated.class.getDeclaredField("uses").getDeclaredAnnotations();
+        assertThat("annotations should not be null", annotations, notNullValue());
+        assertThat("number of annotations", annotations.length, equalTo(1));
+        assertThat("annotation type", annotations[0].annotationType(), equalTo(This.class));
     }
 
     private static class Annotated

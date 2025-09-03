@@ -19,12 +19,6 @@
  */
 package org.qi4j.api.unitofwork;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.association.NamedAssociation;
@@ -41,6 +35,13 @@ import org.qi4j.api.query.QueryBuilder;
 import org.qi4j.api.structure.MetaInfoHolder;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.usecase.Usecase;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * All operations on entities goes through an UnitOfWork.
@@ -133,7 +134,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      *
      * @param metaInfo The metaInfo object that can be retrieved with {@link UnitOfWork#metaInfo(Class)}.
      */
-    void setMetaInfo( Object metaInfo );
+    void setMetaInfo(Object metaInfo);
 
     /**
      * Creates a {@link Query} from the given {@link QueryBuilder} on this {@code UnitOfWork}.
@@ -142,7 +143,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @param <T>          The resulting type of the query.
      * @return A Query against this {@code UnitOfWork}
      */
-    <T> Query<T> newQuery( QueryBuilder<T> queryBuilder );
+    <T> Query<T> newQuery(QueryBuilder<T> queryBuilder);
 
     /**
      * Create a new Entity which implements the given mixin type.
@@ -163,7 +164,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @throws AmbiguousTypeException    If several mixins implement the given type
      * @throws LifecycleException        if the entity cannot be created
      */
-    <T> T newEntity( Class<T> type )
+    <T> T newEntity(Class<T> type)
         throws NoSuchEntityTypeException, AmbiguousTypeException, LifecycleException;
 
     /**
@@ -180,7 +181,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @throws AmbiguousTypeException    If several mixins implement the given type
      * @throws LifecycleException        if the entity cannot be created
      */
-    <T> T newEntity( Class<T> type, @Optional Identity identity )
+    <T> T newEntity(Class<T> type, @Optional Identity identity)
         throws NoSuchEntityTypeException, AmbiguousTypeException, LifecycleException;
 
     /**
@@ -195,7 +196,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @throws NoSuchEntityTypeException if no EntityComposite type of the given mixin type has been registered
      * @throws AmbiguousTypeException    If several mixins implement the given type
      */
-    <T> EntityBuilder<T> newEntityBuilder( Class<T> type )
+    <T> EntityBuilder<T> newEntityBuilder(Class<T> type)
         throws NoSuchEntityTypeException, AmbiguousTypeException;
 
     /**
@@ -211,7 +212,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @throws NoSuchEntityTypeException if no EntityComposite type of the given mixin type has been registered
      * @throws AmbiguousTypeException    If several mixins implement the given type
      */
-    <T> EntityBuilder<T> newEntityBuilder( Class<T> type, @Optional Identity identity )
+    <T> EntityBuilder<T> newEntityBuilder(Class<T> type, @Optional Identity identity)
         throws NoSuchEntityTypeException, AmbiguousTypeException;
 
     /**
@@ -231,12 +232,12 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @throws NoSuchEntityTypeException if no EntityComposite type of the given mixin type has been registered
      * @throws AmbiguousTypeException    If several mixins implement the given type
      */
-    <T> EntityBuilder<T> newEntityBuilderWithState( Class<T> type,
-                                                    Function<PropertyDescriptor, Object> propertyFunction,
-                                                    Function<AssociationDescriptor, EntityReference> associationFunction,
-                                                    Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
-                                                    Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction
-                                                  )
+    <T> EntityBuilder<T> newEntityBuilderWithState(Class<T> type,
+                                                   Function<PropertyDescriptor, Object> propertyFunction,
+                                                   Function<AssociationDescriptor, EntityReference> associationFunction,
+                                                   Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
+                                                   Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction
+    )
         throws NoSuchEntityTypeException, AmbiguousTypeException;
 
     /**
@@ -257,12 +258,12 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @throws NoSuchEntityTypeException If no mixins implements the given type
      * @throws AmbiguousTypeException    If several mixins implement the given type
      */
-    <T> EntityBuilder<T> newEntityBuilderWithState( Class<T> type, @Optional Identity identity,
-                                                    Function<PropertyDescriptor, Object> propertyFunction,
-                                                    Function<AssociationDescriptor, EntityReference> associationFunction,
-                                                    Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
-                                                    Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction
-                                                  )
+    <T> EntityBuilder<T> newEntityBuilderWithState(Class<T> type, @Optional Identity identity,
+                                                   Function<PropertyDescriptor, Object> propertyFunction,
+                                                   Function<AssociationDescriptor, EntityReference> associationFunction,
+                                                   Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
+                                                   Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction
+    )
         throws NoSuchEntityTypeException, AmbiguousTypeException;
 
     /**
@@ -276,7 +277,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @throws NoSuchEntityTypeException if no entity type could be found
      * @throws NoSuchEntityException     if the entity could not be found
      */
-    <T> T get( Class<T> type, Identity identity )
+    <T> T get(Class<T> type, Identity identity)
         throws NoSuchEntityTypeException, NoSuchEntityException;
 
     /**
@@ -289,7 +290,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @return an Entity from this UnitOfWork
      * @throws NoSuchEntityTypeException if no entity type could be found
      */
-    <T> T get( T entity )
+    <T> T get(T entity)
         throws NoSuchEntityTypeException;
 
     /**
@@ -298,7 +299,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @param entity the Entity to be removed.
      * @throws LifecycleException if the entity could not be removed
      */
-    void remove( Object entity )
+    void remove(Object entity)
         throws LifecycleException;
 
     /**
@@ -366,7 +367,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      *
      * @param callback a callback to be registered with this UnitOfWork
      */
-    void addUnitOfWorkCallback( UnitOfWorkCallback callback );
+    void addUnitOfWorkCallback(UnitOfWorkCallback callback);
 
     /**
      * Unregister a callback. Callbacks are invoked when the UnitOfWork
@@ -374,7 +375,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      *
      * @param callback a callback to be unregistered with this UnitOfWork
      */
-    void removeUnitOfWorkCallback( UnitOfWorkCallback callback );
+    void removeUnitOfWorkCallback(UnitOfWorkCallback callback);
 
     /**
      * Converts the provided Entity to a Value of the same type.
@@ -410,7 +411,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @param entityComposite The entity to be convered.
      * @return The Value
      */
-    <T extends HasIdentity> T toValue( Class<T> primaryType, T entityComposite );
+    <T extends HasIdentity> T toValue(Class<T> primaryType, T entityComposite);
 
     /**
      * Converts all the entities referenced in the ManyAssociation into a List of values of the same type.
@@ -430,7 +431,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @return A List of ValueComposites that has been converted from EntityComposites referenced by the Associations.
      * @see #toValue(Class, HasIdentity)
      */
-    <T extends HasIdentity> List<T> toValueList( ManyAssociation<T> association );
+    <T extends HasIdentity> List<T> toValueList(ManyAssociation<T> association);
 
     /**
      * Converts all the entities referenced in the ManyAssociation into a Set of values of the same type.
@@ -451,7 +452,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @return A List of ValueComposites that has been converted from EntityComposites referenced by the Associations.
      * @see #toValue(Class, HasIdentity)
      */
-    <T extends HasIdentity> Set<T> toValueSet( ManyAssociation<T> association );
+    <T extends HasIdentity> Set<T> toValueSet(ManyAssociation<T> association);
 
     /**
      * Converts the {@link NamedAssociation} into a Map with a String key and a ValueComposite as the value.
@@ -471,7 +472,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @return A List of ValueComposites that has been converted from EntityComposites referenced by the Associations.
      * @see #toValue(Class, HasIdentity)
      */
-    <T extends HasIdentity> Map<String, T> toValueMap( NamedAssociation<T> association );
+    <T extends HasIdentity> Map<String, T> toValueMap(NamedAssociation<T> association);
 
     /**
      * Converts the provided Value to an Entity of the same type.
@@ -514,7 +515,7 @@ public interface UnitOfWork extends MetaInfoHolder, AutoCloseable
      * @param valueComposite The Value to be convered into an Entity.
      * @return The new or updated Entity
      */
-    <T extends HasIdentity> T toEntity( Class<T> primaryType, T valueComposite );
+    <T extends HasIdentity> T toEntity(Class<T> primaryType, T valueComposite);
 
     /**
      * The Module of the UnitOfWork is defined as the Module the UnitOfWorkFactory belonged to from where the

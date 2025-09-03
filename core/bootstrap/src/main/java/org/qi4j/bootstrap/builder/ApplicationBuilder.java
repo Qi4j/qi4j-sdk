@@ -19,13 +19,6 @@
  */
 package org.qi4j.bootstrap.builder;
 
-import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
@@ -41,6 +34,10 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.bootstrap.LayerAssembly;
 
+import java.io.InputStream;
+import java.io.StringReader;
+import java.util.*;
+
 /**
  * Application Builder.
  */
@@ -55,32 +52,32 @@ public class ApplicationBuilder
     private final Map<String, LayerDeclaration> layers = new HashMap<>();
     private final List<ActivationEventListener> activationListeners = new ArrayList<>();
 
-    public ApplicationBuilder( String applicationName )
+    public ApplicationBuilder(String applicationName)
     {
         this.applicationName = applicationName;
     }
 
-    public ApplicationBuilder version( String version )
+    public ApplicationBuilder version(String version)
     {
         applicationVersion = version;
         return this;
     }
 
-    public ApplicationBuilder mode( Application.Mode mode )
+    public ApplicationBuilder mode(Application.Mode mode)
     {
         applicationMode = mode;
         return this;
     }
 
-    public ApplicationBuilder metaInfo( Object... metaInfos )
+    public ApplicationBuilder metaInfo(Object... metaInfos)
     {
-        Collections.addAll( this.metaInfos, metaInfos );
+        Collections.addAll(this.metaInfos, metaInfos);
         return this;
     }
 
     /**
      * Register a JVM shutdown hook that passivate the Application.
-     *
+     * <p>
      * The hook is registered after activating the Application and before {@link #afterActivation()}.
      *
      * @return This builder
@@ -93,51 +90,52 @@ public class ApplicationBuilder
 
     /**
      * Create and activate a new Application.
+     *
      * @return Activated Application
-     * @throws AssemblyException if the assembly failed
+     * @throws AssemblyException   if the assembly failed
      * @throws ActivationException if the activation failed
      */
     public Application newApplication()
         throws AssemblyException, ActivationException
     {
         Energy4Java qi4j = new Energy4Java();
-        ApplicationDescriptor model = qi4j.newApplicationModel( factory -> {
+        ApplicationDescriptor model = qi4j.newApplicationModel(factory -> {
             ApplicationAssembly assembly = factory.newApplicationAssembly();
-            assembly.setName( applicationName );
-            if( applicationVersion != null )
+            assembly.setName(applicationName);
+            if(applicationVersion != null)
             {
-                assembly.setVersion( applicationVersion );
+                assembly.setVersion(applicationVersion);
             }
-            if( applicationMode != null )
+            if(applicationMode != null)
             {
-                assembly.setMode( applicationMode );
+                assembly.setMode(applicationMode);
             }
-            for( Object metaInfo : metaInfos )
+            for(Object metaInfo : metaInfos)
             {
-                assembly.setMetaInfo( metaInfo );
+                assembly.setMetaInfo(metaInfo);
             }
             HashMap<String, LayerAssembly> createdLayers = new HashMap<>();
-            for( Map.Entry<String, LayerDeclaration> entry : layers.entrySet() )
+            for(Map.Entry<String, LayerDeclaration> entry : layers.entrySet())
             {
-                LayerAssembly layer = entry.getValue().createLayer( assembly );
-                createdLayers.put( entry.getKey(), layer );
+                LayerAssembly layer = entry.getValue().createLayer(assembly);
+                createdLayers.put(entry.getKey(), layer);
             }
-            for( LayerDeclaration layer : layers.values() )
+            for(LayerDeclaration layer : layers.values())
             {
-                layer.initialize( createdLayers );
+                layer.initialize(createdLayers);
             }
             return assembly;
-        } );
-        Application application = model.newInstance( qi4j.api() );
-        for( ActivationEventListener activationListener : activationListeners )
+        });
+        Application application = model.newInstance(qi4j.api());
+        for(ActivationEventListener activationListener : activationListeners)
         {
-            application.registerActivationEventListener( activationListener );
+            application.registerActivationEventListener(activationListener);
         }
         beforeActivation();
         application.activate();
-        if( passivationShutdownHook )
+        if(passivationShutdownHook)
         {
-            Runtime.getRuntime().addShutdownHook( new ApplicationPassivationThread( application ) );
+            Runtime.getRuntime().addShutdownHook(new ApplicationPassivationThread(application));
         }
         afterActivation();
         return application;
@@ -158,117 +156,122 @@ public class ApplicationBuilder
     }
 
     @Override
-    public void registerActivationEventListener( ActivationEventListener listener )
+    public void registerActivationEventListener(ActivationEventListener listener)
     {
-        activationListeners.add( listener );
+        activationListeners.add(listener);
     }
 
     @Override
-    public void deregisterActivationEventListener( ActivationEventListener listener )
+    public void deregisterActivationEventListener(ActivationEventListener listener)
     {
-        activationListeners.remove( listener );
+        activationListeners.remove(listener);
     }
 
     /**
      * Declare Layer.
+     *
      * @param layerName Name of the Layer
      * @return Layer declaration for the given name, new if did not already exists
      */
-    public LayerDeclaration withLayer( String layerName )
+    public LayerDeclaration withLayer(String layerName)
     {
-        LayerDeclaration layerDeclaration = layers.get( layerName );
-        if( layerDeclaration != null )
+        LayerDeclaration layerDeclaration = layers.get(layerName);
+        if(layerDeclaration != null)
         {
             return layerDeclaration;
         }
-        layerDeclaration = new LayerDeclaration( layerName );
-        layers.put( layerName, layerDeclaration );
+        layerDeclaration = new LayerDeclaration(layerName);
+        layers.put(layerName, layerDeclaration);
         return layerDeclaration;
     }
 
     /**
      * Load an ApplicationBuilder from a JSON String.
+     *
      * @param json JSON String
      * @return Application Builder loaded from JSON
      * @throws AssemblyException if unable to declare the assembly
      */
-    public static ApplicationBuilder fromJson( String json )
+    public static ApplicationBuilder fromJson(String json)
     {
-        JsonObject root = Json.createReader( new StringReader( json ) ).readObject();
-        return fromJson( root );
+        JsonObject root = Json.createReader(new StringReader(json)).readObject();
+        return fromJson(root);
     }
 
     /**
      * Load an ApplicationBuilder from a JSON InputStream.
+     *
      * @param json JSON input
      * @return Application Builder loaded from JSON
      * @throws AssemblyException if unable to declare the assembly
      */
-    public static ApplicationBuilder fromJson( InputStream json )
+    public static ApplicationBuilder fromJson(InputStream json)
         throws AssemblyException
     {
-        JsonObject root = Json.createReader( json ).readObject();
-        return fromJson( root );
+        JsonObject root = Json.createReader(json).readObject();
+        return fromJson(root);
     }
 
     /**
      * Load an ApplicationBuilder from a JSONObject.
+     *
      * @param root JSON object
      * @return Application Builder loaded from JSON
      * @throws AssemblyException if unable to declare the assembly
      */
-    public static ApplicationBuilder fromJson( JsonObject root )
+    public static ApplicationBuilder fromJson(JsonObject root)
         throws AssemblyException
     {
-        String applicationName = root.getString( "name" );
-        ApplicationBuilder builder = new ApplicationBuilder( applicationName );
-        builder.configureWithJson( root );
+        String applicationName = root.getString("name");
+        ApplicationBuilder builder = new ApplicationBuilder(applicationName);
+        builder.configureWithJson(root);
         return builder;
     }
 
-    /** Configures the application struucture from a JSON document.
+    /**
+     * Configures the application struucture from a JSON document.
      *
      * @param root The JSON document root.
      * @throws AssemblyException if probelms in the Assemblers provided in the JSON document.
      */
-    protected void configureWithJson( JsonObject root )
+    protected void configureWithJson(JsonObject root)
         throws AssemblyException
     {
-        JsonValue optLayers = root.get( "layers" );
-        if( optLayers != null && optLayers.getValueType() == JsonValue.ValueType.ARRAY )
+        JsonValue optLayers = root.get("layers");
+        if(optLayers != null && optLayers.getValueType() == JsonValue.ValueType.ARRAY)
         {
             JsonArray layers = (JsonArray) optLayers;
-            for( int i = 0; i < layers.size(); i++ )
+            for(int i = 0; i < layers.size(); i++)
             {
-                JsonObject layerObject = layers.getJsonObject( i );
-                String layerName = layerObject.getString( "name" );
-                LayerDeclaration layerDeclaration = withLayer( layerName );
-                JsonValue optUsing = layerObject.get( "uses" );
-                if( optUsing != null && optUsing.getValueType() == JsonValue.ValueType.ARRAY )
+                JsonObject layerObject = layers.getJsonObject(i);
+                String layerName = layerObject.getString("name");
+                LayerDeclaration layerDeclaration = withLayer(layerName);
+                JsonValue optUsing = layerObject.get("uses");
+                if(optUsing != null && optUsing.getValueType() == JsonValue.ValueType.ARRAY)
                 {
                     JsonArray using = (JsonArray) optUsing;
-                    for( int j = 0; j < using.size(); j++ )
+                    for(int j = 0; j < using.size(); j++)
                     {
-                        layerDeclaration.using( using.getString( j ) );
+                        layerDeclaration.using(using.getString(j));
                     }
                 }
-                JsonValue optModules = layerObject.get( "modules" );
-                if( optModules != null && optModules.getValueType() == JsonValue.ValueType.ARRAY )
+                JsonValue optModules = layerObject.get("modules");
+                if(optModules != null && optModules.getValueType() == JsonValue.ValueType.ARRAY)
                 {
                     JsonArray modules = (JsonArray) optModules;
-                    for( int k = 0; k < modules.size(); k++ )
+                    for(int k = 0; k < modules.size(); k++)
                     {
-                        JsonObject moduleObject = modules.getJsonObject( k );
-                        String moduleName = moduleObject.getString( "name" );
-                        ModuleDeclaration moduleDeclaration = layerDeclaration.withModule( moduleName );
-                        JsonValue optAssemblers = moduleObject.get( "assemblers" );
-                        if( optAssemblers != null && optAssemblers.getValueType() == JsonValue.ValueType.ARRAY )
+                        JsonObject moduleObject = modules.getJsonObject(k);
+                        String moduleName = moduleObject.getString("name");
+                        ModuleDeclaration moduleDeclaration = layerDeclaration.withModule(moduleName);
+                        JsonValue optAssemblers = moduleObject.get("assemblers");
+                        if(optAssemblers != null && optAssemblers.getValueType() == JsonValue.ValueType.ARRAY)
                         {
                             JsonArray assemblers = (JsonArray) optAssemblers;
-                            for( int m = 0; m < assemblers.size(); m++ )
+                            for(int m = 0; m < assemblers.size(); m++)
                             {
-                                String string = assemblers.getString( m );
-                                moduleDeclaration.withAssembler( string );
+                                String string = assemblers.getString(m);
+                                moduleDeclaration.withAssembler(string);
                             }
                         }
                     }
@@ -280,13 +283,14 @@ public class ApplicationBuilder
     /**
      * {@literal main} method that read JSON from STDIN.
      * <p>Passivation exceptions are written to STDERR if any.</p>
+     *
      * @param args Unused
-     * @throws AssemblyException if the assembly failed
+     * @throws AssemblyException   if the assembly failed
      * @throws ActivationException if the activation failed
      */
-    public static void main( String[] args )
+    public static void main(String[] args)
         throws ActivationException, AssemblyException
     {
-        fromJson( System.in ).withPassivationShutdownHook().newApplication();
+        fromJson(System.in).withPassivationShutdownHook().newApplication();
     }
 }

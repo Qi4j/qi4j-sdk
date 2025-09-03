@@ -29,6 +29,8 @@ import org.qi4j.runtime.injection.InjectedFieldsModel;
 import org.qi4j.runtime.injection.InjectedMethodsModel;
 import org.qi4j.runtime.injection.InjectionContext;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Model for a single Activator.
  *
@@ -42,63 +44,63 @@ public class ActivatorModel<ActivateeType>
     private final InjectedFieldsModel injectedFieldsModel;
     private final InjectedMethodsModel injectedMethodsModel;
 
-    public ActivatorModel( Class<? extends Activator<ActivateeType>> activatorType )
+    public ActivatorModel(Class<? extends Activator<ActivateeType>> activatorType)
     {
         this.activatorType = activatorType;
-        this.constructorsModel = new ConstructorsModel( activatorType );
-        this.injectedFieldsModel = new InjectedFieldsModel( activatorType );
-        this.injectedMethodsModel = new InjectedMethodsModel( activatorType );
+        this.constructorsModel = new ConstructorsModel(activatorType);
+        this.injectedFieldsModel = new InjectedFieldsModel(activatorType);
+        this.injectedMethodsModel = new InjectedMethodsModel(activatorType);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            if( constructorsModel.accept( visitor ) )
+            if(constructorsModel.accept(visitor))
             {
-                if( injectedFieldsModel.accept( visitor ) )
+                if(injectedFieldsModel.accept(visitor))
                 {
-                    injectedMethodsModel.accept( visitor );
+                    injectedMethodsModel.accept(visitor);
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
     public Activator<ActivateeType> newInstance()
     {
         try
         {
-            return activatorType.newInstance();
+            return activatorType.getDeclaredConstructor().newInstance();
         }
-        catch( InstantiationException | IllegalAccessException ex )
+        catch(InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ex)
         {
-            throw new ConstructionException( "Could not instantiate " + activatorType.getName(), ex );
+            throw new ConstructionException("Could not instantiate " + activatorType.getName(), ex);
         }
     }
 
-    @SuppressWarnings( "unchecked" )
-    public Activator<ActivateeType> newInstance( InjectionContext injectionContext )
+    @SuppressWarnings("unchecked")
+    public Activator<ActivateeType> newInstance(InjectionContext injectionContext)
     {
         try
         {
-            Activator<ActivateeType> instance = (Activator<ActivateeType>) constructorsModel.newInstance( injectionContext );
-            injectionContext = new InjectionContext( injectionContext.module(), injectionContext.uses(), instance );
-            inject( injectionContext, instance );
+            Activator<ActivateeType> instance = (Activator<ActivateeType>) constructorsModel.newInstance(injectionContext);
+            injectionContext = new InjectionContext(injectionContext.module(), injectionContext.uses(), instance);
+            inject(injectionContext, instance);
             return instance;
         }
-        catch( Exception ex )
+        catch(Exception ex)
         {
-            throw new ConstructionException( "Could not instantiate " + activatorType.getName(), ex );
+            throw new ConstructionException("Could not instantiate " + activatorType.getName(), ex);
         }
     }
 
-    public void inject( InjectionContext injectionContext, Activator<ActivateeType> instance )
+    public void inject(InjectionContext injectionContext, Activator<ActivateeType> instance)
     {
-        injectedFieldsModel.inject( injectionContext, instance );
-        injectedMethodsModel.inject( injectionContext, instance );
+        injectedFieldsModel.inject(injectionContext, instance);
+        injectedMethodsModel.inject(injectionContext, instance);
     }
 
     @Override

@@ -23,8 +23,6 @@ package org.qi4j.api.entity;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.StatefulAssociationCompositeDescriptor;
 import org.qi4j.api.type.EntityCompositeType;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.composite.StatefulAssociationCompositeDescriptor;
 
 /**
  * Entity Descriptor.

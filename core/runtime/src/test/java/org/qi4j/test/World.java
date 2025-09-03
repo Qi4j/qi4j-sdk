@@ -25,5 +25,5 @@ package org.qi4j.test;
  */
 public interface World
 {
-    String someMethod( String foo, double x, int y );
+    String someMethod(String foo, double x, int y);
 }

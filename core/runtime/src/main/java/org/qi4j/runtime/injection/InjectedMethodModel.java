@@ -20,15 +20,15 @@
 
 package org.qi4j.runtime.injection;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.stream.Stream;
 import org.qi4j.api.composite.InjectedMethodDescriptor;
 import org.qi4j.api.util.AccessibleObjects;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.bootstrap.InjectionException;
-import org.qi4j.bootstrap.InjectionException;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -40,9 +40,9 @@ public final class InjectedMethodModel
     private Method method;
     private InjectedParametersModel parameters;
 
-    public InjectedMethodModel( Method method, InjectedParametersModel parameters )
+    public InjectedMethodModel(Method method, InjectedParametersModel parameters)
     {
-        this.method = AccessibleObjects.accessible( method );
+        this.method = AccessibleObjects.accessible(method);
         this.parameters = parameters;
     }
 
@@ -59,32 +59,32 @@ public final class InjectedMethodModel
     }
 
     // Context
-    public void inject( InjectionContext context, Object instance )
+    public void inject(InjectionContext context, Object instance)
         throws InjectionException
     {
-        Object[] params = parameters.newParametersInstance( context );
+        Object[] params = parameters.newParametersInstance(context);
         try
         {
-            method.invoke( instance, params );
+            method.invoke(instance, params);
         }
-        catch( IllegalAccessException e )
+        catch(IllegalAccessException e)
         {
-            throw new InjectionException( e );
+            throw new InjectionException(e);
         }
-        catch( InvocationTargetException e )
+        catch(InvocationTargetException e)
         {
-            throw new InjectionException( e.getTargetException() );
+            throw new InjectionException(e.getTargetException());
         }
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            parameters.accept( visitor );
+            parameters.accept(visitor);
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 }

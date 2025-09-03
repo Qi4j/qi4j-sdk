@@ -49,8 +49,8 @@ package org.qi4j.api.composite;
  */
 public class AmbiguousTypeException extends RuntimeException
 {
-    public AmbiguousTypeException( String message )
+    public AmbiguousTypeException(String message)
     {
-        super( message );
+        super(message);
     }
 }

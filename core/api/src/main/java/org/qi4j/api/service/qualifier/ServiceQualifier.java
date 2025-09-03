@@ -20,8 +20,9 @@
 
 package org.qi4j.api.service.qualifier;
 
-import java.util.function.Predicate;
 import org.qi4j.api.service.ServiceReference;
+
+import java.util.function.Predicate;
 
 /**
  * This class helps you select a particular service
@@ -48,17 +49,17 @@ import org.qi4j.api.service.ServiceReference;
  */
 public abstract class ServiceQualifier
 {
-    public static Predicate<ServiceReference<?>> withId( final String anId )
+    public static Predicate<ServiceReference<?>> withId(final String anId)
     {
-        return service -> service.identity().toString().equals( anId );
+        return service -> service.identity().toString().equals(anId);
     }
 
-    public static Predicate<ServiceReference<?>> whereMetaInfoIs( final Object metaInfo )
+    public static Predicate<ServiceReference<?>> whereMetaInfoIs(final Object metaInfo)
     {
         return service ->
         {
-            Object metaObject = service.metaInfo( metaInfo.getClass() );
-            return metaObject != null && metaInfo.equals( metaObject );
+            Object metaObject = service.metaInfo(metaInfo.getClass());
+            return metaObject != null && metaInfo.equals(metaObject);
         };
     }
 
@@ -72,12 +73,12 @@ public abstract class ServiceQualifier
         return ServiceReference::isAvailable;
     }
 
-    public static Predicate<ServiceReference<?>> withTags( final String... tags )
+    public static Predicate<ServiceReference<?>> withTags(final String... tags)
     {
         return service ->
         {
-            ServiceTags serviceTags = service.metaInfo( ServiceTags.class );
-            return serviceTags != null && serviceTags.hasTags( tags );
+            ServiceTags serviceTags = service.metaInfo(ServiceTags.class);
+            return serviceTags != null && serviceTags.hasTags(tags);
         };
     }
 }

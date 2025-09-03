@@ -27,8 +27,6 @@ import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.api.value.ValueDescriptor;
 import org.qi4j.runtime.composite.StateResolver;
 import org.qi4j.runtime.structure.ModuleInstance;
-import org.qi4j.runtime.composite.StateResolver;
-import org.qi4j.runtime.structure.ModuleInstance;
 
 /**
  * Implementation of ValueBuilder
@@ -40,14 +38,14 @@ public final class ValueBuilderInstance<T>
     private final ModuleInstance currentModule;
     private final ValueInstance prototypeInstance;
 
-    public ValueBuilderInstance( ValueDescriptor compositeModel,
-                                 ModuleInstance currentModule,
-                                 StateResolver stateResolver
+    public ValueBuilderInstance(ValueDescriptor compositeModel,
+                                ModuleInstance currentModule,
+                                StateResolver stateResolver
     )
     {
-        ValueStateInstance state = new ValueStateInstance( compositeModel, currentModule, stateResolver );
+        ValueStateInstance state = new ValueStateInstance(compositeModel, currentModule, stateResolver);
         ValueModel model = (ValueModel) compositeModel;
-        prototypeInstance = model.newValueInstance( state );
+        prototypeInstance = model.newValueInstance(state);
         prototypeInstance.prepareToBuild();
         this.currentModule = currentModule;
     }
@@ -59,7 +57,7 @@ public final class ValueBuilderInstance<T>
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public Class<T> primaryType()
     {
         return (Class<T>) prototypeInstance.descriptor().primaryType();
@@ -72,24 +70,24 @@ public final class ValueBuilderInstance<T>
     }
 
     @Override
-    public <K> K prototypeFor( Class<K> mixinType )
+    public <K> K prototypeFor(Class<K> mixinType)
     {
-        return prototypeInstance.newProxy( mixinType );
+        return prototypeInstance.newProxy(mixinType);
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public T newInstance()
         throws ConstructionException
     {
-        Class<Composite> valueType = (Class<Composite>) prototypeInstance.types().findFirst().orElse( null );
+        Class<Composite> valueType = (Class<Composite>) prototypeInstance.types().findFirst().orElse(null);
 
-        ValueDescriptor valueModel = currentModule.typeLookup().lookupValueModel( valueType );
+        ValueDescriptor valueModel = currentModule.typeLookup().lookupValueModel(valueType);
 
-        if( valueModel == null )
+        if(valueModel == null)
         {
-            throw new NoSuchValueTypeException( valueType.getName(), currentModule.descriptor() );
+            throw new NoSuchValueTypeException(valueType.getName(), currentModule.descriptor());
         }
-        return new ValueBuilderWithPrototype<>( valueModel, currentModule, prototype() ).newInstance();
+        return new ValueBuilderWithPrototype<>(valueModel, currentModule, prototype()).newInstance();
     }
 }

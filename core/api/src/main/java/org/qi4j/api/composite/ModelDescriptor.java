@@ -31,11 +31,12 @@ public interface ModelDescriptor extends HasTypes, MetaInfoHolder
 {
     Visibility visibility();
 
-    /** The Module that the Model is declared in.
+    /**
+     * The Module that the Model is declared in.
      *
      * @return The Module that this Model was declared in.
      */
     ModuleDescriptor module();
 
-    boolean isAssignableTo( Class<?> type );
+    boolean isAssignableTo(Class<?> type);
 }

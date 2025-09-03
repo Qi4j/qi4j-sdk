@@ -33,7 +33,7 @@ public abstract class SomeMixin
     {
     }
 
-    protected SomeMixin( String foo )
+    protected SomeMixin(String foo)
     {
 
     }
@@ -41,20 +41,20 @@ public abstract class SomeMixin
     public String some()
         throws Exception2, Exception1
     {
-        multiEx( "foo" );
+        multiEx("foo");
         unwrapResult();
-        bar( 1.0, true, 1.0F, 'x', 0, 0L, (short) 0, (byte) 3, 4.0, new Object[ 0 ], new int[ 0 ] );
-        generic( new ArrayList<>() );
+        bar(1.0, true, 1.0F, 'x', 0, 0L, (short) 0, (byte) 3, 4.0, new Object[0], new int[0]);
+        generic(new ArrayList<>());
 
-        return "Hello " + other() + foo( "Test", 0 );
+        return "Hello " + other() + foo("Test", 0);
     }
 
     public String testConcern()
     {
-        return someMethod( "Hello", 0, 0 );
+        return someMethod("Hello", 0, 0);
     }
 
-    public String someMethod( String foo, double x, int y )
+    public String someMethod(String foo, double x, int y)
     {
         return foo;
     }

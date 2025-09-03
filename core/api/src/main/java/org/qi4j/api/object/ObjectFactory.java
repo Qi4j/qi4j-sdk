@@ -29,26 +29,23 @@ public interface ObjectFactory
     /**
      * Create new objects of the given type.
      *
-     * @param <T> Object type
+     * @param <T>  Object type
      * @param type an object class which will be instantiated
      * @param uses objects that can be injected into mixins
-     *
      * @return new objects.
-     *
-     * @throws ConstructionException Thrown if instantiation fails.
+     * @throws ConstructionException     Thrown if instantiation fails.
      * @throws NoSuchObjectTypeException Thrown if {@code type} class is not an object.
      */
-    <T> T newObject( Class<T> type, Object... uses )
+    <T> T newObject(Class<T> type, Object... uses)
         throws NoSuchObjectTypeException, ConstructionException;
 
     /**
      * Inject an existing instance. Only fields and methods will be called.
      *
      * @param instance instance
-     * @param uses dependencies
-     *
+     * @param uses     dependencies
      * @throws ConstructionException if it was not possible to construct the Object dependencies
      */
-    void injectTo( Object instance, Object... uses )
+    void injectTo(Object instance, Object... uses)
         throws ConstructionException;
 }

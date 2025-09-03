@@ -25,7 +25,6 @@ import org.qi4j.api.object.ObjectFactory;
 import org.qi4j.api.service.ImportedServiceDescriptor;
 import org.qi4j.api.service.ServiceImporter;
 import org.qi4j.api.service.ServiceImporterException;
-import org.qi4j.api.injection.scope.Structure;
 
 /**
  * Import Services using a new registered Object instance.
@@ -37,15 +36,15 @@ public final class NewObjectImporter<T>
     private ObjectFactory obf;
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public T importService( ImportedServiceDescriptor serviceDescriptor )
+    @SuppressWarnings("unchecked")
+    public T importService(ImportedServiceDescriptor serviceDescriptor)
         throws ServiceImporterException
     {
-        return obf.newObject( (Class<T>) serviceDescriptor.types().findFirst().orElse( null ));
+        return obf.newObject((Class<T>) serviceDescriptor.types().findFirst().orElse(null));
     }
 
     @Override
-    public boolean isAvailable( T instance )
+    public boolean isAvailable(T instance)
     {
         return true;
     }

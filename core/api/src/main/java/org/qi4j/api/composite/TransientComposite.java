@@ -21,7 +21,7 @@ package org.qi4j.api.composite;
 
 /**
  * Transient Composite Type.
- *
+ * <p>
  * TransientComposites have the following criteria;
  * <ul>
  * <li>Does not persist its state, and is not serializable</li>

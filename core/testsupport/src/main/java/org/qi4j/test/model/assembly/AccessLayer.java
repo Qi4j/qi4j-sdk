@@ -20,44 +20,45 @@
 
 package org.qi4j.test.model.assembly;
 
-import java.lang.reflect.InvocationTargetException;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.layered.LayeredLayerAssembler;
 import org.qi4j.bootstrap.layered.ModuleAssembler;
+
+import java.lang.reflect.InvocationTargetException;
 
 class AccessLayer extends LayeredLayerAssembler
 {
 
     private final Class<?> testClass;
 
-    AccessLayer( Class<?> testClass )
+    AccessLayer(Class<?> testClass)
     {
         this.testClass = testClass;
     }
 
     @Override
-    public LayerAssembly assemble( LayerAssembly layer )
+    public LayerAssembly assemble(LayerAssembly layer)
     {
-        createModule( layer, TestExecutionModule.class );
-        createModule( layer, TestSuite1Module.class );
-        createModule( layer, TestSuite2Module.class );
-        createModule( layer, TestSuite3Module.class );
+        createModule(layer, TestExecutionModule.class);
+        createModule(layer, TestSuite1Module.class);
+        createModule(layer, TestSuite2Module.class);
+        createModule(layer, TestSuite3Module.class);
         return layer;
     }
 
     @Override
-    protected ModuleAssembler instantiateModuleAssembler( Class<? extends ModuleAssembler> moduleAssemblerClass, ModuleAssembly constructorArgument
-                                                        )
+    protected ModuleAssembler instantiateModuleAssembler(Class<? extends ModuleAssembler> moduleAssemblerClass, ModuleAssembly constructorArgument
+    )
         throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException
     {
-        if( moduleAssemblerClass.equals(TestExecutionModule.class))
+        if(moduleAssemblerClass.equals(TestExecutionModule.class))
         {
-            return new TestExecutionModule( testClass );
+            return new TestExecutionModule(testClass);
         }
         else
         {
-            return super.instantiateModuleAssembler( moduleAssemblerClass, constructorArgument );
+            return super.instantiateModuleAssembler(moduleAssemblerClass, constructorArgument);
         }
     }
 }

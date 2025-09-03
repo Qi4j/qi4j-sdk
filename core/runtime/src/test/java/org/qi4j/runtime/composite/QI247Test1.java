@@ -19,12 +19,12 @@
  */
 package org.qi4j.runtime.composite;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -35,30 +35,30 @@ public class QI247Test1
     extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TransientWithMixin.class );
+        module.transients(TransientWithMixin.class);
     }
 
-    private void checkToString( ObjectMethods withMixin )
+    private void checkToString(ObjectMethods withMixin)
     {
-        assertThat( withMixin.toString(), equalTo( ObjectMethods.MESSAGE ) );
+        assertThat(withMixin.toString(), equalTo(ObjectMethods.MESSAGE));
     }
 
-    private void checkHashCode( ObjectMethods withMixin )
+    private void checkHashCode(ObjectMethods withMixin)
     {
-        assertThat( withMixin.hashCode(), equalTo( ObjectMethods.CODE ) );
+        assertThat(withMixin.hashCode(), equalTo(ObjectMethods.CODE));
     }
 
-    private void checkSelfEquals( ObjectMethods withMixin )
+    private void checkSelfEquals(ObjectMethods withMixin)
     {
-        assertThat( withMixin, equalTo( withMixin ) );
+        assertThat(withMixin, equalTo(withMixin));
     }
 
-    private void checkTwoNotEqual( ObjectMethods first, ObjectMethods second )
+    private void checkTwoNotEqual(ObjectMethods first, ObjectMethods second)
     {
-        assertThat( first.equals( second ), is( false ) );
+        assertThat(first.equals(second), is(false));
     }
 
     // MIXIN
@@ -66,44 +66,44 @@ public class QI247Test1
     @Test
     public void testWithMixinToString()
     {
-        ObjectMethods withMixin = transientBuilderFactory.newTransient( ObjectMethods.class );
-        checkToString( withMixin );
+        ObjectMethods withMixin = transientBuilderFactory.newTransient(ObjectMethods.class);
+        checkToString(withMixin);
     }
 
     @Test
     public void testWithMixinHashCode()
     {
-        ObjectMethods withMixin = transientBuilderFactory.newTransient( ObjectMethods.class );
-        checkHashCode( withMixin );
+        ObjectMethods withMixin = transientBuilderFactory.newTransient(ObjectMethods.class);
+        checkHashCode(withMixin);
     }
 
     @Test
     public void testWithMixinSelfEquals()
     {
-        ObjectMethods withMixin = transientBuilderFactory.newTransient( ObjectMethods.class );
-        checkSelfEquals( withMixin );
+        ObjectMethods withMixin = transientBuilderFactory.newTransient(ObjectMethods.class);
+        checkSelfEquals(withMixin);
     }
 
     @Test
     public void testWithMixinSelfEquals2()
     {
-        ObjectMethods withMixin = transientBuilderFactory.newTransient( ObjectMethods.class );
-        assertThat( withMixin.equals( withMixin ), is( true ) );
+        ObjectMethods withMixin = transientBuilderFactory.newTransient(ObjectMethods.class);
+        assertThat(withMixin.equals(withMixin), is(true));
     }
 
     @Test
     public void testWithMixinSelfSame()
     {
-        ObjectMethods withMixin = transientBuilderFactory.newTransient( ObjectMethods.class );
-        assertSame( withMixin, withMixin );
+        ObjectMethods withMixin = transientBuilderFactory.newTransient(ObjectMethods.class);
+        assertSame(withMixin, withMixin);
     }
 
     @Test
     public void testWithMixinTwoNotEqual()
     {
-        ObjectMethods first = transientBuilderFactory.newTransient( ObjectMethods.class );
-        ObjectMethods second = transientBuilderFactory.newTransient( ObjectMethods.class );
-        checkTwoNotEqual( first, second );
+        ObjectMethods first = transientBuilderFactory.newTransient(ObjectMethods.class);
+        ObjectMethods second = transientBuilderFactory.newTransient(ObjectMethods.class);
+        checkTwoNotEqual(first, second);
     }
 
     public interface ObjectMethods
@@ -135,7 +135,7 @@ public class QI247Test1
         }
     }
 
-    @Mixins( ObjectMethodsMixin.class )
+    @Mixins(ObjectMethodsMixin.class)
     public interface TransientWithMixin
         extends TransientComposite, ObjectMethods
     {

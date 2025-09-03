@@ -28,11 +28,10 @@ public interface MetricsGaugeFactory extends MetricsFactory
     /**
      * Register a MetricsGauge with the underlying Metrics system.
      *
-     * @param name   A human readable, short name of the metric.
-     * @param gauge  The implementation of the MetricsGauge.
-     * @param <T>    Any type holding the MetricsGauge's current value.
-     *
+     * @param name  A human readable, short name of the metric.
+     * @param gauge The implementation of the MetricsGauge.
+     * @param <T>   Any type holding the MetricsGauge's current value.
      * @return The same MetricsGauge or the DefaultMetric.NULL MetricsGauge instance.
      */
-    <T> MetricsGauge<T> registerGauge( String name, MetricsGauge<T> gauge );
+    <T> MetricsGauge<T> registerGauge(String name, MetricsGauge<T> gauge);
 }

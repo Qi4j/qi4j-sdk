@@ -19,11 +19,10 @@
  */
 package org.qi4j.runtime.activation;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.SingletonAssembler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,25 +36,25 @@ public class ModuleActivationTest
     private static int passivationLevel = 0;
 
     public static class TestedActivator
-            implements Activator<Module>
+        implements Activator<Module>
     {
 
-        public void beforeActivation( Module activating )
+        public void beforeActivation(Module activating)
         {
             activationLevel++;
         }
 
-        public void afterActivation( Module activated )
+        public void afterActivation(Module activated)
         {
             activationLevel++;
         }
 
-        public void beforePassivation( Module passivating )
+        public void beforePassivation(Module passivating)
         {
             passivationLevel++;
         }
 
-        public void afterPassivation( Module passivated )
+        public void afterPassivation(Module passivated)
         {
             passivationLevel++;
         }
@@ -64,22 +63,22 @@ public class ModuleActivationTest
 
     @Test
     public void testModulesActivators()
-            throws Exception
+        throws Exception
     {
         SingletonAssembler assembly = new SingletonAssembler(
-            module -> module.withActivators( TestedActivator.class )
+            module -> module.withActivators(TestedActivator.class)
         );
         // Activate
         Application application = assembly.application();
 
         // Assert activated
-        assertThat( "Activation Level", activationLevel, equalTo( 2 ) );
+        assertThat("Activation Level", activationLevel, equalTo(2));
 
         // Passivate
         application.passivate();
 
         // Assert passivated
-        assertThat( "Passivation Level", passivationLevel, equalTo( 2 ) );
+        assertThat("Passivation Level", passivationLevel, equalTo(2));
     }
 
 }

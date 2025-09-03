@@ -20,15 +20,14 @@
 
 package org.qi4j.runtime.objects;
 
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.concern.GenericConcern;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.SingletonAssembler;
+
+import java.lang.reflect.Method;
 
 /**
  * JAVADOC
@@ -41,15 +40,15 @@ public class ObjectConcernTest
         throws ActivationException, AssemblyException
     {
         SingletonAssembler assembler = new SingletonAssembler(
-            module -> module.objects( TestObject.class )
+            module -> module.objects(TestObject.class)
         );
 
-        TestObject object = assembler.module().newObject( TestObject.class );
+        TestObject object = assembler.module().newObject(TestObject.class);
 
         object.doStuff();
     }
 
-    @Concerns( LogConcern.class )
+    @Concerns(LogConcern.class)
     public static class TestObject
     {
         public void doStuff()
@@ -60,12 +59,12 @@ public class ObjectConcernTest
     public static class LogConcern
         extends GenericConcern
     {
-        public Object invoke( Object proxy, Method method, Object[] args )
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
-            System.out.println( "Invoked " + method.getName() + " on " + proxy );
+            System.out.println("Invoked " + method.getName() + " on " + proxy);
 
-            return next.invoke( proxy, method, args );
+            return next.invoke(proxy, method, args);
         }
     }
 }

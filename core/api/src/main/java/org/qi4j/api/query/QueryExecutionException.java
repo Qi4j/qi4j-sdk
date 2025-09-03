@@ -27,13 +27,13 @@ public final class QueryExecutionException
 {
     private static final long serialVersionUID = 5147421865890379209L;
 
-    public QueryExecutionException( String message )
+    public QueryExecutionException(String message)
     {
-        super( message );
+        super(message);
     }
 
-    public QueryExecutionException( String message, Throwable cause )
+    public QueryExecutionException(String message, Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 }

@@ -21,7 +21,7 @@ package org.qi4j.api.mixin;
 
 // START SNIPPET: something
 public class SomethingMixin
-        implements Something
+    implements Something
 {
     // State is allowed.
 

@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.unitofwork;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.Visibility;
@@ -42,20 +43,16 @@ import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.Energy4Java;
-import org.qi4j.test.EntityTestAssembler;
 
-import static org.qi4j.api.common.Visibility.application;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.qi4j.api.common.Visibility.application;
 
 /**
  * JAVADOC
  */
 public class PrivateEntityUnitOfWorkTest
 {
-    private static final Identity TEST_IDENTITY = StringIdentity.identityOf( "1" );
+    private static final Identity TEST_IDENTITY = StringIdentity.identityOf("1");
 
     @Structure
     private UnitOfWorkFactory uowf;
@@ -64,49 +61,49 @@ public class PrivateEntityUnitOfWorkTest
     public void givenAppWithPrivateEntityWhenUnitOfWorkCanSeeItThenCanCommit()
         throws Exception
     {
-        System.setProperty( "qi4j.compacttrace", "off" );
+        System.setProperty("qi4j.compacttrace", "off");
 
         Energy4Java qi4j = new Energy4Java();
         Application app = qi4j.newApplication(
             applicationFactory ->
-                applicationFactory.newApplicationAssembly( new Assembler[][][]{
+                applicationFactory.newApplicationAssembly(new Assembler[][][]{
                     {
                         {
                             module -> {
-                                module.objects( PrivateEntityUnitOfWorkTest.class );
+                                module.objects(PrivateEntityUnitOfWorkTest.class);
                             }
                         }
                     },
                     {
                         {
                             module -> {
-                                module.entities( ProductEntity.class );
-                                module.entities( ProductCatalogEntity.class ).visibleIn( application );
-                                module.values( ProductInfo.class );
+                                module.entities(ProductEntity.class);
+                                module.entities(ProductCatalogEntity.class).visibleIn(application);
+                                module.values(ProductInfo.class);
 
-                                new EntityTestAssembler().visibleIn( Visibility.module )
-                                                         .defaultServicesVisibleIn( Visibility.application )
-                                                         .assemble( module );
+                                new EntityTestAssembler().visibleIn(Visibility.module)
+                                    .defaultServicesVisibleIn(Visibility.application)
+                                    .assemble(module);
                             }
                         }
                     }
-                } ) );
+                }));
         app.activate();
 
-        Module module = app.findModule( "Layer 1", "Module 1" );
-        module.injectTo( this );
+        Module module = app.findModule("Layer 1", "Module 1");
+        module.injectTo(this);
 
         UnitOfWork unitOfWork = uowf.newUnitOfWork();
 
         try
         {
-            unitOfWork.newEntity( ProductEntity.class );
-            fail( "Should not be able to create product here" );
+            unitOfWork.newEntity(ProductEntity.class);
+            fail("Should not be able to create product here");
         }
-        catch( NoSuchEntityTypeException e )
+        catch(NoSuchEntityTypeException e)
         {
             // Ok
-            ProductCatalog catalog = unitOfWork.newEntity( ProductCatalog.class, TEST_IDENTITY);
+            ProductCatalog catalog = unitOfWork.newEntity(ProductCatalog.class, TEST_IDENTITY);
             unitOfWork.complete();
         }
         unitOfWork = uowf.newUnitOfWork();
@@ -114,7 +111,7 @@ public class PrivateEntityUnitOfWorkTest
         Identity id;
         try
         {
-            ProductCatalog catalog = unitOfWork.get( ProductCatalog.class, TEST_IDENTITY);
+            ProductCatalog catalog = unitOfWork.get(ProductCatalog.class, TEST_IDENTITY);
             id = catalog.newProduct().identity().get();
             unitOfWork.complete();
         }
@@ -126,9 +123,9 @@ public class PrivateEntityUnitOfWorkTest
         unitOfWork = uowf.newUnitOfWork();
         try
         {
-            ProductCatalog catalog = unitOfWork.get( ProductCatalog.class, TEST_IDENTITY);
-            Product product = catalog.findProduct( id );
-            product.price().set( 100 );
+            ProductCatalog catalog = unitOfWork.get(ProductCatalog.class, TEST_IDENTITY);
+            Product product = catalog.findProduct(id);
+            product.price().set(100);
             unitOfWork.complete();
         }
         finally
@@ -141,10 +138,10 @@ public class PrivateEntityUnitOfWorkTest
     {
         Product newProduct();
 
-        Product findProduct( Identity id );
+        Product findProduct(Identity id);
     }
 
-    @Mixins( ProductCatalogEntity.ProductRepositoryMixin.class )
+    @Mixins(ProductCatalogEntity.ProductRepositoryMixin.class)
     interface ProductCatalogEntity
         extends ProductCatalog, EntityComposite
     {
@@ -159,28 +156,28 @@ public class PrivateEntityUnitOfWorkTest
 
             public Product newProduct()
             {
-                ValueBuilder<ProductInfo> vb = vbf.newValueBuilder( ProductInfo.class );
-                vb.prototype().description().set( "Some mundane description" );
-                vb.prototype().weight().set( 1.0f );
+                ValueBuilder<ProductInfo> vb = vbf.newValueBuilder(ProductInfo.class);
+                vb.prototype().description().set("Some mundane description");
+                vb.prototype().weight().set(1.0f);
                 ProductInfo info = vb.newInstance();
 
                 UnitOfWork uow = uowf.currentUnitOfWork();
-                EntityBuilder<Product> eb = uow.newEntityBuilder( Product.class );
-                eb.instance().name().set( "Product Name" );
-                eb.instance().price().set( 100 );
-                eb.instance().productInfo().set( info );
+                EntityBuilder<Product> eb = uow.newEntityBuilder(Product.class);
+                eb.instance().name().set("Product Name");
+                eb.instance().price().set(100);
+                eb.instance().productInfo().set(info);
                 return eb.newInstance();
             }
 
-            public Product findProduct( Identity id )
+            public Product findProduct(Identity id)
             {
                 UnitOfWork uow = uowf.currentUnitOfWork();
-                return uow.get( Product.class,  id );
+                return uow.get(Product.class, id);
             }
         }
     }
 
-    @Mixins( { AccountMixin.class } )
+    @Mixins({AccountMixin.class})
     public interface AccountComposite
         extends Account, EntityComposite
     {
@@ -190,22 +187,22 @@ public class PrivateEntityUnitOfWorkTest
     {
         Property<Integer> balance();
 
-        void add( int amount );
+        void add(int amount);
 
-        void remove( int amount );
+        void remove(int amount);
     }
 
     public static abstract class AccountMixin
         implements Account
     {
-        public void add( int amount )
+        public void add(int amount)
         {
-            balance().set( balance().get() + amount );
+            balance().set(balance().get() + amount);
         }
 
-        public void remove( int amount )
+        public void remove(int amount)
         {
-            balance().set( balance().get() - amount );
+            balance().set(balance().get() - amount);
         }
     }
 

@@ -30,11 +30,11 @@ public class OrderModule
     implements ModuleAssembler
 {
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( Order.class, Customer.class );
-        module.values( Address.class );
+        module.entities(Order.class, Customer.class);
+        module.values(Address.class);
         return module;
     }
 

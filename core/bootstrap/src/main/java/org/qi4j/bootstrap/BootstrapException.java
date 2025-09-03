@@ -26,13 +26,13 @@ package org.qi4j.bootstrap;
 public class BootstrapException
     extends RuntimeException
 {
-    public BootstrapException( String message )
+    public BootstrapException(String message)
     {
-        super( message );
+        super(message);
     }
 
-    public BootstrapException( String message, Throwable cause )
+    public BootstrapException(String message, Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 }

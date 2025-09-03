@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.unitofwork;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.UseDefaults;
@@ -31,7 +32,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -40,15 +40,15 @@ public class UnitOfWorkFactoryTest
     extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( AccountComposite.class,
-                         OrderComposite.class,
-                         ProductEntity.class,
-                         CustomerComposite.class );
+        module.entities(AccountComposite.class,
+            OrderComposite.class,
+            ProductEntity.class,
+            CustomerComposite.class);
 
-        new EntityTestAssembler().assemble( module );
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
@@ -58,19 +58,19 @@ public class UnitOfWorkFactoryTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
 
         // Create product
-        EntityBuilder<ProductEntity> cb = unitOfWork.newEntityBuilder( ProductEntity.class );
-        cb.instance().name().set( "Chair" );
-        cb.instance().price().set( 57 );
+        EntityBuilder<ProductEntity> cb = unitOfWork.newEntityBuilder(ProductEntity.class);
+        cb.instance().name().set("Chair");
+        cb.instance().price().set(57);
         Product chair = cb.newInstance();
 
         String actual = chair.name().get();
-        assertThat( "Chair.name()", actual, equalTo( "Chair" ) );
-        assertThat( "Chair.price()", chair.price().get(), equalTo( 57 ) );
+        assertThat("Chair.name()", actual, equalTo("Chair"));
+        assertThat("Chair.price()", chair.price().get(), equalTo(57));
 
         unitOfWork.complete();
     }
 
-    @Mixins( { AccountMixin.class } )
+    @Mixins({AccountMixin.class})
     public interface AccountComposite
         extends Account, EntityComposite
     {
@@ -80,22 +80,22 @@ public class UnitOfWorkFactoryTest
     {
         Property<Integer> balance();
 
-        void add( int amount );
+        void add(int amount);
 
-        void remove( int amount );
+        void remove(int amount);
     }
 
     public static abstract class AccountMixin
         implements Account
     {
-        public void add( int amount )
+        public void add(int amount)
         {
-            balance().set( balance().get() + amount );
+            balance().set(balance().get() + amount);
         }
 
-        public void remove( int amount )
+        public void remove(int amount)
         {
-            balance().set( balance().get() - amount );
+            balance().set(balance().get() - amount);
         }
     }
 

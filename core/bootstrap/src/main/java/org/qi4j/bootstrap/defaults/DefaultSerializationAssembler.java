@@ -36,17 +36,17 @@ public class DefaultSerializationAssembler
     public static final String IDENTITY = "default-serialization";
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.services( JakartaJsonSerialization.class )
-              .withTypes( Serialization.class,
-                          Serializer.class, Deserializer.class,
-                          Converters.class,
-                          JsonSerialization.class,
-                          JsonSerializer.class, JsonDeserializer.class,
-                          JakartaJsonAdapters.class,
-                          JakartaJsonFactories.class )
-              .identifiedBy( IDENTITY )
-              .taggedWith( Serialization.Format.JSON );
+        module.services(JakartaJsonSerialization.class)
+            .withTypes(Serialization.class,
+                Serializer.class, Deserializer.class,
+                Converters.class,
+                JsonSerialization.class,
+                JsonSerializer.class, JsonDeserializer.class,
+                JakartaJsonAdapters.class,
+                JakartaJsonFactories.class)
+            .identifiedBy(IDENTITY)
+            .taggedWith(Serialization.Format.JSON);
     }
 }

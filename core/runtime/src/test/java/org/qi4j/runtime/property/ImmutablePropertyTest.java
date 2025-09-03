@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.property;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.entity.EntityBuilder;
@@ -30,7 +31,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -46,44 +46,44 @@ public final class ImmutablePropertyTest
     @Test
     public final void testCreationalWithStateFor()
     {
-        Location location = createLocation( KUALA_LUMPUR );
-        testNamePropertyGet( location, KUALA_LUMPUR );
+        Location location = createLocation(KUALA_LUMPUR);
+        testNamePropertyGet(location, KUALA_LUMPUR);
     }
 
-    private Location createLocation( String locationName )
+    private Location createLocation(String locationName)
     {
-        TransientBuilder<Location> locationBuilder = transientBuilderFactory.newTransientBuilder( Location.class );
-        Location locState = locationBuilder.prototypeFor( Location.class );
-        locState.name().set( locationName );
+        TransientBuilder<Location> locationBuilder = transientBuilderFactory.newTransientBuilder(Location.class);
+        Location locState = locationBuilder.prototypeFor(Location.class);
+        locState.name().set(locationName);
         return locationBuilder.newInstance();
     }
 
-    private void testNamePropertyGet( Location location, String locationName )
+    private void testNamePropertyGet(Location location, String locationName)
     {
-        assertThat( location, notNullValue() );
-        assertThat( location.name().get(), equalTo( locationName ) );
+        assertThat(location, notNullValue());
+        assertThat(location.name().get(), equalTo(locationName));
     }
 
     @Test
     public final void testCreationWithStateOfComposite()
     {
-        TransientBuilder<Location> locationBuilder = transientBuilderFactory.newTransientBuilder( Location.class );
+        TransientBuilder<Location> locationBuilder = transientBuilderFactory.newTransientBuilder(Location.class);
         Location locState = locationBuilder.prototype();
-        locState.name().set( KUALA_LUMPUR );
+        locState.name().set(KUALA_LUMPUR);
         Location location = locationBuilder.newInstance();
 
-        testNamePropertyGet( location, KUALA_LUMPUR );
+        testNamePropertyGet(location, KUALA_LUMPUR);
     }
 
     @Test
     public final void testSetter()
     {
-        assertThrows( IllegalStateException.class, () -> {
-            Location location = createLocation( KUALA_LUMPUR );
+        assertThrows(IllegalStateException.class, () -> {
+            Location location = createLocation(KUALA_LUMPUR);
             // Must fail!
             Property<String> stringProperty = location.name();
-            stringProperty.set( "abc" );
-        } );
+            stringProperty.set("abc");
+        });
     }
 
     @Test
@@ -92,16 +92,16 @@ public final class ImmutablePropertyTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<LocationEntity> builder = uow.newEntityBuilder( LocationEntity.class );
-            builder.instance().name().set( "Rickard" );
+            EntityBuilder<LocationEntity> builder = uow.newEntityBuilder(LocationEntity.class);
+            builder.instance().name().set("Rickard");
             Location location = builder.newInstance();
 
             try
             {
-                location.name().set( "Niclas" );
-                fail( "Should be immutable" );
+                location.name().set("Niclas");
+                fail("Should be immutable");
             }
-            catch( IllegalStateException e )
+            catch(IllegalStateException e)
             {
                 // Ok
             }
@@ -112,12 +112,12 @@ public final class ImmutablePropertyTest
         }
     }
 
-    public final void assemble( ModuleAssembly module )
+    public final void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( LocationComposite.class );
-        module.entities( LocationEntity.class );
-        new EntityTestAssembler().assemble( module );
+        module.transients(LocationComposite.class);
+        module.entities(LocationEntity.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     interface LocationComposite

@@ -19,11 +19,12 @@
  */
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.Type;
-import java.util.function.BiFunction;
 import org.qi4j.api.association.AbstractAssociation;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.identity.HasIdentity;
+
+import java.lang.reflect.Type;
+import java.util.function.BiFunction;
 
 /**
  * Implementation of AbstractAssociation. Includes helper methods for subclasses
@@ -34,8 +35,8 @@ public abstract class AbstractAssociationInstance<T>
     protected AssociationInfo associationInfo;
     private final BiFunction<EntityReference, Type, Object> entityFunction;
 
-    public AbstractAssociationInstance( AssociationInfo associationInfo,
-                                        BiFunction<EntityReference, Type, Object> entityFunction
+    public AbstractAssociationInstance(AssociationInfo associationInfo,
+                                       BiFunction<EntityReference, Type, Object> entityFunction
     )
     {
         this.associationInfo = associationInfo;
@@ -47,25 +48,25 @@ public abstract class AbstractAssociationInstance<T>
         return associationInfo;
     }
 
-    public void setAssociationInfo( AssociationInfo newInfo )
+    public void setAssociationInfo(AssociationInfo newInfo)
     {
         this.associationInfo = newInfo;
     }
 
-    @SuppressWarnings( "unchecked" )
-    protected T getEntity( EntityReference entityId )
+    @SuppressWarnings("unchecked")
+    protected T getEntity(EntityReference entityId)
     {
-        if( entityId == null )
+        if(entityId == null)
         {
             return null;
         }
 
-        return (T) entityFunction.apply( entityId, associationInfo.type() );
+        return (T) entityFunction.apply(entityId, associationInfo.type());
     }
 
-    protected EntityReference getEntityReference( Object composite )
+    protected EntityReference getEntityReference(Object composite)
     {
-        if( composite == null )
+        if(composite == null)
         {
             return null;
         }
@@ -73,22 +74,22 @@ public abstract class AbstractAssociationInstance<T>
         return EntityReference.create(((HasIdentity) composite).identity().get());
     }
 
-    protected void checkType( Object instance )
+    protected void checkType(Object instance)
     {
 
-        if( instance instanceof HasIdentity || instance == null )
+        if(instance instanceof HasIdentity || instance == null)
         {
             return;
         }
-        throw new IllegalArgumentException( "Object must be a subtype of org.qi4j.api.reference.Identity: " + instance.getClass() );
+        throw new IllegalArgumentException("Object must be a subtype of org.qi4j.api.reference.Identity: " + instance.getClass());
     }
 
     protected void checkImmutable()
         throws IllegalStateException
     {
-        if( associationInfo.isImmutable() )
+        if(associationInfo.isImmutable())
         {
-            throw new IllegalStateException( "Association [" + associationInfo.qualifiedName() + "] is immutable." );
+            throw new IllegalStateException("Association [" + associationInfo.qualifiedName() + "] is immutable.");
         }
     }
 }

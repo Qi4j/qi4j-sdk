@@ -20,6 +20,8 @@
 
 package org.qi4j.test.indexing.layered;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.injection.scope.Service;
@@ -34,8 +36,6 @@ import org.qi4j.api.usecase.UsecaseBuilder;
 import org.qi4j.bootstrap.layered.ModuleAssembler;
 import org.qi4j.test.indexing.TestData;
 import org.qi4j.test.model.assembly.ApplicationAssembler;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 public abstract class AbstractMultiLayeredIndexingTest
 {
@@ -48,25 +48,25 @@ public abstract class AbstractMultiLayeredIndexingTest
 
     @Optional
     @Service
-    @Tagged( "Suite1Case1" )
+    @Tagged("Suite1Case1")
     private ServiceReference<TestCase> suite1Case1;
 
     @Optional
     @Service
-    @Tagged( "Suite1Case2" )
+    @Tagged("Suite1Case2")
     private ServiceReference<TestCase> suite1Case2;
 
     @Optional
     @Service
-    @Tagged( "Suite2Case1" )
+    @Tagged("Suite2Case1")
     private ServiceReference<TestCase> suite2Case1;
 
     @Optional
     @Service
-    @Tagged( "Suite3Case1" )
+    @Tagged("Suite3Case1")
     private ServiceReference<TestCase> suite3Case1;
 
-    public AbstractMultiLayeredIndexingTest( Class<? extends ModuleAssembler> indexingAssembler )
+    public AbstractMultiLayeredIndexingTest(Class<? extends ModuleAssembler> indexingAssembler)
     {
         AbstractMultiLayeredIndexingTest.indexingAssembler = indexingAssembler;
     }
@@ -76,55 +76,55 @@ public abstract class AbstractMultiLayeredIndexingTest
         throws ActivationException
     {
         ApplicationAssembler assembler =
-            new ApplicationAssembler( "Multi Layered Indexing Test", "1.0", Application.Mode.development, getClass() );
+            new ApplicationAssembler("Multi Layered Indexing Test", "1.0", Application.Mode.development, getClass());
         assembler.initialize();
         assembler.start();
         application = assembler.application();
-        Module familyModule = application.findModule( "Domain Layer", "Family Module" );
-        TestData.populate( familyModule );
-        Module executionModule = application.findModule( "Access Layer", "TestExecution Module" );
-        executionModule.injectTo( this );
+        Module familyModule = application.findModule("Domain Layer", "Family Module");
+        TestData.populate(familyModule);
+        Module executionModule = application.findModule("Access Layer", "TestExecution Module");
+        executionModule.injectTo(this);
     }
 
     @Test
     public void suite1Case1()
         throws Exception
     {
-        runTest( suite1Case1, "suite1Case1" );
+        runTest(suite1Case1, "suite1Case1");
     }
 
     @Test
     public void suite1Case2()
         throws Exception
     {
-        runTest( suite1Case2, "suite1Case2"  );
+        runTest(suite1Case2, "suite1Case2");
     }
 
     @Test
     public void suite2Case1()
         throws Exception
     {
-        runTest( suite2Case1, "suite2Case1"  );
+        runTest(suite2Case1, "suite2Case1");
     }
 
     @Test
     public void suite3Case1()
         throws Exception
     {
-        runTest( suite3Case1, "suite3Case1"  );
+        runTest(suite3Case1, "suite3Case1");
     }
 
-    private void runTest( ServiceReference<TestCase> testCaseRef, String testName )
+    private void runTest(ServiceReference<TestCase> testCaseRef, String testName)
         throws Exception
     {
-        if( testCaseRef == null )
+        if(testCaseRef == null)
         {
-            System.err.println( "TestCase is not defined." );
+            System.err.println("TestCase is not defined.");
         }
         else
         {
             TestCase testCase = testCaseRef.get();
-            try(UnitOfWork uow = uowf.newUnitOfWork( UsecaseBuilder.newUsecase( testName ) ))
+            try(UnitOfWork uow = uowf.newUnitOfWork(UsecaseBuilder.newUsecase(testName)))
             {
                 testCase.given();
                 testCase.when();

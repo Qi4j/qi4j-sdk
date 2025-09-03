@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivatorAdapter;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
@@ -31,7 +32,6 @@ import org.qi4j.api.structure.Module;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -45,7 +45,7 @@ public class ActivatorInjectionTest
     extends AbstractQi4jTest
 {
 
-    @Mixins( MixinA.class )
+    @Mixins(MixinA.class)
     public interface ServiceA
     {
         String what();
@@ -63,7 +63,7 @@ public class ActivatorInjectionTest
 
     }
 
-    @Mixins( MixinB.class )
+    @Mixins(MixinB.class)
     public interface ServiceB
     {
         String what();
@@ -104,15 +104,15 @@ public class ActivatorInjectionTest
         private ServiceB serviceB;
 
         @Override
-        public void afterActivation( ServiceReference<ServiceA> activatee )
+        public void afterActivation(ServiceReference<ServiceA> activatee)
             throws Exception
         {
-            assertThat( application, notNullValue() );
-            assertThat( layer, notNullValue() );
-            assertThat( module, notNullValue() );
-            assertThat( serviceRefB.isActive(), is( false ) );
-            assertThat( serviceB, notNullValue() );
-            assertThat( serviceB.what(), equalTo( "B" ) );
+            assertThat(application, notNullValue());
+            assertThat(layer, notNullValue());
+            assertThat(module, notNullValue());
+            assertThat(serviceRefB.isActive(), is(false));
+            assertThat(serviceB, notNullValue());
+            assertThat(serviceB.what(), equalTo("B"));
         }
     }
 
@@ -129,13 +129,13 @@ public class ActivatorInjectionTest
         private Foo foo;
 
         @Override
-        public void afterActivation( ServiceReference<ServiceB> activatee )
+        public void afterActivation(ServiceReference<ServiceB> activatee)
             throws Exception
         {
-            assertThat( application, notNullValue() );
-            assertThat( layer, notNullValue() );
-            assertThat( module, notNullValue() );
-            assertThat( foo.bar(), equalTo( "BAZAR" ) );
+            assertThat(application, notNullValue());
+            assertThat(layer, notNullValue());
+            assertThat(module, notNullValue());
+            assertThat(foo.bar(), equalTo("BAZAR"));
         }
     }
 
@@ -144,29 +144,29 @@ public class ActivatorInjectionTest
     {
 
         @Override
-        public void afterActivation( Module activatee )
+        public void afterActivation(Module activatee)
             throws Exception
         {
             // No injection support in Structure Activators
-            assertThat( activatee, notNullValue() );
+            assertThat(activatee, notNullValue());
         }
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.withActivators( ModuleActivator.class );
-        module.objects( Foo.class );
-        module.services( ServiceA.class ).withActivators( ServiceAActivator.class ).instantiateOnStartup();
-        module.services( ServiceB.class ).withActivators( ServiceBActivator.class ).instantiateOnStartup();
+        module.withActivators(ModuleActivator.class);
+        module.objects(Foo.class);
+        module.services(ServiceA.class).withActivators(ServiceAActivator.class).instantiateOnStartup();
+        module.services(ServiceB.class).withActivators(ServiceBActivator.class).instantiateOnStartup();
     }
 
     @Test
     public void test()
     {
-        assertThat( serviceFinder.findService( ServiceA.class ).get().what(), equalTo( "A" ) );
-        assertThat( serviceFinder.findService( ServiceB.class ).get().what(), equalTo( "B" ) );
+        assertThat(serviceFinder.findService(ServiceA.class).get().what(), equalTo("A"));
+        assertThat(serviceFinder.findService(ServiceB.class).get().what(), equalTo("B"));
     }
 
 }

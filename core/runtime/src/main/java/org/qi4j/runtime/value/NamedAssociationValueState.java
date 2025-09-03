@@ -19,17 +19,18 @@
  */
 package org.qi4j.runtime.value;
 
-import java.util.Iterator;
-import java.util.Map;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.spi.entity.NamedAssociationState;
+
+import java.util.Iterator;
+import java.util.Map;
 
 public class NamedAssociationValueState
     implements NamedAssociationState
 {
     private final Map<String, EntityReference> references;
 
-    public NamedAssociationValueState( Map<String, EntityReference> references )
+    public NamedAssociationValueState(Map<String, EntityReference> references)
     {
         this.references = references;
     }
@@ -41,27 +42,27 @@ public class NamedAssociationValueState
     }
 
     @Override
-    public boolean containsName( String name )
+    public boolean containsName(String name)
     {
-        return references.containsKey( name );
+        return references.containsKey(name);
     }
 
     @Override
-    public boolean put( String name, EntityReference entityReference )
+    public boolean put(String name, EntityReference entityReference)
     {
-        return references.put( name, entityReference ) != null;
+        return references.put(name, entityReference) != null;
     }
 
     @Override
-    public boolean remove( String name )
+    public boolean remove(String name)
     {
-        return references.remove( name ) != null;
+        return references.remove(name) != null;
     }
 
     @Override
     public boolean clear()
     {
-        if( !references.isEmpty() )
+        if(!references.isEmpty())
         {
             references.clear();
             return true;
@@ -70,17 +71,17 @@ public class NamedAssociationValueState
     }
 
     @Override
-    public EntityReference get( String name )
+    public EntityReference get(String name)
     {
-        return references.get( name );
+        return references.get(name);
     }
 
     @Override
-    public String nameOf( EntityReference entityReference )
+    public String nameOf(EntityReference entityReference)
     {
-        for( Map.Entry<String, EntityReference> entry : references.entrySet() )
+        for(Map.Entry<String, EntityReference> entry : references.entrySet())
         {
-            if( entry.getValue().equals( entityReference ) )
+            if(entry.getValue().equals(entityReference))
             {
                 return entry.getKey();
             }

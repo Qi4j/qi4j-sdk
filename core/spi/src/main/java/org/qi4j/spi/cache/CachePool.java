@@ -47,10 +47,9 @@ public interface CachePool
      *                  returned.
      * @param valueType Value type
      * @param <T>       Value type
-     *
      * @return The cache fetched from the pool.
      */
-    <T> Cache<T> fetchCache( String cacheId, Class<T> valueType );
+    <T> Cache<T> fetchCache(String cacheId, Class<T> valueType);
 
     /**
      * Returns the cache back to the pool.
@@ -59,5 +58,5 @@ public interface CachePool
      *
      * @param cache The cache to return to the pool.
      */
-    void returnCache( Cache<?> cache );
+    void returnCache(Cache<?> cache);
 }

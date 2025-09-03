@@ -20,14 +20,13 @@
 
 package org.qi4j.api.property;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Type;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.structure.MetaInfoHolder;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
-import org.qi4j.api.structure.MetaInfoHolder;
-import org.qi4j.api.structure.ModuleDescriptor;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Type;
 
 /**
  * Property Descriptor.

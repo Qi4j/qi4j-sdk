@@ -40,7 +40,7 @@ public interface BackupRestore
      *
      * @param states Stream of serialized entity states
      */
-    void restore( Stream<String> states );
+    void restore(Stream<String> states);
 
     /**
      * Restore entity states.

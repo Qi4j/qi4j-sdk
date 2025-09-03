@@ -29,7 +29,7 @@ public class EntityNotFoundException
 {
     private EntityReference reference;
 
-    public EntityNotFoundException( EntityReference reference)
+    public EntityNotFoundException(EntityReference reference)
     {
         super("Entity " + reference + " not found");
         this.reference = reference;

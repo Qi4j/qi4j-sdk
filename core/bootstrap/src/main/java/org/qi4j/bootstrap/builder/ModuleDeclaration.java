@@ -19,18 +19,14 @@
  */
 package org.qi4j.bootstrap.builder;
 
+import org.qi4j.api.structure.Module;
+import org.qi4j.bootstrap.*;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.StreamSupport;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.AssemblyReportException;
-import org.qi4j.bootstrap.ClassScanner;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.api.structure.Module;
 
 import static java.util.stream.Collectors.toList;
 import static org.qi4j.api.util.Classes.isAssignableFrom;
@@ -44,7 +40,7 @@ public class ModuleDeclaration
     private final List<Assembler> assemblers = new ArrayList<>();
     private ModuleAssembly module;
 
-    public ModuleDeclaration( String moduleName )
+    public ModuleDeclaration(String moduleName)
     {
         this.moduleName = moduleName;
     }
@@ -55,9 +51,9 @@ public class ModuleDeclaration
      * @param assembler Assembler instance
      * @return This Module declaration
      */
-    public ModuleDeclaration withAssembler( Assembler assembler )
+    public ModuleDeclaration withAssembler(Assembler assembler)
     {
-        assemblers.add( assembler );
+        assemblers.add(assembler);
         return this;
     }
 
@@ -68,11 +64,11 @@ public class ModuleDeclaration
      * @return This Module declaration
      * @throws AssemblyException if unable to load class, not an Assembler or unable to instanciate
      */
-    public ModuleDeclaration withAssembler( String classname )
+    public ModuleDeclaration withAssembler(String classname)
         throws AssemblyException
     {
-        Class<? extends Assembler> clazz = loadClass( classname );
-        return withAssembler( clazz );
+        Class<? extends Assembler> clazz = loadClass(classname);
+        return withAssembler(clazz);
     }
 
     /**
@@ -82,11 +78,11 @@ public class ModuleDeclaration
      * @return This Module declaration
      * @throws AssemblyException not an Assembler or if unable to instanciate
      */
-    public ModuleDeclaration withAssembler( Class<?> assemblerClass )
+    public ModuleDeclaration withAssembler(Class<?> assemblerClass)
         throws AssemblyException
     {
-        Assembler assembler = createAssemblerInstance( assemblerClass );
-        assemblers.add( assembler );
+        Assembler assembler = createAssemblerInstance(assemblerClass);
+        assemblers.add(assembler);
         return this;
     }
 
@@ -99,64 +95,64 @@ public class ModuleDeclaration
      * @return This Module declaration
      * @throws AssemblyException if one of the Class is not an Assembler or unable to instantiate
      */
-    public ModuleDeclaration withAssemblers( Iterable<Class<?>> assemblerClasses )
+    public ModuleDeclaration withAssemblers(Iterable<Class<?>> assemblerClasses)
         throws AssemblyException
     {
-        List<Class<?>> notAssemblers = StreamSupport.stream( assemblerClasses.spliterator(), false )
-                                                    .filter( isAssignableFrom( Assembler.class ).negate() )
-                                                    .collect( toList() );
-        if( !notAssemblers.isEmpty() )
+        List<Class<?>> notAssemblers = StreamSupport.stream(assemblerClasses.spliterator(), false)
+            .filter(isAssignableFrom(Assembler.class).negate())
+            .collect(toList());
+        if(!notAssemblers.isEmpty())
         {
             throw new AssemblyException(
                 "Classes " + notAssemblers + " are not implementing " + Assembler.class.getName()
             );
         }
-        for( Class<?> assemblerClass : assemblerClasses )
+        for(Class<?> assemblerClass : assemblerClasses)
         {
-            withAssembler( assemblerClass );
+            withAssembler(assemblerClass);
         }
         return this;
     }
 
-    ModuleAssembly createModule( LayerAssembly layer )
+    ModuleAssembly createModule(LayerAssembly layer)
     {
-        module = layer.module( moduleName );
+        module = layer.module(moduleName);
         return module;
     }
 
     void initialize()
     {
         Set<Throwable> problems = new HashSet<>();
-        for( Assembler assembler : assemblers )
+        for(Assembler assembler : assemblers)
         {
             try
             {
-                assembler.assemble( module );
+                assembler.assemble(module);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
-                problems.add( e );
+                problems.add(e);
             }
         }
-        if( problems.size() > 0 )
+        if(problems.size() > 0)
         {
-            throw new AssemblyReportException( problems );
+            throw new AssemblyReportException(problems);
         }
     }
 
-    @SuppressWarnings( "unchecked" )
-    private Class<? extends Assembler> loadClass( String classname )
+    @SuppressWarnings("unchecked")
+    private Class<? extends Assembler> loadClass(String classname)
     {
         Class<?> clazz;
         try
         {
-            clazz = getClass().getClassLoader().loadClass( classname );
+            clazz = getClass().getClassLoader().loadClass(classname);
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new AssemblyException( "Unable to load class " + classname, e );
+            throw new AssemblyException("Unable to load class " + classname, e);
         }
-        if( !Assembler.class.isAssignableFrom( clazz ) )
+        if(!Assembler.class.isAssignableFrom(clazz))
         {
             throw new AssemblyException(
                 "Class " + classname + " is not implementing " + Assembler.class.getName()
@@ -166,9 +162,9 @@ public class ModuleDeclaration
         return (Class<? extends Assembler>) clazz;
     }
 
-    private Assembler createAssemblerInstance( Class<?> assemblerClass )
+    private Assembler createAssemblerInstance(Class<?> assemblerClass)
     {
-        if( !Assembler.class.isAssignableFrom( assemblerClass ) )
+        if(!Assembler.class.isAssignableFrom(assemblerClass))
         {
             throw new AssemblyException(
                 "Class " + assemblerClass + " is not implementing " + Assembler.class.getName()
@@ -178,9 +174,9 @@ public class ModuleDeclaration
         {
             return (Assembler) assemblerClass.getConstructor().newInstance();
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new AssemblyException( "Unable to instantiate " + assemblerClass, e );
+            throw new AssemblyException("Unable to instantiate " + assemblerClass, e);
         }
     }
 }

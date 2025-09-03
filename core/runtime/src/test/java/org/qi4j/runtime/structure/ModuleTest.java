@@ -20,16 +20,13 @@
 
 package org.qi4j.runtime.structure;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Module;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.Energy4Java;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.Energy4Java;
@@ -53,13 +50,13 @@ public class ModuleTest
                     {
                         {
                             {
-                                module -> module.transients( TestComposite1.class )
+                                module -> module.transients(TestComposite1.class)
                             },
                             {
-                                module -> module.transients( TestComposite2.class ).visibleIn( Visibility.layer )
+                                module -> module.transients(TestComposite2.class).visibleIn(Visibility.layer)
                             }
                         }
-                    } ) );
+                    }));
     }
 
     @Test
@@ -68,8 +65,8 @@ public class ModuleTest
     {
         Application app = givenFixture1();
 
-        Module module = app.findModule( "Layer 1", "Module 1" ).newTransient( TestComposite1.class ).getModule();
-        assertThat( "module name is correct", module.name(), equalTo( "Module 1" ) );
+        Module module = app.findModule("Layer 1", "Module 1").newTransient(TestComposite1.class).getModule();
+        assertThat("module name is correct", module.name(), equalTo("Module 1"));
     }
 
     @Test
@@ -78,8 +75,8 @@ public class ModuleTest
     {
         Application app = givenFixture1();
 
-        Module module = app.findModule( "Layer 1", "Module 1" ).newTransient( TestComposite1.class ).getModule();
-        assertThat( "module for composite is correct", module, equalTo( module ) );
+        Module module = app.findModule("Layer 1", "Module 1").newTransient(TestComposite1.class).getModule();
+        assertThat("module for composite is correct", module, equalTo(module));
     }
 
     @Test
@@ -88,11 +85,11 @@ public class ModuleTest
     {
         Application app = givenFixture1();
 
-        Module module = app.findModule( "Layer 1", "Module 1" ).newTransient( TestComposite1.class ).getModule();
-        module.descriptor().classLoader().loadClass( TestComposite2.class.getName() );
+        Module module = app.findModule("Layer 1", "Module 1").newTransient(TestComposite1.class).getModule();
+        module.descriptor().classLoader().loadClass(TestComposite2.class.getName());
     }
 
-    @Mixins( TestMixin1.class )
+    @Mixins(TestMixin1.class)
     public interface TestComposite1
         extends TransientComposite
     {
@@ -111,7 +108,7 @@ public class ModuleTest
         }
     }
 
-    @Mixins( TestMixin2.class )
+    @Mixins(TestMixin2.class)
     public interface TestComposite2
         extends TransientComposite
     {

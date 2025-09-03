@@ -19,9 +19,8 @@
  */
 package org.qi4j.runtime.structure;
 
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.activation.ActivationException;
+import org.qi4j.api.activation.ActivatorDescriptor;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.ModelDescriptor;
@@ -36,8 +35,10 @@ import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.api.value.ValueDescriptor;
 import org.qi4j.runtime.activation.ActivatorsInstance;
 import org.qi4j.runtime.activation.ActivatorsModel;
-import org.qi4j.runtime.activation.ActivatorsInstance;
-import org.qi4j.runtime.activation.ActivatorsModel;
+
+import java.util.List;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * JAVADOC
@@ -53,11 +54,11 @@ public final class LayerModel
     private final List<ModuleModel> modules;
     private LayerInstance layerInstance;
 
-    public LayerModel( String name,
-                       MetaInfo metaInfo,
-                       UsedLayersModel usedLayersModel,
-                       ActivatorsModel<Layer> activatorsModel,
-                       List<ModuleModel> modules
+    public LayerModel(String name,
+                      MetaInfo metaInfo,
+                      UsedLayersModel usedLayersModel,
+                      ActivatorsModel<Layer> activatorsModel,
+                      List<ModuleModel> modules
     )
     {
         this.name = name;
@@ -73,9 +74,9 @@ public final class LayerModel
         return name;
     }
 
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return metaInfo.get( infoType );
+        return metaInfo.get(infoType);
     }
 
     public Stream<? extends ModuleDescriptor> modules()
@@ -92,27 +93,27 @@ public final class LayerModel
     public ActivatorsInstance<Layer> newActivatorsInstance()
         throws ActivationException
     {
-        return new ActivatorsInstance<>( activatorsModel.newInstances() );
+        return new ActivatorsInstance<>(activatorsModel.newInstances());
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> modelVisitor)
         throws ThrowableType
     {
-        if( modelVisitor.visitEnter( this ) )
+        if(modelVisitor.visitEnter(this))
         {
-            if( activatorsModel.accept( modelVisitor ) )
+            if(activatorsModel.accept(modelVisitor))
             {
-                for( ModuleModel module : modules )
+                for(ModuleModel module : modules)
                 {
-                    if( !module.accept( modelVisitor ) )
+                    if(!module.accept(modelVisitor))
                     {
                         break;
                     }
                 }
             }
         }
-        return modelVisitor.visitLeave( this );
+        return modelVisitor.visitLeave(this);
     }
 
     @Override
@@ -121,47 +122,52 @@ public final class LayerModel
         return layerInstance;
     }
 
-    public LayerInstance newInstance( ApplicationInstance applicationInstance )
+    public LayerInstance newInstance(ApplicationInstance applicationInstance)
     {
-        layerInstance = new LayerInstance( this, applicationInstance );
-        for( ModuleModel module : modules )
+        layerInstance = new LayerInstance(this, applicationInstance);
+        for(ModuleModel module : modules)
         {
-            ModuleInstance moduleInstance = module.newInstance( this );
-            layerInstance.addModule( moduleInstance );
+            ModuleInstance moduleInstance = module.newInstance(this);
+            layerInstance.addModule(moduleInstance);
         }
         return layerInstance;
     }
 
     @Override
-    public Stream<? extends ObjectDescriptor> visibleObjects( final Visibility visibility )
+    public Stream<? extends ObjectDescriptor> visibleObjects(final Visibility visibility)
     {
-        return modules.stream().flatMap( module -> module.visibleObjects( visibility ) );
+        return modules.stream().flatMap(module -> module.visibleObjects(visibility));
     }
 
     @Override
-    public Stream<? extends TransientDescriptor> visibleTransients( final Visibility visibility )
+    public Stream<? extends TransientDescriptor> visibleTransients(final Visibility visibility)
     {
-        return modules.stream().flatMap( module -> module.visibleTransients( visibility ) );
+        return modules.stream().flatMap(module -> module.visibleTransients(visibility));
     }
 
     @Override
-    public Stream<? extends EntityDescriptor> visibleEntities( final Visibility visibility )
+    public Stream<? extends EntityDescriptor> visibleEntities(final Visibility visibility)
     {
-        return modules.stream().flatMap( module -> module.visibleEntities( visibility ) );
+        return modules.stream().flatMap(module -> module.visibleEntities(visibility));
     }
 
     @Override
-    public Stream<? extends ValueDescriptor> visibleValues( final Visibility visibility )
+    public Stream<? extends ValueDescriptor> visibleValues(final Visibility visibility)
     {
-        return modules.stream().flatMap( module -> module.visibleValues( visibility ) );
+        return modules.stream().flatMap(module -> module.visibleValues(visibility));
     }
 
     @Override
-    public Stream<? extends ModelDescriptor> visibleServices( final Visibility visibility )
+    public Stream<? extends ModelDescriptor> visibleServices(final Visibility visibility)
     {
-        return modules.stream().flatMap( module -> module.visibleServices( visibility ) );
+        return modules.stream().flatMap(module -> module.visibleServices(visibility));
     }
 
+    @Override
+    public Stream<? extends ActivatorDescriptor> activators()
+    {
+        return StreamSupport.stream(activatorsModel.models().spliterator(), false);
+    }
 
     @Override
     public String toString()

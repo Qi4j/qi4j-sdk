@@ -24,20 +24,20 @@ package org.qi4j.spi.query;
  */
 public class EntityFinderException extends RuntimeException
 {
-    public EntityFinderException( final String message )
+    public EntityFinderException(final String message)
     {
-        super( message );
+        super(message);
     }
 
-    public EntityFinderException( final String message,
-                                  final Throwable throwable
+    public EntityFinderException(final String message,
+                                 final Throwable throwable
     )
     {
-        super( message, throwable );
+        super(message, throwable);
     }
 
-    public EntityFinderException( final Throwable throwable )
+    public EntityFinderException(final Throwable throwable)
     {
-        super( throwable );
+        super(throwable);
     }
 }

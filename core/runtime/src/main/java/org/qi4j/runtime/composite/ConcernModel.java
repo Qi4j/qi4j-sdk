@@ -28,8 +28,8 @@ import org.qi4j.api.concern.ConcernDescriptor;
 public final class ConcernModel extends AbstractModifierModel
     implements ConcernDescriptor
 {
-    public ConcernModel( Class concernClass, Class instantiationClass )
+    public ConcernModel(Class concernClass, Class instantiationClass)
     {
-        super( concernClass, instantiationClass );
+        super(concernClass, instantiationClass);
     }
 }

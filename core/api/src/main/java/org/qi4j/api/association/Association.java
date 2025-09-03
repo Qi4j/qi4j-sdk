@@ -38,11 +38,10 @@ public interface Association<T> extends AbstractAssociation
      * Set the associated entity.
      *
      * @param associated the entity
-     *
      * @throws IllegalArgumentException thrown if the entity is not a valid reference for this association
      * @throws IllegalStateException    thrown if association is immutable
      */
-    void set( T associated )
+    void set(T associated)
         throws IllegalArgumentException, IllegalStateException;
 
     /**

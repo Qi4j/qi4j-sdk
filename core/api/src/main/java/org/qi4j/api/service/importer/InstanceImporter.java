@@ -20,8 +20,6 @@
 
 package org.qi4j.api.service.importer;
 
-import java.util.Objects;
-import java.util.stream.Stream;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.service.ImportedServiceDescriptor;
 import org.qi4j.api.service.ServiceImporter;
@@ -29,10 +27,9 @@ import org.qi4j.api.service.ServiceImporterException;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.Layer;
 import org.qi4j.api.structure.Module;
-import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.structure.Application;
-import org.qi4j.api.structure.Layer;
-import org.qi4j.api.structure.Module;
+
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Return a predefined service instance that was provided as meta-info. Search for meta-info in the following order:
@@ -50,19 +47,19 @@ public final class InstanceImporter<T>
     @Structure
     private Module module;
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     @Override
-    public T importService( final ImportedServiceDescriptor serviceDescriptor )
+    public T importService(final ImportedServiceDescriptor serviceDescriptor)
         throws ServiceImporterException
     {
-        return Stream.of( serviceDescriptor, module, layer, application )
-            .flatMap( holder -> serviceDescriptor.types().map( type -> (T) holder.metaInfo( type ) ) )
-            .filter( Objects::nonNull )
-            .findFirst().orElse( null );
+        return Stream.of(serviceDescriptor, module, layer, application)
+            .flatMap(holder -> serviceDescriptor.types().map(type -> (T) holder.metaInfo(type)))
+            .filter(Objects::nonNull)
+            .findFirst().orElse(null);
     }
 
     @Override
-    public boolean isAvailable( T instance )
+    public boolean isAvailable(T instance)
     {
         return true;
     }

@@ -20,13 +20,14 @@
 
 package org.qi4j.spi.entitystore;
 
-import java.time.Instant;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.spi.entity.EntityState;
+
+import java.time.Instant;
 
 /**
  * EntityStore UnitOfWork.
@@ -43,33 +44,30 @@ public interface EntityStoreUnitOfWork
      * This should only create the EntityState and not insert it into any database, since that should occur during
      * the {@link EntityStoreUnitOfWork#applyChanges()} call.
      * </p>
+     *
      * @param anIdentity       the reference of the entity
      * @param entityDescriptor entity descriptor
-     *
      * @return The new entity state.
-     *
      * @throws EntityStoreException Thrown if creational fails.
      */
-    EntityState newEntityState( EntityReference anIdentity, EntityDescriptor entityDescriptor )
+    EntityState newEntityState(EntityReference anIdentity, EntityDescriptor entityDescriptor)
         throws EntityStoreException;
 
     /**
      * Get the EntityState for a given reference. Throws {@link EntityNotFoundException}
      * if the entity with given {@code anIdentity} is not found.
      *
-     *
-     * @param module Module descriptor
+     * @param module     Module descriptor
      * @param anIdentity The entity reference. This argument must not be {@code null}.
-     *
      * @return Entity state given the composite descriptor and reference.
-     *
      * @throws EntityStoreException    thrown if retrieval failed.
      * @throws EntityNotFoundException if requested entity does not exist
      */
-    EntityState entityStateOf( ModuleDescriptor module, EntityReference anIdentity )
+    EntityState entityStateOf(ModuleDescriptor module, EntityReference anIdentity)
         throws EntityStoreException, EntityNotFoundException;
 
-    String versionOf( EntityReference anIdentity ) throws EntityStoreException;
+    String versionOf(EntityReference anIdentity)
+        throws EntityStoreException;
 
     StateCommitter applyChanges()
         throws EntityStoreException;

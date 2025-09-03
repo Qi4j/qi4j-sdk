@@ -22,11 +22,11 @@ package org.qi4j.api.identity;
 import java.util.UUID;
 
 public class UuidGeneratorMixin
-        implements IdentityGenerator
+    implements IdentityGenerator
 {
     @Override
     public Identity generate(Class<?> compositeType)
     {
-        return StringIdentity.identityOf( UUID.randomUUID().toString() );
+        return StringIdentity.identityOf(UUID.randomUUID().toString());
     }
 }

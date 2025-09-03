@@ -19,8 +19,7 @@
  */
 package org.qi4j.runtime.appliesto;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.concern.ConcernOf;
@@ -29,7 +28,9 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -40,40 +41,40 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class AppliesToTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( SomeComposite.class );
+        module.transients(SomeComposite.class);
     }
 
     @Test
     public void givenAnAppliesToWhenNoAnnotationExpectNoConcernInInvocationStack()
         throws Exception
     {
-        Some some = transientBuilderFactory.newTransient( Some.class );
-        assertThat( some.doStuff1(), equalTo( "," ) );
+        Some some = transientBuilderFactory.newTransient(Some.class);
+        assertThat(some.doStuff1(), equalTo(","));
     }
 
     @Test
     public void givenAnAppliesToWhenAnnotationIsOnMixinTypeExpectConcernInInvocationStack()
         throws Exception
     {
-        Some some = transientBuilderFactory.newTransient( Some.class );
-        assertThat( some.doStuff2(), equalTo( ",,.." ) );
+        Some some = transientBuilderFactory.newTransient(Some.class);
+        assertThat(some.doStuff2(), equalTo(",,.."));
     }
 
     @Test
     public void givenAnAppliesToWhenAnnotationIsOnMixinImplementationExpectConcernInInvocationStack()
         throws Exception
     {
-        Some some = transientBuilderFactory.newTransient( Some.class );
-        assertThat( some.doStuff1(), equalTo( "," ) );
-        assertThat( some.doStuff2(), equalTo( ",,.." ) );
-        assertThat( some.doStuff3(), equalTo( ",,," ) );
+        Some some = transientBuilderFactory.newTransient(Some.class);
+        assertThat(some.doStuff1(), equalTo(","));
+        assertThat(some.doStuff2(), equalTo(",,.."));
+        assertThat(some.doStuff3(), equalTo(",,,"));
     }
 
-    @Concerns( MyConcern.class )
-    @Mixins( SomeMixin.class )
+    @Concerns(MyConcern.class)
+    @Mixins(SomeMixin.class)
     private interface SomeComposite
         extends Some, TransientComposite
     {
@@ -89,7 +90,7 @@ public class AppliesToTest
         String doStuff3();
     }
 
-    @AppliesTo( Foo.class )
+    @AppliesTo(Foo.class)
     public static class MyConcern
         extends ConcernOf<Some>
         implements Some
@@ -132,7 +133,7 @@ public class AppliesToTest
         }
     }
 
-    @Retention( RetentionPolicy.RUNTIME )
+    @Retention(RetentionPolicy.RUNTIME)
     private @interface Foo
     {
     }

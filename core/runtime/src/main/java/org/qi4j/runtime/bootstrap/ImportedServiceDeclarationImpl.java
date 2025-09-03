@@ -20,16 +20,16 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.service.ServiceImporter;
 import org.qi4j.api.service.qualifier.ServiceTags;
 import org.qi4j.bootstrap.ImportedServiceDeclaration;
-import org.qi4j.bootstrap.ImportedServiceDeclaration;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Declaration of an imported Service.
@@ -39,7 +39,7 @@ public final class ImportedServiceDeclarationImpl
 {
     private final Iterable<ImportedServiceAssemblyImpl> assemblies;
 
-    public ImportedServiceDeclarationImpl( Iterable<ImportedServiceAssemblyImpl> assemblies )
+    public ImportedServiceDeclarationImpl(Iterable<ImportedServiceAssemblyImpl> assemblies)
     {
         this.assemblies = assemblies;
     }
@@ -47,7 +47,7 @@ public final class ImportedServiceDeclarationImpl
     @Override
     public ImportedServiceDeclaration importOnStartup()
     {
-        for( ImportedServiceAssemblyImpl assembly : assemblies )
+        for(ImportedServiceAssemblyImpl assembly : assemblies)
         {
             assembly.importOnStartup = true;
         }
@@ -55,9 +55,9 @@ public final class ImportedServiceDeclarationImpl
     }
 
     @Override
-    public ImportedServiceDeclaration visibleIn( Visibility visibility )
+    public ImportedServiceDeclaration visibleIn(Visibility visibility)
     {
-        for( ImportedServiceAssemblyImpl assembly : assemblies )
+        for(ImportedServiceAssemblyImpl assembly : assemblies)
         {
             assembly.visibility = visibility;
         }
@@ -65,10 +65,10 @@ public final class ImportedServiceDeclarationImpl
     }
 
     @Override
-    @SuppressWarnings( "raw" )
-    public ImportedServiceDeclaration importedBy( Class<? extends ServiceImporter> sip )
+    @SuppressWarnings("raw")
+    public ImportedServiceDeclaration importedBy(Class<? extends ServiceImporter> sip)
     {
-        for( ImportedServiceAssemblyImpl assembly : assemblies )
+        for(ImportedServiceAssemblyImpl assembly : assemblies)
         {
             assembly.serviceProvider = sip;
         }
@@ -76,9 +76,9 @@ public final class ImportedServiceDeclarationImpl
     }
 
     @Override
-    public ImportedServiceDeclaration identifiedBy( String identity )
+    public ImportedServiceDeclaration identifiedBy(String identity)
     {
-        for( ImportedServiceAssemblyImpl assembly : assemblies )
+        for(ImportedServiceAssemblyImpl assembly : assemblies)
         {
             assembly.identity = identity;
         }
@@ -86,21 +86,21 @@ public final class ImportedServiceDeclarationImpl
     }
 
     @Override
-    public ImportedServiceDeclaration taggedWith( String... tags )
+    public ImportedServiceDeclaration taggedWith(String... tags)
     {
-        for( ImportedServiceAssemblyImpl serviceAssembly : assemblies )
+        for(ImportedServiceAssemblyImpl serviceAssembly : assemblies)
         {
-            ServiceTags previousTags = serviceAssembly.metaInfo.get( ServiceTags.class );
-            if( previousTags != null )
+            ServiceTags previousTags = serviceAssembly.metaInfo.get(ServiceTags.class);
+            if(previousTags != null)
             {
                 List<String> tagList = new ArrayList<>();
-                Collections.addAll( tagList, previousTags.tags() );
-                Collections.addAll( tagList, tags );
-                serviceAssembly.metaInfo.set( new ServiceTags( tagList.toArray( new String[ tagList.size() ] ) ) );
+                Collections.addAll(tagList, previousTags.tags());
+                Collections.addAll(tagList, tags);
+                serviceAssembly.metaInfo.set(new ServiceTags(tagList.toArray(new String[tagList.size()])));
             }
             else
             {
-                serviceAssembly.metaInfo.set( new ServiceTags( tags ) );
+                serviceAssembly.metaInfo.set(new ServiceTags(tags));
             }
         }
 
@@ -108,21 +108,22 @@ public final class ImportedServiceDeclarationImpl
     }
 
     @Override
-    public ImportedServiceDeclaration setMetaInfo( Object serviceAttribute )
+    public ImportedServiceDeclaration setMetaInfo(Object serviceAttribute)
     {
-        for( ImportedServiceAssemblyImpl assembly : assemblies )
+        for(ImportedServiceAssemblyImpl assembly : assemblies)
         {
-            assembly.metaInfo.set( serviceAttribute );
+            assembly.metaInfo.set(serviceAttribute);
         }
         return this;
     }
 
     @Override
     @SafeVarargs
-    public final ImportedServiceDeclaration withActivators( Class<? extends Activator<?>>... activators )
+    public final ImportedServiceDeclaration withActivators(Class<? extends Activator<?>>... activators)
     {
-        for ( ImportedServiceAssemblyImpl serviceAssembly : assemblies ) {
-            serviceAssembly.activators.addAll( Arrays.asList( activators ) );
+        for(ImportedServiceAssemblyImpl serviceAssembly : assemblies)
+        {
+            serviceAssembly.activators.addAll(Arrays.asList(activators));
         }
         return this;
     }

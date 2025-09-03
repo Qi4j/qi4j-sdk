@@ -66,7 +66,7 @@ public interface AppliesToFilter
      * internal class in Qi4j.
      * </p>
      */
-    AppliesToFilter ALWAYS = ( method, mixin, compositeType, fragmentClass ) -> true;
+    AppliesToFilter ALWAYS = (method, mixin, compositeType, fragmentClass) -> true;
 
     /**
      * Check if the Fragment should be applied or not. Will be call when applied to Mixins, Concerns, SideEffects.
@@ -75,8 +75,7 @@ public interface AppliesToFilter
      * @param mixin         mixin implementation for the method
      * @param compositeType composite type
      * @param fragmentClass fragment that is being applies
-     *
      * @return true if the filter passes, otherwise false
      */
-    boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass );
+    boolean appliesTo(Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass);
 }

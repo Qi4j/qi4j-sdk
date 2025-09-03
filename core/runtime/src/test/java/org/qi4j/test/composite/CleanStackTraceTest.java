@@ -20,17 +20,18 @@
 
 package org.qi4j.test.composite;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.concern.GenericConcern;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -48,13 +49,13 @@ public class CleanStackTraceTest extends AbstractQi4jTest
     @BeforeAll
     public static void beforeClass_IBMJDK()
     {
-        assumeTrue( !( System.getProperty( "java.vendor" ).contains( "IBM" ) ) );
+        assumeTrue(!(System.getProperty("java.vendor").contains("IBM")));
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.transients( CleanStackTraceTest.TestComposite.class );
+        module.transients(CleanStackTraceTest.TestComposite.class);
     }
 
     /**
@@ -64,46 +65,46 @@ public class CleanStackTraceTest extends AbstractQi4jTest
     public void cleanStackTraceOnApplicationException()
     {
         // Don't run the satisfiedBy if compacttrace is set to anything else but proxy
-        String compactTracePropertyValue = System.getProperty( "qi4j.compacttrace" );
-        if( compactTracePropertyValue != null && !"proxy".equals( compactTracePropertyValue ) )
+        String compactTracePropertyValue = System.getProperty("qi4j.compacttrace");
+        if(compactTracePropertyValue != null && !"proxy".equals(compactTracePropertyValue))
         {
             return;
         }
-        TestComposite composite = transientBuilderFactory.newTransient( TestComposite.class );
+        TestComposite composite = transientBuilderFactory.newTransient(TestComposite.class);
         try
         {
             composite.doStuff();
         }
-        catch( RuntimeException e )
+        catch(RuntimeException e)
         {
-            String separator = System.getProperty( "line.separator" );
+            String separator = System.getProperty("line.separator");
             String correctTrace1 = "java.lang.RuntimeException: level 2" + separator +
-                                   "\tat method \"doStuff\" of TestComposite in module [Module 1] of layer [Layer 1].(:0)\n" +
-                                   "\tat org.qi4j.test.composite.CleanStackTraceTest$DoStuffMixin.doStuff(CleanStackTraceTest.java:124)" + separator +
-                                   "\tat org.qi4j.test.composite.CleanStackTraceTest$NillyWilly.invoke(CleanStackTraceTest.java:136)" + separator +
-                                   "\tat org.qi4j.test.composite.CleanStackTraceTest.cleanStackTraceOnApplicationException(CleanStackTraceTest.java:75)";
-            assertEquality( e, correctTrace1 );
+                "\tat method \"doStuff\" of TestComposite in module [Module 1] of layer [Layer 1].(:0)\n" +
+                "\tat org.qi4j.test.composite.CleanStackTraceTest$DoStuffMixin.doStuff(CleanStackTraceTest.java:124)" + separator +
+                "\tat org.qi4j.test.composite.CleanStackTraceTest$NillyWilly.invoke(CleanStackTraceTest.java:136)" + separator +
+                "\tat org.qi4j.test.composite.CleanStackTraceTest.cleanStackTraceOnApplicationException(CleanStackTraceTest.java:75)";
+            assertEquality(e, correctTrace1);
             String correctTrace2 = "java.lang.RuntimeException: level 1" + separator +
-                                   "\tat org.qi4j.test.composite.CleanStackTraceTest$DoStuffMixin.doStuff(CleanStackTraceTest.java:120)" + separator +
-                                   "\tat org.qi4j.test.composite.CleanStackTraceTest$NillyWilly.invoke(CleanStackTraceTest.java:136)" + separator +
-                                   "\tat org.qi4j.test.composite.CleanStackTraceTest.cleanStackTraceOnApplicationException(CleanStackTraceTest.java:75)";
-            assertThat( e.getCause(), notNullValue() );
-            assertEquality( e.getCause(), correctTrace2 );
+                "\tat org.qi4j.test.composite.CleanStackTraceTest$DoStuffMixin.doStuff(CleanStackTraceTest.java:120)" + separator +
+                "\tat org.qi4j.test.composite.CleanStackTraceTest$NillyWilly.invoke(CleanStackTraceTest.java:136)" + separator +
+                "\tat org.qi4j.test.composite.CleanStackTraceTest.cleanStackTraceOnApplicationException(CleanStackTraceTest.java:75)";
+            assertThat(e.getCause(), notNullValue());
+            assertEquality(e.getCause(), correctTrace2);
         }
     }
 
-    private void assertEquality( Throwable e, String correctTrace )
+    private void assertEquality(Throwable e, String correctTrace)
     {
         StringWriter actualTrace = new StringWriter();
-        e.printStackTrace( new PrintWriter( actualTrace ) );
+        e.printStackTrace(new PrintWriter(actualTrace));
 
         String actual = actualTrace.toString();
-        actual = actual.substring( 0, correctTrace.length() );
-        assertThat( actual, equalTo( correctTrace ) );
+        actual = actual.substring(0, correctTrace.length());
+        assertThat(actual, equalTo(correctTrace));
     }
 
-    @Concerns( NillyWilly.class )
-    @Mixins( DoStuffMixin.class )
+    @Concerns(NillyWilly.class)
+    @Mixins(DoStuffMixin.class)
     public interface TestComposite
     {
         void doStuff();
@@ -117,11 +118,11 @@ public class CleanStackTraceTest extends AbstractQi4jTest
         {
             try
             {
-                throw new RuntimeException( "level 1" );
+                throw new RuntimeException("level 1");
             }
-            catch( RuntimeException e )
+            catch(RuntimeException e)
             {
-                throw new RuntimeException( "level 2", e );
+                throw new RuntimeException("level 2", e);
             }
         }
     }
@@ -130,10 +131,10 @@ public class CleanStackTraceTest extends AbstractQi4jTest
         implements InvocationHandler
     {
         @Override
-        public Object invoke( Object proxy, Method method, Object[] args )
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
-            return next.invoke( proxy, method, args );
+            return next.invoke(proxy, method, args);
         }
     }
 }

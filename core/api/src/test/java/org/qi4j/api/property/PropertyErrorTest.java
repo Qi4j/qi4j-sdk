@@ -20,13 +20,13 @@
 
 package org.qi4j.api.property;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -34,30 +34,30 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Error messages for Properties
  */
 public class PropertyErrorTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( PersonEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(PersonEntity.class);
     }
 
     @Test
     public void givenEntityWithNonOptionPropertyWhenInstantiatedThenException()
         throws Exception
     {
-        assertThrows( ConstraintViolationException.class, () -> {
+        assertThrows(ConstraintViolationException.class, () -> {
             UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
             try
             {
-                PersonEntity person = unitOfWork.newEntity( PersonEntity.class );
+                PersonEntity person = unitOfWork.newEntity(PersonEntity.class);
                 unitOfWork.complete();
             }
             finally
             {
                 unitOfWork.discard();
             }
-        } );
+        });
     }
 
     interface PersonEntity

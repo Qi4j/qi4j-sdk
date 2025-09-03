@@ -25,8 +25,6 @@ import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.api.value.ValueDescriptor;
 import org.qi4j.runtime.composite.StateResolver;
 import org.qi4j.runtime.structure.ModuleInstance;
-import org.qi4j.runtime.composite.StateResolver;
-import org.qi4j.runtime.structure.ModuleInstance;
 
 public class ValueBuilderWithState<T>
     implements ValueBuilder<T>
@@ -34,12 +32,12 @@ public class ValueBuilderWithState<T>
     private final ValueDescriptor model;
     private ValueInstance prototypeInstance;
 
-    public ValueBuilderWithState( ValueDescriptor compositeModelModule,
-                                  ModuleInstance currentModule,
-                                  StateResolver stateResolver )
+    public ValueBuilderWithState(ValueDescriptor compositeModelModule,
+                                 ModuleInstance currentModule,
+                                 StateResolver stateResolver)
     {
-        ValueStateInstance state = new ValueStateInstance( compositeModelModule, currentModule, stateResolver );
-        ValueInstance instance = ((ValueModel) compositeModelModule).newValueInstance( state );
+        ValueStateInstance state = new ValueStateInstance(compositeModelModule, currentModule, stateResolver);
+        ValueInstance instance = ((ValueModel) compositeModelModule).newValueInstance(state);
         instance.prepareToBuild();
         this.model = compositeModelModule;
         this.prototypeInstance = instance;
@@ -53,7 +51,7 @@ public class ValueBuilderWithState<T>
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public Class<T> primaryType()
     {
         return (Class<T>) model.primaryType();
@@ -67,11 +65,11 @@ public class ValueBuilderWithState<T>
     }
 
     @Override
-    public <K> K prototypeFor( Class<K> mixinType )
+    public <K> K prototypeFor(Class<K> mixinType)
     {
         verifyUnderConstruction();
 
-        return prototypeInstance.newProxy( mixinType );
+        return prototypeInstance.newProxy(mixinType);
     }
 
     @Override
@@ -84,7 +82,7 @@ public class ValueBuilderWithState<T>
         prototypeInstance.prepareBuilderState();
 
         // Check that it is valid
-        ((ValueModel) model).checkConstraints( prototypeInstance.state() );
+        ((ValueModel) model).checkConstraints(prototypeInstance.state());
 
         try
         {
@@ -99,9 +97,9 @@ public class ValueBuilderWithState<T>
 
     private void verifyUnderConstruction()
     {
-        if( prototypeInstance == null )
+        if(prototypeInstance == null)
         {
-            throw new IllegalStateException( "ValueBuilder instances cannot be reused" );
+            throw new IllegalStateException("ValueBuilder instances cannot be reused");
         }
     }
 }

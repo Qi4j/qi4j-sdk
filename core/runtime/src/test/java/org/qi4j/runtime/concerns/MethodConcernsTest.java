@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.concerns;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.concern.ConcernOf;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.mixin.Mixins;
@@ -27,7 +28,6 @@ import org.qi4j.api.sideeffect.SideEffects;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -37,34 +37,34 @@ public class MethodConcernsTest extends AbstractQi4jTest
     private static int count = 0;
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.values( SomeType.class );
+        module.values(SomeType.class);
     }
 
     @Test
     public void givenTypedConcernWhenCallingMethodExpectConcernToBeInvoked()
         throws Exception
     {
-        SomeType value = valueBuilderFactory.newValue( SomeType.class );
-        assertThat( value.doSomething( "abc" ), equalTo( "(...abc...)" ) );
-        assertThat( count, equalTo(1) );
+        SomeType value = valueBuilderFactory.newValue(SomeType.class);
+        assertThat(value.doSomething("abc"), equalTo("(...abc...)"));
+        assertThat(count, equalTo(1));
     }
 
-    @Mixins( Mixin.class )
+    @Mixins(Mixin.class)
     public interface SomeType
     {
-        @Concerns( ParenWrapConcern.class )
-        @SideEffects( CountInvocationsSideEffect.class )
-        String doSomething( String value );
+        @Concerns(ParenWrapConcern.class)
+        @SideEffects(CountInvocationsSideEffect.class)
+        String doSomething(String value);
     }
 
     public class Mixin implements SomeType
     {
 
         @Override
-        public String doSomething( String value )
+        public String doSomething(String value)
         {
             return "..." + value + "...";
         }
@@ -75,9 +75,9 @@ public class MethodConcernsTest extends AbstractQi4jTest
     {
 
         @Override
-        public String doSomething( String value )
+        public String doSomething(String value)
         {
-            return "(" + next.doSomething( value ) + ")";
+            return "(" + next.doSomething(value) + ")";
         }
     }
 
@@ -85,7 +85,7 @@ public class MethodConcernsTest extends AbstractQi4jTest
         implements SomeType
     {
         @Override
-        public String doSomething( String value )
+        public String doSomething(String value)
         {
             count++;
             return null;  // side effect returns are ignored.

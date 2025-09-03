@@ -29,18 +29,18 @@ public class EntityStoreException
     {
     }
 
-    public EntityStoreException( String message )
+    public EntityStoreException(String message)
     {
-        super( message );
+        super(message);
     }
 
-    public EntityStoreException( String message, Throwable cause )
+    public EntityStoreException(String message, Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 
-    public EntityStoreException( Throwable cause )
+    public EntityStoreException(Throwable cause)
     {
-        super( cause );
+        super(cause);
     }
 }

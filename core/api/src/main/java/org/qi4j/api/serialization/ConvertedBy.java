@@ -17,19 +17,15 @@
  */
 package org.qi4j.api.serialization;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Convert this type or Property with the given {@link Converter}.
- *
+ * <p>
  * {@link Converter}s must have a no-args constructor and will be instantiated by the serialization SPI.
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.TYPE, ElementType.METHOD } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
 public @interface ConvertedBy
 {

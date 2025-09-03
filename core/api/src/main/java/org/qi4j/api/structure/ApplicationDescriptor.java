@@ -20,7 +20,10 @@
 package org.qi4j.api.structure;
 
 import org.qi4j.api.Qi4jAPI;
+import org.qi4j.api.activation.ActivatorDescriptor;
 import org.qi4j.api.util.VisitableHierarchy;
+
+import java.util.stream.Stream;
 
 /**
  * Application Descriptor.
@@ -30,11 +33,12 @@ public interface ApplicationDescriptor
 {
     /**
      * Create a new instance of the Application.
-     * @param runtime Qi4j Runtime
+     *
+     * @param runtime                  Qi4j Runtime
      * @param importedServiceInstances Imported Services instances
      * @return a new instance of the Application.
      */
-    Application newInstance( Qi4jAPI runtime, Object... importedServiceInstances );
+    Application newInstance(Qi4jAPI runtime, Object... importedServiceInstances);
 
     /**
      * @return the Application's name
@@ -50,4 +54,9 @@ public interface ApplicationDescriptor
      * @return the Application's runtime mode
      */
     Application.Mode mode();
+
+    Stream<? extends LayerDescriptor> layers();
+
+    Stream<? extends ActivatorDescriptor> activators();
+
 }

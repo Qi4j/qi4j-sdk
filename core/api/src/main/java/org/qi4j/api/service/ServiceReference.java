@@ -25,10 +25,6 @@ import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.api.identity.Identifiable;
 import org.qi4j.api.structure.MetaInfoHolder;
 import org.qi4j.api.type.HasTypes;
-import org.qi4j.api.activation.ActivationEventListenerRegistration;
-import org.qi4j.api.composite.ModelDescriptor;
-import org.qi4j.api.identity.Identifiable;
-import org.qi4j.api.structure.MetaInfoHolder;
 
 /**
  * From a ServiceReference you can access and modify metadata about a service.
@@ -55,5 +51,5 @@ public interface ServiceReference<T>
     /**
      * @return the ServiceModel of the service referenced by this ServiceReference.
      */
-     ModelDescriptor model();
+    ModelDescriptor model();
 }

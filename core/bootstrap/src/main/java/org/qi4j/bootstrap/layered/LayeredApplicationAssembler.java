@@ -19,22 +19,14 @@
  */
 package org.qi4j.bootstrap.layered;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.HashMap;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.PassivationException;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ApplicationDescriptor;
-import org.qi4j.bootstrap.ApplicationAssembler;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.ApplicationAssemblyFactory;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.Energy4Java;
-import org.qi4j.bootstrap.LayerAssembly;
+import org.qi4j.bootstrap.*;
+
+import java.lang.reflect.*;
+import java.util.HashMap;
 
 import static org.qi4j.api.util.AccessibleObjects.accessible;
 
@@ -52,7 +44,7 @@ public abstract class LayeredApplicationAssembler
     protected ApplicationDescriptor model;
     protected Application application;
 
-    public LayeredApplicationAssembler( String name, String version, Application.Mode mode )
+    public LayeredApplicationAssembler(String name, String version, Application.Mode mode)
         throws AssemblyException
     {
         this.name = name;
@@ -64,9 +56,9 @@ public abstract class LayeredApplicationAssembler
     public void initialize()
         throws AssemblyException
     {
-        model = qi4j.newApplicationModel( this );
-        onModelCreated( model );
-        instantiateApplication( qi4j, model );
+        model = qi4j.newApplicationModel(this);
+        onModelCreated(model);
+        instantiateApplication(qi4j, model);
     }
 
     public ApplicationAssembly assembly()
@@ -88,9 +80,9 @@ public abstract class LayeredApplicationAssembler
      * @param qi4j  The Qi4j runtime engine.
      * @param model The application model descriptor.
      */
-    protected void instantiateApplication( Energy4Java qi4j, ApplicationDescriptor model )
+    protected void instantiateApplication(Energy4Java qi4j, ApplicationDescriptor model)
     {
-        application = model.newInstance( qi4j.spi() );
+        application = model.newInstance(qi4j.spi());
     }
 
     /**
@@ -105,7 +97,7 @@ public abstract class LayeredApplicationAssembler
      *
      * @param model The model that has just been created.
      */
-    protected void onModelCreated( ApplicationDescriptor model )
+    protected void onModelCreated(ApplicationDescriptor model)
     {
     }
 
@@ -132,7 +124,7 @@ public abstract class LayeredApplicationAssembler
     }
 
     @Override
-    public ApplicationAssembly assemble( ApplicationAssemblyFactory applicationFactory )
+    public ApplicationAssembly assemble(ApplicationAssemblyFactory applicationFactory)
     {
         assembly = applicationFactory.newApplicationAssembly();
         assembleApplication();
@@ -141,116 +133,119 @@ public abstract class LayeredApplicationAssembler
 
     protected void assembleApplication()
     {
-        assembly.setName( name );
-        assembly.setVersion( version );
-        assembly.setMode( mode );
-        assembleLayers( assembly );
+        assembly.setName(name);
+        assembly.setVersion(version);
+        assembly.setMode(mode);
+        assembleLayers(assembly);
     }
 
-    protected LayerAssembly createLayer( Class<? extends LayerAssembler> layerAssemblerClass )
+    protected LayerAssembly createLayer(Class<? extends LayerAssembler> layerAssemblerClass, Object... layerMetaInfo)
         throws IllegalArgumentException
     {
         try
         {
             String classname = layerAssemblerClass.getSimpleName();
-            if( classname.endsWith( "Layer" ) )
+            if(classname.endsWith("Layer"))
             {
-                classname = classname.substring( 0, classname.length() - 5 ) + " Layer";
+                classname = classname.substring(0, classname.length() - 5) + " Layer";
             }
-            setNameIfPresent( layerAssemblerClass, classname );
-            LayerAssembly layer = assembly.layer( classname );
-
-            LayerAssembler layerAssembler = instantiateLayerAssembler( layerAssemblerClass, layer );
-            assemblers.put( layerAssemblerClass, layerAssembler );
-            assembleLayer( layerAssembler, layer );
+            setNameIfPresent(layerAssemblerClass, classname);
+            LayerAssembly layer = assembly.layer(classname);
+            for(Object metaInfo : layerMetaInfo)
+            {
+                layer.setMetaInfo(metaInfo);
+            }
+            LayerAssembler layerAssembler = instantiateLayerAssembler(layerAssemblerClass, layer);
+            assemblers.put(layerAssemblerClass, layerAssembler);
+            assembleLayer(layerAssembler, layer);
             return layer;
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new IllegalArgumentException( "Unable to instantiate layer with " + layerAssemblerClass.getSimpleName(), e );
+            throw new IllegalArgumentException("Unable to instantiate layer with " + layerAssemblerClass.getSimpleName(), e);
         }
     }
 
-    protected void assembleLayer( LayerAssembler layerAssembler, LayerAssembly layer )
+    protected void assembleLayer(LayerAssembler layerAssembler, LayerAssembly layer)
         throws AssemblyException
     {
-        layerAssembler.assemble( layer );
+        layerAssembler.assemble(layer);
     }
 
-    protected <T extends LayerAssembler> LayerAssembler instantiateLayerAssembler( Class<T> layerAssemblerClass,
-                                                                                   LayerAssembly layer
+    protected <T extends LayerAssembler> LayerAssembler instantiateLayerAssembler(Class<T> layerAssemblerClass,
+                                                                                  LayerAssembly layer
     )
         throws InstantiationException, IllegalAccessException, InvocationTargetException, IllegalLayerAssemblerException
     {
-        LayerAssembler assembler = createWithFactoryMethod( layerAssemblerClass, layer );
-        if( assembler != null )
+        LayerAssembler assembler = createWithFactoryMethod(layerAssemblerClass, layer);
+        if(assembler != null)
         {
             return assembler;
         }
-        assembler = createWithConstructor( layerAssemblerClass, layer );
-        if( assembler != null )
+        assembler = createWithConstructor(layerAssemblerClass, layer);
+        if(assembler != null)
         {
             return assembler;
         }
-        throw new IllegalLayerAssemblerException( "No matching factory method nor constructor found in " + layerAssemblerClass );
+        throw new IllegalLayerAssemblerException("No matching factory method nor constructor found in " + layerAssemblerClass);
     }
 
-    private LayerAssembler createWithFactoryMethod( Class<? extends LayerAssembler> layerAssemblerClass,
-                                                    LayerAssembly layer
+    private LayerAssembler createWithFactoryMethod(Class<? extends LayerAssembler> layerAssemblerClass,
+                                                   LayerAssembly layer
     )
         throws InvocationTargetException, IllegalAccessException
     {
         try
         {
-            Method factoryMethod = accessible( layerAssemblerClass.getDeclaredMethod( "create", LayerAssembly.class ) );
+            Method factoryMethod = accessible(layerAssemblerClass.getDeclaredMethod("create", LayerAssembly.class));
             int modifiers = factoryMethod.getModifiers();
-            if( Modifier.isStatic( modifiers ) && LayerAssembler.class.isAssignableFrom( factoryMethod.getReturnType() ) )
+            if(Modifier.isStatic(modifiers) && LayerAssembler.class.isAssignableFrom(factoryMethod.getReturnType()))
             {
-                return (LayerAssembler) factoryMethod.invoke( null, layer );
+                return (LayerAssembler) factoryMethod.invoke(null, layer);
             }
         }
-        catch( NoSuchMethodException e )
+        catch(NoSuchMethodException e)
         {
             try
             {
-                Method factoryMethod = accessible( layerAssemblerClass.getDeclaredMethod( "create" ) );
+                Method factoryMethod = accessible(layerAssemblerClass.getDeclaredMethod("create"));
                 int modifiers = factoryMethod.getModifiers();
-                if( Modifier.isStatic( modifiers ) && LayerAssembler.class.isAssignableFrom( factoryMethod.getReturnType() ) )
+                if(Modifier.isStatic(modifiers) && LayerAssembler.class.isAssignableFrom(factoryMethod.getReturnType()))
                 {
-                    return (LayerAssembler) factoryMethod.invoke( null );
+                    return (LayerAssembler) factoryMethod.invoke(null);
                 }
             }
-            catch( NoSuchMethodException e1 )
+            catch(NoSuchMethodException e1)
             {
             }
         }
         return null;
     }
 
-    private LayerAssembler createWithConstructor( Class<? extends LayerAssembler> layerAssemblerClass,
-                                                  LayerAssembly assembly
+    private LayerAssembler createWithConstructor(Class<? extends LayerAssembler> layerAssemblerClass,
+                                                 LayerAssembly assembly
     )
         throws IllegalAccessException, InvocationTargetException, InstantiationException
     {
         try
         {
-            Constructor<? extends LayerAssembler> constructor = layerAssemblerClass.getConstructor( LayerAssembly.class );
-            if( constructor != null )
+            Constructor<? extends LayerAssembler> constructor = layerAssemblerClass.getConstructor(LayerAssembly.class);
+            if(constructor != null)
             {
-                return accessible( constructor ).newInstance( assembly );
+                return accessible(constructor).newInstance(assembly);
             }
         }
-        catch( NoSuchMethodException e )
+        catch(NoSuchMethodException e)
         {
             try
             {
                 Constructor<? extends LayerAssembler> constructor = layerAssemblerClass.getDeclaredConstructor();
-                if( constructor != null )
+                if(constructor != null)
                 {
-                    return accessible( constructor ).newInstance();
+                    return accessible(constructor).newInstance();
                 }
             }
-            catch( NoSuchMethodException e1 )
+            catch(NoSuchMethodException e1)
             {
                 return null;
             }
@@ -258,27 +253,26 @@ public abstract class LayeredApplicationAssembler
         return null;
     }
 
-    static void setNameIfPresent( Class<?> clazz, String classname )
-        throws IllegalAccessException
+    static void setNameIfPresent(Class<?> clazz, String classname)
     {
         try
         {
-            Field field = clazz.getDeclaredField( "NAME" );
-            if( Modifier.isStatic( field.getModifiers() ) )
+            Field field = clazz.getDeclaredField("NAME");
+            if(Modifier.isStatic(field.getModifiers()))
             {
-                accessible( field ).set( null, classname );
+                accessible(field).set(null, classname);
             }
         }
-        catch( Exception e )
+        catch(Exception e)
         {
             // Ignore and consider normal.
         }
     }
 
-    @SuppressWarnings( "unchecked" )
-    protected <T extends LayerAssembler> T assemblerOf( Class<T> layerAssemblerClass )
+    @SuppressWarnings("unchecked")
+    protected <T extends LayerAssembler> T assemblerOf(Class<T> layerAssemblerClass)
     {
-        return (T) assemblers.get( layerAssemblerClass );
+        return (T) assemblers.get(layerAssemblerClass);
     }
 
     /**
@@ -292,6 +286,6 @@ public abstract class LayeredApplicationAssembler
      * @param assembly Application assembly
      * @throws AssemblyException on invalid assembly
      */
-    protected abstract void assembleLayers( ApplicationAssembly assembly )
+    protected abstract void assembleLayers(ApplicationAssembly assembly)
         throws AssemblyException;
 }

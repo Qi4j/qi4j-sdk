@@ -29,21 +29,21 @@ import org.qi4j.api.common.Visibility;
  */
 public interface ServiceDeclaration
 {
-    ServiceDeclaration setMetaInfo( Object serviceAttribute );
+    ServiceDeclaration setMetaInfo(Object serviceAttribute);
 
-    ServiceDeclaration visibleIn( Visibility visibility );
+    ServiceDeclaration visibleIn(Visibility visibility);
 
-    ServiceDeclaration withConcerns( Class<?>... concerns );
+    ServiceDeclaration withConcerns(Class<?>... concerns);
 
-    ServiceDeclaration withSideEffects( Class<?>... sideEffects );
+    ServiceDeclaration withSideEffects(Class<?>... sideEffects);
 
-    ServiceDeclaration withMixins( Class<?>... mixins );
+    ServiceDeclaration withMixins(Class<?>... mixins);
 
-    ServiceDeclaration withTypes( Class<?>... types );
+    ServiceDeclaration withTypes(Class<?>... types);
 
-    ServiceDeclaration identifiedBy( String identity );
+    ServiceDeclaration identifiedBy(String identity);
 
-    ServiceDeclaration taggedWith( String... tags );
+    ServiceDeclaration taggedWith(String... tags);
 
     ServiceDeclaration instantiateOnStartup();
 
@@ -53,7 +53,7 @@ public interface ServiceDeclaration
      *
      * @param activators the service activators
      * @return the assembly
-     */    
-    @SuppressWarnings( { "unchecked","varargs" } )
-    ServiceDeclaration withActivators( Class<? extends Activator<?>>... activators );
+     */
+    @SuppressWarnings({"unchecked", "varargs"})
+    ServiceDeclaration withActivators(Class<? extends Activator<?>>... activators);
 }

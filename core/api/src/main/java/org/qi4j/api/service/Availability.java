@@ -30,7 +30,7 @@ public interface Availability
 {
     /**
      * Implementations should return true if the underlying service is currently available for use.
-     *
+     * <p>
      * Reasons why a service might not be available is either if it has been configured not to be (see
      * the Enabled interface), or if an underlying resource is currently unavailable.
      *

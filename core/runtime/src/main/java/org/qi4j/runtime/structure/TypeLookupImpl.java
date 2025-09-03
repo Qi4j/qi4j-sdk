@@ -19,12 +19,6 @@
  */
 package org.qi4j.runtime.structure;
 
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.composite.AmbiguousTypeException;
 import org.qi4j.api.composite.ModelDescriptor;
@@ -37,6 +31,13 @@ import org.qi4j.api.type.HasAssignableFromType;
 import org.qi4j.api.type.HasEqualType;
 import org.qi4j.api.type.HasTypesCollectors;
 import org.qi4j.api.value.ValueDescriptor;
+
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Stream.concat;
@@ -69,7 +70,7 @@ class TypeLookupImpl
      *
      * @param module Module bound to this TypeLookup
      */
-    TypeLookupImpl( ModuleDescriptor module )
+    TypeLookupImpl(ModuleDescriptor module)
     {
         this.module = module;
 
@@ -89,87 +90,87 @@ class TypeLookupImpl
     }
 
     @Override
-    public ObjectDescriptor lookupObjectModel( final Class<?> type )
+    public ObjectDescriptor lookupObjectModel(final Class<?> type)
     {
-        return objectModels.computeIfAbsent( type, key ->
+        return objectModels.computeIfAbsent(type, key ->
         {
             List<? extends ObjectDescriptor> allModels = getAllObjects();
-            ObjectDescriptor model = ambiguityMatching( key, allModels, new HasEqualType<>( key ) );
-            if( model == null )
+            ObjectDescriptor model = ambiguityMatching(key, allModels, new HasEqualType<>(key));
+            if(model == null)
             {
-                model = ambiguityMatching( key, allModels, new HasAssignableFromType<>( key ) );
+                model = ambiguityMatching(key, allModels, new HasAssignableFromType<>(key));
             }
             return model;
-        } );
+        });
     }
 
     @Override
-    public TransientDescriptor lookupTransientModel( final Class<?> type )
+    public TransientDescriptor lookupTransientModel(final Class<?> type)
     {
-        return transientModels.computeIfAbsent( type, key ->
+        return transientModels.computeIfAbsent(type, key ->
         {
             List<? extends TransientDescriptor> allModels = getAllTransients();
-            TransientDescriptor model = ambiguityMatching( key, allModels, new HasEqualType<>( key ) );
-            if( model == null )
+            TransientDescriptor model = ambiguityMatching(key, allModels, new HasEqualType<>(key));
+            if(model == null)
             {
-                model = ambiguityMatching( key, allModels, new HasAssignableFromType<>( key ) );
+                model = ambiguityMatching(key, allModels, new HasAssignableFromType<>(key));
             }
             return model;
-        } );
+        });
     }
 
     @Override
-    public ValueDescriptor lookupValueModel( final Class<?> type )
+    public ValueDescriptor lookupValueModel(final Class<?> type)
     {
-        return valueModels.computeIfAbsent( type, key ->
+        return valueModels.computeIfAbsent(type, key ->
         {
             List<? extends ValueDescriptor> allModels = getAllValues();
-            ValueDescriptor model = ambiguityMatching( key, allModels, new HasEqualType<>( key ) );
-            if( model == null )
+            ValueDescriptor model = ambiguityMatching(key, allModels, new HasEqualType<>(key));
+            if(model == null)
             {
-                model = ambiguityMatching( key, allModels, new HasAssignableFromType<>( key ) );
+                model = ambiguityMatching(key, allModels, new HasAssignableFromType<>(key));
             }
             return model;
-        } );
+        });
     }
 
     @Override
-    public EntityDescriptor lookupEntityModel( final Class<?> type )
+    public EntityDescriptor lookupEntityModel(final Class<?> type)
     {
-        return unambiguousEntityModels.computeIfAbsent( type, key ->
+        return unambiguousEntityModels.computeIfAbsent(type, key ->
         {
             List<? extends EntityDescriptor> allModels = getAllEntities();
-            EntityDescriptor model = ambiguityMatching( key, allModels, new HasEqualType<>( key ) );
-            if( model == null )
+            EntityDescriptor model = ambiguityMatching(key, allModels, new HasEqualType<>(key));
+            if(model == null)
             {
-                model = ambiguityMatching( key, allModels, new HasAssignableFromType<>( key ) );
+                model = ambiguityMatching(key, allModels, new HasAssignableFromType<>(key));
             }
             return model;
-        } );
+        });
     }
 
     @Override
-    public List<EntityDescriptor> lookupEntityModels( final Class type )
+    public List<EntityDescriptor> lookupEntityModels(final Class type)
     {
         return entityModels.computeIfAbsent(
             type,
-            key -> allEntities().collect( HasTypesCollectors.matchingTypes( key ) ) );
+            key -> allEntities().collect(HasTypesCollectors.matchingTypes(key)));
     }
 
     @Override
-    public ModelDescriptor lookupServiceModel( Type serviceType )
+    public ModelDescriptor lookupServiceModel(Type serviceType)
     {
         return serviceModels.computeIfAbsent(
             serviceType,
-            key -> allServices().collect( HasTypesCollectors.matchingType( key ) ).orElse( null ) );
+            key -> allServices().collect(HasTypesCollectors.matchingType(key)).orElse(null));
     }
 
     @Override
-    public List<? extends ModelDescriptor> lookupServiceModels( final Type type )
+    public List<? extends ModelDescriptor> lookupServiceModels(final Type type)
     {
         return servicesReferences.computeIfAbsent(
             type,
-            key -> allServices().collect( HasTypesCollectors.matchingTypes( key ) ) );
+            key -> allServices().collect(HasTypesCollectors.matchingTypes(key)));
     }
 
     @Override
@@ -181,16 +182,16 @@ class TypeLookupImpl
     private List<ObjectDescriptor> getAllObjects()
     {
         return allObjects.computeIfAbsent(
-            () -> concat( module.objects(),
-                          concat(
-                              concat(
-                                  module.layer().visibleObjects( layer ),
-                                  module.layer().visibleObjects( application )
-                              ),
-                              module.layer().usedLayers().layers()
-                                    .flatMap( layer -> layer.visibleObjects( application ) )
-                          )
-            ).collect( toList() )
+            () -> concat(module.objects(),
+                concat(
+                    concat(
+                        module.layer().visibleObjects(layer),
+                        module.layer().visibleObjects(application)
+                    ),
+                    module.layer().usedLayers().layers()
+                        .flatMap(layer -> layer.visibleObjects(application))
+                )
+            ).collect(toList())
         );
     }
 
@@ -203,16 +204,16 @@ class TypeLookupImpl
     private List<TransientDescriptor> getAllTransients()
     {
         return allTransients.computeIfAbsent(
-            () -> concat( module.transientComposites(),
-                          concat(
-                              concat(
-                                  module.layer().visibleTransients( layer ),
-                                  module.layer().visibleTransients( application )
-                              ),
-                              module.layer().usedLayers().layers()
-                                    .flatMap( layer -> layer.visibleTransients( application ) )
-                          )
-            ).collect( toList() )
+            () -> concat(module.transientComposites(),
+                concat(
+                    concat(
+                        module.layer().visibleTransients(layer),
+                        module.layer().visibleTransients(application)
+                    ),
+                    module.layer().usedLayers().layers()
+                        .flatMap(layer -> layer.visibleTransients(application))
+                )
+            ).collect(toList())
         );
     }
 
@@ -225,15 +226,15 @@ class TypeLookupImpl
     private List<ValueDescriptor> getAllValues()
     {
         return allValues.computeIfAbsent(
-            () -> concat( module.valueComposites(),
-                          concat(
-                              concat( module.layer().visibleValues( layer ),
-                                      module.layer().visibleValues( application )
-                              ),
-                              module.layer().usedLayers().layers()
-                                    .flatMap( layer1 -> layer1.visibleValues( application ) )
-                          )
-            ).collect( toList() )
+            () -> concat(module.valueComposites(),
+                concat(
+                    concat(module.layer().visibleValues(layer),
+                        module.layer().visibleValues(application)
+                    ),
+                    module.layer().usedLayers().layers()
+                        .flatMap(layer1 -> layer1.visibleValues(application))
+                )
+            ).collect(toList())
         );
     }
 
@@ -246,16 +247,16 @@ class TypeLookupImpl
     private List<EntityDescriptor> getAllEntities()
     {
         return allEntities.computeIfAbsent(
-            () -> concat( module.entityComposites(),
-                          concat(
-                              concat(
-                                  module.layer().visibleEntities( layer ),
-                                  module.layer().visibleEntities( application )
-                              ),
-                              module.layer().usedLayers().layers()
-                                    .flatMap( layer -> layer.visibleEntities( application ) )
-                          )
-            ).collect( toList() )
+            () -> concat(module.entityComposites(),
+                concat(
+                    concat(
+                        module.layer().visibleEntities(layer),
+                        module.layer().visibleEntities(application)
+                    ),
+                    module.layer().usedLayers().layers()
+                        .flatMap(layer -> layer.visibleEntities(application))
+                )
+            ).collect(toList())
         );
     }
 
@@ -269,27 +270,27 @@ class TypeLookupImpl
     {
         return allServices.computeIfAbsent(
             () -> concat(
-                concat( module.serviceComposites(),
+                concat(module.serviceComposites(),
+                    concat(
                         concat(
-                            concat(
-                                module.layer().visibleServices( layer ),
-                                module.layer().visibleServices( application )
-                            ),
-                            module.layer().usedLayers().layers()
-                                  .flatMap( layer -> layer.visibleServices( application ) )
-                        )
+                            module.layer().visibleServices(layer),
+                            module.layer().visibleServices(application)
+                        ),
+                        module.layer().usedLayers().layers()
+                            .flatMap(layer -> layer.visibleServices(application))
+                    )
                 ),
-                concat( module.importedServices(),
+                concat(module.importedServices(),
+                    concat(
                         concat(
-                            concat(
-                                module.layer().visibleServices( layer ),
-                                module.layer().visibleServices( application )
-                            ),
-                            module.layer().usedLayers().layers()
-                                  .flatMap( layer -> layer.visibleServices( application ) )
-                        )
+                            module.layer().visibleServices(layer),
+                            module.layer().visibleServices(application)
+                        ),
+                        module.layer().usedLayers().layers()
+                            .flatMap(layer -> layer.visibleServices(application))
+                    )
                 )
-            ).collect( toList() )
+            ).collect(toList())
         );
     }
 
@@ -300,18 +301,18 @@ class TypeLookupImpl
     )
     {
         List<T> models = modelModules.stream()
-                                     .filter( matching.and( new SameVisibility<>() ) )
-                                     .distinct()
-                                     .collect( toList() );
-        if( models.size() > 1 )
+            .filter(matching.and(new SameVisibility<>()))
+            .distinct()
+            .collect(toList());
+        if(models.size() > 1)
         {
-            throw new AmbiguousTypeException( "More than one type matches " + type.getName() + ": " + models + "]" );
+            throw new AmbiguousTypeException("More than one type matches " + type.getName() + ": " + models + "]");
         }
-        if( models.isEmpty() )
+        if(models.isEmpty())
         {
             return null;
         }
-        return models.get( 0 );
+        return models.get(0);
     }
 
     /**
@@ -323,9 +324,9 @@ class TypeLookupImpl
         private Visibility current = null;
 
         @Override
-        public boolean test( T model )
+        public boolean test(T model)
         {
-            if( current == null )
+            if(current == null)
             {
                 current = model.visibility();
                 return true;
@@ -338,13 +339,13 @@ class TypeLookupImpl
     {
         private volatile T value;
 
-        private T computeIfAbsent( Supplier<T> supplier )
+        private T computeIfAbsent(Supplier<T> supplier)
         {
-            if( value == null )
+            if(value == null)
             {
-                synchronized( this )
+                synchronized(this)
                 {
-                    if( value == null )
+                    if(value == null)
                     {
                         value = supplier.get();
                     }

@@ -32,48 +32,44 @@ public interface ConfigurationDeclaration
      * Set additional metainfo for this configuration declaration.
      *
      * @param info metainfo that can be retrieved from the CompositeDescriptor.
-     *
      * @return This instance for a fluid DSL
      */
-    ConfigurationDeclaration setMetaInfo( Object info );
+    ConfigurationDeclaration setMetaInfo(Object info);
 
     /**
      * Set visibility for declared entities.
      *
      * @param visibility The {@link Visibility} that this ConfigurationComposite will have.
-     *
      * @return This instance for a fluid DSL
      */
-    ConfigurationDeclaration visibleIn( Visibility visibility );
+    ConfigurationDeclaration visibleIn(Visibility visibility);
 
     /**
      * Declare additional concerns for these configurations.
      *
      * @param concerns The concerns that are to be added to the ConfigurationComposite beyond the statically declared ones.
-     *
      * @return This instance for a fluid DSL
      */
-    ConfigurationDeclaration withConcerns( Class<?>... concerns );
+    ConfigurationDeclaration withConcerns(Class<?>... concerns);
 
     /**
      * Declare additional side-effects for these configurations.
      *
      * @param sideEffects The sideeffects that are to be added to the ConfigurationComposite beyond the statically declared ones.
-     *
      * @return This instance for a fluid DSL
      */
-    ConfigurationDeclaration withSideEffects( Class<?>... sideEffects );
+    ConfigurationDeclaration withSideEffects(Class<?>... sideEffects);
 
     /**
      * Declare additional mixins for these configurations.
      * <p>
      * This can be useful to override any default mixins from the configuration interface.
      * </p>
-     * @param mixins The mixins that are to be added to the ConfigurationComposite beyond the statically declared ones.
      *
+     * @param mixins The mixins that are to be added to the ConfigurationComposite beyond the statically declared ones.
      * @return This instance for a fluid DSL
      */
-    ConfigurationDeclaration withMixins( Class<?>... mixins );
+    ConfigurationDeclaration withMixins(Class<?>... mixins);
 
     /**
      * Declare additional interfaces for these declared interfaces.
@@ -81,9 +77,9 @@ public interface ConfigurationDeclaration
      * This can be useful to add types that the Configuration should implement, but
      * which you do not want to include in the entity interface itself.
      * </p>
-     * @param types list of interfaces to add
      *
+     * @param types list of interfaces to add
      * @return This instance for a fluid DSL
      */
-    ConfigurationDeclaration withTypes( Class<?>... types );
+    ConfigurationDeclaration withTypes(Class<?>... types);
 }

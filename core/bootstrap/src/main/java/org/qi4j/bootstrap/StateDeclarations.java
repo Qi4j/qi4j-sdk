@@ -20,18 +20,19 @@
 
 package org.qi4j.bootstrap;
 
-import java.lang.reflect.AccessibleObject;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.property.Property;
+
+import java.lang.reflect.AccessibleObject;
 
 /**
  * This provides declared {@link Property} information that the runtime can use.
  */
 public interface StateDeclarations
 {
-    MetaInfo metaInfoFor( AccessibleObject accessor );
+    MetaInfo metaInfoFor(AccessibleObject accessor);
 
-    Object initialValueOf( AccessibleObject accessor );
+    Object initialValueOf(AccessibleObject accessor);
 
-    boolean useDefaults( AccessibleObject accessor );
+    boolean useDefaults(AccessibleObject accessor);
 }

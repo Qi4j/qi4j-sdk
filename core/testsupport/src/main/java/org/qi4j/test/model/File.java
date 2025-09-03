@@ -25,7 +25,7 @@ import org.qi4j.api.property.Property;
 /**
  * JAVADOC Add JavaDoc.
  */
-@Queryable( false )
+@Queryable(false)
 public interface File
 {
     Property<String> value();

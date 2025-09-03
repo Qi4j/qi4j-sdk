@@ -20,7 +20,7 @@
 
 package org.qi4j.runtime.service;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivatorAdapter;
 import org.qi4j.api.activation.PassivationException;
 import org.qi4j.api.mixin.Mixins;
@@ -29,10 +29,8 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
+
+import java.util.ArrayList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -48,20 +46,20 @@ public class PassivationTest
     {
         SingletonAssembler assembly = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
             }
         };
 
-        assembly.module().findServices( DataAccess.class ).forEach(
+        assembly.module().findServices(DataAccess.class).forEach(
             service ->
             {
-                assertThat( "Service should not be Active before accessed", !service.isActive(), is( true ) );
-                assertThat( service.get().data().activated, is( true ) );
-                assertThat( "Service should be Active after access.", service.isActive(), is( true ) );
+                assertThat("Service should not be Active before accessed", !service.isActive(), is(true));
+                assertThat(service.get().data().activated, is(true));
+                assertThat("Service should be Active after access.", service.isActive(), is(true));
             }
         );
         assembly.application().passivate();
@@ -73,56 +71,56 @@ public class PassivationTest
     {
         SingletonAssembler assembly = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationFailureActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationFailureActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationFailureActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationSuccessActivator.class );
-                module.addServices( DataAccessService.class ).withActivators( PassivationFailureActivator.class );
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationFailureActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationFailureActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationFailureActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationSuccessActivator.class);
+                module.addServices(DataAccessService.class).withActivators(PassivationFailureActivator.class);
             }
         };
 
         ArrayList<Data> datas = new ArrayList<Data>();
 
-        assembly.module().findServices( DataAccess.class ).forEach(
+        assembly.module().findServices(DataAccess.class).forEach(
             service ->
             {
-                assertThat( "Service should not be Active before accessed", !service.isActive(), is( true ) );
+                assertThat("Service should not be Active before accessed", !service.isActive(), is(true));
                 Data data = service.get().data();
-                if( DataAccessService.class.isInstance( service.get() ) )
+                if(DataAccessService.class.isInstance(service.get()))
                 {
                     // Collect the expected successes.
-                    datas.add( data );
+                    datas.add(data);
                 }
-                assertThat( "Data should indicate that the service is activated", data.activated, is( true ) );
-                assertThat( "Service should be Active after access.", service.isActive(), is( true ) );
+                assertThat("Data should indicate that the service is activated", data.activated, is(true));
+                assertThat("Service should be Active after access.", service.isActive(), is(true));
             }
         );
         try
         {
             assembly.application().passivate();
-            fail( "PassivationException should have been thrown." );
+            fail("PassivationException should have been thrown.");
         }
-        catch( PassivationException e )
+        catch(PassivationException e)
         {
             // Expected
         }
 
         // Still ensure that all services have been shutdown.
-        assembly.module().findServices( DataAccess.class ).forEach(
+        assembly.module().findServices(DataAccess.class).forEach(
             service ->
             {
-                assertThat( "All services should have been shutdown", service.isActive(), is( false ) );
+                assertThat("All services should have been shutdown", service.isActive(), is(false));
             }
         );
     }
@@ -131,30 +129,30 @@ public class PassivationTest
     public void givenMultipleFailingPassivationWhenPassivatingExpectPassivationExceptionToBubbleUp()
         throws Exception
     {
-        assertThrows( PassivationException.class, () -> {
+        assertThrows(PassivationException.class, () -> {
             SingletonAssembler assembly = new SingletonAssembler()
             {
-                public void assemble( ModuleAssembly module )
+                public void assemble(ModuleAssembly module)
                     throws AssemblyException
                 {
-                    module.addServices( DataAccessService.class ).withActivators( PassivationFailureActivator.class );
-                    module.addServices( DataAccessService.class ).withActivators( PassivationFailureActivator.class );
+                    module.addServices(DataAccessService.class).withActivators(PassivationFailureActivator.class);
+                    module.addServices(DataAccessService.class).withActivators(PassivationFailureActivator.class);
                 }
             };
 
-            assembly.module().findServices( DataAccess.class ).forEach(
+            assembly.module().findServices(DataAccess.class).forEach(
                 service ->
                 {
-                    assertThat( "Service should not be Active before accessed", !service.isActive(), is( true ) );
-                    assertThat( service.get().data().activated, is( true ) );
-                    assertThat( "Service should be Active after access.", service.isActive(), is( true ) );
+                    assertThat("Service should not be Active before accessed", !service.isActive(), is(true));
+                    assertThat(service.get().data().activated, is(true));
+                    assertThat("Service should be Active after access.", service.isActive(), is(true));
                 }
             );
             assembly.application().passivate();
-        } );
+        });
     }
 
-    @Mixins( DataAccessMixin.class )
+    @Mixins(DataAccessMixin.class)
     public interface DataAccessService
         extends DataAccess, ServiceComposite
     {
@@ -181,14 +179,14 @@ public class PassivationTest
     {
 
         @Override
-        public void afterActivation( ServiceReference<DataAccess> activated )
+        public void afterActivation(ServiceReference<DataAccess> activated)
             throws Exception
         {
             activated.get().data().activated = true;
         }
 
         @Override
-        public void beforePassivation( ServiceReference<DataAccess> passivating )
+        public void beforePassivation(ServiceReference<DataAccess> passivating)
             throws Exception
         {
             passivating.get().data().activated = false;
@@ -200,14 +198,14 @@ public class PassivationTest
     {
 
         @Override
-        public void afterActivation( ServiceReference<DataAccess> activated )
+        public void afterActivation(ServiceReference<DataAccess> activated)
             throws Exception
         {
             activated.get().data().activated = true;
         }
 
         @Override
-        public void beforePassivation( ServiceReference<DataAccess> passivating )
+        public void beforePassivation(ServiceReference<DataAccess> passivating)
             throws Exception
         {
             throw new IllegalStateException();

@@ -19,21 +19,23 @@
  */
 package org.qi4j.test;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.Optional;
-import org.qi4j.api.structure.Application;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.qi4j.api.structure.Application;
+import org.qi4j.bootstrap.Assembler;
+import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.bootstrap.SingletonAssembler;
 
-/** JUNIT 5 Extension for running Qi4j unit tests.
- *
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Optional;
+
+/**
+ * JUNIT 5 Extension for running Qi4j unit tests.
+ * <p>
  * This will create a Singleton Application only, i.e. one layer with one module.
  */
 public class Qi4jUnitExtension
@@ -42,61 +44,61 @@ public class Qi4jUnitExtension
     private final Assembler assembler;
     private Application application;
 
-    public static Qi4jUnitExtensionBuilder forModule( Assembler assembler )
+    public static Qi4jUnitExtensionBuilder forModule(Assembler assembler)
     {
-        return new Qi4jUnitExtensionBuilder( assembler);
+        return new Qi4jUnitExtensionBuilder(assembler);
     }
 
-    private Qi4jUnitExtension( Assembler assembler )
+    private Qi4jUnitExtension(Assembler assembler)
     {
 
         this.assembler = assembler;
     }
 
-    static void setField( Field f, Object injectable, ExtensionContext context )
+    static void setField(Field f, Object injectable, ExtensionContext context)
     {
         try
         {
-            f.setAccessible( true );
+            f.setAccessible(true);
             Optional<Object> possibleInstance = context.getTestInstance();
-            if( possibleInstance.isPresent() )
+            if(possibleInstance.isPresent())
             {
-                f.set( possibleInstance.get(), injectable );
+                f.set(possibleInstance.get(), injectable);
             }
             else
             {
-                if( Modifier.isStatic( f.getModifiers() ) )
+                if(Modifier.isStatic(f.getModifiers()))
                 {
-                    f.set( null, injectable );
+                    f.set(null, injectable);
                 }
             }
         }
-        catch( IllegalAccessException e )
+        catch(IllegalAccessException e)
         {
-            throw new UndeclaredThrowableException( e );
+            throw new UndeclaredThrowableException(e);
         }
     }
 
     @Override
-    public void beforeTestExecution( ExtensionContext context )
+    public void beforeTestExecution(ExtensionContext context)
         throws Exception
     {
-        SingletonAssembler app = new SingletonAssembler( assembler )
+        SingletonAssembler app = new SingletonAssembler(assembler)
         {
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws Exception
             {
-                super.assemble( module );
-                module.objects( context.getRequiredTestClass() );
+                super.assemble(module);
+                module.objects(context.getRequiredTestClass());
             }
         };
-        app.module().objectFactory().injectTo( context.getRequiredTestInstance() );
+        app.module().objectFactory().injectTo(context.getRequiredTestInstance());
         application = app.application();
     }
 
     @Override
-    public void afterTestExecution( ExtensionContext context )
+    public void afterTestExecution(ExtensionContext context)
         throws Exception
     {
         application.passivate();
@@ -106,14 +108,14 @@ public class Qi4jUnitExtension
     {
         private final Assembler assembler;
 
-        public Qi4jUnitExtensionBuilder( Assembler assembler )
+        public Qi4jUnitExtensionBuilder(Assembler assembler)
         {
             this.assembler = assembler;
         }
 
         public Qi4jUnitExtension build()
         {
-            return new Qi4jUnitExtension( assembler );
+            return new Qi4jUnitExtension(assembler);
         }
     }
 }

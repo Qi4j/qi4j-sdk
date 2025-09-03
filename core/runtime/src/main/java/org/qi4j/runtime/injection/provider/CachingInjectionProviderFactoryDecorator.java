@@ -25,7 +25,6 @@ import org.qi4j.runtime.injection.DependencyModel;
 import org.qi4j.runtime.injection.InjectionProvider;
 import org.qi4j.runtime.injection.InjectionProviderFactory;
 import org.qi4j.runtime.model.Resolution;
-import org.qi4j.bootstrap.InvalidInjectionException;
 
 /**
  * JAVADOC
@@ -35,19 +34,19 @@ public class CachingInjectionProviderFactoryDecorator
 {
     private final InjectionProviderFactory decoratedFactory;
 
-    public CachingInjectionProviderFactoryDecorator( InjectionProviderFactory decoratedFactory )
+    public CachingInjectionProviderFactoryDecorator(InjectionProviderFactory decoratedFactory)
     {
         this.decoratedFactory = decoratedFactory;
     }
 
     @Override
-    public InjectionProvider newInjectionProvider( Resolution resolution, DependencyModel dependencyModel )
+    public InjectionProvider newInjectionProvider(Resolution resolution, DependencyModel dependencyModel)
         throws InvalidInjectionException
     {
-        InjectionProvider injectionProvider = decoratedFactory.newInjectionProvider( resolution, dependencyModel );
-        if( injectionProvider != null )
+        InjectionProvider injectionProvider = decoratedFactory.newInjectionProvider(resolution, dependencyModel);
+        if(injectionProvider != null)
         {
-            return new CachingInjectionProviderDecorator( injectionProvider );
+            return new CachingInjectionProviderDecorator(injectionProvider);
         }
         else
         {

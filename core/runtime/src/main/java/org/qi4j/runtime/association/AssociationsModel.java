@@ -19,17 +19,18 @@
  */
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Member;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Member;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Model for Associations.
@@ -49,76 +50,76 @@ public final class AssociationsModel
         return mapAccessorAssociationModel.values().stream();
     }
 
-    public void addAssociation( AssociationModel associationModel )
+    public void addAssociation(AssociationModel associationModel)
     {
-        mapAccessorAssociationModel.put( associationModel.accessor(), associationModel );
-        mapNameAssociationModel.put( associationModel.qualifiedName(), associationModel );
+        mapAccessorAssociationModel.put(associationModel.accessor(), associationModel);
+        mapNameAssociationModel.put(associationModel.qualifiedName(), associationModel);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super AssociationsModel, ? super AssociationModel, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super AssociationsModel, ? super AssociationModel, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            for( AssociationModel associationModel : mapAccessorAssociationModel.values() )
+            for(AssociationModel associationModel : mapAccessorAssociationModel.values())
             {
-                if( !associationModel.accept( visitor ) )
+                if(!associationModel.accept(visitor))
                 {
                     break;
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
-    public AssociationModel getAssociation( AccessibleObject accessor )
+    public AssociationModel getAssociation(AccessibleObject accessor)
         throws IllegalArgumentException
     {
-        AssociationModel associationModel = mapAccessorAssociationModel.get( accessor );
-        if( associationModel == null )
+        AssociationModel associationModel = mapAccessorAssociationModel.get(accessor);
+        if(associationModel == null)
         {
-            throw new IllegalArgumentException( "No association found with name:" + ( (Member) accessor ).getName() );
+            throw new IllegalArgumentException("No association found with name:" + ((Member) accessor).getName());
         }
         return associationModel;
     }
 
-    public AssociationDescriptor getAssociationByName( String name )
+    public AssociationDescriptor getAssociationByName(String name)
         throws IllegalArgumentException
     {
-        for( AssociationModel associationModel : mapAccessorAssociationModel.values() )
+        for(AssociationModel associationModel : mapAccessorAssociationModel.values())
         {
-            if( associationModel.qualifiedName().name().equals( name ) )
+            if(associationModel.qualifiedName().name().equals(name))
             {
                 return associationModel;
             }
         }
-        throw new IllegalArgumentException( "No association found with name:" + name );
+        throw new IllegalArgumentException("No association found with name:" + name);
     }
 
-    public AssociationDescriptor getAssociationByQualifiedName( QualifiedName name )
+    public AssociationDescriptor getAssociationByQualifiedName(QualifiedName name)
         throws IllegalArgumentException
     {
-        AssociationModel associationModel = mapNameAssociationModel.get( name );
-        if( associationModel != null )
+        AssociationModel associationModel = mapNameAssociationModel.get(name);
+        if(associationModel != null)
         {
             return associationModel;
         }
-        throw new IllegalArgumentException( "No association found with qualified name:" + name );
+        throw new IllegalArgumentException("No association found with qualified name:" + name);
     }
 
-    public boolean hasAssociation( QualifiedName name )
+    public boolean hasAssociation(QualifiedName name)
     {
-        return mapNameAssociationModel.containsKey( name );
+        return mapNameAssociationModel.containsKey(name);
     }
 
-    public void checkConstraints( AssociationStateHolder state )
+    public void checkConstraints(AssociationStateHolder state)
     {
-        for( AssociationModel associationModel : mapAccessorAssociationModel.values() )
+        for(AssociationModel associationModel : mapAccessorAssociationModel.values())
         {
-            Association<Object> association = state.associationFor( associationModel.accessor() );
-            associationModel.checkAssociationConstraints( association );
-            associationModel.checkConstraints( association.get() );
+            Association<Object> association = state.associationFor(associationModel.accessor());
+            associationModel.checkAssociationConstraints(association);
+            associationModel.checkConstraints(association.get());
         }
     }
 }

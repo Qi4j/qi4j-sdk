@@ -21,8 +21,6 @@ package org.qi4j.api.query.grammar;
 
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.property.Property;
 
 /**
  * Property null Specification.
@@ -32,7 +30,7 @@ public class PropertyNullPredicate<T>
 {
     private PropertyFunction<T> property;
 
-    public PropertyNullPredicate( PropertyFunction<T> property )
+    public PropertyNullPredicate(PropertyFunction<T> property)
     {
         this.property = property;
     }
@@ -43,11 +41,11 @@ public class PropertyNullPredicate<T>
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
-        Property<T> prop = property.apply( item );
+        Property<T> prop = property.apply(item);
 
-        if( prop == null )
+        if(prop == null)
         {
             return true;
         }

@@ -20,7 +20,6 @@
 
 package org.qi4j.runtime.object;
 
-import java.util.stream.Stream;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
@@ -29,15 +28,12 @@ import org.qi4j.api.mixin.InitializationException;
 import org.qi4j.api.object.ObjectDescriptor;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.util.HierarchicalVisitor;
-import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.composite.ConstructorsModel;
 import org.qi4j.runtime.injection.InjectedFieldsModel;
 import org.qi4j.runtime.injection.InjectedMethodsModel;
 import org.qi4j.runtime.injection.InjectionContext;
-import org.qi4j.runtime.composite.ConstructorsModel;
-import org.qi4j.runtime.injection.InjectedFieldsModel;
-import org.qi4j.runtime.injection.InjectedMethodsModel;
-import org.qi4j.runtime.injection.InjectionContext;
+
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -53,10 +49,10 @@ public final class ObjectModel
     private final InjectedFieldsModel injectedFieldsModel;
     private final InjectedMethodsModel injectedMethodsModel;
 
-    public ObjectModel( ModuleDescriptor module,
-                        Class<?> objectType,
-                        Visibility visibility,
-                        MetaInfo metaInfo
+    public ObjectModel(ModuleDescriptor module,
+                       Class<?> objectType,
+                       Visibility visibility,
+                       MetaInfo metaInfo
     )
     {
         this.module = module;
@@ -64,16 +60,16 @@ public final class ObjectModel
         this.visibility = visibility;
         this.metaInfo = metaInfo;
 
-        constructorsModel = new ConstructorsModel( objectType );
-        injectedFieldsModel = new InjectedFieldsModel( objectType );
-        injectedMethodsModel = new InjectedMethodsModel( objectType );
+        constructorsModel = new ConstructorsModel(objectType);
+        injectedFieldsModel = new InjectedFieldsModel(objectType);
+        injectedMethodsModel = new InjectedMethodsModel(objectType);
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public Stream<Class<?>> types()
     {
-        return Stream.of( objectType );
+        return Stream.of(objectType);
     }
 
     @Override
@@ -89,69 +85,69 @@ public final class ObjectModel
     }
 
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return metaInfo.get( infoType );
+        return metaInfo.get(infoType);
     }
 
     @Override
-    public boolean isAssignableTo( Class<?> type )
+    public boolean isAssignableTo(Class<?> type)
     {
-        return type.isAssignableFrom( objectType );
+        return type.isAssignableFrom(objectType);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            if( constructorsModel.accept( visitor ) )
+            if(constructorsModel.accept(visitor))
             {
-                if( injectedFieldsModel.accept( visitor ) )
+                if(injectedFieldsModel.accept(visitor))
                 {
-                    injectedMethodsModel.accept( visitor );
+                    injectedMethodsModel.accept(visitor);
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
-    public Object newInstance( InjectionContext injectionContext )
+    public Object newInstance(InjectionContext injectionContext)
     {
         Object instance;
         try
         {
-            instance = constructorsModel.newInstance( injectionContext );
-            injectionContext = new InjectionContext( injectionContext.module(), injectionContext.uses(), instance );
-            injectedFieldsModel.inject( injectionContext, instance );
-            injectedMethodsModel.inject( injectionContext, instance );
+            instance = constructorsModel.newInstance(injectionContext);
+            injectionContext = new InjectionContext(injectionContext.module(), injectionContext.uses(), instance);
+            injectedFieldsModel.inject(injectionContext, instance);
+            injectedMethodsModel.inject(injectionContext, instance);
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new ConstructionException( "Could not instantiate " + objectType.getName(), e );
+            throw new ConstructionException("Could not instantiate " + objectType.getName(), e);
         }
 
-        if( instance instanceof Initializable )
+        if(instance instanceof Initializable)
         {
             try
             {
-                ( (Initializable) instance ).initialize();
+                ((Initializable) instance).initialize();
             }
-            catch( Exception e )
+            catch(Exception e)
             {
                 String message = "Unable to initialize " + objectType;
-                throw new ConstructionException( new InitializationException( message, e ) );
+                throw new ConstructionException(new InitializationException(message, e));
             }
         }
 
         return instance;
     }
 
-    public void inject( InjectionContext injectionContext, Object instance )
+    public void inject(InjectionContext injectionContext, Object instance)
     {
-        injectedFieldsModel.inject( injectionContext, instance );
-        injectedMethodsModel.inject( injectionContext, instance );
+        injectedFieldsModel.inject(injectionContext, instance);
+        injectedMethodsModel.inject(injectionContext, instance);
     }
 
     @Override

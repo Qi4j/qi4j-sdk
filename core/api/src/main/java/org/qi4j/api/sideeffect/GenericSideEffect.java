@@ -34,10 +34,10 @@ public abstract class GenericSideEffect
      * {@inheritDoc}
      */
     @Override
-    public Object invoke( final Object proxy, final Method method, final Object[] args )
+    public Object invoke(final Object proxy, final Method method, final Object[] args)
         throws Throwable
     {
-        invoke( method, args );
+        invoke(method, args);
         return null;
     }
 
@@ -47,7 +47,6 @@ public abstract class GenericSideEffect
      *
      * @param method the method that was invoked
      * @param args   the arguments of the method invocation
-     *
      * @throws Throwable - the exception to throw from the method invocation on the proxy instance. The exception's type
      *                   must be assignable either to any of the exception types declared in the throws clause of the
      *                   interface method or to the unchecked exception types {code}java.lang.RuntimeException{code}
@@ -56,7 +55,7 @@ public abstract class GenericSideEffect
      *                   then an UndeclaredThrowableException containing the exception that was thrown by this method
      *                   will be thrown by the method invocation on the proxy instance.
      */
-    protected void invoke( final Method method, final Object[] args )
+    protected void invoke(final Method method, final Object[] args)
         throws Throwable
     {
     }

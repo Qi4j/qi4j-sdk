@@ -20,8 +20,7 @@
 
 package org.qi4j.runtime.entity.associations;
 
-import java.io.Serializable;
-import javax.swing.Icon;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.Optional;
@@ -33,7 +32,9 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
+
+import javax.swing.*;
+import java.io.Serializable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -46,17 +47,17 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class AssociationTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( AssociationTest.Person.class,
-                         AssociationTest.Company.class );
-        module.forMixin( Employer.class )
-            .setMetaInfo( new DisplayInfo( "Employees", "Employees in the company", "Employees", null ) )
+        new EntityTestAssembler().assemble(module);
+        module.entities(AssociationTest.Person.class,
+            AssociationTest.Company.class);
+        module.forMixin(Employer.class)
+            .setMetaInfo(new DisplayInfo("Employees", "Employees in the company", "Employees", null))
             .declareDefaults()
             .employees();
-        module.forMixin( Company.class ).declareDefaults().name().set( "A Company" );
+        module.forMixin(Company.class).declareDefaults().name().set("A Company");
     }
 
     @Test
@@ -66,47 +67,47 @@ public class AssociationTest
 
         try
         {
-            Company company = unitOfWork.newEntity( Company.class );
-            assertThat( "Company Name Default", company.name().get(), equalTo( "A Company" ) );
+            Company company = unitOfWork.newEntity(Company.class);
+            assertThat("Company Name Default", company.name().get(), equalTo("A Company"));
             {
-                EntityBuilder<Company> builder = unitOfWork.newEntityBuilder( Company.class );
+                EntityBuilder<Company> builder = unitOfWork.newEntityBuilder(Company.class);
                 final Company companyPrototype = builder.instance();
-                companyPrototype.name().set( "JayWay" );
+                companyPrototype.name().set("JayWay");
                 company = builder.newInstance();
-                assertThat( "Company Name ", company.name().get(), equalTo( "JayWay" ) );
+                assertThat("Company Name ", company.name().get(), equalTo("JayWay"));
             }
 
-            company.name().set( "Jayway" );
-            assertThat( "Company Name ", company.name().get(), equalTo( "Jayway" ) );
+            company.name().set("Jayway");
+            assertThat("Company Name ", company.name().get(), equalTo("Jayway"));
 
-            System.out.println( "Name is:" + company.name().get() );
+            System.out.println("Name is:" + company.name().get());
 
-            EntityBuilder<Person> builder = unitOfWork.newEntityBuilder( Person.class );
-            builder.instance().name().set( "Rickard" );
+            EntityBuilder<Person> builder = unitOfWork.newEntityBuilder(Person.class);
+            builder.instance().name().set("Rickard");
             Person rickard = builder.newInstance();
 
-            builder = unitOfWork.newEntityBuilder( Person.class );
-            builder.instance().name().set( "Niclas" );
-            builder.instance().friend().set( rickard );
+            builder = unitOfWork.newEntityBuilder(Person.class);
+            builder.instance().name().set("Niclas");
+            builder.instance().friend().set(rickard);
             Person niclas = builder.newInstance();
 
-            niclas.members().add( rickard );
+            niclas.members().add(rickard);
 
-            company.employees().add( 0, rickard );
+            company.employees().add(0, rickard);
 
-            for( Employer employer : rickard.employers() )
+            for(Employer employer : rickard.employers())
             {
-                System.out.println( ( (Nameable) employer ).name() );
+                System.out.println(((Nameable) employer).name());
             }
 
-            assertThat( rickard, equalTo( niclas.friend().get() ) );
-            assertThat( rickard, equalTo( niclas.members().get( 0 ) ) );
+            assertThat(rickard, equalTo(niclas.friend().get()));
+            assertThat(rickard, equalTo(niclas.members().get(0)));
 
             // Empty associations
-            niclas.friend().set( null );
+            niclas.friend().set(null);
             niclas.members().clear();
-            assertThat( niclas.friend().get(), nullValue() );
-            assertThat( niclas.employers().count(), is( 0 ) );
+            assertThat(niclas.friend().get(), nullValue());
+            assertThat(niclas.employers().count(), is(0));
         }
         finally
         {
@@ -127,19 +128,19 @@ public class AssociationTest
 
     public interface Company
         extends AssociationTest.Nameable,
-                AssociationTest.Employer,
-                AssociationTest.StandardComposite,
-                EntityComposite
+        AssociationTest.Employer,
+        AssociationTest.StandardComposite,
+        EntityComposite
     {
     }
 
     public interface Person
         extends AssociationTest.Nameable,
-                AssociationTest.Employee,
-                AssociationTest.Friend<Person>,
-                AssociationTest.Team<Person>,
-                AssociationTest.StandardComposite,
-                EntityComposite
+        AssociationTest.Employee,
+        AssociationTest.Friend<Person>,
+        AssociationTest.Team<Person>,
+        AssociationTest.StandardComposite,
+        EntityComposite
     {
     }
 
@@ -170,14 +171,14 @@ public class AssociationTest
         private String toolTip;
         private Icon icon;
 
-        public DisplayInfo( String name, String description, String toolTip )
+        public DisplayInfo(String name, String description, String toolTip)
         {
             this.name = name;
             this.description = description;
             this.toolTip = toolTip;
         }
 
-        public DisplayInfo( String name, String description, String toolTip, Icon icon )
+        public DisplayInfo(String name, String description, String toolTip, Icon icon)
         {
             this.name = name;
             this.description = description;
@@ -212,7 +213,7 @@ public class AssociationTest
         private String predicate;
         private String namespace;
 
-        public RdfInfo( String predicate, String namespace )
+        public RdfInfo(String predicate, String namespace)
         {
             this.predicate = predicate;
             this.namespace = namespace;

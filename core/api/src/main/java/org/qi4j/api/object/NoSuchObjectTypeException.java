@@ -19,9 +19,10 @@
  */
 package org.qi4j.api.object;
 
+import org.qi4j.api.common.InvalidApplicationException;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.qi4j.api.common.InvalidApplicationException;
 
 /**
  * This exception is thrown if no visible Object of the requested type can be found.
@@ -30,17 +31,17 @@ public class NoSuchObjectTypeException
     extends InvalidApplicationException
 {
     private static final long serialVersionUID = -1121690536365682511L;
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
 
     private final String objectType;
     private final String moduleName;
 
-    public NoSuchObjectTypeException( String type, String moduleName, Stream<Class<?>> visible )
+    public NoSuchObjectTypeException(String type, String moduleName, Stream<Class<?>> visible)
     {
-        super( "Could not find any visible Object of type [" + type + "] in module ["
-               + moduleName
-               + "]. The visible types are: " + NL
-               + visible.map( Class::getName ).collect( Collectors.joining( NL ) )
+        super("Could not find any visible Object of type [" + type + "] in module ["
+            + moduleName
+            + "]. The visible types are: " + NL
+            + visible.map(Class::getName).collect(Collectors.joining(NL))
         );
         this.objectType = type;
         this.moduleName = moduleName;

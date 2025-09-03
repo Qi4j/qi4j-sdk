@@ -23,13 +23,13 @@ apply plugin: 'qi4j-core'
 //jar { manifest { name = "Qi4j Core SPI" } }
 
 dependencies {
-  api qi4j.core.api
-  api libraries.jakarta_json
+    api qi4j.core.api
+    api libraries.jakarta_json
 
-  runtimeOnly libraries.johnzon
+    runtimeOnly libraries.johnzon
 
-  testImplementation qi4j.core.testsupport
+    testImplementation qi4j.core.testsupport
 
-  testRuntimeOnly qi4j.core.runtime
-  testRuntimeOnly libraries.logback
+    testRuntimeOnly qi4j.core.runtime
+    testRuntimeOnly libraries.logback
 }

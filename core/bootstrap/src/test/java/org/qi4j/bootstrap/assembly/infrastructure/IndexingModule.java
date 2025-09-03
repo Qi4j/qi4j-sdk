@@ -30,13 +30,13 @@ public class IndexingModule
     public static final String NAME = "Indexing Module";
     private final ModuleAssembly configModule;
 
-    public IndexingModule( ModuleAssembly configModule )
+    public IndexingModule(ModuleAssembly configModule)
     {
         this.configModule = configModule;
     }
 
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
         throws AssemblyException
     {
         return module;

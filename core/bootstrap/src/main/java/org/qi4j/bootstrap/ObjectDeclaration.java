@@ -28,8 +28,8 @@ import org.qi4j.api.common.Visibility;
  */
 public interface ObjectDeclaration
 {
-    ObjectDeclaration setMetaInfo( Object info );
+    ObjectDeclaration setMetaInfo(Object info);
 
-    ObjectDeclaration visibleIn( Visibility visibility )
+    ObjectDeclaration visibleIn(Visibility visibility)
         throws IllegalStateException;
 }

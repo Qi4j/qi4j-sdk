@@ -17,8 +17,7 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.composite.DefaultMethodsFilter;
@@ -32,7 +31,9 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.library.constraints.annotation.NotEmpty;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -43,7 +44,7 @@ import static org.hamcrest.Matchers.equalTo;
  */
 public class InterfaceDefaultMethodsTest extends AbstractQi4jTest
 {
-//    @BeforeAll
+    //    @BeforeAll
 //    public static void assumeJavaVersionIs8()
 //    {
 //        assumeJavaVersion( 8 );
@@ -51,10 +52,10 @@ public class InterfaceDefaultMethodsTest extends AbstractQi4jTest
 //
     public interface DefaultMethods
     {
-        @UseDefaults( "Hello" )
+        @UseDefaults("Hello")
         Property<String> greeting();
 
-        default String sayHello( String name )
+        default String sayHello(String name)
         {
             return greeting().get() + ", " + name + '!';
         }
@@ -63,7 +64,7 @@ public class InterfaceDefaultMethodsTest extends AbstractQi4jTest
     public interface OverrideDefaultMethods extends DefaultMethods
     {
         @Override
-        default String sayHello( String name )
+        default String sayHello(String name)
         {
             return greeting().get() + ", overridden in " + name + '!';
         }
@@ -72,7 +73,7 @@ public class InterfaceDefaultMethodsTest extends AbstractQi4jTest
     public static abstract class MixinDefaultMethods implements DefaultMethods
     {
         @Override
-        public String sayHello( String name )
+        public String sayHello(String name)
         {
             return greeting().get() + ", mixed in " + name + '!';
         }
@@ -81,22 +82,22 @@ public class InterfaceDefaultMethodsTest extends AbstractQi4jTest
     public interface DefaultMethodsConstraints extends DefaultMethods
     {
         @Override
-        default String sayHello( @NotEmpty String name )
+        default String sayHello(@NotEmpty String name)
         {
             return greeting().get() + ", " + name + '!';
         }
     }
 
-    @Concerns( DefaultMethodsConcern.class )
+    @Concerns(DefaultMethodsConcern.class)
     public interface DefaultMethodsConcerns extends DefaultMethods
     {
         @Override
-        default String sayHello( String name )
+        default String sayHello(String name)
         {
             return greeting().get() + ", " + name + '!';
         }
 
-        default String sayGoodBye( String name )
+        default String sayGoodBye(String name)
         {
             return "Good Bye, " + name + '!';
         }
@@ -106,47 +107,47 @@ public class InterfaceDefaultMethodsTest extends AbstractQi4jTest
         implements DefaultMethodsConcerns
     {
         @Override
-        public String sayHello( String name )
+        public String sayHello(String name)
         {
-            return next.sayHello( "concerned " + name );
+            return next.sayHello("concerned " + name);
         }
     }
 
-    @Concerns( DefaultMethodsGenericConcern.class )
+    @Concerns(DefaultMethodsGenericConcern.class)
     public interface DefaultMethodsGenericConcerns extends DefaultMethods
     {
         @Override
-        default String sayHello( String name )
+        default String sayHello(String name)
         {
             return greeting().get() + ", " + name + '!';
         }
 
-        default String sayGoodBye( String name )
+        default String sayGoodBye(String name)
         {
             return "Good Bye, " + name + '!';
         }
     }
 
-    @AppliesTo( DefaultMethodsFilter.class )
+    @AppliesTo(DefaultMethodsFilter.class)
     public static class DefaultMethodsGenericConcern extends ConcernOf<InvocationHandler>
         implements InvocationHandler
     {
         static int count = 0;
 
         @Override
-        public Object invoke( Object o, Method method, Object[] objects )
+        public Object invoke(Object o, Method method, Object[] objects)
             throws Throwable
         {
             count++;
-            return next.invoke( o, method, objects );
+            return next.invoke(o, method, objects);
         }
     }
 
-    @SideEffects( DefaultMethodsSideEffect.class )
+    @SideEffects(DefaultMethodsSideEffect.class)
     public interface DefaultMethodsSideEffects extends DefaultMethods
     {
         @Override
-        default String sayHello( String name )
+        default String sayHello(String name)
         {
             return greeting().get() + ", " + name + '!';
         }
@@ -158,31 +159,31 @@ public class InterfaceDefaultMethodsTest extends AbstractQi4jTest
         static int count;
 
         @Override
-        public String sayHello( String name )
+        public String sayHello(String name)
         {
             count++;
             return null;
         }
     }
 
-    @SideEffects( DefaultMethodsGenericSideEffect.class )
+    @SideEffects(DefaultMethodsGenericSideEffect.class)
     public interface DefaultMethodsGenericSideEffects extends DefaultMethods
     {
         @Override
-        default String sayHello( String name )
+        default String sayHello(String name)
         {
             return greeting().get() + ", " + name + '!';
         }
     }
 
-    @AppliesTo( DefaultMethodsFilter.class )
+    @AppliesTo(DefaultMethodsFilter.class)
     public static class DefaultMethodsGenericSideEffect extends SideEffectOf<InvocationHandler>
         implements InvocationHandler
     {
         static int count = 0;
 
         @Override
-        public Object invoke( Object o, Method method, Object[] objects )
+        public Object invoke(Object o, Method method, Object[] objects)
             throws Throwable
         {
             count++;
@@ -191,91 +192,91 @@ public class InterfaceDefaultMethodsTest extends AbstractQi4jTest
     }
 
     @Override
-    public void assemble( final ModuleAssembly module )
+    public void assemble(final ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( DefaultMethods.class,
-                           OverrideDefaultMethods.class,
-                           MixinDefaultMethods.class,
-                           DefaultMethodsConstraints.class,
-                           DefaultMethodsConcerns.class,
-                           DefaultMethodsSideEffects.class,
-                           DefaultMethodsGenericConcerns.class,
-                           DefaultMethodsGenericSideEffects.class
-                         );
+        module.transients(DefaultMethods.class,
+            OverrideDefaultMethods.class,
+            MixinDefaultMethods.class,
+            DefaultMethodsConstraints.class,
+            DefaultMethodsConcerns.class,
+            DefaultMethodsSideEffects.class,
+            DefaultMethodsGenericConcerns.class,
+            DefaultMethodsGenericSideEffects.class
+        );
     }
 
     @Test
     public void defaultMethods()
     {
-        DefaultMethods composite = transientBuilderFactory.newTransient( DefaultMethods.class );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, John!" ) );
+        DefaultMethods composite = transientBuilderFactory.newTransient(DefaultMethods.class);
+        assertThat(composite.sayHello("John"), equalTo("Hello, John!"));
     }
 
     @Test
     public void overrideDefaultMethods()
     {
-        OverrideDefaultMethods composite = transientBuilderFactory.newTransient( OverrideDefaultMethods.class );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, overridden in John!" ) );
+        OverrideDefaultMethods composite = transientBuilderFactory.newTransient(OverrideDefaultMethods.class);
+        assertThat(composite.sayHello("John"), equalTo("Hello, overridden in John!"));
     }
 
     @Test
     public void mixinDefaultMethods()
     {
-        MixinDefaultMethods composite = transientBuilderFactory.newTransient( MixinDefaultMethods.class );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, mixed in John!" ) );
+        MixinDefaultMethods composite = transientBuilderFactory.newTransient(MixinDefaultMethods.class);
+        assertThat(composite.sayHello("John"), equalTo("Hello, mixed in John!"));
     }
 
     @Test
     public void defaultMethodsConstraints()
     {
-        DefaultMethodsConstraints composite = transientBuilderFactory.newTransient( DefaultMethodsConstraints.class );
+        DefaultMethodsConstraints composite = transientBuilderFactory.newTransient(DefaultMethodsConstraints.class);
         try
         {
-            composite.sayHello( "" );
+            composite.sayHello("");
         }
-        catch( ConstraintViolationException ex )
+        catch(ConstraintViolationException ex)
         {
-            assertThat( ex.getMessage(), containsString( "sayHello" ) );
-            assertThat( ex.getMessage(), containsString( "DefaultMethodsConstraints" ) );
-            assertThat( ex.getMessage(), containsString( "NotEmpty" ) );
+            assertThat(ex.getMessage(), containsString("sayHello"));
+            assertThat(ex.getMessage(), containsString("DefaultMethodsConstraints"));
+            assertThat(ex.getMessage(), containsString("NotEmpty"));
         }
     }
 
     @Test
     public void defaultMethodsConcerns()
     {
-        DefaultMethodsConcerns composite = transientBuilderFactory.newTransient( DefaultMethodsConcerns.class );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, concerned John!" ) );
-        assertThat( composite.sayGoodBye( "John" ), equalTo( "Good Bye, John!" ) );
+        DefaultMethodsConcerns composite = transientBuilderFactory.newTransient(DefaultMethodsConcerns.class);
+        assertThat(composite.sayHello("John"), equalTo("Hello, concerned John!"));
+        assertThat(composite.sayGoodBye("John"), equalTo("Good Bye, John!"));
     }
 
     @Test
     public void defaultMethodsGenericConcerns()
     {
-        DefaultMethodsGenericConcerns composite = transientBuilderFactory.newTransient( DefaultMethodsGenericConcerns.class );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, John!" ) );
-        assertThat( composite.sayGoodBye( "John" ), equalTo( "Good Bye, John!" ) );
-        assertThat( DefaultMethodsGenericConcern.count, equalTo( 2 ) );
+        DefaultMethodsGenericConcerns composite = transientBuilderFactory.newTransient(DefaultMethodsGenericConcerns.class);
+        assertThat(composite.sayHello("John"), equalTo("Hello, John!"));
+        assertThat(composite.sayGoodBye("John"), equalTo("Good Bye, John!"));
+        assertThat(DefaultMethodsGenericConcern.count, equalTo(2));
     }
 
     @Test
     public void defaultMethodsSideEffects()
     {
-        DefaultMethodsSideEffects composite = transientBuilderFactory.newTransient( DefaultMethodsSideEffects.class );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, John!" ) );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, John!" ) );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, John!" ) );
-        assertThat( DefaultMethodsSideEffect.count, equalTo( 3 ) );
+        DefaultMethodsSideEffects composite = transientBuilderFactory.newTransient(DefaultMethodsSideEffects.class);
+        assertThat(composite.sayHello("John"), equalTo("Hello, John!"));
+        assertThat(composite.sayHello("John"), equalTo("Hello, John!"));
+        assertThat(composite.sayHello("John"), equalTo("Hello, John!"));
+        assertThat(DefaultMethodsSideEffect.count, equalTo(3));
     }
 
     @Test
     public void defaultMethodsGenericSideEffects()
     {
-        DefaultMethodsGenericSideEffects composite = transientBuilderFactory.newTransient( DefaultMethodsGenericSideEffects.class );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, John!" ) );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, John!" ) );
-        assertThat( composite.sayHello( "John" ), equalTo( "Hello, John!" ) );
-        assertThat( DefaultMethodsGenericSideEffect.count, equalTo( 3 ) );
+        DefaultMethodsGenericSideEffects composite = transientBuilderFactory.newTransient(DefaultMethodsGenericSideEffects.class);
+        assertThat(composite.sayHello("John"), equalTo("Hello, John!"));
+        assertThat(composite.sayHello("John"), equalTo("Hello, John!"));
+        assertThat(composite.sayHello("John"), equalTo("Hello, John!"));
+        assertThat(DefaultMethodsGenericSideEffect.count, equalTo(3));
     }
 }

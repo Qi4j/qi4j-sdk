@@ -17,12 +17,7 @@
  */
 package org.qi4j.serialization.jakartajson;
 
-import jakarta.json.JsonArray;
-import jakarta.json.JsonException;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonString;
-import jakarta.json.JsonStructure;
-import jakarta.json.JsonValue;
+import jakarta.json.*;
 
 /**
  * jakarta.json utilities.
@@ -35,9 +30,9 @@ public class JakartaJson
      * @param jsonValue the JSON value
      * @return the String
      */
-    public static String asString( JsonValue jsonValue )
+    public static String asString(JsonValue jsonValue)
     {
-        return jsonValue instanceof JsonString ? ( (JsonString) jsonValue ).getString() : jsonValue.toString();
+        return jsonValue instanceof JsonString ? ((JsonString) jsonValue).getString() : jsonValue.toString();
     }
 
     /**
@@ -47,11 +42,11 @@ public class JakartaJson
      * @return the JSON structure
      * @throws JsonException if it is not
      */
-    public static JsonStructure requireJsonStructure( JsonValue json )
+    public static JsonStructure requireJsonStructure(JsonValue json)
     {
-        if( json.getValueType() != JsonValue.ValueType.OBJECT && json.getValueType() != JsonValue.ValueType.ARRAY )
+        if(json.getValueType() != JsonValue.ValueType.OBJECT && json.getValueType() != JsonValue.ValueType.ARRAY)
         {
-            throw new JsonException( "Expected a JSON object or array but got " + json );
+            throw new JsonException("Expected a JSON object or array but got " + json);
         }
         return (JsonStructure) json;
     }
@@ -63,11 +58,11 @@ public class JakartaJson
      * @return the JSON object
      * @throws JsonException if it is not
      */
-    public static JsonObject requireJsonObject( JsonValue json )
+    public static JsonObject requireJsonObject(JsonValue json)
     {
-        if( json.getValueType() != JsonValue.ValueType.OBJECT )
+        if(json.getValueType() != JsonValue.ValueType.OBJECT)
         {
-            throw new JsonException( "Expected a JSON object but got " + json );
+            throw new JsonException("Expected a JSON object but got " + json);
         }
         return (JsonObject) json;
     }
@@ -79,14 +74,16 @@ public class JakartaJson
      * @return the JSON array
      * @throws JsonException if it is not
      */
-    public static JsonArray requireJsonArray( JsonValue json )
+    public static JsonArray requireJsonArray(JsonValue json)
     {
-        if( json.getValueType() != JsonValue.ValueType.ARRAY )
+        if(json.getValueType() != JsonValue.ValueType.ARRAY)
         {
-            throw new JsonException( "Expected a JSON array but got " + json );
+            throw new JsonException("Expected a JSON array but got " + json);
         }
         return (JsonArray) json;
     }
 
-    private JakartaJson() {}
+    private JakartaJson()
+    {
+    }
 }

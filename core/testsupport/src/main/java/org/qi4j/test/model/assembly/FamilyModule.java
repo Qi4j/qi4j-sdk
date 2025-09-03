@@ -24,26 +24,21 @@ import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.layered.ModuleAssembler;
-import org.qi4j.test.model.Address;
-import org.qi4j.test.model.Cat;
-import org.qi4j.test.model.City;
-import org.qi4j.test.model.Dog;
-import org.qi4j.test.model.Female;
-import org.qi4j.test.model.Male;
+import org.qi4j.test.model.*;
 
 class FamilyModule
     implements ModuleAssembler
 {
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
     {
-        module.entities( Male.class,
-                         Female.class,
-                         City.class,
-                         Cat.class,
-                         Dog.class ).visibleIn( Visibility.application );
+        module.entities(Male.class,
+            Female.class,
+            City.class,
+            Cat.class,
+            Dog.class).visibleIn(Visibility.application);
 
-        module.values( Address.class ).visibleIn( Visibility.application );
+        module.values(Address.class).visibleIn(Visibility.application);
         return module;
     }
 }

@@ -35,5 +35,5 @@ public interface MetricsMeter extends Metric
      *
      * @param numberOfEvents the number of events
      */
-    void mark( int numberOfEvents );
+    void mark(int numberOfEvents);
 }

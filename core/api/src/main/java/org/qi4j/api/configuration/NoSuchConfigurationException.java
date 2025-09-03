@@ -28,12 +28,12 @@ public class NoSuchConfigurationException extends RuntimeException
     private final Class<? extends HasIdentity> configType;
     private final Identity identity;
 
-    public NoSuchConfigurationException( Class<? extends HasIdentity> configType,
-                                         Identity identity,
-                                         Exception cause
+    public NoSuchConfigurationException(Class<? extends HasIdentity> configType,
+                                        Identity identity,
+                                        Exception cause
     )
     {
-        super( "No configuration found for '" + identity + "' and configuration " + configType.getName() + " has one or more non-Optional properties.", cause );
+        super("No configuration found for '" + identity + "' and configuration " + configType.getName() + " has one or more non-Optional properties.", cause);
         this.configType = configType;
         this.identity = identity;
     }

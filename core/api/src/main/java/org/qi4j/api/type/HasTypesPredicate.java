@@ -27,48 +27,46 @@ import java.lang.reflect.WildcardType;
 import java.util.List;
 import java.util.function.Predicate;
 
-import static org.qi4j.api.util.Classes.interfacesOf;
-
 public abstract class HasTypesPredicate<T extends HasTypes> implements Predicate<T>
 {
     protected final List<Type> matchTypes;
 
-    protected HasTypesPredicate( List<Type> types )
+    protected HasTypesPredicate(List<Type> types)
     {
         matchTypes = types;
     }
 
     @Override
-    public final boolean test( T hasTypes )
+    public final boolean test(T hasTypes)
     {
-        for( Type matchType : matchTypes )
+        for(Type matchType : matchTypes)
         {
-            if( matchType instanceof Class )
+            if(matchType instanceof Class)
             {
-                if( hasTypes.types().anyMatch( matchPredicate( matchType ) ) )
+                if(hasTypes.types().anyMatch(matchPredicate(matchType)))
                 {
                     return true;
                 }
             }
             else
             {
-                if( matchType instanceof ParameterizedType )
+                if(matchType instanceof ParameterizedType)
                 {
                     // Foo<Bar> check
                     // First check Foo
                     ParameterizedType parameterizedType = (ParameterizedType) matchType;
                     Type rawType = parameterizedType.getRawType();
 
-                    if( hasTypes.types().anyMatch( matchPredicate( rawType ) ) )
+                    if(hasTypes.types().anyMatch(matchPredicate(rawType)))
                     {
                         // Then check Bar
-                        if( Classes.interfacesOf( hasTypes.types() ).anyMatch(intf -> intf.equals( matchType ) ) )
+                        if(Classes.interfacesOf(hasTypes.types()).anyMatch(intf -> intf.equals(matchType)))
                         {
                             return true;
                         }
                     }
                 }
-                else if( matchType instanceof WildcardType )
+                else if(matchType instanceof WildcardType)
                 {
                     return true;
                 }
@@ -77,5 +75,5 @@ public abstract class HasTypesPredicate<T extends HasTypes> implements Predicate
         return false;
     }
 
-    protected abstract Predicate<Type> matchPredicate( Type candidate );
+    protected abstract Predicate<Type> matchPredicate(Type candidate);
 }

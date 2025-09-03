@@ -2,8 +2,8 @@ package org.qi4j.api.messaging;
 
 public class InvalidMessageKeyException extends MessagingException
 {
-    public InvalidMessageKeyException( String message )
+    public InvalidMessageKeyException(String message)
     {
-        super( message );
+        super(message);
     }
 }

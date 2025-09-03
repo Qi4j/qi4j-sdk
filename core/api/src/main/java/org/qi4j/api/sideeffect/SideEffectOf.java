@@ -20,7 +20,6 @@
 package org.qi4j.api.sideeffect;
 
 import org.qi4j.api.sideeffect.internal.SideEffectFor;
-import org.qi4j.api.sideeffect.internal.SideEffectFor;
 
 /**
  * Base class for SideEffects. It introduces a typed "next" pointer

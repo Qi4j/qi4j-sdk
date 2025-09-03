@@ -23,7 +23,7 @@ package org.qi4j.api.service.qualifier;
 /**
  * Use this as metainfo about a Service to specify tags. Easiest way to set them on a service
  * is to use the <code>ServiceDeclaration.taggedWith(String...)</code> method.
- *
+ * <p>
  * These can be used in conjunction with the withTags() Service
  * Selector.
  */
@@ -31,7 +31,7 @@ public final class ServiceTags
 {
     private String[] tags;
 
-    public ServiceTags( String... tags )
+    public ServiceTags(String... tags)
     {
         this.tags = tags;
     }
@@ -41,11 +41,11 @@ public final class ServiceTags
         return tags;
     }
 
-    public boolean hasTag( String tag )
+    public boolean hasTag(String tag)
     {
-        for( String serviceTag : tags )
+        for(String serviceTag : tags)
         {
-            if( serviceTag.equals( tag ) )
+            if(serviceTag.equals(tag))
             {
                 return true;
             }
@@ -54,11 +54,11 @@ public final class ServiceTags
         return false;
     }
 
-    public boolean hasTags( String... aTags )
+    public boolean hasTags(String... aTags)
     {
-        for( String tag : aTags )
+        for(String tag : aTags)
         {
-            if( !hasTag( tag ) )
+            if(!hasTag(tag))
             {
                 return false;
             }

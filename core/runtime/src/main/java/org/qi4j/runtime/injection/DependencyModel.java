@@ -19,15 +19,6 @@
  */
 package org.qi4j.runtime.injection;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.composite.DependencyDescriptor;
@@ -40,11 +31,16 @@ import org.qi4j.runtime.injection.provider.InjectionProviderException;
 import org.qi4j.runtime.injection.provider.ServiceInjectionProviderFactory;
 import org.qi4j.runtime.model.Binder;
 import org.qi4j.runtime.model.Resolution;
-import org.qi4j.bootstrap.BindingException;
-import org.qi4j.bootstrap.InvalidInjectionException;
-import org.qi4j.runtime.injection.provider.CachingInjectionProviderDecorator;
-import org.qi4j.runtime.injection.provider.InjectionProviderException;
-import org.qi4j.runtime.injection.provider.ServiceInjectionProviderFactory;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static org.qi4j.api.util.Annotations.isType;
 
@@ -55,23 +51,23 @@ import static org.qi4j.api.util.Annotations.isType;
 public final class DependencyModel
     implements Binder, DependencyDescriptor, Visitable<DependencyModel>
 {
-    public static boolean isOptional( Annotation injectionAnnotation, Annotation[] annotations )
+    public static boolean isOptional(Annotation injectionAnnotation, Annotation[] annotations)
     {
-        if( Stream.of( annotations ).anyMatch( isType( Optional.class ) ) )
+        if(Stream.of(annotations).anyMatch(isType(Optional.class)))
         {
             return true;
         }
 
         Method[] methods = injectionAnnotation.annotationType().getMethods();
-        for( Method method : methods )
+        for(Method method : methods)
         {
-            if( method.getName().equals( "optional" ) )
+            if(method.getName().equals("optional"))
             {
                 try
                 {
-                    return (Boolean) method.invoke( injectionAnnotation );
+                    return (Boolean) method.invoke(injectionAnnotation);
                 }
-                catch( Throwable e )
+                catch(Throwable e)
                 {
                     return false;
                 }
@@ -92,11 +88,11 @@ public final class DependencyModel
     // Binding
     private InjectionProvider injectionProvider;
 
-    public DependencyModel( Annotation injectionAnnotation,
-                            Type genericType,
-                            Class<?> injectedClass,
-                            boolean optional,
-                            Annotation[] annotations
+    public DependencyModel(Annotation injectionAnnotation,
+                           Type genericType,
+                           Class<?> injectedClass,
+                           boolean optional,
+                           Annotation[] annotations
     )
     {
         this.injectionAnnotation = injectionAnnotation;
@@ -105,81 +101,81 @@ public final class DependencyModel
         this.injectionType = genericType;
         this.optional = optional;
         this.annotations = annotations;
-        this.rawInjectionClass = mapPrimitiveTypes( extractRawInjectionClass( injectedClass, injectionType ) );
+        this.rawInjectionClass = mapPrimitiveTypes(extractRawInjectionClass(injectedClass, injectionType));
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( Visitor<? super DependencyModel, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(Visitor<? super DependencyModel, ThrowableType> visitor)
         throws ThrowableType
     {
-        return visitor.visit( this );
+        return visitor.visit(this);
     }
 
-    private Class<?> extractRawInjectionClass( Class<?> injectedClass, final Type injectionType )
+    private Class<?> extractRawInjectionClass(Class<?> injectedClass, final Type injectionType)
     {
         // Calculate raw injection type
-        if( injectionType instanceof Class )
+        if(injectionType instanceof Class)
         {
             return (Class<?>) injectionType;
         }
-        else if( injectionType instanceof ParameterizedType )
+        else if(injectionType instanceof ParameterizedType)
         {
-            return (Class<?>) ( (ParameterizedType) injectionType ).getRawType();
+            return (Class<?>) ((ParameterizedType) injectionType).getRawType();
         }
-        else if( injectionType instanceof TypeVariable )
+        else if(injectionType instanceof TypeVariable)
         {
-            return extractRawInjectionClass( injectedClass, (TypeVariable<?>) injectionType );
+            return extractRawInjectionClass(injectedClass, (TypeVariable<?>) injectionType);
         }
         throw new IllegalArgumentException(
-            "Could not extract the rawInjectionClass of " + injectedClass + " and " + injectionType );
+            "Could not extract the rawInjectionClass of " + injectedClass + " and " + injectionType);
     }
 
-    private Class<?> extractRawInjectionClass( Class<?> injectedClass, TypeVariable<?> injectionTypeVariable )
+    private Class<?> extractRawInjectionClass(Class<?> injectedClass, TypeVariable<?> injectionTypeVariable)
     {
         int index = 0;
-        for( TypeVariable<?> typeVariable : injectionTypeVariable.getGenericDeclaration().getTypeParameters() )
+        for(TypeVariable<?> typeVariable : injectionTypeVariable.getGenericDeclaration().getTypeParameters())
         {
-            if( injectionTypeVariable.getName().equals( typeVariable.getName() ) )
+            if(injectionTypeVariable.getName().equals(typeVariable.getName()))
             {
-                return (Class<?>) getActualType( injectedClass, index );
+                return (Class<?>) getActualType(injectedClass, index);
             }
             index++;
         }
         throw new IllegalArgumentException(
-            "Could not extract the rawInjectionClass of " + injectedClass + " and " + injectionTypeVariable );
+            "Could not extract the rawInjectionClass of " + injectedClass + " and " + injectionTypeVariable);
     }
 
     // todo continue refactoring
 
-    private Type getActualType( Class<?> injectedClass, int index )
+    private Type getActualType(Class<?> injectedClass, int index)
     {
         // Type index found - map it to actual type
         Type genericType = injectedClass;
         Type type = null;
 
-        while( !Object.class.equals( genericType ) && type == null )
+        while(!Object.class.equals(genericType) && type == null)
         {
-            genericType = ( (Class<?>) genericType ).getGenericSuperclass();
-            if( genericType instanceof ParameterizedType )
+            genericType = ((Class<?>) genericType).getGenericSuperclass();
+            if(genericType instanceof ParameterizedType)
             {
-                type = ( (ParameterizedType) genericType ).getActualTypeArguments()[ index ];
+                type = ((ParameterizedType) genericType).getActualTypeArguments()[index];
             }
             else
             {
-                Type[] genericInterfaces = ( (Class<?>) genericType ).getGenericInterfaces();
-                if( genericInterfaces.length > index )
+                Type[] genericInterfaces = ((Class<?>) genericType).getGenericInterfaces();
+                if(genericInterfaces.length > index)
                 {
-                    type = genericInterfaces[ index ];
-                    if( type instanceof ParameterizedType )
+                    type = genericInterfaces[index];
+                    if(type instanceof ParameterizedType)
                     {
-                        type = ( (ParameterizedType) type ).getActualTypeArguments()[ index ];
+                        type = ((ParameterizedType) type).getActualTypeArguments()[index];
                     }
                     // TODO type may still be one of the generic interfaces???
                 }
             }
         }
 
-        if( type == null )
+        if(type == null)
         {
             type = Object.class; // Generic type with no constraints so Object is fine
         }
@@ -188,15 +184,15 @@ public final class DependencyModel
     }
 
     // FIXME This method is unused, remove it.
-    private Type extractDependencyType( Type injectionType )
+    private Type extractDependencyType(Type injectionType)
     {
-        if( injectionType instanceof ParameterizedType )
+        if(injectionType instanceof ParameterizedType)
         {
-            return ( (ParameterizedType) injectionType ).getActualTypeArguments()[ 0 ];
+            return ((ParameterizedType) injectionType).getActualTypeArguments()[0];
         }
-        else if( injectionType instanceof TypeVariable )
+        else if(injectionType instanceof TypeVariable)
         {
-            return ( (TypeVariable) injectionType ).getBounds()[ 0 ];
+            return ((TypeVariable) injectionType).getBounds()[0];
         }
         return injectionType;
     }
@@ -255,101 +251,102 @@ public final class DependencyModel
     }
 
     @Override
-    public void bind( Resolution resolution )
+    public void bind(Resolution resolution)
         throws BindingException
     {
         InjectionProviderFactory providerFactory = resolution.application().injectionProviderFactory();
 
         try
         {
-            injectionProvider = providerFactory.newInjectionProvider( resolution, this );
+            injectionProvider = providerFactory.newInjectionProvider(resolution, this);
 
-            if( injectionProvider == null && !optional )
+            if(injectionProvider == null && !optional)
             {
                 String message = "[Module " + resolution.module().name() + "] Non-optional @" + rawInjectionClass.getName() + " was not bound in " + injectedClass.getName();
-                throw new ConstructionException( message );
+                throw new ConstructionException(message);
             }
         }
-        catch( InvalidInjectionException e )
+        catch(InvalidInjectionException e)
         {
-            throw new BindingException( "Could not bind dependency injection", e );
+            throw new BindingException("Could not bind dependency injection", e);
         }
     }
 
     // Context
-    public Object inject( InjectionContext context )
+    public Object inject(InjectionContext context)
     {
-        if( injectionProvider == null )
+        if(injectionProvider == null)
         {
             return null;
         }
         Object injectedValue;
         try
         {
-            injectedValue = injectionProvider.provideInjection( context );
+            injectedValue = injectionProvider.provideInjection(context);
         }
-        catch( InjectionProviderException e )
+        catch(InjectionProviderException e)
         {
             Throwable ex = e;
-            if( ex.getCause() != null )
+            if(ex.getCause() != null)
             {
                 ex = ex.getCause();
             }
 
             String message = "[Module " + context.module().name() + "] InjectionProvider unable to resolve @" +
-                             injectionAnnotation.annotationType().getSimpleName() + " " + injectionType.toString();
-            throw new ConstructionException( message, ex );
+                injectionAnnotation.annotationType().getSimpleName() + " " + injectionType.toString();
+            throw new ConstructionException(message, ex);
         }
-        if( injectedValue == null && !optional )
+        if(injectedValue == null && !optional)
         {
             String simpleName = injectionAnnotation.annotationType().getSimpleName();
             String message = "[Module " + context.module().name() + "] Non-optional @" + simpleName + " " + injectionType.toString() + " was null in " + injectedClass.getName();
-            if( simpleName.toLowerCase().contains( "service" )
-                && !isServiceInjectionProvider() )
+            if(simpleName.toLowerCase().contains("service")
+                && !isServiceInjectionProvider())
             {
                 message = message + ". Did you mean the @Service injection scope?";
             }
-            throw new ConstructionException( message );
+            throw new ConstructionException(message);
         }
-        return getInjectedValue( injectedValue );
+        return getInjectedValue(injectedValue);
     }
 
     private boolean isServiceInjectionProvider()
     {
 
         InjectionProvider provider = this.injectionProvider;
-        if( provider instanceof CachingInjectionProviderDecorator){
-            provider = ((CachingInjectionProviderDecorator) provider ).decoratedProvider();
+        if(provider instanceof CachingInjectionProviderDecorator)
+        {
+            provider = ((CachingInjectionProviderDecorator) provider).decoratedProvider();
         }
-        return ServiceInjectionProviderFactory.ServiceInjectionProvider.class.isAssignableFrom( provider.getClass() );
+        return ServiceInjectionProviderFactory.ServiceInjectionProvider.class.isAssignableFrom(provider.getClass());
     }
 
-    @SuppressWarnings( "unchecked" )
-    private Object getInjectedValue( Object injectionResult )
+    @SuppressWarnings("unchecked")
+    private Object getInjectedValue(Object injectionResult)
     {
-        if( injectionResult == null )
+        if(injectionResult == null)
         {
             return null;
         }
 
-        if( injectionResult instanceof Iterable )
+        if(injectionResult instanceof Iterable)
         {
-            if( Iterable.class.isAssignableFrom( rawInjectionClass )
-                || rawInjectionClass.isInstance( injectionResult ) )
+            if(Iterable.class.isAssignableFrom(rawInjectionClass)
+                || rawInjectionClass.isInstance(injectionResult))
             {
                 return injectionResult;
             }
             else
             {
-                Iterator iterator = ( (Iterable) injectionResult ).iterator();
+                Iterator iterator = ((Iterable) injectionResult).iterator();
                 return iterator.hasNext() ? iterator.next() : null;
             }
         }
         else
         {
-            if( Iterable.class.equals( injectionType ) )
+            if(Iterable.class.equals(injectionType))
             {
-                return Collections.singleton( injectionResult );
+                return Collections.singleton(injectionResult);
             }
         }
         return injectionResult;
@@ -364,32 +361,32 @@ public final class DependencyModel
         double.class, Double.class,
         float.class, Float.class,
         int.class, Integer.class,
-        };
+    };
 
-    private Class<?> mapPrimitiveTypes( Class<?> rawInjectionType )
+    private Class<?> mapPrimitiveTypes(Class<?> rawInjectionType)
     {
-        if( rawInjectionType == null || !rawInjectionType.isPrimitive() )
+        if(rawInjectionType == null || !rawInjectionType.isPrimitive())
         {
             return rawInjectionType;
         }
-        for( int i = 0; i < primitiveTypeMapping.length; i += 2 )
+        for(int i = 0; i < primitiveTypeMapping.length; i += 2)
         {
-            if( primitiveTypeMapping[ i ].equals( rawInjectionType ) )
+            if(primitiveTypeMapping[i].equals(rawInjectionType))
             {
-                return primitiveTypeMapping[ i + 1 ];
+                return primitiveTypeMapping[i + 1];
             }
         }
         return rawInjectionType;
     }
 
-    public boolean hasScope( final Class<? extends Annotation> scope )
+    public boolean hasScope(final Class<? extends Annotation> scope)
     {
-        return scope == null || scope.equals( injectionAnnotation().annotationType() );
+        return scope == null || scope.equals(injectionAnnotation().annotationType());
     }
 
     public Class<? extends Annotation> injectionAnnotationType()
     {
-        if( injectionAnnotation == null )
+        if(injectionAnnotation == null)
         {
             return null;
         }
@@ -407,15 +404,15 @@ public final class DependencyModel
     {
         private final Class<? extends Annotation> scope;
 
-        public ScopeSpecification( Class<? extends Annotation> scope )
+        public ScopeSpecification(Class<? extends Annotation> scope)
         {
             this.scope = scope;
         }
 
         @Override
-        public boolean test( DependencyModel model )
+        public boolean test(DependencyModel model)
         {
-            return model.hasScope( scope );
+            return model.hasScope(scope);
         }
     }
 }

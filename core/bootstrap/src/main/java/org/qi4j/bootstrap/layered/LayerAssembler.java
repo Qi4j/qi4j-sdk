@@ -25,6 +25,6 @@ import org.qi4j.bootstrap.LayerAssembly;
 @FunctionalInterface
 public interface LayerAssembler
 {
-    LayerAssembly assemble( LayerAssembly layer )
+    LayerAssembly assemble(LayerAssembly layer)
         throws AssemblyException;
 }

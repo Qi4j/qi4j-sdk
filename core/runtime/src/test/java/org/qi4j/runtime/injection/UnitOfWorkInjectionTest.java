@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.identity.StringIdentity;
 import org.qi4j.api.injection.scope.State;
@@ -31,7 +32,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -39,34 +39,34 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class UnitOfWorkInjectionTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( TrialEntity.class );
-        new EntityTestAssembler().assemble( module );
+        module.entities(TrialEntity.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
     public void givenEntityInOneUnitOfWorkWhenCurrentUnitOfWorkHasChangedThenUnitOfWorkInjectionInEntityPointsToCorrectUow()
         throws Exception
     {
-        Usecase usecase = UsecaseBuilder.newUsecase( "usecase1" );
-        UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( usecase );
+        Usecase usecase = UsecaseBuilder.newUsecase("usecase1");
+        UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(usecase);
         try
         {
-            Trial trial = uow.newEntity( Trial.class, StringIdentity.identityOf( "123" ) );
+            Trial trial = uow.newEntity(Trial.class, StringIdentity.identityOf("123"));
             trial.doSomething();
             uow.complete();
-            uow = unitOfWorkFactory.newUnitOfWork( usecase );
-            usecase = UsecaseBuilder.newUsecase( "usecase2" );
-            UnitOfWork uow2 = unitOfWorkFactory.newUnitOfWork( usecase );
-            trial = uow.get( trial );
+            uow = unitOfWorkFactory.newUnitOfWork(usecase);
+            usecase = UsecaseBuilder.newUsecase("usecase2");
+            UnitOfWork uow2 = unitOfWorkFactory.newUnitOfWork(usecase);
+            trial = uow.get(trial);
             trial.doSomething();
-            assertThat( ( (EntityComposite) trial ).identity().get().toString(), equalTo( "123" ) );
-            assertThat( trial.usecaseName(), equalTo( "usecase1" ) );
+            assertThat(((EntityComposite) trial).identity().get().toString(), equalTo("123"));
+            assertThat(trial.usecaseName(), equalTo("usecase1"));
             uow2.discard();
         }
-        catch( Throwable ex )
+        catch(Throwable ex)
         {
             ex.printStackTrace();
         }
@@ -74,13 +74,13 @@ public class UnitOfWorkInjectionTest
         {
             try
             {
-                while( unitOfWorkFactory.isUnitOfWorkActive() )
+                while(unitOfWorkFactory.isUnitOfWorkActive())
                 {
                     uow = unitOfWorkFactory.currentUnitOfWork();
                     uow.discard();
                 }
             }
-            catch( IllegalStateException e )
+            catch(IllegalStateException e)
             {
                 // Continue
             }
@@ -94,7 +94,7 @@ public class UnitOfWorkInjectionTest
         String usecaseName();
     }
 
-    @Mixins( TrialMixin.class )
+    @Mixins(TrialMixin.class)
     public interface TrialEntity
         extends Trial, EntityComposite
     {

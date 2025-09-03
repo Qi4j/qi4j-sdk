@@ -19,6 +19,8 @@
  */
 package org.qi4j.runtime.unitofwork;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.property.Property;
@@ -28,8 +30,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -50,21 +50,21 @@ public class AutoCloseableUoWTest
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( TestEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(TestEntity.class);
     }
 
     @Test
     public void givenGoodAutoCloseableUoWWhenTryWithResourceExpectSuccess()
         throws UnitOfWorkCompletionException
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            EntityBuilder<TestEntity> builder = uow.newEntityBuilder( TestEntity.class );
-            builder.instance().mandatory().set( "Mandatory property" );
+            EntityBuilder<TestEntity> builder = uow.newEntityBuilder(TestEntity.class);
+            builder.instance().mandatory().set("Mandatory property");
             builder.newInstance();
             uow.complete();
         }
@@ -74,19 +74,19 @@ public class AutoCloseableUoWTest
     public void givenWrongAutoCloseableUoWWhenTryWithResourceExpectSuccess()
         throws UnitOfWorkCompletionException
     {
-        assertThrows( ConstraintViolationException.class, () -> {
-            try (UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
+        assertThrows(ConstraintViolationException.class, () -> {
+            try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
             {
-                uow.newEntity( TestEntity.class );
+                uow.newEntity(TestEntity.class);
                 uow.complete();
             }
-        } );
+        });
     }
 
     @AfterEach
     public void afterEachTest()
     {
-        assertThat( unitOfWorkFactory.isUnitOfWorkActive(), is( false ) );
+        assertThat(unitOfWorkFactory.isUnitOfWorkActive(), is(false));
     }
 
 }

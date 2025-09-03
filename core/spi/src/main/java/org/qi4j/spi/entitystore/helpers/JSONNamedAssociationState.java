@@ -19,10 +19,6 @@
  */
 package org.qi4j.spi.entitystore.helpers;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -30,6 +26,11 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.NamedAssociationState;
 import org.qi4j.spi.entitystore.EntityStoreException;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * JSON implementation of NamedAssociationState.
@@ -42,9 +43,9 @@ public final class JSONNamedAssociationState
     private final JSONEntityState entityState;
     private final String stateName;
 
-    /* package */ JSONNamedAssociationState( JakartaJsonFactories jsonFactories,
-                                             JSONEntityState entityState,
-                                             String stateName )
+    /* package */ JSONNamedAssociationState(JakartaJsonFactories jsonFactories,
+                                            JSONEntityState entityState,
+                                            String stateName)
     {
         this.jsonFactories = jsonFactories;
         this.entityState = entityState;
@@ -53,8 +54,8 @@ public final class JSONNamedAssociationState
 
     private JsonObject getReferences()
     {
-        JsonValue references = entityState.state().getJsonObject( JSONKeys.VALUE ).get( stateName );
-        if( references != null && references.getValueType() == JsonValue.ValueType.OBJECT )
+        JsonValue references = entityState.state().getJsonObject(JSONKeys.VALUE).get(stateName);
+        if(references != null && references.getValueType() == JsonValue.ValueType.OBJECT)
         {
             return (JsonObject) references;
         }
@@ -68,39 +69,39 @@ public final class JSONNamedAssociationState
     }
 
     @Override
-    public boolean containsName( String name )
+    public boolean containsName(String name)
     {
-        return getReferences().containsKey( name );
+        return getReferences().containsKey(name);
     }
 
     @Override
-    public boolean put( String name, EntityReference entityReference )
+    public boolean put(String name, EntityReference entityReference)
     {
         try
         {
-            if( containsName( name )
-                && entityReference.identity().toString().equals( getReferences().getString( name ) ) )
+            if(containsName(name)
+                && entityReference.identity().toString().equals(getReferences().getString(name)))
             {
                 return false;
             }
-            entityState.stateCloneAddNamedAssociation( stateName, name, entityReference );
+            entityState.stateCloneAddNamedAssociation(stateName, name, entityReference);
             entityState.markUpdated();
             return true;
         }
-        catch( JsonException ex )
+        catch(JsonException ex)
         {
-            throw new EntityStoreException( ex );
+            throw new EntityStoreException(ex);
         }
     }
 
     @Override
-    public boolean remove( String name )
+    public boolean remove(String name)
     {
-        if( !containsName( name ) )
+        if(!containsName(name))
         {
             return false;
         }
-        entityState.stateCloneRemoveNamedAssociation( stateName, name );
+        entityState.stateCloneRemoveNamedAssociation(stateName, name);
         entityState.markUpdated();
         return true;
     }
@@ -108,46 +109,46 @@ public final class JSONNamedAssociationState
     @Override
     public boolean clear()
     {
-        if( count() > 0 )
+        if(count() > 0)
         {
-            entityState.stateCloneClearNamedAssociation( stateName );
+            entityState.stateCloneClearNamedAssociation(stateName);
             entityState.markUpdated();
         }
         return false;
     }
 
     @Override
-    public EntityReference get( String name )
+    public EntityReference get(String name)
     {
-        String stringRef = getReferences().getString( name, null );
-        return stringRef == null ? null : EntityReference.parseEntityReference( stringRef );
+        String stringRef = getReferences().getString(name, null);
+        return stringRef == null ? null : EntityReference.parseEntityReference(stringRef);
     }
 
     @Override
-    public String nameOf( EntityReference entityReference )
+    public String nameOf(EntityReference entityReference)
     {
         try
         {
             JsonObject references = getReferences();
-            for( String name : references.keySet() )
+            for(String name : references.keySet())
             {
-                if( entityReference.identity().toString().equals( references.getString( name ) ) )
+                if(entityReference.identity().toString().equals(references.getString(name)))
                 {
                     return name;
                 }
             }
             return null;
         }
-        catch( JsonException ex )
+        catch(JsonException ex)
         {
-            throw new EntityStoreException( ex );
+            throw new EntityStoreException(ex);
         }
     }
 
     @Override
     public Iterator<String> iterator()
     {
-        List<String> names = new ArrayList<>( getReferences().keySet() );
+        List<String> names = new ArrayList<>(getReferences().keySet());
         return new Iterator<String>()
         {
             private int idx = 0;
@@ -163,11 +164,11 @@ public final class JSONNamedAssociationState
             {
                 try
                 {
-                    String next = names.get( idx );
+                    String next = names.get(idx);
                     idx++;
                     return next;
                 }
-                catch( JsonException ex )
+                catch(JsonException ex)
                 {
                     throw new NoSuchElementException();
                 }
@@ -176,7 +177,7 @@ public final class JSONNamedAssociationState
             @Override
             public void remove()
             {
-                throw new UnsupportedOperationException( "remove() is not supported on NamedAssociation iterators." );
+                throw new UnsupportedOperationException("remove() is not supported on NamedAssociation iterators.");
             }
         };
     }

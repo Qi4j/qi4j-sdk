@@ -20,6 +20,7 @@
 
 package org.qi4j.api.common;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
@@ -32,7 +33,6 @@ import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,71 +43,71 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 public class OptionalTest extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.transients( TestComposite.class );
-        module.transients( TestComposite2.class );
-        module.entities( TestComposite3.class, TestComposite4.class );
-        new EntityTestAssembler().assemble( module );
+        module.transients(TestComposite.class);
+        module.transients(TestComposite2.class);
+        module.entities(TestComposite3.class, TestComposite4.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
     public void givenOptionalMethodWhenCorrectInvokeThenNoException()
     {
-        TestComposite instance = transientBuilderFactory.newTransient( TestComposite.class );
-        instance.doStuff( "Hello WOrld", "Hello World" );
+        TestComposite instance = transientBuilderFactory.newTransient(TestComposite.class);
+        instance.doStuff("Hello WOrld", "Hello World");
     }
 
     @Test
     public void givenOptionalMethodWhenMandatoryMissingThenException()
     {
-        assertThrows( ConstraintViolationException.class, () -> {
-            TestComposite instance = transientBuilderFactory.newTransient( TestComposite.class );
-            instance.doStuff( "Hello World", null );
-        } );
+        assertThrows(ConstraintViolationException.class, () -> {
+            TestComposite instance = transientBuilderFactory.newTransient(TestComposite.class);
+            instance.doStuff("Hello World", null);
+        });
     }
 
     @Test
     public void givenOptionalMethodWhenOptionalMissingThenNoException()
     {
-        TestComposite instance = transientBuilderFactory.newTransient( TestComposite.class );
-        instance.doStuff( null, "Hello World" );
+        TestComposite instance = transientBuilderFactory.newTransient(TestComposite.class);
+        instance.doStuff(null, "Hello World");
     }
 
     @Test
     public void givenOptionalPropertyWhenOptionalMissingThenNoException()
     {
-        TransientBuilder<TestComposite2> builder = transientBuilderFactory.newTransientBuilder( TestComposite2.class );
-        builder.prototype().mandatoryProperty().set( "Hello World" );
+        TransientBuilder<TestComposite2> builder = transientBuilderFactory.newTransientBuilder(TestComposite2.class);
+        builder.prototype().mandatoryProperty().set("Hello World");
         TestComposite2 testComposite2 = builder.newInstance();
     }
 
     @Test
     public void givenOptionalPropertyWhenOptionalSetThenNoException()
     {
-        TransientBuilder<TestComposite2> builder = transientBuilderFactory.newTransientBuilder( TestComposite2.class );
-        builder.prototype().mandatoryProperty().set( "Hello World" );
-        builder.prototype().optionalProperty().set( "Hello World" );
+        TransientBuilder<TestComposite2> builder = transientBuilderFactory.newTransientBuilder(TestComposite2.class);
+        builder.prototype().mandatoryProperty().set("Hello World");
+        builder.prototype().optionalProperty().set("Hello World");
         TestComposite2 testComposite2 = builder.newInstance();
     }
 
     @Test
     public void givenMandatoryPropertyWhenMandatoryMissingThenException()
     {
-        assertThrows( ConstraintViolationException.class, () -> transientBuilderFactory.newTransient( TestComposite2.class ) );
+        assertThrows(ConstraintViolationException.class, () -> transientBuilderFactory.newTransient(TestComposite2.class));
     }
 
     @Test
     public void givenMandatoryPropertyWhenSettingPropertyToNullOnBuiltInstanceThenException()
     {
-        TransientBuilder<TestComposite2> builder = transientBuilderFactory.newTransientBuilder( TestComposite2.class );
-        builder.prototype().mandatoryProperty().set( "Hello" );
-        builder.prototype().optionalProperty().set( "World" );
+        TransientBuilder<TestComposite2> builder = transientBuilderFactory.newTransientBuilder(TestComposite2.class);
+        builder.prototype().mandatoryProperty().set("Hello");
+        builder.prototype().optionalProperty().set("World");
         TestComposite2 testComposite2 = builder.newInstance();
-        testComposite2.optionalProperty().set( null );
-        assertThrows( ConstraintViolationException.class, () -> {
-            testComposite2.mandatoryProperty().set( null );
-        } );
+        testComposite2.optionalProperty().set(null);
+        assertThrows(ConstraintViolationException.class, () -> {
+            testComposite2.mandatoryProperty().set(null);
+        });
     }
 
     @Test
@@ -117,10 +117,10 @@ public class OptionalTest extends AbstractQi4jTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            TestComposite4 ref = unitOfWork.newEntity( TestComposite4.class );
+            TestComposite4 ref = unitOfWork.newEntity(TestComposite4.class);
 
-            EntityBuilder<TestComposite3> builder = unitOfWork.newEntityBuilder( TestComposite3.class );
-            builder.instance().mandatoryAssociation().set( ref );
+            EntityBuilder<TestComposite3> builder = unitOfWork.newEntityBuilder(TestComposite3.class);
+            builder.instance().mandatoryAssociation().set(ref);
             TestComposite3 testComposite3 = builder.newInstance();
 
             unitOfWork.complete();
@@ -138,11 +138,11 @@ public class OptionalTest extends AbstractQi4jTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            TestComposite4 ref = unitOfWork.newEntity( TestComposite4.class );
+            TestComposite4 ref = unitOfWork.newEntity(TestComposite4.class);
 
-            EntityBuilder<TestComposite3> builder = unitOfWork.newEntityBuilder( TestComposite3.class );
-            builder.instance().mandatoryAssociation().set( ref );
-            builder.instance().optionalAssociation().set( ref );
+            EntityBuilder<TestComposite3> builder = unitOfWork.newEntityBuilder(TestComposite3.class);
+            builder.instance().mandatoryAssociation().set(ref);
+            builder.instance().optionalAssociation().set(ref);
             TestComposite3 testComposite3 = builder.newInstance();
 
             unitOfWork.complete();
@@ -157,14 +157,14 @@ public class OptionalTest extends AbstractQi4jTest
     public void givenMandatoryAssociationWhenMandatoryMissingThenException()
         throws Exception
     {
-        assertThrows( ConstraintViolationException.class, () -> {
+        assertThrows(ConstraintViolationException.class, () -> {
             UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
             try
             {
-                TestComposite4 ref = unitOfWork.newEntity( TestComposite4.class );
+                TestComposite4 ref = unitOfWork.newEntity(TestComposite4.class);
 
-                EntityBuilder<TestComposite3> builder = unitOfWork.newEntityBuilder( TestComposite3.class );
-                builder.instance().optionalAssociation().set( ref );
+                EntityBuilder<TestComposite3> builder = unitOfWork.newEntityBuilder(TestComposite3.class);
+                builder.instance().optionalAssociation().set(ref);
                 TestComposite3 testComposite3 = builder.newInstance();
 
                 unitOfWork.complete();
@@ -173,21 +173,21 @@ public class OptionalTest extends AbstractQi4jTest
             {
                 unitOfWork.discard();
             }
-        } );
+        });
     }
 
-    @Mixins( TestComposite.TestMixin.class )
+    @Mixins(TestComposite.TestMixin.class)
     public interface TestComposite
         extends TransientComposite
     {
-        void doStuff( @Optional String optional, String mandatory );
+        void doStuff(@Optional String optional, String mandatory);
 
         abstract class TestMixin
             implements TestComposite
         {
-            public void doStuff( @Optional String optional, String mandatory )
+            public void doStuff(@Optional String optional, String mandatory)
             {
-                assertThat( "Mandatory is not null", mandatory, notNullValue() );
+                assertThat("Mandatory is not null", mandatory, notNullValue());
             }
         }
     }

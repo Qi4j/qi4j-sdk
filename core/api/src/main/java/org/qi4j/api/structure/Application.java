@@ -19,11 +19,10 @@
  */
 package org.qi4j.api.structure;
 
+import org.qi4j.api.activation.Activation;
+import org.qi4j.api.activation.ActivationEventListenerRegistration;
+
 import java.util.stream.Stream;
-import org.qi4j.api.activation.Activation;
-import org.qi4j.api.activation.ActivationEventListenerRegistration;
-import org.qi4j.api.activation.Activation;
-import org.qi4j.api.activation.ActivationEventListenerRegistration;
 
 /**
  * The Application represents a whole Qi4j application.
@@ -80,18 +79,18 @@ public interface Application
      * @return Found Layer, never returns null
      * @throws IllegalArgumentException if there's no such Layer
      */
-    Layer findLayer( String layerName )
+    Layer findLayer(String layerName)
         throws IllegalArgumentException;
 
     /**
      * Find a Module.
      *
-     * @param layerName Layer name
+     * @param layerName  Layer name
      * @param moduleName Module name
      * @return Found Module, never returns null
      * @throws IllegalArgumentException if there's no such Module
      */
-    Module findModule( String layerName, String moduleName )
+    Module findModule(String layerName, String moduleName)
         throws IllegalArgumentException;
 
     /**

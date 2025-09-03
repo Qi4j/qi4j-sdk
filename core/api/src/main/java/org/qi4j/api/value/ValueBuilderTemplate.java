@@ -20,7 +20,6 @@
 package org.qi4j.api.value;
 
 import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.structure.ModuleDescriptor;
 
 /**
  * Builder template for Values.
@@ -29,17 +28,17 @@ public abstract class ValueBuilderTemplate<T>
 {
     Class<T> type;
 
-    protected ValueBuilderTemplate( Class<T> type )
+    protected ValueBuilderTemplate(Class<T> type)
     {
         this.type = type;
     }
 
-    protected abstract void build( T prototype );
+    protected abstract void build(T prototype);
 
-    public T newInstance( ModuleDescriptor module )
+    public T newInstance(ModuleDescriptor module)
     {
-        ValueBuilder<T> builder = module.instance().newValueBuilder( type );
-        build( builder.prototype() );
+        ValueBuilder<T> builder = module.instance().newValueBuilder(type);
+        build(builder.prototype());
         return builder.newInstance();
     }
 }

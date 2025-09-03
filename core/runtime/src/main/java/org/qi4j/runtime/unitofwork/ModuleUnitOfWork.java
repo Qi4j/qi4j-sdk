@@ -20,27 +20,13 @@
 
 package org.qi4j.runtime.unitofwork;
 
-import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.composite.Composite;
-import org.qi4j.api.entity.EntityBuilder;
-import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.api.entity.LifecycleException;
+import org.qi4j.api.entity.*;
 import org.qi4j.api.identity.HasIdentity;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.identity.IdentityGenerator;
@@ -56,15 +42,7 @@ import org.qi4j.api.query.QueryBuilder;
 import org.qi4j.api.query.QueryExecutionException;
 import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
-import org.qi4j.api.unitofwork.NoSuchEntityException;
-import org.qi4j.api.unitofwork.NoSuchEntityTypeException;
-import org.qi4j.api.unitofwork.ToEntityConverter;
-import org.qi4j.api.unitofwork.ToValueConverter;
-import org.qi4j.api.unitofwork.UnitOfWork;
-import org.qi4j.api.unitofwork.UnitOfWorkCallback;
-import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
-import org.qi4j.api.unitofwork.UnitOfWorkFactory;
+import org.qi4j.api.unitofwork.*;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.runtime.association.AssociationInstance;
@@ -81,6 +59,13 @@ import org.qi4j.spi.query.EntityFinder;
 import org.qi4j.spi.query.EntityFinderException;
 import org.qi4j.spi.query.QueryBuilderSPI;
 import org.qi4j.spi.query.QuerySource;
+
+import java.time.Instant;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.qi4j.api.composite.CompositeInstance.compositeInstanceOf;
 import static org.qi4j.api.identity.HasIdentity.IDENTITY_STATE_NAME;
@@ -132,73 +117,73 @@ public class ModuleUnitOfWork
     }
 
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return uow.metaInfo().get( infoType );
+        return uow.metaInfo().get(infoType);
     }
 
     @Override
-    public void setMetaInfo( Object metaInfo )
+    public void setMetaInfo(Object metaInfo)
     {
-        uow.metaInfo().set( metaInfo );
+        uow.metaInfo().set(metaInfo);
     }
 
     @Override
-    @SuppressWarnings( { "raw", "unchecked" } )
-    public <T> Query<T> newQuery( QueryBuilder<T> queryBuilder )
+    @SuppressWarnings({"raw", "unchecked"})
+    public <T> Query<T> newQuery(QueryBuilder<T> queryBuilder)
     {
         QueryBuilderSPI queryBuilderSPI = (QueryBuilderSPI) queryBuilder;
 
-        return queryBuilderSPI.newQuery( new UoWQuerySource( this ) );
+        return queryBuilderSPI.newQuery(new UoWQuerySource(this));
     }
 
     @Override
-    public <T> T newEntity( Class<T> type )
+    public <T> T newEntity(Class<T> type)
         throws NoSuchEntityTypeException, LifecycleException
     {
-        return newEntity( type, null );
+        return newEntity(type, null);
     }
 
     @Override
-    public <T> T newEntity( Class<T> type, Identity identity )
+    public <T> T newEntity(Class<T> type, Identity identity)
         throws NoSuchEntityTypeException, LifecycleException
     {
-        return newEntityBuilder( type, identity ).newInstance();
+        return newEntityBuilder(type, identity).newInstance();
     }
 
     @Override
-    public <T> EntityBuilder<T> newEntityBuilder( Class<T> type )
+    public <T> EntityBuilder<T> newEntityBuilder(Class<T> type)
         throws NoSuchEntityTypeException
     {
-        return newEntityBuilder( type, null );
+        return newEntityBuilder(type, null);
     }
 
     @Override
-    public <T> EntityBuilder<T> newEntityBuilder( Class<T> type, Identity identity )
+    public <T> EntityBuilder<T> newEntityBuilder(Class<T> type, Identity identity)
         throws NoSuchEntityTypeException
     {
-        EntityDescriptor model = module.typeLookup().lookupEntityModel( type );
+        EntityDescriptor model = module.typeLookup().lookupEntityModel(type);
 
-        if( model == null )
+        if(model == null)
         {
-            throw new NoSuchEntityTypeException( type.getName(), module );
+            throw new NoSuchEntityTypeException(type.getName(), module);
         }
 
         ModuleDescriptor modelModule = model.module();
-        EntityStore entityStore = ( (ModuleSpi) modelModule.instance() ).entityStore();
+        EntityStore entityStore = ((ModuleSpi) modelModule.instance()).entityStore();
 
         // Generate id if necessary
-        if( identity == null )
+        if(identity == null)
         {
-            IdentityGenerator idGen = ( (ModuleSpi) modelModule.instance() ).identityGenerator();
-            identity = idGen.generate( model.types().findFirst().orElse( null ) );
+            IdentityGenerator idGen = ((ModuleSpi) modelModule.instance()).identityGenerator();
+            identity = idGen.generate(model.types().findFirst().orElse(null));
         }
         EntityBuilder<T> builder;
 
-        builder = new EntityBuilderInstance<>( model,
-                                               this,
-                                               uow.getEntityStoreUnitOfWork( entityStore ),
-                                               identity );
+        builder = new EntityBuilderInstance<>(model,
+            this,
+            uow.getEntityStoreUnitOfWork(entityStore),
+            identity);
         return builder;
     }
 
@@ -209,14 +194,14 @@ public class ModuleUnitOfWork
         Function<AssociationDescriptor, EntityReference> associationFunction,
         Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
         Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction
-                                                         )
+    )
         throws NoSuchEntityTypeException
     {
-        return newEntityBuilderWithState( type, null,
-                                          propertyFunction,
-                                          associationFunction,
-                                          manyAssociationFunction,
-                                          namedAssociationFunction );
+        return newEntityBuilderWithState(type, null,
+            propertyFunction,
+            associationFunction,
+            manyAssociationFunction,
+            namedAssociationFunction);
     }
 
     @Override
@@ -226,19 +211,19 @@ public class ModuleUnitOfWork
         Function<AssociationDescriptor, EntityReference> associationFunction,
         Function<AssociationDescriptor, Stream<EntityReference>> manyAssociationFunction,
         Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssociationFunction
-                                                         )
+    )
         throws NoSuchEntityTypeException
     {
-        Objects.requireNonNull( propertyFunction, "propertyFunction" );
-        Objects.requireNonNull( associationFunction, "associationFunction" );
-        Objects.requireNonNull( manyAssociationFunction, "manyAssociationFunction" );
-        Objects.requireNonNull( namedAssociationFunction, "namedAssociationFunction" );
+        Objects.requireNonNull(propertyFunction, "propertyFunction");
+        Objects.requireNonNull(associationFunction, "associationFunction");
+        Objects.requireNonNull(manyAssociationFunction, "manyAssociationFunction");
+        Objects.requireNonNull(namedAssociationFunction, "namedAssociationFunction");
 
-        EntityDescriptor model = module.typeLookup().lookupEntityModel( type );
+        EntityDescriptor model = module.typeLookup().lookupEntityModel(type);
 
-        if( model == null )
+        if(model == null)
         {
-            throw new NoSuchEntityTypeException( type.getName(), module );
+            throw new NoSuchEntityTypeException(type.getName(), module);
         }
 
         ModuleDescriptor modelModule = model.module();
@@ -249,84 +234,84 @@ public class ModuleUnitOfWork
             propertyFunction, associationFunction, manyAssociationFunction, namedAssociationFunction
         );
 
-        if( identity == null )
+        if(identity == null)
         {
             // Use reference from StateResolver if available
             PropertyModel identityModel = (PropertyModel) model
                 .state()
-                .findPropertyModelByQualifiedName( IDENTITY_STATE_NAME );
-            String propertyState = (String) stateResolver.getPropertyState( identityModel );
-            if( propertyState == null )
+                .findPropertyModelByQualifiedName(IDENTITY_STATE_NAME);
+            String propertyState = (String) stateResolver.getPropertyState(identityModel);
+            if(propertyState == null)
             {
                 // Generate reference
                 IdentityGenerator idGen = moduleSpi.identityGenerator();
-                identity = idGen.generate( model.types().findFirst().orElse( null ) );
+                identity = idGen.generate(model.types().findFirst().orElse(null));
             }
             else
             {
-                identity = StringIdentity.identityOf( propertyState );
+                identity = StringIdentity.identityOf(propertyState);
             }
         }
 
-        return new EntityBuilderInstance<>( model,
-                                            this,
-                                            uow.getEntityStoreUnitOfWork( entityStore ),
-                                            identity,
-                                            stateResolver );
+        return new EntityBuilderInstance<>(model,
+            this,
+            uow.getEntityStoreUnitOfWork(entityStore),
+            identity,
+            stateResolver);
     }
 
     @Override
-    public <T> T get( Class<T> type, Identity identity )
+    public <T> T get(Class<T> type, Identity identity)
         throws NoSuchEntityTypeException, NoSuchEntityException
     {
-        Iterable<EntityDescriptor> models = module.typeLookup().lookupEntityModels( type );
+        Iterable<EntityDescriptor> models = module.typeLookup().lookupEntityModels(type);
 
-        if( !models.iterator().hasNext() )
+        if(!models.iterator().hasNext())
         {
-            throw new NoSuchEntityTypeException( type.getName(), module );
+            throw new NoSuchEntityTypeException(type.getName(), module);
         }
 
-        return uow.get( EntityReference.create( identity ), this, models, type );
+        return uow.get(EntityReference.create(identity), this, models, type);
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> T get( T entity )
+    @SuppressWarnings("unchecked")
+    public <T> T get(T entity)
         throws NoSuchEntityTypeException
     {
         EntityComposite entityComposite = (EntityComposite) entity;
-        EntityInstance compositeInstance = (EntityInstance) compositeInstanceOf( entityComposite );
+        EntityInstance compositeInstance = (EntityInstance) compositeInstanceOf(entityComposite);
         EntityDescriptor model = compositeInstance.entityModel();
-        Class<T> type = (Class<T>) compositeInstance.types().findFirst().orElse( null );
-        return uow.get( compositeInstance.reference(), this, Collections.singletonList( model ), type );
+        Class<T> type = (Class<T>) compositeInstance.types().findFirst().orElse(null);
+        return uow.get(compositeInstance.reference(), this, Collections.singletonList(model), type);
     }
 
     @Override
-    public void remove( Object entity )
+    public void remove(Object entity)
         throws LifecycleException
     {
         uow.checkOpen();
 
         EntityComposite entityComposite = (EntityComposite) entity;
 
-        EntityInstance compositeInstance = (EntityInstance) compositeInstanceOf( entityComposite );
+        EntityInstance compositeInstance = (EntityInstance) compositeInstanceOf(entityComposite);
 
-        if( compositeInstance.status() == EntityStatus.NEW )
+        if(compositeInstance.status() == EntityStatus.NEW)
         {
-            compositeInstance.remove( this );
-            uow.remove( compositeInstance.reference() );
+            compositeInstance.remove(this);
+            uow.remove(compositeInstance.reference());
         }
-        else if( compositeInstance.status() == EntityStatus.LOADED || compositeInstance.status() == EntityStatus.UPDATED )
+        else if(compositeInstance.status() == EntityStatus.LOADED || compositeInstance.status() == EntityStatus.UPDATED)
         {
-            compositeInstance.remove( this );
+            compositeInstance.remove(this);
         }
         else
         {
-            throw new NoSuchEntityException( compositeInstance.reference(), compositeInstance.types(), usecase() );
+            throw new NoSuchEntityException(compositeInstance.reference(), compositeInstance.types(), usecase());
         }
     }
 
-    @SuppressWarnings( "DuplicateThrows" )
+    @SuppressWarnings("DuplicateThrows")
     @Override
     public void complete()
         throws UnitOfWorkCompletionException, ConcurrentEntityModificationException
@@ -371,32 +356,32 @@ public class ModuleUnitOfWork
     }
 
     @Override
-    public void addUnitOfWorkCallback( UnitOfWorkCallback callback )
+    public void addUnitOfWorkCallback(UnitOfWorkCallback callback)
     {
-        uow.addUnitOfWorkCallback( callback );
+        uow.addUnitOfWorkCallback(callback);
     }
 
     @Override
-    public void removeUnitOfWorkCallback( UnitOfWorkCallback callback )
+    public void removeUnitOfWorkCallback(UnitOfWorkCallback callback)
     {
-        uow.removeUnitOfWorkCallback( callback );
+        uow.removeUnitOfWorkCallback(callback);
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
 
         ModuleUnitOfWork that = (ModuleUnitOfWork) o;
 
-        return uow.equals( that.uow );
+        return uow.equals(that.uow);
     }
 
     @Override
@@ -411,140 +396,140 @@ public class ModuleUnitOfWork
         return uow.toString();
     }
 
-    void addEntity( EntityInstance instance )
+    void addEntity(EntityInstance instance)
     {
-        uow.addEntity( instance );
+        uow.addEntity(instance);
     }
 
     @Override
-    public <T extends HasIdentity> T toValue( Class<T> primaryType, T entityComposite )
+    public <T extends HasIdentity> T toValue(Class<T> primaryType, T entityComposite)
     {
-        Objects.requireNonNull( primaryType );
-        if( entityComposite == null )
+        Objects.requireNonNull(primaryType);
+        if(entityComposite == null)
         {
             return null;
         }
-        Function<PropertyDescriptor, Object> propertyFunction = new ToValuePropertyMappingFunction( entityComposite );
-        Function<AssociationDescriptor, EntityReference> assocationFunction = new ToValueAssociationMappingFunction<>( entityComposite );
-        Function<AssociationDescriptor, Stream<EntityReference>> manyAssocFunction = new ToValueManyAssociationMappingFunction<>( entityComposite );
-        Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssocFunction = new ToValueNameAssociationMappingFunction<>( entityComposite );
-        ToValueConverter converter = getConverter( ToValueConverter.class );
-        if( converter != null )
+        Function<PropertyDescriptor, Object> propertyFunction = new ToValuePropertyMappingFunction(entityComposite);
+        Function<AssociationDescriptor, EntityReference> assocationFunction = new ToValueAssociationMappingFunction<>(entityComposite);
+        Function<AssociationDescriptor, Stream<EntityReference>> manyAssocFunction = new ToValueManyAssociationMappingFunction<>(entityComposite);
+        Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssocFunction = new ToValueNameAssociationMappingFunction<>(entityComposite);
+        ToValueConverter converter = getConverter(ToValueConverter.class);
+        if(converter != null)
         {
-            propertyFunction = converter.properties( entityComposite, propertyFunction );
-            assocationFunction = converter.associations( entityComposite, assocationFunction );
-            manyAssocFunction = converter.manyAssociations( entityComposite, manyAssocFunction );
-            namedAssocFunction = converter.namedAssociations( entityComposite, namedAssocFunction );
+            propertyFunction = converter.properties(entityComposite, propertyFunction);
+            assocationFunction = converter.associations(entityComposite, assocationFunction);
+            manyAssocFunction = converter.manyAssociations(entityComposite, manyAssocFunction);
+            namedAssocFunction = converter.namedAssociations(entityComposite, namedAssocFunction);
         }
-        @SuppressWarnings( "unchecked" )
+        @SuppressWarnings("unchecked")
         ValueBuilder<T> builder = module().instance().newValueBuilderWithState(
-            primaryType, propertyFunction, assocationFunction, manyAssocFunction, namedAssocFunction );
+            primaryType, propertyFunction, assocationFunction, manyAssocFunction, namedAssocFunction);
         return builder.newInstance();
     }
 
     @Override
-    public <T extends HasIdentity> Map<String, T> toValueMap( NamedAssociation<T> association )
+    public <T extends HasIdentity> Map<String, T> toValueMap(NamedAssociation<T> association)
     {
-        @SuppressWarnings( "unchecked" )
-        Class<T> primaryType = (Class<T>) api.associationDescriptorFor( association ).type();
+        @SuppressWarnings("unchecked")
+        Class<T> primaryType = (Class<T>) api.associationDescriptorFor(association).type();
 
         return association
             .toMap()
             .entrySet()
             .stream()
-            .collect( Collectors.toMap( Map.Entry::getKey, entry -> toValue( primaryType, entry.getValue() ) ) );
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> toValue(primaryType, entry.getValue())));
     }
 
     @Override
-    public <T extends HasIdentity> List<T> toValueList( ManyAssociation<T> association )
+    public <T extends HasIdentity> List<T> toValueList(ManyAssociation<T> association)
     {
-        @SuppressWarnings( "unchecked" )
-        Class<T> primaryType = (Class<T>) api.associationDescriptorFor( association ).type();
+        @SuppressWarnings("unchecked")
+        Class<T> primaryType = (Class<T>) api.associationDescriptorFor(association).type();
 
         return association
             .toList()
             .stream()
-            .map( entity -> toValue( primaryType, entity ) )
-            .collect( Collectors.toList() );
+            .map(entity -> toValue(primaryType, entity))
+            .collect(Collectors.toList());
     }
 
     @Override
-    public <T extends HasIdentity> Set<T> toValueSet( ManyAssociation<T> association )
+    public <T extends HasIdentity> Set<T> toValueSet(ManyAssociation<T> association)
     {
-        @SuppressWarnings( "unchecked" )
-        Class<T> primaryType = (Class<T>) api.associationDescriptorFor( association ).type();
+        @SuppressWarnings("unchecked")
+        Class<T> primaryType = (Class<T>) api.associationDescriptorFor(association).type();
 
         return association
             .toSet()
             .stream()
-            .map( entity -> toValue( primaryType, entity ) )
-            .collect( Collectors.toSet() );
+            .map(entity -> toValue(primaryType, entity))
+            .collect(Collectors.toSet());
     }
 
     @Override
-    public <T extends HasIdentity> T toEntity( Class<T> primaryType, T valueComposite )
+    public <T extends HasIdentity> T toEntity(Class<T> primaryType, T valueComposite)
     {
-        Objects.requireNonNull( primaryType );
-        if( valueComposite == null )
+        Objects.requireNonNull(primaryType);
+        if(valueComposite == null)
         {
             return null;
         }
-        Function<PropertyDescriptor, Object> propertyFunction = new ToEntityPropertyMappingFunction<>( valueComposite );
-        Function<AssociationDescriptor, EntityReference> assocationFunction = new ToEntityAssociationMappingFunction<>( valueComposite );
-        Function<AssociationDescriptor, Stream<EntityReference>> manyAssocFunction = new ToEntityManyAssociationMappingFunction<>( valueComposite );
-        Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssocFunction = new ToEntityNameAssociationMappingFunction<>( valueComposite );
-        ToEntityConverter converter = getConverter( ToEntityConverter.class );
-        if( converter != null )
+        Function<PropertyDescriptor, Object> propertyFunction = new ToEntityPropertyMappingFunction<>(valueComposite);
+        Function<AssociationDescriptor, EntityReference> assocationFunction = new ToEntityAssociationMappingFunction<>(valueComposite);
+        Function<AssociationDescriptor, Stream<EntityReference>> manyAssocFunction = new ToEntityManyAssociationMappingFunction<>(valueComposite);
+        Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>> namedAssocFunction = new ToEntityNameAssociationMappingFunction<>(valueComposite);
+        ToEntityConverter converter = getConverter(ToEntityConverter.class);
+        if(converter != null)
         {
-            propertyFunction = converter.properties( valueComposite, propertyFunction );
-            assocationFunction = converter.associations( valueComposite, assocationFunction );
-            manyAssocFunction = converter.manyAssociations( valueComposite, manyAssocFunction );
-            namedAssocFunction = converter.namedAssociations( valueComposite, namedAssocFunction );
+            propertyFunction = converter.properties(valueComposite, propertyFunction);
+            assocationFunction = converter.associations(valueComposite, assocationFunction);
+            manyAssocFunction = converter.manyAssociations(valueComposite, manyAssocFunction);
+            namedAssocFunction = converter.namedAssociations(valueComposite, namedAssocFunction);
         }
         try
         {
-            T entity = get( primaryType, valueComposite.identity().get() );
+            T entity = get(primaryType, valueComposite.identity().get());
             // If successful, then this entity is to by modified.
-            EntityInstance instance = (EntityInstance) compositeInstanceOf( (EntityComposite) entity );
+            EntityInstance instance = (EntityInstance) compositeInstanceOf((EntityComposite) entity);
             EntityState state = instance.entityState();
-            FunctionStateResolver stateResolver = new FunctionStateResolver( propertyFunction,
-                                                                             assocationFunction,
-                                                                             manyAssocFunction,
-                                                                             namedAssocFunction );
-            EntityModel model = (EntityModel) compositeInstanceOf( (Composite) entity ).descriptor();
-            stateResolver.populateState( model, state );
+            FunctionStateResolver stateResolver = new FunctionStateResolver(propertyFunction,
+                assocationFunction,
+                manyAssocFunction,
+                namedAssocFunction);
+            EntityModel model = (EntityModel) compositeInstanceOf((Composite) entity).descriptor();
+            stateResolver.populateState(model, state);
             return entity;
         }
-        catch( NoSuchEntityException e )
+        catch(NoSuchEntityException e)
         {
-            EntityBuilder<T> entityBuilder = newEntityBuilderWithState( primaryType,
-                                                                        valueComposite.identity().get(),
-                                                                        propertyFunction,
-                                                                        assocationFunction,
-                                                                        manyAssocFunction,
-                                                                        namedAssocFunction );
+            EntityBuilder<T> entityBuilder = newEntityBuilderWithState(primaryType,
+                valueComposite.identity().get(),
+                propertyFunction,
+                assocationFunction,
+                manyAssocFunction,
+                namedAssocFunction);
             return entityBuilder.newInstance();
         }
     }
 
-    private <T> T getConverter( Class<T> converterType )
+    private <T> T getConverter(Class<T> converterType)
     {
         T converter = null;
         Usecase usecase = usecase();
-        if( usecase != null )
+        if(usecase != null)
         {
-            converter = usecase.metaInfo( converterType );
+            converter = usecase.metaInfo(converterType);
         }
-        if( converter == null )
+        if(converter == null)
         {
-            converter = metaInfo( converterType );
+            converter = metaInfo(converterType);
         }
         return converter;
     }
 
-    private static EntityState getEntityState( Object entity )
+    private static EntityState getEntityState(Object entity)
     {
-        return ( (EntityInstance) compositeInstanceOf( (Composite) entity ) ).entityState();
+        return ((EntityInstance) compositeInstanceOf((Composite) entity)).entityState();
     }
 
     private static class UoWQuerySource
@@ -552,35 +537,35 @@ public class ModuleUnitOfWork
     {
         private final ModuleUnitOfWork moduleUnitOfWork;
 
-        private UoWQuerySource( ModuleUnitOfWork moduleUnitOfWork )
+        private UoWQuerySource(ModuleUnitOfWork moduleUnitOfWork)
         {
             this.moduleUnitOfWork = moduleUnitOfWork;
         }
 
         @Override
-        public <T> T find( Class<T> resultType,
-                           Predicate<Composite> whereClause,
-                           List<OrderBy> orderBySegments,
-                           Integer firstResult,
-                           Integer maxResults,
-                           Map<String, Object> variables
-                         )
+        public <T> T find(Class<T> resultType,
+                          Predicate<Composite> whereClause,
+                          List<OrderBy> orderBySegments,
+                          Integer firstResult,
+                          Integer maxResults,
+                          Map<String, Object> variables
+        )
         {
             final EntityFinder entityFinder = moduleUnitOfWork.module()
-                                                              .instance()
-                                                              .findService( EntityFinder.class )
-                                                              .get();
+                .instance()
+                .findService(EntityFinder.class)
+                .get();
 
             try
             {
-                EntityReference foundEntity = entityFinder.findEntity( resultType, whereClause, variables == null ? Collections.emptyMap() : variables );
-                if( foundEntity != null )
+                EntityReference foundEntity = entityFinder.findEntity(resultType, whereClause, variables == null ? Collections.emptyMap() : variables);
+                if(foundEntity != null)
                 {
                     try
                     {
-                        return moduleUnitOfWork.get( resultType, foundEntity.identity() );
+                        return moduleUnitOfWork.get(resultType, foundEntity.identity());
                     }
-                    catch( NoSuchEntityException e )
+                    catch(NoSuchEntityException e)
                     {
                         return null; // Index is out of sync - entity has been removed
                     }
@@ -588,28 +573,28 @@ public class ModuleUnitOfWork
                 // No entity was found
                 return null;
             }
-            catch( EntityFinderException e )
+            catch(EntityFinderException e)
             {
-                throw new QueryExecutionException( "Finder caused exception", e );
+                throw new QueryExecutionException("Finder caused exception", e);
             }
         }
 
         @Override
-        public <T> long count( Class<T> resultType,
-                               Predicate<Composite> whereClause,
-                               List<OrderBy> orderBySegments,
-                               Integer firstResult,
-                               Integer maxResults,
-                               Map<String, Object> variables
-                             )
+        public <T> long count(Class<T> resultType,
+                              Predicate<Composite> whereClause,
+                              List<OrderBy> orderBySegments,
+                              Integer firstResult,
+                              Integer maxResults,
+                              Map<String, Object> variables
+        )
         {
-            EntityFinder entityFinder = moduleUnitOfWork.module().instance().findService( EntityFinder.class ).get();
+            EntityFinder entityFinder = moduleUnitOfWork.module().instance().findService(EntityFinder.class).get();
 
             try
             {
-                return entityFinder.countEntities( resultType, whereClause, variables == null ? Collections.emptyMap() : variables );
+                return entityFinder.countEntities(resultType, whereClause, variables == null ? Collections.emptyMap() : variables);
             }
-            catch( EntityFinderException e )
+            catch(EntityFinderException e)
             {
                 e.printStackTrace();
                 return 0;
@@ -617,14 +602,14 @@ public class ModuleUnitOfWork
         }
 
         @Override
-        public <T> Stream<T> stream( Class<T> resultType,
-                                     Predicate<Composite> whereClause,
-                                     List<OrderBy> orderBySegments,
-                                     Integer firstResult,
-                                     Integer maxResults,
-                                     Map<String, Object> variables )
+        public <T> Stream<T> stream(Class<T> resultType,
+                                    Predicate<Composite> whereClause,
+                                    List<OrderBy> orderBySegments,
+                                    Integer firstResult,
+                                    Integer maxResults,
+                                    Map<String, Object> variables)
         {
-            EntityFinder entityFinder = moduleUnitOfWork.module().instance().findService( EntityFinder.class ).get();
+            EntityFinder entityFinder = moduleUnitOfWork.module().instance().findService(EntityFinder.class).get();
 
             try
             {
@@ -635,22 +620,22 @@ public class ModuleUnitOfWork
                     firstResult,
                     maxResults,
                     variables == null ? Collections.emptyMap() : variables
-                                                ).map( ref ->
-                                                       {
-                                                           try
-                                                           {
-                                                               return moduleUnitOfWork.get( resultType, ref.identity() );
-                                                           }
-                                                           catch( NoSuchEntityException e )
-                                                           {
-                                                               // Index is out of sync - entity has been removed
-                                                               return null;
-                                                           }
-                                                       } );
+                ).map(ref ->
+                {
+                    try
+                    {
+                        return moduleUnitOfWork.get(resultType, ref.identity());
+                    }
+                    catch(NoSuchEntityException e)
+                    {
+                        // Index is out of sync - entity has been removed
+                        return null;
+                    }
+                });
             }
-            catch( EntityFinderException e )
+            catch(EntityFinderException e)
             {
-                throw new QueryExecutionException( "Query '" + toString() + "' could not be executed", e );
+                throw new QueryExecutionException("Query '" + toString() + "' could not be executed", e);
             }
         }
     }
@@ -660,15 +645,15 @@ public class ModuleUnitOfWork
     {
         private Object entity;
 
-        ToValuePropertyMappingFunction( Object entity )
+        ToValuePropertyMappingFunction(Object entity)
         {
             this.entity = entity;
         }
 
         @Override
-        public Object apply( PropertyDescriptor propertyDescriptor )
+        public Object apply(PropertyDescriptor propertyDescriptor)
         {
-            return getEntityState( entity ).propertyValueOf( propertyDescriptor.qualifiedName() );
+            return getEntityState(entity).propertyValueOf(propertyDescriptor.qualifiedName());
         }
     }
 
@@ -677,15 +662,15 @@ public class ModuleUnitOfWork
     {
         private final T entity;
 
-        ToValueAssociationMappingFunction( T entity )
+        ToValueAssociationMappingFunction(T entity)
         {
             this.entity = entity;
         }
 
         @Override
-        public EntityReference apply( AssociationDescriptor associationDescriptor )
+        public EntityReference apply(AssociationDescriptor associationDescriptor)
         {
-            return getEntityState( entity ).associationValueOf( associationDescriptor.qualifiedName() );
+            return getEntityState(entity).associationValueOf(associationDescriptor.qualifiedName());
         }
     }
 
@@ -694,15 +679,15 @@ public class ModuleUnitOfWork
     {
         private final T entity;
 
-        ToValueManyAssociationMappingFunction( T entity )
+        ToValueManyAssociationMappingFunction(T entity)
         {
             this.entity = entity;
         }
 
         @Override
-        public Stream<EntityReference> apply( AssociationDescriptor associationDescriptor )
+        public Stream<EntityReference> apply(AssociationDescriptor associationDescriptor)
         {
-            return getEntityState( entity ).manyAssociationValueOf( associationDescriptor.qualifiedName() ).stream();
+            return getEntityState(entity).manyAssociationValueOf(associationDescriptor.qualifiedName()).stream();
         }
     }
 
@@ -711,15 +696,15 @@ public class ModuleUnitOfWork
     {
         private final T entity;
 
-        ToValueNameAssociationMappingFunction( T entity )
+        ToValueNameAssociationMappingFunction(T entity)
         {
             this.entity = entity;
         }
 
         @Override
-        public Stream<Map.Entry<String, EntityReference>> apply( AssociationDescriptor associationDescriptor )
+        public Stream<Map.Entry<String, EntityReference>> apply(AssociationDescriptor associationDescriptor)
         {
-            return getEntityState( entity ).namedAssociationValueOf( associationDescriptor.qualifiedName() ).stream();
+            return getEntityState(entity).namedAssociationValueOf(associationDescriptor.qualifiedName()).stream();
         }
 
     }
@@ -729,16 +714,16 @@ public class ModuleUnitOfWork
     {
         private final T value;
 
-        private ToEntityPropertyMappingFunction( T value )
+        private ToEntityPropertyMappingFunction(T value)
         {
             this.value = value;
         }
 
         @Override
-        public Object apply( PropertyDescriptor propertyDescriptor )
+        public Object apply(PropertyDescriptor propertyDescriptor)
         {
-            StateHolder state = getValueStateInstance( value );
-            Property<Object> property = state.propertyFor( propertyDescriptor.accessor() );
+            StateHolder state = getValueStateInstance(value);
+            Property<Object> property = state.propertyFor(propertyDescriptor.accessor());
             return property.get();
         }
     }
@@ -749,17 +734,17 @@ public class ModuleUnitOfWork
 
         private final T value;
 
-        private ToEntityAssociationMappingFunction( T value )
+        private ToEntityAssociationMappingFunction(T value)
         {
             this.value = value;
         }
 
         @Override
-        @SuppressWarnings( "unchecked" )
-        public EntityReference apply( AssociationDescriptor associationDescriptor )
+        @SuppressWarnings("unchecked")
+        public EntityReference apply(AssociationDescriptor associationDescriptor)
         {
-            AssociationStateHolder state = getValueStateInstance( value );
-            AssociationInstance<T> association = (AssociationInstance<T>) state.associationFor( associationDescriptor.accessor() );
+            AssociationStateHolder state = getValueStateInstance(value);
+            AssociationInstance<T> association = (AssociationInstance<T>) state.associationFor(associationDescriptor.accessor());
             return association.getAssociationState().get();
         }
     }
@@ -770,15 +755,15 @@ public class ModuleUnitOfWork
 
         private final T value;
 
-        private ToEntityManyAssociationMappingFunction( T valueComposite )
+        private ToEntityManyAssociationMappingFunction(T valueComposite)
         {
             this.value = valueComposite;
         }
 
         @Override
-        public Stream<EntityReference> apply( AssociationDescriptor associationDescriptor )
+        public Stream<EntityReference> apply(AssociationDescriptor associationDescriptor)
         {
-            return getValueStateInstance( value ).manyAssociationFor( associationDescriptor.accessor() ).references();
+            return getValueStateInstance(value).manyAssociationFor(associationDescriptor.accessor()).references();
         }
     }
 
@@ -787,20 +772,20 @@ public class ModuleUnitOfWork
     {
         private final T value;
 
-        private ToEntityNameAssociationMappingFunction( T valueComposite )
+        private ToEntityNameAssociationMappingFunction(T valueComposite)
         {
             this.value = valueComposite;
         }
 
         @Override
-        public Stream<Map.Entry<String, EntityReference>> apply( AssociationDescriptor associationDescriptor )
+        public Stream<Map.Entry<String, EntityReference>> apply(AssociationDescriptor associationDescriptor)
         {
-            return getValueStateInstance( value ).namedAssociationFor( associationDescriptor.accessor() ).references();
+            return getValueStateInstance(value).namedAssociationFor(associationDescriptor.accessor()).references();
         }
     }
 
-    private static ValueStateInstance getValueStateInstance( Object value )
+    private static ValueStateInstance getValueStateInstance(Object value)
     {
-        return (ValueStateInstance) compositeInstanceOf( (Composite) value ).state();
+        return (ValueStateInstance) compositeInstanceOf((Composite) value).state();
     }
 }

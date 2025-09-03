@@ -19,11 +19,11 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.composite.Composite;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.function.Predicate;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.Composite;
 
 /**
  * Base binary Specification, used for AND and OR Specifications..
@@ -33,9 +33,9 @@ public abstract class BinaryPredicate
 {
     protected final Collection<Predicate<Composite>> operands;
 
-    protected BinaryPredicate( Collection<Predicate<Composite>> operands )
+    protected BinaryPredicate(Collection<Predicate<Composite>> operands)
     {
-        this.operands = Collections.unmodifiableCollection( operands );
+        this.operands = Collections.unmodifiableCollection(operands);
     }
 
     public Collection<Predicate<Composite>> operands()

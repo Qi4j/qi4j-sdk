@@ -21,13 +21,12 @@
 package org.qi4j.runtime.model;
 
 import org.qi4j.bootstrap.BindingException;
-import org.qi4j.bootstrap.BindingException;
 
 /**
  * Interface for models that can understand binding of dependencies
  */
 public interface Binder
 {
-    void bind( Resolution resolution )
+    void bind(Resolution resolution)
         throws BindingException;
 }

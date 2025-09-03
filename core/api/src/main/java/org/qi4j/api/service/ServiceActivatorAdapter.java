@@ -20,7 +20,6 @@
 package org.qi4j.api.service;
 
 import org.qi4j.api.activation.Activator;
-import org.qi4j.api.activation.Activator;
 
 /**
  * Adapter for Service Activator.
@@ -32,40 +31,44 @@ public class ServiceActivatorAdapter<ServiceType>
 {
     /**
      * Called before Service activation.
+     *
      * @param activating Activating Service
      */
     @Override
-    public void beforeActivation( ServiceReference<ServiceType> activating )
+    public void beforeActivation(ServiceReference<ServiceType> activating)
         throws Exception
     {
     }
 
     /**
      * Called after Service activation.
+     *
      * @param activated Activated Service
      */
     @Override
-    public void afterActivation( ServiceReference<ServiceType> activated )
+    public void afterActivation(ServiceReference<ServiceType> activated)
         throws Exception
     {
     }
 
     /**
      * Called before Service passivation.
+     *
      * @param passivating Passivating Service
      */
     @Override
-    public void beforePassivation( ServiceReference<ServiceType> passivating )
+    public void beforePassivation(ServiceReference<ServiceType> passivating)
         throws Exception
     {
     }
 
     /**
      * Called after Service passivation.
+     *
      * @param passivated Passivated Service
      */
     @Override
-    public void afterPassivation( ServiceReference<ServiceType> passivated )
+    public void afterPassivation(ServiceReference<ServiceType> passivated)
         throws Exception
     {
     }

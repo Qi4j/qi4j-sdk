@@ -20,34 +20,31 @@
 
 package org.qi4j.api.metrics;
 
-import java.lang.reflect.Method;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.injection.scope.Invocation;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.structure.Module;
-import org.qi4j.api.injection.scope.Invocation;
-import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.structure.Module;
 
-@AppliesTo( TimingCapture.class )
+import java.lang.reflect.Method;
+
+@AppliesTo(TimingCapture.class)
 public class TimingCaptureConcern extends TimingCaptureAllConcern
 {
 
-    public TimingCaptureConcern( @Structure Module module,
-                                 @Service @Optional MetricsProvider metrics,
-                                 @Invocation Method method
+    public TimingCaptureConcern(@Structure Module module,
+                                @Service @Optional MetricsProvider metrics,
+                                @Invocation Method method
     )
     {
-        super( module, metrics, method );
+        super(module, metrics, method);
     }
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
-        return super.invoke( proxy, method, args );
+        return super.invoke(proxy, method, args);
     }
 }

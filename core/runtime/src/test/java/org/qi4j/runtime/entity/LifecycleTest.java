@@ -20,6 +20,8 @@
 
 package org.qi4j.runtime.entity;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.Lifecycle;
@@ -30,8 +32,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.hamcrest.CoreMatchers;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -44,11 +44,11 @@ public class LifecycleTest
     public static boolean create;
     public static boolean remove;
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( TestEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(TestEntity.class);
     }
 
     @Test
@@ -58,7 +58,7 @@ public class LifecycleTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<TestEntity> builder = unitOfWork.newEntityBuilder( TestEntity.class );
+            EntityBuilder<TestEntity> builder = unitOfWork.newEntityBuilder(TestEntity.class);
             builder.newInstance();
             unitOfWork.complete();
         }
@@ -67,7 +67,7 @@ public class LifecycleTest
             unitOfWork.discard();
         }
 
-        assertThat( "Lifecycle.create() was invoked", create, CoreMatchers.equalTo( true ) );
+        assertThat("Lifecycle.create() was invoked", create, CoreMatchers.equalTo(true));
     }
 
     @Test
@@ -77,9 +77,9 @@ public class LifecycleTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<TestEntity> builder = unitOfWork.newEntityBuilder( TestEntity.class );
+            EntityBuilder<TestEntity> builder = unitOfWork.newEntityBuilder(TestEntity.class);
             TestEntity testEntity = builder.newInstance();
-            unitOfWork.remove( testEntity );
+            unitOfWork.remove(testEntity);
             unitOfWork.complete();
         }
         finally
@@ -87,7 +87,7 @@ public class LifecycleTest
             unitOfWork.discard();
         }
 
-        assertThat( "Lifecycle.remove() was invoked", remove, CoreMatchers.equalTo( true ) );
+        assertThat("Lifecycle.remove() was invoked", remove, CoreMatchers.equalTo(true));
     }
 
     public interface Testing
@@ -95,7 +95,7 @@ public class LifecycleTest
         void doSomething();
     }
 
-    @Mixins( TestMixin.class )
+    @Mixins(TestMixin.class)
     public interface TestEntity
         extends Testing, EntityComposite
     {
@@ -116,7 +116,7 @@ public class LifecycleTest
 
         public void doSomething()
         {
-            System.out.println( "Test!" );
+            System.out.println("Test!");
         }
     }
 }

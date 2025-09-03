@@ -4,5 +4,5 @@ import org.qi4j.api.messaging.MessageReceiver;
 
 public interface ConsumerFactory
 {
-    MessageReceiver create( String topicAlias);
+    MessageReceiver create(String topicAlias);
 }

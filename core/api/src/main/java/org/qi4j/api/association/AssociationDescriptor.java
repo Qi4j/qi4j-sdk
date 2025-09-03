@@ -20,10 +20,11 @@
 
 package org.qi4j.api.association;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Type;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.structure.MetaInfoHolder;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Type;
 
 /**
  * Association Descriptor.

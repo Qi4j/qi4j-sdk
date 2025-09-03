@@ -22,8 +22,6 @@ package org.qi4j.runtime.entity;
 import org.qi4j.runtime.property.PropertyInfo;
 import org.qi4j.runtime.property.PropertyInstance;
 import org.qi4j.spi.entity.EntityState;
-import org.qi4j.runtime.property.PropertyInfo;
-import org.qi4j.runtime.property.PropertyInstance;
 
 /**
  * {@code EntityPropertyInstance} represents a property whose value must be backed by an EntityState.
@@ -37,12 +35,12 @@ public class EntityPropertyInstance<T>
      * Construct an instance of {@code PropertyInstance} with the specified arguments.
      *
      * @param aPropertyInfo The property info. This argument must not be {@code null}.
-     * @param entityState EntityState
+     * @param entityState   EntityState
      */
-    @SuppressWarnings( "unchecked" )
-    public EntityPropertyInstance(PropertyInfo aPropertyInfo, EntityState entityState )
+    @SuppressWarnings("unchecked")
+    public EntityPropertyInstance(PropertyInfo aPropertyInfo, EntityState entityState)
     {
-        super( aPropertyInfo, (T) entityState.propertyValueOf( aPropertyInfo.qualifiedName() ) );
+        super(aPropertyInfo, (T) entityState.propertyValueOf(aPropertyInfo.qualifiedName()));
         this.entityState = entityState;
     }
 
@@ -52,9 +50,9 @@ public class EntityPropertyInstance<T>
      * @param aNewValue The new value.
      */
     @Override
-    public void set( T aNewValue )
+    public void set(T aNewValue)
     {
-        super.set( aNewValue );
-        entityState.setPropertyValue( model.qualifiedName(), aNewValue );
+        super.set(aNewValue);
+        entityState.setPropertyValue(model.qualifiedName(), aNewValue);
     }
 }

@@ -19,10 +19,10 @@
  */
 package org.qi4j.api.type;
 
+import org.qi4j.api.util.Classes;
+
 import java.lang.reflect.Type;
 import java.util.Objects;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.util.Classes;
 
 /**
  * Array ValueType.
@@ -30,25 +30,25 @@ import org.qi4j.api.util.Classes;
  */
 public class ArrayType extends ValueType
 {
-    public static boolean isArray( Type type )
+    public static boolean isArray(Type type)
     {
-        return Classes.RAW_CLASS.apply( type ).isArray();
+        return Classes.RAW_CLASS.apply(type).isArray();
     }
 
-    public static ArrayType of( Class<?> arrayType )
+    public static ArrayType of(Class<?> arrayType)
     {
-        return new ArrayType( arrayType, ValueType.of( arrayType.getComponentType() ) );
+        return new ArrayType(arrayType, ValueType.of(arrayType.getComponentType()));
     }
 
     private ValueType collectedType;
 
-    public ArrayType( Class<?> type, ValueType collectedType )
+    public ArrayType(Class<?> type, ValueType collectedType)
     {
-        super( type );
+        super(type);
         this.collectedType = collectedType;
-        if( !isArray( type ) )
+        if(!isArray(type))
         {
-            throw new IllegalArgumentException( type + " is not an array" );
+            throw new IllegalArgumentException(type + " is not an array");
         }
     }
 
@@ -59,35 +59,44 @@ public class ArrayType extends ValueType
 
     public boolean isArrayOfPrimitives()
     {
-        return hasType( boolean[].class )
-               || hasType( char[].class )
-               || hasType( short[].class )
-               || hasType( int[].class )
-               || hasType( byte[].class )
-               || hasType( long[].class )
-               || hasType( float[].class )
-               || hasType( double[].class );
+        return hasType(boolean[].class)
+            || hasType(char[].class)
+            || hasType(short[].class)
+            || hasType(int[].class)
+            || hasType(byte[].class)
+            || hasType(long[].class)
+            || hasType(float[].class)
+            || hasType(double[].class);
     }
 
     public boolean isArrayOfPrimitiveBytes()
     {
-        return hasType( byte[].class );
+        return hasType(byte[].class);
     }
 
     @Override
-    public boolean equals( final Object o )
+    public boolean equals(final Object o)
     {
-        if( this == o ) { return true; }
-        if( o == null || getClass() != o.getClass() ) { return false; }
-        if( !super.equals( o ) ) { return false; }
+        if(this == o)
+        {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
         ArrayType that = (ArrayType) o;
-        return Objects.equals( collectedType, that.collectedType );
+        return Objects.equals(collectedType, that.collectedType);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( super.hashCode(), collectedType );
+        return Objects.hash(super.hashCode(), collectedType);
     }
 
     @Override

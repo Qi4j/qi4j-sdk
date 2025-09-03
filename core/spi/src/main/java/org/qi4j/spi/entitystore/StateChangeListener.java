@@ -28,5 +28,5 @@ import org.qi4j.spi.entity.EntityState;
  */
 public interface StateChangeListener
 {
-    void notifyChanges( Iterable<EntityState> changedStates );
+    void notifyChanges(Iterable<EntityState> changedStates);
 }

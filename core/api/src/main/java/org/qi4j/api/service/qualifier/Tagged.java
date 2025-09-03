@@ -20,17 +20,18 @@
 
 package org.qi4j.api.service.qualifier;
 
+import org.qi4j.api.service.ServiceReference;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.function.Predicate;
-import org.qi4j.api.service.ServiceReference;
 
 /**
  * Filter services based on tags. Tags can be set using the ServiceTags meta-info, like so:
  * <pre><code>
  * module.addService(MyService.class).taggedWith(new ServiceTags("onetag","twotag"));
  * </code></pre>
- *
+ * <p>
  * and then at an injection point you can do this:
  *
  * <pre><code>
@@ -38,8 +39,8 @@ import org.qi4j.api.service.ServiceReference;
  * </code></pre>
  * to get only a service tagged with MyService. If several match only the first match is used.
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Qualifier( Tagged.TaggedQualifier.class )
+@Retention(RetentionPolicy.RUNTIME)
+@Qualifier(Tagged.TaggedQualifier.class)
 public @interface Tagged
 {
     String[] value();
@@ -52,9 +53,9 @@ public @interface Tagged
         implements AnnotationQualifier<Tagged>
     {
         @Override
-        public Predicate<ServiceReference<?>> qualifier( Tagged tagged )
+        public Predicate<ServiceReference<?>> qualifier(Tagged tagged)
         {
-            return ServiceQualifier.withTags( tagged.value() );
+            return ServiceQualifier.withTags(tagged.value());
         }
     }
 }

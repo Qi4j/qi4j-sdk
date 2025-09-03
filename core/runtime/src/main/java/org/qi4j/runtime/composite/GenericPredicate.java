@@ -31,8 +31,8 @@ public class GenericPredicate
     public static final GenericPredicate INSTANCE = new GenericPredicate();
 
     @Override
-    public boolean test( Class<?> item )
+    public boolean test(Class<?> item)
     {
-        return InvocationHandler.class.isAssignableFrom( item );
+        return InvocationHandler.class.isAssignableFrom(item);
     }
 }

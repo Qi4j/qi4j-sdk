@@ -19,9 +19,7 @@
  */
 package org.qi4j.test.entity.model.legal;
 
-import java.math.BigDecimal;
 import org.qi4j.api.property.Property;
-import org.qi4j.test.entity.model.monetary.Currency;
 import org.qi4j.test.entity.model.monetary.Currency;
 
 public interface WillAmount extends WillBenefit

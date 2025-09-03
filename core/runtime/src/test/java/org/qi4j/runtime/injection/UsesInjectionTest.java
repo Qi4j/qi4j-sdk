@@ -20,15 +20,13 @@
 
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -37,10 +35,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class UsesInjectionTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.objects( InjectionTarget.class, ToBeInjected.class );
+        module.objects(InjectionTarget.class, ToBeInjected.class);
     }
 
     @Test
@@ -48,24 +46,24 @@ public class UsesInjectionTest
         throws Exception
     {
         ToBeInjected toBeInjected = new ToBeInjected();
-        assertThat( "Injected object", objectFactory.newObject( InjectionTarget.class, toBeInjected, true )
-            .getUsedObject(), is( equalTo( toBeInjected ) ) );
-        assertThat( "Injected boolean", objectFactory.newObject( InjectionTarget.class, toBeInjected, true )
-            .isUsedBoolean(), is( equalTo( true ) ) );
+        assertThat("Injected object", objectFactory.newObject(InjectionTarget.class, toBeInjected, true)
+            .getUsedObject(), is(equalTo(toBeInjected)));
+        assertThat("Injected boolean", objectFactory.newObject(InjectionTarget.class, toBeInjected, true)
+            .isUsedBoolean(), is(equalTo(true)));
     }
 
     @Test
     public void givenUsedObjectBuilderWhenUseWithBuilderThenInjectNewInstance()
         throws Exception
     {
-        assertThat( "Injected object", objectFactory.newObject( InjectionTarget.class, objectFactory.newObject( ToBeInjected.class ), true ), is( notNullValue() ) );
+        assertThat("Injected object", objectFactory.newObject(InjectionTarget.class, objectFactory.newObject(ToBeInjected.class), true), is(notNullValue()));
     }
 
     @Test
     public void givenNoUsesWhenBuilderNewInstanceThenInjectNewInstance()
         throws Exception
     {
-        assertThat( "Injected object", objectFactory.newObject( InjectionTarget.class, true ), is( notNullValue() ) );
+        assertThat("Injected object", objectFactory.newObject(InjectionTarget.class, true), is(notNullValue()));
     }
 
     public static class InjectionTarget

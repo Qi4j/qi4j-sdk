@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.service;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivatorAdapter;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Initializable;
@@ -29,7 +30,6 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -38,20 +38,20 @@ public class ComplexActivatableTest
     extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( SuperType.class ).withActivators( TestActivator.class ).instantiateOnStartup();
+        module.services(SuperType.class).withActivators(TestActivator.class).instantiateOnStartup();
     }
 
     @Test
     public void validateThatApplicationGotAssembled()
     {
-        ServiceReference<SuperType> reference = serviceFinder.findService( SuperType.class );
-        assertThat( reference.get().sayHello(), equalTo( "Hello, World" ) );
+        ServiceReference<SuperType> reference = serviceFinder.findService(SuperType.class);
+        assertThat(reference.get().sayHello(), equalTo("Hello, World"));
     }
 
-    @Mixins( { DomainType.class, InitializationMixin.class } )
+    @Mixins({DomainType.class, InitializationMixin.class})
     public interface SuperType
         extends ServiceComposite, Initializable
     {
@@ -82,7 +82,7 @@ public class ComplexActivatableTest
 
         public void initialize()
         {
-            me.greeting().set( "Hello" );
+            me.greeting().set("Hello");
         }
     }
 
@@ -91,10 +91,10 @@ public class ComplexActivatableTest
     {
 
         @Override
-        public void afterActivation( ServiceReference<SuperType> activated )
+        public void afterActivation(ServiceReference<SuperType> activated)
             throws Exception
         {
-            activated.get().recepient().set( "World" );
+            activated.get().recepient().set("World");
         }
     }
 }

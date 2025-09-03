@@ -19,24 +19,17 @@
  */
 package org.qi4j.runtime.entity;
 
-import java.lang.reflect.AccessibleObject;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateDescriptor;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
-import org.qi4j.runtime.association.AssociationModel;
-import org.qi4j.runtime.association.AssociationsModel;
-import org.qi4j.runtime.association.ManyAssociationModel;
-import org.qi4j.runtime.association.ManyAssociationsModel;
-import org.qi4j.runtime.association.NamedAssociationModel;
-import org.qi4j.runtime.association.NamedAssociationsModel;
-import org.qi4j.runtime.composite.StateModel;
-import org.qi4j.runtime.property.PropertiesModel;
 import org.qi4j.runtime.association.*;
 import org.qi4j.runtime.composite.StateModel;
 import org.qi4j.runtime.property.PropertiesModel;
+
+import java.lang.reflect.AccessibleObject;
+import java.util.stream.Stream;
 
 /**
  * Model for EntityComposite state.
@@ -48,93 +41,93 @@ public final class EntityStateModel extends StateModel
     private final ManyAssociationsModel manyAssociationsModel;
     private final NamedAssociationsModel namedAssociationsModel;
 
-    public EntityStateModel( PropertiesModel propertiesModel,
-                             AssociationsModel associationsModel,
-                             ManyAssociationsModel manyAssociationsModel,
-                             NamedAssociationsModel namedAssociationsModel )
+    public EntityStateModel(PropertiesModel propertiesModel,
+                            AssociationsModel associationsModel,
+                            ManyAssociationsModel manyAssociationsModel,
+                            NamedAssociationsModel namedAssociationsModel)
     {
-        super( propertiesModel );
+        super(propertiesModel);
         this.associationsModel = associationsModel;
         this.manyAssociationsModel = manyAssociationsModel;
         this.namedAssociationsModel = namedAssociationsModel;
     }
 
-    public AssociationModel getAssociation(AccessibleObject accessor )
+    public AssociationModel getAssociation(AccessibleObject accessor)
         throws IllegalArgumentException
     {
-        return associationsModel.getAssociation( accessor );
+        return associationsModel.getAssociation(accessor);
     }
 
     @Override
-    public AssociationDescriptor getAssociationByName( String name )
+    public AssociationDescriptor getAssociationByName(String name)
         throws IllegalArgumentException
     {
-        return associationsModel.getAssociationByName( name );
+        return associationsModel.getAssociationByName(name);
     }
 
     @Override
-    public AssociationDescriptor getAssociationByQualifiedName( QualifiedName name )
+    public AssociationDescriptor getAssociationByQualifiedName(QualifiedName name)
         throws IllegalArgumentException
     {
-        return associationsModel.getAssociationByQualifiedName( name );
+        return associationsModel.getAssociationByQualifiedName(name);
     }
 
     @Override
-    public boolean hasAssociation( QualifiedName name )
+    public boolean hasAssociation(QualifiedName name)
     {
-        return associationsModel.hasAssociation( name );
+        return associationsModel.hasAssociation(name);
     }
 
-    public ManyAssociationModel getManyAssociation(AccessibleObject accessor )
+    public ManyAssociationModel getManyAssociation(AccessibleObject accessor)
         throws IllegalArgumentException
     {
-        return manyAssociationsModel.getManyAssociation( accessor );
+        return manyAssociationsModel.getManyAssociation(accessor);
     }
 
     @Override
-    public AssociationDescriptor getManyAssociationByName( String name )
+    public AssociationDescriptor getManyAssociationByName(String name)
         throws IllegalArgumentException
     {
-        return manyAssociationsModel.getManyAssociationByName( name );
+        return manyAssociationsModel.getManyAssociationByName(name);
     }
 
     @Override
-    public AssociationDescriptor getManyAssociationByQualifiedName( QualifiedName name )
+    public AssociationDescriptor getManyAssociationByQualifiedName(QualifiedName name)
         throws IllegalArgumentException
     {
-        return manyAssociationsModel.getManyAssociationByQualifiedName( name );
+        return manyAssociationsModel.getManyAssociationByQualifiedName(name);
     }
 
     @Override
-    public boolean hasManyAssociation( QualifiedName name )
+    public boolean hasManyAssociation(QualifiedName name)
     {
-        return manyAssociationsModel.hasAssociation( name );
+        return manyAssociationsModel.hasAssociation(name);
     }
 
-    public NamedAssociationModel getNamedAssociation( AccessibleObject accessor )
+    public NamedAssociationModel getNamedAssociation(AccessibleObject accessor)
         throws IllegalArgumentException
     {
-        return namedAssociationsModel.getNamedAssociation( accessor );
+        return namedAssociationsModel.getNamedAssociation(accessor);
     }
 
     @Override
-    public AssociationDescriptor getNamedAssociationByName( String name )
+    public AssociationDescriptor getNamedAssociationByName(String name)
         throws IllegalArgumentException
     {
-        return namedAssociationsModel.getNamedAssociationByName( name );
+        return namedAssociationsModel.getNamedAssociationByName(name);
     }
 
     @Override
-    public AssociationDescriptor getNamedAssociationByQualifiedName( QualifiedName name )
+    public AssociationDescriptor getNamedAssociationByQualifiedName(QualifiedName name)
         throws IllegalArgumentException
     {
-        return namedAssociationsModel.getNamedAssociationByQualifiedName( name );
+        return namedAssociationsModel.getNamedAssociationByQualifiedName(name);
     }
 
     @Override
-    public boolean hasNamedAssociation( QualifiedName name )
+    public boolean hasNamedAssociation(QualifiedName name)
     {
-        return namedAssociationsModel.hasAssociation( name );
+        return namedAssociationsModel.hasAssociation(name);
     }
 
     @Override
@@ -156,23 +149,23 @@ public final class EntityStateModel extends StateModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            if( ( (VisitableHierarchy<Object, Object>) propertiesModel ).accept( visitor ) )
+            if(((VisitableHierarchy<Object, Object>) propertiesModel).accept(visitor))
             {
-                if( ( (VisitableHierarchy<AssociationsModel, AssociationModel>) associationsModel ).accept( visitor ) )
+                if(((VisitableHierarchy<AssociationsModel, AssociationModel>) associationsModel).accept(visitor))
                 {
-                    if( ( (VisitableHierarchy<ManyAssociationsModel, ManyAssociationModel>) manyAssociationsModel ).accept( visitor ) )
+                    if(((VisitableHierarchy<ManyAssociationsModel, ManyAssociationModel>) manyAssociationsModel).accept(visitor))
                     {
-                        ( (VisitableHierarchy<NamedAssociationsModel, NamedAssociationModel>) namedAssociationsModel ).accept( visitor );
+                        ((VisitableHierarchy<NamedAssociationsModel, NamedAssociationModel>) namedAssociationsModel).accept(visitor);
                     }
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
 }

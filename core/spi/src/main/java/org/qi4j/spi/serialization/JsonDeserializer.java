@@ -17,67 +17,70 @@
  */
 package org.qi4j.spi.serialization;
 
-import java.util.function.Function;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import jakarta.json.JsonValue;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.serialization.Deserializer;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.spi.module.ModuleSpi;
+
+import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * {@literal jakarta.json} deserializer.
  */
 public interface JsonDeserializer extends Deserializer
 {
-    <T> T fromJson( ModuleDescriptor module, ValueType valueType, @Optional JsonValue state );
 
-    default <T> Function<JsonValue, T> fromJsonFunction( ModuleDescriptor module, ValueType valueType )
+    <T> T fromJson(ModuleDescriptor module, Options options, ValueType valueType, @Optional JsonValue state);
+
+    default <T> Function<JsonValue, T> fromJsonFunction(ModuleDescriptor module, Options options, ValueType valueType)
     {
-        return state -> fromJson( module, valueType, state );
+        return state -> fromJson(module, options, valueType, state);
     }
 
-    default <T> Stream<T> fromJsonEach( ModuleDescriptor module, ValueType valueType, Stream<JsonValue> states )
+    default <T> Stream<T> fromJsonEach(ModuleDescriptor module, Options options, ValueType valueType, Stream<JsonValue> states)
     {
-        return states.map( fromJsonFunction( module, valueType ) );
+        return states.map(fromJsonFunction(module, options, valueType));
     }
 
-    default <T> Stream<T> fromJsonEach( ModuleDescriptor module, ValueType valueType, Iterable<JsonValue> states )
+    default <T> Stream<T> fromJsonEach(ModuleDescriptor module, Options options, ValueType valueType, Iterable<JsonValue> states)
     {
-        return fromJsonEach( module, valueType, StreamSupport.stream( states.spliterator(), false ) );
+        return fromJsonEach(module, options, valueType, StreamSupport.stream(states.spliterator(), false));
     }
 
-    default <T> Stream<T> fromJsonEach( ModuleDescriptor module, ValueType valueType, JsonValue... states )
+    default <T> Stream<T> fromJsonEach(ModuleDescriptor module, Options options, ValueType valueType, JsonValue... states)
     {
-        return fromJsonEach( module, valueType, Stream.of( states ) );
+        return fromJsonEach(module, options, valueType, Stream.of(states));
     }
 
-    default <T> T fromJson( ModuleDescriptor module, Class<T> type, @Optional JsonValue state )
+    default <T> T fromJson(ModuleDescriptor module, Options options, Class<T> type, @Optional JsonValue state)
     {
         // TODO Remove (ModuleSpi) cast
-        ValueType valueType = ( (ModuleSpi) module.instance() ).valueTypeFactory().valueTypeOf( module, type );
-        return fromJson( module, valueType, state );
+        ValueType valueType = ((ModuleSpi) module.instance()).valueTypeFactory().valueTypeOf(module, type);
+        return fromJson(module, options, valueType, state);
     }
 
-    default <T> Function<JsonValue, T> fromJson( ModuleDescriptor module, Class<T> type )
+    default <T> Function<JsonValue, T> fromJson(ModuleDescriptor module, Options options, Class<T> type)
     {
-        return state -> fromJson( module, type, state );
+        return state -> fromJson(module, options, type, state);
     }
 
-    default <T> Stream<T> fromJsonEach( ModuleDescriptor module, Class<T> valueType, Stream<JsonValue> states )
+    default <T> Stream<T> fromJsonEach(ModuleDescriptor module, Options options, Class<T> valueType, Stream<JsonValue> states)
     {
-        return states.map( fromJson( module, valueType ) );
+        return states.map(fromJson(module, options, valueType));
     }
 
-    default <T> Stream<T> fromJsonEach( ModuleDescriptor module, Class<T> valueType, Iterable<JsonValue> states )
+    default <T> Stream<T> fromJsonEach(ModuleDescriptor module, Options options, Class<T> valueType, Iterable<JsonValue> states)
     {
-        return fromJsonEach( module, valueType, StreamSupport.stream( states.spliterator(), false ) );
+        return fromJsonEach(module, options, valueType, StreamSupport.stream(states.spliterator(), false));
     }
 
-    default <T> Stream<T> fromJsonEach( ModuleDescriptor module, Class<T> valueType, JsonValue... states )
+    default <T> Stream<T> fromJsonEach(ModuleDescriptor module, Options options, Class<T> valueType, JsonValue... states)
     {
-        return fromJsonEach( module, valueType, Stream.of( states ) );
+        return fromJsonEach(module, options, valueType, Stream.of(states));
     }
 }

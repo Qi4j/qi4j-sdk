@@ -19,10 +19,11 @@
  */
 package org.qi4j.api.activation;
 
+import org.qi4j.api.structure.Application;
+
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.qi4j.api.structure.Application;
 
 /**
  * Application Passivation Thread to use as a Shutdown Hook.
@@ -33,39 +34,42 @@ public final class ApplicationPassivationThread
 {
     /**
      * Create a new Application Passivation Thread that output errors to STDERR.
+     *
      * @param application The Application to passivate
      */
     @SuppressWarnings("unused")
-    public ApplicationPassivationThread(final Application application )
+    public ApplicationPassivationThread(final Application application)
     {
-        this( application, null, null );
+        this(application, null, null);
     }
 
     /**
      * Create a new Application Passivation Thread that output errors to a Logger.
+     *
      * @param application The Application to passivate
-     * @param logger Logger for errors
+     * @param logger      Logger for errors
      */
     @SuppressWarnings("unused")
-    public ApplicationPassivationThread(Application application, Logger logger )
+    public ApplicationPassivationThread(Application application, Logger logger)
     {
-        this( application, null, logger );
+        this(application, null, logger);
     }
 
     /**
      * Create a new Application Passivation Thread that output errors to a PrintStream.
+     *
      * @param application The Application to passivate
-     * @param output PrintStream for errors
+     * @param output      PrintStream for errors
      */
-    public ApplicationPassivationThread( Application application, PrintStream output )
+    public ApplicationPassivationThread(Application application, PrintStream output)
     {
-        this( application, output, null );
+        this(application, output, null);
     }
 
-    private ApplicationPassivationThread( Application application, PrintStream output, Logger logger )
+    private ApplicationPassivationThread(Application application, PrintStream output, Logger logger)
     {
-        super( new ApplicationPassivation( application, output, logger ),
-               application.name() + " Passivation Thread" );
+        super(new ApplicationPassivation(application, output, logger),
+            application.name() + " Passivation Thread");
     }
 
     private static class ApplicationPassivation
@@ -75,7 +79,7 @@ public final class ApplicationPassivationThread
         private final PrintStream output;
         private final Logger logger;
 
-        private ApplicationPassivation( Application application, PrintStream output, Logger logger )
+        private ApplicationPassivation(Application application, PrintStream output, Logger logger)
         {
             this.application = application;
             this.output = output;
@@ -89,17 +93,17 @@ public final class ApplicationPassivationThread
             {
                 application.passivate();
             }
-            catch( PassivationException ex )
+            catch(PassivationException ex)
             {
                 String message = application.name() + " " + ex.getMessage();
-                if( logger != null )
+                if(logger != null)
                 {
-                    logger.log( Level.SEVERE, message, ex );
+                    logger.log(Level.SEVERE, message, ex);
                 }
-                else if( output != null )
+                else if(output != null)
                 {
-                    output.println( message );
-                    ex.printStackTrace( output );
+                    output.println(message);
+                    ex.printStackTrace(output);
                 }
                 else
                 {

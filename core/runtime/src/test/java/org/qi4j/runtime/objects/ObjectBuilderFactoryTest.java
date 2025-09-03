@@ -20,13 +20,12 @@
 
 package org.qi4j.runtime.objects;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.object.NoSuchObjectTypeException;
 import org.qi4j.api.structure.Module;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.SingletonAssembler;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -49,11 +48,11 @@ public class ObjectBuilderFactoryTest
     public void newBuilderForUnregisteredObject()
         throws Exception
     {
-        assertThrows( NoSuchObjectTypeException.class, () -> {
+        assertThrows(NoSuchObjectTypeException.class, () -> {
             SingletonAssembler assembler = new SingletonAssembler(module -> {
-            } );
-            assembler.module().newObject( AnyObject.class );
-        } );
+            });
+            assembler.module().newObject(AnyObject.class);
+        });
     }
 
     /**
@@ -65,11 +64,11 @@ public class ObjectBuilderFactoryTest
     public void newBuilderForNullType()
         throws Exception
     {
-        assertThrows( NullPointerException.class, () -> {
-            SingletonAssembler assembler = new SingletonAssembler( module -> {
-            } );
-            assembler.module().newObject( null );
-        } );
+        assertThrows(NullPointerException.class, () -> {
+            SingletonAssembler assembler = new SingletonAssembler(module -> {
+            });
+            assembler.module().newObject(null);
+        });
     }
 
     /**
@@ -81,11 +80,11 @@ public class ObjectBuilderFactoryTest
     public void newObjectInstanceForNullType()
         throws Exception
     {
-        assertThrows( NullPointerException.class, () -> {
-            SingletonAssembler assembler = new SingletonAssembler( module -> {
-            } );
-            assembler.module().newObject( null );
-        } );
+        assertThrows(NullPointerException.class, () -> {
+            SingletonAssembler assembler = new SingletonAssembler(module -> {
+            });
+            assembler.module().newObject(null);
+        });
     }
 
     /**
@@ -95,34 +94,34 @@ public class ObjectBuilderFactoryTest
     public void newInstanceForRegisteredObject()
         throws ActivationException
     {
-        SingletonAssembler assembler = new SingletonAssembler( module -> module.objects( AnyObject.class ) );
-        assembler.module().newObject( AnyObject.class );
+        SingletonAssembler assembler = new SingletonAssembler(module -> module.objects(AnyObject.class));
+        assembler.module().newObject(AnyObject.class);
     }
 
     @Test
     public void givenManyConstructorsWhenInstantiateThenChooseCorrectConstructor()
         throws ActivationException
     {
-        SingletonAssembler assembler = new SingletonAssembler( module -> module.objects( ManyConstructorObject.class ) );
+        SingletonAssembler assembler = new SingletonAssembler(module -> module.objects(ManyConstructorObject.class));
 
-        ManyConstructorObject object = assembler.module().newObject( ManyConstructorObject.class );
-        assertThat( "ref is not null", object.anyObject, notNullValue() );
+        ManyConstructorObject object = assembler.module().newObject(ManyConstructorObject.class);
+        assertThat("ref is not null", object.anyObject, notNullValue());
 
         object = assembler.module()
-            .newObject( ManyConstructorObject.class, new AnyObject() );
+            .newObject(ManyConstructorObject.class, new AnyObject());
 
-        assertThat( "ref is not null", object.anyObject, notNullValue() );
+        assertThat("ref is not null", object.anyObject, notNullValue());
     }
 
     @Test
     public void givenClassWithInnerClassesWhenInstantiateThenInstantiateInnerClass()
         throws ActivationException
     {
-        SingletonAssembler assembler = new SingletonAssembler( module -> module.objects( OuterClass.class ) );
+        SingletonAssembler assembler = new SingletonAssembler(module -> module.objects(OuterClass.class));
 
-        assertThat( "inner class has been injected", assembler.module()
-            .newObject( OuterClass.class )
-            .name(), equalTo( "Module 1" ) );
+        assertThat("inner class has been injected", assembler.module()
+            .newObject(OuterClass.class)
+            .name(), equalTo("Module 1"));
     }
 
     public static final class AnyObject
@@ -134,13 +133,13 @@ public class ObjectBuilderFactoryTest
         AnyObject anyObject;
         Module module;
 
-        public ManyConstructorObject( @Uses AnyObject anyObject, @Structure Module module )
+        public ManyConstructorObject(@Uses AnyObject anyObject, @Structure Module module)
         {
             this.anyObject = anyObject;
             this.module = module;
         }
 
-        public ManyConstructorObject( @Structure Module module )
+        public ManyConstructorObject(@Structure Module module)
         {
             this.module = module;
         }

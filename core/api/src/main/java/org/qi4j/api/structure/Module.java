@@ -27,8 +27,6 @@ import org.qi4j.api.query.QueryBuilderFactory;
 import org.qi4j.api.service.ServiceFinder;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.api.value.ValueBuilderFactory;
-import org.qi4j.api.activation.ActivationEventListenerRegistration;
-import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 
 /**
  * API for interacting with a Module. Instances
@@ -37,12 +35,12 @@ import org.qi4j.api.unitofwork.UnitOfWorkFactory;
  */
 public interface Module
     extends ActivationEventListenerRegistration,
-            MetaInfoHolder,
-            ObjectFactory,
-            TransientBuilderFactory,
-            ValueBuilderFactory,
-            QueryBuilderFactory,
-            ServiceFinder
+    MetaInfoHolder,
+    ObjectFactory,
+    TransientBuilderFactory,
+    ValueBuilderFactory,
+    QueryBuilderFactory,
+    ServiceFinder
 {
 
     /**
@@ -57,38 +55,44 @@ public interface Module
      */
     LayerDescriptor layer();
 
-    /** Returns the TypeLookup for the Module.
+    /**
+     * Returns the TypeLookup for the Module.
      * TypeLookup handles all the types visible from within this Module.
      *
      * @return TypeLookup for this Module
      */
     TypeLookup typeLookup();
 
-    /** Returns the UnitOfWorkFactory for this Module.
+    /**
+     * Returns the UnitOfWorkFactory for this Module.
      *
      * @return the UnitOfWorkFactory of this Module.
      */
     UnitOfWorkFactory unitOfWorkFactory();
 
-    /** Returns the ServiceFinder for this Module.
+    /**
+     * Returns the ServiceFinder for this Module.
      *
      * @return the ServiceFinder for this Module.
      */
     ServiceFinder serviceFinder();
 
-    /** Returns the ValueBuilderFactory for this Module.
+    /**
+     * Returns the ValueBuilderFactory for this Module.
      *
      * @return the ValueBuilderFactory for this Module.
      */
     ValueBuilderFactory valueBuilderFactory();
 
-    /** Returns the TransientBuilderFactory for this Module.
+    /**
+     * Returns the TransientBuilderFactory for this Module.
      *
      * @return the TransientBuilderFactory for this Module.
      */
     TransientBuilderFactory transientBuilderFactory();
 
-    /** Returns the ObjectFactory for this Module.
+    /**
+     * Returns the ObjectFactory for this Module.
      *
      * @return the ObjectFactory for this Module.
      */

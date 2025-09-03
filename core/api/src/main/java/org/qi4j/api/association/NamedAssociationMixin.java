@@ -19,16 +19,17 @@
  */
 package org.qi4j.api.association;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.common.AppliesToFilter;
 import org.qi4j.api.injection.scope.State;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+
 /**
  * Generic mixin for NamedAssociations.
  */
-@AppliesTo( NamedAssociationMixin.AssociationFilter.class )
+@AppliesTo(NamedAssociationMixin.AssociationFilter.class)
 public final class NamedAssociationMixin
     implements InvocationHandler
 {
@@ -36,10 +37,10 @@ public final class NamedAssociationMixin
     private AssociationStateHolder associations;
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
-        return associations.namedAssociationFor( method );
+        return associations.namedAssociationFor(method);
     }
 
     /**
@@ -49,9 +50,9 @@ public final class NamedAssociationMixin
         implements AppliesToFilter
     {
         @Override
-        public boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> modifierClass )
+        public boolean appliesTo(Method method, Class<?> mixin, Class<?> compositeType, Class<?> modifierClass)
         {
-            return NamedAssociation.class.isAssignableFrom( method.getReturnType() );
+            return NamedAssociation.class.isAssignableFrom(method.getReturnType());
         }
     }
 

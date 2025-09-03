@@ -22,7 +22,6 @@ package org.qi4j.runtime.injection;
 
 import org.qi4j.bootstrap.InvalidInjectionException;
 import org.qi4j.runtime.model.Resolution;
-import org.qi4j.bootstrap.InvalidInjectionException;
 
 /**
  * JAVADOC
@@ -34,11 +33,11 @@ public interface InjectionProviderFactory
      * can be found, return null. If the dependency is optional the dependency will
      * then be explicitly set to null.
      *
-     * @param resolution Injection resolution
+     * @param resolution      Injection resolution
      * @param dependencyModel Dependency model
      * @return InjectionProvider
      * @throws InvalidInjectionException if the injection is invalid
      */
-    InjectionProvider newInjectionProvider( Resolution resolution, DependencyModel dependencyModel )
+    InjectionProvider newInjectionProvider(Resolution resolution, DependencyModel dependencyModel)
         throws InvalidInjectionException;
 }

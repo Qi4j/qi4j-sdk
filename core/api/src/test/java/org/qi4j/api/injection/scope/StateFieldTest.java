@@ -20,6 +20,7 @@
 
 package org.qi4j.api.injection.scope;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.Optional;
@@ -31,7 +32,6 @@ import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -41,12 +41,12 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Define a field to be a Property
  */
 public class StateFieldTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( PersonEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(PersonEntity.class);
     }
 
     @Test
@@ -56,29 +56,29 @@ public class StateFieldTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            PersonEntity charles = unitOfWork.newEntity( PersonEntity.class );
-            charles.changeName( "Charles" );
-            assertThat( "Charles", equalTo( charles.getName() ) );
+            PersonEntity charles = unitOfWork.newEntity(PersonEntity.class);
+            charles.changeName("Charles");
+            assertThat("Charles", equalTo(charles.getName()));
 
-            PersonEntity daniel = unitOfWork.newEntity( PersonEntity.class );
-            daniel.changeName( "Daniel" );
-            assertThat( "Daniel", equalTo( daniel.getName() ) );
+            PersonEntity daniel = unitOfWork.newEntity(PersonEntity.class);
+            daniel.changeName("Daniel");
+            assertThat("Daniel", equalTo(daniel.getName()));
 
-            PersonEntity lisa = unitOfWork.newEntity( PersonEntity.class );
-            lisa.changeName( "Lisa" );
-            assertThat( "Lisa", equalTo( lisa.getName() ) );
+            PersonEntity lisa = unitOfWork.newEntity(PersonEntity.class);
+            lisa.changeName("Lisa");
+            assertThat("Lisa", equalTo(lisa.getName()));
 
-            charles.befriend( daniel );
-            charles.befriend( lisa );
-            charles.marry( lisa );
+            charles.befriend(daniel);
+            charles.befriend(lisa);
+            charles.marry(lisa);
 
             unitOfWork.complete();
 
             unitOfWork = unitOfWorkFactory.newUnitOfWork();
 
-            charles = unitOfWork.get( charles );
-            daniel = unitOfWork.get( daniel );
-            assertThat( charles.isFriend( daniel ), is( true ) );
+            charles = unitOfWork.get(charles);
+            daniel = unitOfWork.get(daniel);
+            assertThat(charles.isFriend(daniel), is(true));
 
             unitOfWork.complete();
         }
@@ -88,17 +88,17 @@ public class StateFieldTest
         }
     }
 
-    @Mixins( PersonEntity.Mixin.class )
+    @Mixins(PersonEntity.Mixin.class)
     public interface PersonEntity
         extends EntityComposite
     {
-        void changeName( String newName );
+        void changeName(String newName);
 
-        void marry( PersonEntity entity );
+        void marry(PersonEntity entity);
 
-        void befriend( PersonEntity entity );
+        void befriend(PersonEntity entity);
 
-        boolean isFriend( PersonEntity entity );
+        boolean isFriend(PersonEntity entity);
 
         String getName();
 
@@ -117,21 +117,21 @@ public class StateFieldTest
             public ManyAssociation<PersonEntity> friends;
 
             @Override
-            public void changeName( String newName )
+            public void changeName(String newName)
             {
-                name.set( newName );
+                name.set(newName);
             }
 
             @Override
-            public void marry( PersonEntity entity )
+            public void marry(PersonEntity entity)
             {
-                spouse.set( entity );
+                spouse.set(entity);
             }
 
             @Override
-            public void befriend( PersonEntity entity )
+            public void befriend(PersonEntity entity)
             {
-                friends.add( entity );
+                friends.add(entity);
             }
 
             @Override
@@ -141,9 +141,9 @@ public class StateFieldTest
             }
 
             @Override
-            public boolean isFriend( PersonEntity entity )
+            public boolean isFriend(PersonEntity entity)
             {
-                return friends.contains( entity );
+                return friends.contains(entity);
             }
         }
     }

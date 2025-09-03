@@ -19,6 +19,7 @@
  */
 package org.qi4j.regression.qi53;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientBuilderFactory;
 import org.qi4j.api.composite.TransientComposite;
@@ -30,29 +31,28 @@ import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 public class IssueTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( CostPerUnitComposite.class );
+        module.transients(CostPerUnitComposite.class);
     }
 
     @Test
     public void genericPropertiesAndParameters()
         throws SecurityException, NoSuchMethodException
     {
-        TransientBuilder<CostPerUnitComposite> builder = transientBuilderFactory.newTransientBuilder( CostPerUnitComposite.class );
-        builder.prototype().unit().set( new Unit<>( 10 ) );
+        TransientBuilder<CostPerUnitComposite> builder = transientBuilderFactory.newTransientBuilder(CostPerUnitComposite.class);
+        builder.prototype().unit().set(new Unit<>(10));
         CostPerUnitComposite test = builder.newInstance();
-        assertThat( test.unit().get().value, equalTo( 10 ) );
-        assertThat( test.toCostPer( new Unit<>( 50 ) ).unit().get().value, equalTo( 50 ) );
+        assertThat(test.unit().get().value, equalTo(10));
+        assertThat(test.toCostPer(new Unit<>(50)).unit().get().value, equalTo(50));
     }
 
     public interface CostPerUnit
@@ -60,14 +60,14 @@ public class IssueTest
         @Immutable
         Property<Unit<?>> unit();
 
-        CostPerUnit toCostPer( Unit<?> unit );
+        CostPerUnit toCostPer(Unit<?> unit);
     }
 
     public static class Unit<T>
     {
         private T value;
 
-        public Unit( T value )
+        public Unit(T value)
         {
             this.value = value;
         }
@@ -87,17 +87,17 @@ public class IssueTest
         @Structure
         TransientBuilderFactory builderFactory;
 
-        public CostPerUnit toCostPer( Unit<?> unit )
+        public CostPerUnit toCostPer(Unit<?> unit)
         {
             TransientBuilder<CostPerUnitComposite> builder =
-                builderFactory.newTransientBuilder( CostPerUnitComposite.class );
+                builderFactory.newTransientBuilder(CostPerUnitComposite.class);
 
-            builder.prototype().unit().set( unit );
+            builder.prototype().unit().set(unit);
             return builder.newInstance();
         }
     }
 
-    @Mixins( { CostPerUnitMixin.class } )
+    @Mixins({CostPerUnitMixin.class})
     public interface CostPerUnitComposite
         extends CostPerUnit, TransientComposite
     {

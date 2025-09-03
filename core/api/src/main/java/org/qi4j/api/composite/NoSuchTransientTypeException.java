@@ -20,25 +20,22 @@
 
 package org.qi4j.api.composite;
 
-import java.util.stream.Stream;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.structure.TypeLookup;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.structure.TypeLookup;
 
-import static java.util.stream.Collectors.joining;
+import java.util.stream.Stream;
 
 /**
  * This exception is thrown if client code tries to create a non-existing TransientComposite type.
  */
 public class NoSuchTransientTypeException extends NoSuchCompositeTypeException
 {
-    public NoSuchTransientTypeException( String typeName, ModuleDescriptor module )
+    public NoSuchTransientTypeException(String typeName, ModuleDescriptor module)
     {
-        super( "TransientComposite", typeName, module );
+        super("TransientComposite", typeName, module);
     }
 
-    protected Stream<? extends CompositeDescriptor> descriptors( TypeLookup typeLookup )
+    protected Stream<? extends CompositeDescriptor> descriptors(TypeLookup typeLookup)
     {
         return typeLookup.allTransients();
     }

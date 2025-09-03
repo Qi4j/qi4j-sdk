@@ -1,7 +1,8 @@
 package org.qi4j.api.messaging;
 
-import java.util.List;
 import org.qi4j.api.property.Property;
+
+import java.util.List;
 
 public interface ConsumerConfiguration
 {

@@ -24,7 +24,6 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.composite.CompositesModel;
-import org.qi4j.runtime.composite.CompositesModel;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,17 +34,17 @@ import java.util.stream.Collectors;
 public class ServicesModel extends CompositesModel<ServiceModel>
     implements VisitableHierarchy<Object, Object>
 {
-    public ServicesModel( List<ServiceModel> serviceModels )
+    public ServicesModel(List<ServiceModel> serviceModels)
     {
         super(serviceModels);
     }
 
-    public ServicesInstance newInstance( ModuleDescriptor module )
+    public ServicesInstance newInstance(ModuleDescriptor module)
     {
         List<ServiceReference<?>> serviceReferences = stream()
-                        .map(serviceModel -> new ServiceReferenceInstance(serviceModel, module))
-                        .<ServiceReference<?>>map(ServiceReference.class::cast)
-                        .collect(Collectors.toList());
-        return new ServicesInstance( this, serviceReferences );
+            .map(serviceModel -> new ServiceReferenceInstance(serviceModel, module))
+            .<ServiceReference<?>>map(ServiceReference.class::cast)
+            .collect(Collectors.toList());
+        return new ServicesInstance(this, serviceReferences);
     }
 }

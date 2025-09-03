@@ -40,16 +40,16 @@ public interface ImportedServiceDeclaration
     Class<? extends ServiceImporter> SERVICE_SELECTOR = ServiceSelectorImporter.class;
     Class<? extends ServiceImporter> SERVICE_IMPORTER = ServiceInstanceImporter.class;
 
-    ImportedServiceDeclaration visibleIn( Visibility visibility );
+    ImportedServiceDeclaration visibleIn(Visibility visibility);
 
-    ImportedServiceDeclaration importedBy( Class<? extends ServiceImporter> serviceImporterClass );
+    ImportedServiceDeclaration importedBy(Class<? extends ServiceImporter> serviceImporterClass);
 
-    ImportedServiceDeclaration identifiedBy( String identity );
+    ImportedServiceDeclaration identifiedBy(String identity);
 
-    ImportedServiceDeclaration taggedWith( String... tags );
+    ImportedServiceDeclaration taggedWith(String... tags);
 
-    ImportedServiceDeclaration setMetaInfo( Object serviceAttribute );
-    
+    ImportedServiceDeclaration setMetaInfo(Object serviceAttribute);
+
     ImportedServiceDeclaration importOnStartup();
 
     /**
@@ -58,7 +58,7 @@ public interface ImportedServiceDeclaration
      *
      * @param activators the imported service activators
      * @return the assembly
-     */    
-    @SuppressWarnings( { "unchecked","varargs" } )
-    ImportedServiceDeclaration withActivators( Class<? extends Activator<?>>... activators );
+     */
+    @SuppressWarnings({"unchecked", "varargs"})
+    ImportedServiceDeclaration withActivators(Class<? extends Activator<?>>... activators);
 }

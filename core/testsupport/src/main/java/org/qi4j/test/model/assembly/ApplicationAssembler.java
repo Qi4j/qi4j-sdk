@@ -20,7 +20,6 @@
 
 package org.qi4j.test.model.assembly;
 
-import java.lang.reflect.InvocationTargetException;
 import org.qi4j.api.structure.Application;
 import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.AssemblyException;
@@ -29,42 +28,44 @@ import org.qi4j.bootstrap.layered.IllegalLayerAssemblerException;
 import org.qi4j.bootstrap.layered.LayerAssembler;
 import org.qi4j.bootstrap.layered.LayeredApplicationAssembler;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class ApplicationAssembler extends LayeredApplicationAssembler
 {
 
     private final Class<?> testClass;
 
-    public ApplicationAssembler( String name, String version, Application.Mode mode, Class<?> testClass )
+    public ApplicationAssembler(String name, String version, Application.Mode mode, Class<?> testClass)
         throws AssemblyException
     {
-        super( name, version, mode );
+        super(name, version, mode);
         this.testClass = testClass;
     }
 
     @Override
-    protected void assembleLayers( ApplicationAssembly assembly )
+    protected void assembleLayers(ApplicationAssembly assembly)
     {
-        LayerAssembly accessLayer = createLayer( AccessLayer.class );
-        LayerAssembly domainLayer = createLayer( DomainLayer.class );
-        LayerAssembly persistenceLayer = createLayer( PersistenceLayer.class );
-        LayerAssembly indexingLayer = createLayer( IndexingLayer.class );
-        LayerAssembly configLayer = createLayer( ConfigLayer.class );
-        accessLayer.uses( domainLayer );
-        domainLayer.uses( persistenceLayer, indexingLayer );
-        persistenceLayer.uses( configLayer );
-        indexingLayer.uses( configLayer );
+        LayerAssembly accessLayer = createLayer(AccessLayer.class);
+        LayerAssembly domainLayer = createLayer(DomainLayer.class);
+        LayerAssembly persistenceLayer = createLayer(PersistenceLayer.class);
+        LayerAssembly indexingLayer = createLayer(IndexingLayer.class);
+        LayerAssembly configLayer = createLayer(ConfigLayer.class);
+        accessLayer.uses(domainLayer);
+        domainLayer.uses(persistenceLayer, indexingLayer);
+        persistenceLayer.uses(configLayer);
+        indexingLayer.uses(configLayer);
     }
 
     @Override
-    protected <T extends LayerAssembler> LayerAssembler instantiateLayerAssembler( Class<T> layerAssemblerClass,
-                                                                                   LayerAssembly layer
+    protected <T extends LayerAssembler> LayerAssembler instantiateLayerAssembler(Class<T> layerAssemblerClass,
+                                                                                  LayerAssembly layer
     )
         throws InstantiationException, IllegalAccessException, InvocationTargetException, IllegalLayerAssemblerException
     {
-        if( layerAssemblerClass.equals( AccessLayer.class ))
+        if(layerAssemblerClass.equals(AccessLayer.class))
         {
-            return new AccessLayer( testClass );
+            return new AccessLayer(testClass);
         }
-        return super.instantiateLayerAssembler( layerAssemblerClass, layer );
+        return super.instantiateLayerAssembler(layerAssemblerClass, layer);
     }
 }

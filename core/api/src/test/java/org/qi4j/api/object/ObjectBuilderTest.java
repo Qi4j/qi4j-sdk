@@ -20,10 +20,10 @@
 
 package org.qi4j.api.object;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -34,19 +34,19 @@ import static org.hamcrest.core.IsNull.notNullValue;
 public class ObjectBuilderTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.objects( A.class, B.class, C.class, D.class );
+        module.objects(A.class, B.class, C.class, D.class);
     }
 
     @Test
     public void testNotProvidedUses()
     {
-        A a = objectFactory.newObject( A.class );
-        assertThat( a, notNullValue() );
-        assertThat( a.b, notNullValue() );
-        assertThat( a.b.c, notNullValue() );
-        assertThat( a.b.c.d, notNullValue() );
+        A a = objectFactory.newObject(A.class);
+        assertThat(a, notNullValue());
+        assertThat(a.b, notNullValue());
+        assertThat(a.b.c, notNullValue());
+        assertThat(a.b.c.d, notNullValue());
     }
 
     public static class A

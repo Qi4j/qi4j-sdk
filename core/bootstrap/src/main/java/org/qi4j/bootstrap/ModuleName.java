@@ -28,14 +28,14 @@ public final class ModuleName
 {
     private final String name;
 
-    public ModuleName( String name )
+    public ModuleName(String name)
     {
         this.name = name;
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.setName( name );
+        module.setName(name);
     }
 }

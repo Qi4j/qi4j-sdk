@@ -19,12 +19,6 @@
  */
 package org.qi4j.runtime.injection.provider;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.util.Classes;
 import org.qi4j.bootstrap.InvalidInjectionException;
@@ -34,7 +28,13 @@ import org.qi4j.runtime.injection.InjectionContext;
 import org.qi4j.runtime.injection.InjectionProvider;
 import org.qi4j.runtime.injection.InjectionProviderFactory;
 import org.qi4j.runtime.model.Resolution;
-import org.qi4j.bootstrap.InvalidInjectionException;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -43,67 +43,67 @@ public final class ThisInjectionProviderFactory
     implements InjectionProviderFactory
 {
     @Override
-    @SuppressWarnings( "unchecked" )
-    public InjectionProvider newInjectionProvider( Resolution bindingContext, DependencyModel dependencyModel )
+    @SuppressWarnings("unchecked")
+    public InjectionProvider newInjectionProvider(Resolution bindingContext, DependencyModel dependencyModel)
         throws InvalidInjectionException
     {
-        if( bindingContext.model() instanceof CompositeDescriptor )
+        if(bindingContext.model() instanceof CompositeDescriptor)
         {
             // If Composite type then return real type, otherwise use the specified one
             final Class<?> thisType = dependencyModel.rawInjectionType();
 
             Stream<Class<?>> injectionTypes;
-            if( Classes.assignableTypeSpecification( thisType ).test( bindingContext.model() ) )
+            if(Classes.assignableTypeSpecification(thisType).test(bindingContext.model()))
             {
                 injectionTypes = bindingContext.model().types();
             }
             else
             {
-                CompositeDescriptor acd = ( (CompositeDescriptor) bindingContext.model() );
-                injectionTypes = acd.mixinTypes().filter( thisType::isAssignableFrom );
+                CompositeDescriptor acd = ((CompositeDescriptor) bindingContext.model());
+                injectionTypes = acd.mixinTypes().filter(thisType::isAssignableFrom);
             }
 
-            List<Class<?>> classes = injectionTypes.collect( Collectors.toList() );
-            if( classes.size() == 0 )
+            List<Class<?>> classes = injectionTypes.collect(Collectors.toList());
+            if(classes.size() == 0)
             {
-                throw new InvalidInjectionException( "Composite " + bindingContext.model()
-                                                     + " does not implement @This type " + thisType.getName() + " in fragment "
-                                                     + dependencyModel.injectedClass().getName() );
+                throw new InvalidInjectionException("Composite " + bindingContext.model()
+                    + " does not implement @This type " + thisType.getName() + " in fragment "
+                    + dependencyModel.injectedClass().getName());
             }
-            return new ThisInjectionProvider( classes );
+            return new ThisInjectionProvider(classes);
         }
         else
         {
-            throw new InvalidInjectionException( "Object " + dependencyModel.injectedClass() + " may not use @This" );
+            throw new InvalidInjectionException("Object " + dependencyModel.injectedClass() + " may not use @This");
         }
     }
 
-    @SuppressWarnings( { "raw", "unchecked" } )
+    @SuppressWarnings({"raw", "unchecked"})
     private static class ThisInjectionProvider
         implements InjectionProvider
     {
         Constructor proxyConstructor;
         private Class[] interfaces;
 
-        private ThisInjectionProvider( List<Class<?>> types )
+        private ThisInjectionProvider(List<Class<?>> types)
         {
             try
             {
                 Class proxyClass;
-                Class<?> mainType = types.get( 0 );
-                if( Proxy.class.isAssignableFrom( mainType ) )
+                Class<?> mainType = types.get(0);
+                if(Proxy.class.isAssignableFrom(mainType))
                 {
                     proxyClass = mainType;
                 }
                 else
                 {
-                    interfaces = types.stream().map( Class.class::cast ).toArray( Class[]::new );
-                    proxyClass = ProxyGenerator.createProxyClass( mainType.getClassLoader(), interfaces );
+                    interfaces = types.stream().map(Class.class::cast).toArray(Class[]::new);
+                    proxyClass = ProxyGenerator.createProxyClass(mainType.getClassLoader(), interfaces);
                 }
 
-                proxyConstructor = proxyClass.getConstructor( InvocationHandler.class );
+                proxyConstructor = proxyClass.getConstructor(InvocationHandler.class);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
                 // Ignore
                 e.printStackTrace();
@@ -111,20 +111,20 @@ public final class ThisInjectionProviderFactory
         }
 
         @Override
-        public Object provideInjection( InjectionContext context )
+        public Object provideInjection(InjectionContext context)
         {
             try
             {
                 InvocationHandler handler = context.compositeInstance();
-                if( handler == null )
+                if(handler == null)
                 {
                     handler = context.proxyHandler();
                 }
-                return proxyConstructor.newInstance( handler );
+                return proxyConstructor.newInstance(handler);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
-                throw new InjectionProviderException( "Could not instantiate @This proxy", e );
+                throw new InjectionProviderException("Could not instantiate @This proxy", e);
             }
         }
     }

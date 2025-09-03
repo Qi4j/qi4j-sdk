@@ -20,15 +20,6 @@
 
 package org.qi4j.runtime.composite;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.injection.InjectionScope;
@@ -38,15 +29,15 @@ import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.HierarchicalVisitorAdapter;
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.bootstrap.BindingException;
-import org.qi4j.runtime.injection.Dependencies;
-import org.qi4j.runtime.injection.DependencyModel;
-import org.qi4j.runtime.injection.InjectedParametersModel;
-import org.qi4j.runtime.injection.InjectionContext;
-import org.qi4j.runtime.injection.ParameterizedTypeInstance;
+import org.qi4j.runtime.injection.*;
 import org.qi4j.runtime.model.Binder;
 import org.qi4j.runtime.model.Resolution;
-import org.qi4j.bootstrap.BindingException;
-import org.qi4j.runtime.injection.*;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.qi4j.api.composite.InvalidCompositeException.handleInvalidCompositeType;
 import static org.qi4j.api.util.Annotations.typeHasAnnotation;
@@ -57,32 +48,32 @@ import static org.qi4j.api.util.Annotations.typeHasAnnotation;
 public final class ConstructorsModel
     implements Binder, Dependencies, VisitableHierarchy<Object, Object>
 {
-    @SuppressWarnings( "raw" )
+    @SuppressWarnings("raw")
     private final Class<?> fragmentClass;
     private final List<ConstructorModel> constructorModels;
     private List<ConstructorModel> boundConstructors;
 
-    @SuppressWarnings( { "raw", "unchecked" } )
-    public ConstructorsModel( Class<?> fragmentClass )
+    @SuppressWarnings({"raw", "unchecked"})
+    public ConstructorsModel(Class<?> fragmentClass)
     {
         this.fragmentClass = fragmentClass;
-        validate( fragmentClass );
+        validate(fragmentClass);
         constructorModels = new ArrayList<>();
         Constructor<?>[] realConstructors = this.fragmentClass.getDeclaredConstructors();
-        Class<?> injectionClass = FragmentClassLoader.getSourceClass( fragmentClass );
-        for( Constructor<?> constructor : realConstructors )
+        Class<?> injectionClass = FragmentClassLoader.getSourceClass(fragmentClass);
+        for(Constructor<?> constructor : realConstructors)
         {
             try
             {
-                Constructor<?> injectionConstructor = injectionClass.getDeclaredConstructor( constructor.getParameterTypes() );
-                ConstructorModel constructorModel = newConstructorModel( this.fragmentClass, constructor,
-                                                                         injectionConstructor );
-                if( constructorModel != null )
+                Constructor<?> injectionConstructor = injectionClass.getDeclaredConstructor(constructor.getParameterTypes());
+                ConstructorModel constructorModel = newConstructorModel(this.fragmentClass, constructor,
+                    injectionConstructor);
+                if(constructorModel != null)
                 {
-                    constructorModels.add( constructorModel );
+                    constructorModels.add(constructorModel);
                 }
             }
-            catch( NoSuchMethodException e )
+            catch(NoSuchMethodException e)
             {
                 // Ignore and continue
                 e.printStackTrace();
@@ -90,49 +81,49 @@ public final class ConstructorsModel
         }
     }
 
-    @SuppressWarnings( "raw" )
-    private void validate( Class<?> fragmentClass )
+    @SuppressWarnings("raw")
+    private void validate(Class<?> fragmentClass)
     {
         // Ensure that the fragment class is not an inner class, in which case we should give a reasonable exception
-        if( fragmentClass.getDeclaringClass() == null )
+        if(fragmentClass.getDeclaringClass() == null)
         {
             return;
         }
-        if( Modifier.isStatic( fragmentClass.getModifiers() ) )
+        if(Modifier.isStatic(fragmentClass.getModifiers()))
         {
             return;
         }
-        handleInvalidCompositeType( "Inner classes can not be used. Use static nested classes instead.", null, null, fragmentClass, null, null, null );
+        handleInvalidCompositeType("Inner classes can not be used. Use static nested classes instead.", null, null, fragmentClass, null, null, null);
     }
 
     @Override
     public Stream<DependencyModel> dependencies()
     {
-        if( boundConstructors == null )
+        if(boundConstructors == null)
         {
-            return constructorModels.stream().flatMap( ConstructorModel::dependencies );
+            return constructorModels.stream().flatMap(ConstructorModel::dependencies);
         }
-        return boundConstructors.stream().flatMap( ConstructorModel::dependencies );
+        return boundConstructors.stream().flatMap(ConstructorModel::dependencies);
     }
 
-    @SuppressWarnings( "raw" )
-    private ConstructorModel newConstructorModel( Class<?> fragmentClass,
-                                                  Constructor<?> realConstructor,
-                                                  Constructor<?> injectedConstructor
+    @SuppressWarnings("raw")
+    private ConstructorModel newConstructorModel(Class<?> fragmentClass,
+                                                 Constructor<?> realConstructor,
+                                                 Constructor<?> injectedConstructor
     )
     {
         int idx = 0;
         InjectedParametersModel parameters = new InjectedParametersModel();
         Annotation[][] parameterAnnotations = injectedConstructor.getParameterAnnotations();
-        for( Type type : injectedConstructor.getGenericParameterTypes() )
+        for(Type type : injectedConstructor.getGenericParameterTypes())
         {
-            Annotation injectionAnnotation = Stream.of( parameterAnnotations[ idx ] )
-                                                   .filter( typeHasAnnotation( InjectionScope.class ) )
-                                                   .findFirst().orElse( null );
+            Annotation injectionAnnotation = Stream.of(parameterAnnotations[idx])
+                .filter(typeHasAnnotation(InjectionScope.class))
+                .findFirst().orElse(null);
 
-            if( injectionAnnotation == null )
+            if(injectionAnnotation == null)
             {
-                if( fragmentClass.getSuperclass().isMemberClass() )
+                if(fragmentClass.getSuperclass().isMemberClass())
                 {
                     injectionAnnotation = new Uses()
                     {
@@ -149,44 +140,44 @@ public final class ConstructorsModel
                 }
             }
 
-            boolean optional = DependencyModel.isOptional( injectionAnnotation, parameterAnnotations[ idx ] );
+            boolean optional = DependencyModel.isOptional(injectionAnnotation, parameterAnnotations[idx]);
 
             Type genericType = type;
-            if( genericType instanceof ParameterizedType )
+            if(genericType instanceof ParameterizedType)
             {
-                genericType = new ParameterizedTypeInstance( ( (ParameterizedType) genericType ).getActualTypeArguments(), ( (ParameterizedType) genericType )
-                    .getRawType(), ( (ParameterizedType) genericType ).getOwnerType() );
+                genericType = new ParameterizedTypeInstance(((ParameterizedType) genericType).getActualTypeArguments(), ((ParameterizedType) genericType)
+                    .getRawType(), ((ParameterizedType) genericType).getOwnerType());
 
-                for( int i = 0; i < ( (ParameterizedType) genericType ).getActualTypeArguments().length; i++ )
+                for(int i = 0; i < ((ParameterizedType) genericType).getActualTypeArguments().length; i++)
                 {
-                    Type typeArg = ( (ParameterizedType) genericType ).getActualTypeArguments()[ i ];
-                    if( typeArg instanceof TypeVariable )
+                    Type typeArg = ((ParameterizedType) genericType).getActualTypeArguments()[i];
+                    if(typeArg instanceof TypeVariable)
                     {
-                        typeArg = Classes.resolveTypeVariable( (TypeVariable) typeArg, realConstructor.getDeclaringClass(), fragmentClass );
-                        ( (ParameterizedType) genericType ).getActualTypeArguments()[ i ] = typeArg;
+                        typeArg = Classes.resolveTypeVariable((TypeVariable) typeArg, realConstructor.getDeclaringClass(), fragmentClass);
+                        ((ParameterizedType) genericType).getActualTypeArguments()[i] = typeArg;
                     }
                 }
             }
 
-            DependencyModel dependencyModel = new DependencyModel( injectionAnnotation, genericType, fragmentClass, optional,
-                                                                   parameterAnnotations[ idx ] );
-            parameters.addDependency( dependencyModel );
+            DependencyModel dependencyModel = new DependencyModel(injectionAnnotation, genericType, fragmentClass, optional,
+                parameterAnnotations[idx]);
+            parameters.addDependency(dependencyModel);
             idx++;
         }
-        return new ConstructorModel( realConstructor, parameters );
+        return new ConstructorModel(realConstructor, parameters);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            if( boundConstructors != null )
+            if(boundConstructors != null)
             {
-                for( ConstructorModel constructorModel : boundConstructors )
+                for(ConstructorModel constructorModel : boundConstructors)
                 {
-                    if( !constructorModel.accept( visitor ) )
+                    if(!constructorModel.accept(visitor))
                     {
                         break;
                     }
@@ -194,95 +185,95 @@ public final class ConstructorsModel
             }
             else
             {
-                for( ConstructorModel constructorModel : constructorModels )
+                for(ConstructorModel constructorModel : constructorModels)
                 {
-                    if( !constructorModel.accept( visitor ) )
+                    if(!constructorModel.accept(visitor))
                     {
                         break;
                     }
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
     // Binding
     @Override
-    public void bind( final Resolution resolution )
+    public void bind(final Resolution resolution)
         throws BindingException
     {
         boundConstructors = new ArrayList<>();
-        for( ConstructorModel constructorModel : constructorModels )
+        for(ConstructorModel constructorModel : constructorModels)
         {
             try
             {
-                constructorModel.accept( new HierarchicalVisitorAdapter<Object, Object, BindingException>()
+                constructorModel.accept(new HierarchicalVisitorAdapter<Object, Object, BindingException>()
                 {
                     @Override
-                    public boolean visit( Object visitor )
+                    public boolean visit(Object visitor)
                         throws BindingException
                     {
-                        if( visitor instanceof Binder )
+                        if(visitor instanceof Binder)
                         {
-                            ( (Binder) visitor ).bind( resolution );
+                            ((Binder) visitor).bind(resolution);
                         }
                         return true;
                     }
-                } );
-                boundConstructors.add( constructorModel );
+                });
+                boundConstructors.add(constructorModel);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
                 // Ignore
                 e.printStackTrace();
             }
         }
 
-        if( boundConstructors.isEmpty() )
+        if(boundConstructors.isEmpty())
         {
-            StringBuilder messageBuilder = new StringBuilder( "Found no constructor that could be bound: " );
-            if( resolution.model() instanceof CompositeDescriptor )
+            StringBuilder messageBuilder = new StringBuilder("Found no constructor that could be bound: ");
+            if(resolution.model() instanceof CompositeDescriptor)
             {
-                messageBuilder.append( fragmentClass.getName() )
-                    .append( " in " )
-                    .append( resolution.model().toString() );
+                messageBuilder.append(fragmentClass.getName())
+                    .append(" in ")
+                    .append(resolution.model().toString());
             }
             else
             {
-                messageBuilder.append( resolution.model().toString() );
+                messageBuilder.append(resolution.model().toString());
             }
 
-            if( messageBuilder.indexOf( "$" ) >= 0 )
+            if(messageBuilder.indexOf("$") >= 0)
             {
                 // This could be ok if instance is created manually
                 return;
 //                messageBuilder.append( "\nInner classes can not be used." );
             }
             String message = messageBuilder.toString();
-            throw new BindingException( message );
+            throw new BindingException(message);
         }
 
         // Sort based on parameter count
         boundConstructors.sort(
-            ( o1, o2 ) ->
+            (o1, o2) ->
             {
                 Integer model2ParametersCount = o2.constructor().getParameterTypes().length;
                 int model1ParametersCount = o1.constructor().getParameterTypes().length;
-                return model2ParametersCount.compareTo( model1ParametersCount );
-            } );
+                return model2ParametersCount.compareTo(model1ParametersCount);
+            });
     }
 
-    public Object newInstance( InjectionContext injectionContext )
+    public Object newInstance(InjectionContext injectionContext)
     {
         // Try all bound constructors, in order
         ConstructionException exception = null;
-        for( ConstructorModel constructorModel : boundConstructors )
+        for(ConstructorModel constructorModel : boundConstructors)
         {
             try
             {
-                return constructorModel.newInstance( injectionContext );
+                return constructorModel.newInstance(injectionContext);
             }
-            catch( ConstructionException e )
+            catch(ConstructionException e)
             {
                 exception = e;
             }

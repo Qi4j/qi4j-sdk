@@ -19,7 +19,8 @@
  */
 package org.qi4j.runtime.activation;
 
-import java.util.Arrays;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.ActivatorAdapter;
 import org.qi4j.api.activation.Activators;
@@ -33,11 +34,8 @@ import org.qi4j.bootstrap.SingletonAssembler;
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.ActivationStep;
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.ActivationStepsRecorder;
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.ActivationStepsRecorderInstance;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
+
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -72,13 +70,13 @@ public class IntraMixinActivationOrderTest
         public void setupAlpha()
         {
             beta.ensureActivated();
-            RECORDER.record( new ActivationStep( "alpha", "setup" ) );
+            RECORDER.record(new ActivationStep("alpha", "setup"));
         }
 
         @Override
         public void tearDownAlpha()
         {
-            RECORDER.record( new ActivationStep( "alpha", "tear-down" ) );
+            RECORDER.record(new ActivationStep("alpha", "tear-down"));
         }
 
     }
@@ -99,30 +97,30 @@ public class IntraMixinActivationOrderTest
         @Override
         public void ensureActivated()
         {
-            if( !activated )
+            if(!activated)
             {
-                throw new IllegalStateException( "BetaMixin is not activated" );
+                throw new IllegalStateException("BetaMixin is not activated");
             }
         }
 
         @Override
         public void setupBeta()
         {
-            RECORDER.record( new ActivationStep( "beta", "setup" ) );
+            RECORDER.record(new ActivationStep("beta", "setup"));
             activated = true;
         }
 
         @Override
         public void tearDownBeta()
         {
-            RECORDER.record( new ActivationStep( "beta", "tear-down" ) );
+            RECORDER.record(new ActivationStep("beta", "tear-down"));
             activated = false;
         }
 
     }
 
-    @Activators( AlphaActivation.AlphaActivator.class )
-    @Mixins( AlphaMixin.class )
+    @Activators(AlphaActivation.AlphaActivator.class)
+    @Mixins(AlphaMixin.class)
     public interface AlphaActivation
     {
 
@@ -135,14 +133,14 @@ public class IntraMixinActivationOrderTest
         {
 
             @Override
-            public void afterActivation( ServiceReference<AlphaActivation> activated )
+            public void afterActivation(ServiceReference<AlphaActivation> activated)
                 throws Exception
             {
                 activated.get().setupAlpha();
             }
 
             @Override
-            public void beforePassivation( ServiceReference<AlphaActivation> passivating )
+            public void beforePassivation(ServiceReference<AlphaActivation> passivating)
                 throws Exception
             {
                 passivating.get().tearDownAlpha();
@@ -152,8 +150,8 @@ public class IntraMixinActivationOrderTest
 
     }
 
-    @Activators( BetaActivation.BetaActivator.class )
-    @Mixins( BetaMixin.class )
+    @Activators(BetaActivation.BetaActivator.class)
+    @Mixins(BetaMixin.class)
     public interface BetaActivation
     {
 
@@ -166,14 +164,14 @@ public class IntraMixinActivationOrderTest
         {
 
             @Override
-            public void afterActivation( ServiceReference<BetaActivation> activated )
+            public void afterActivation(ServiceReference<BetaActivation> activated)
                 throws Exception
             {
                 activated.get().setupBeta();
             }
 
             @Override
-            public void beforePassivation( ServiceReference<BetaActivation> passivating )
+            public void beforePassivation(ServiceReference<BetaActivation> passivating)
                 throws Exception
             {
                 passivating.get().tearDownBeta();
@@ -196,22 +194,22 @@ public class IntraMixinActivationOrderTest
         new SingletonAssembler()
         {
             @Override
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.services( UnderTestServiceType.class ).instantiateOnStartup();
+                module.services(UnderTestServiceType.class).instantiateOnStartup();
             }
         }.application().passivate();
         // System.out.println( RECORDER.steps() );
-        String expected = Arrays.toString( new String[]
-        {
-            "beta.setup",
-            "alpha.setup",
-            "alpha.tear-down",
-            "beta.tear-down",
-        } );
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
-        assertThat( actual, equalTo( expected ) );
+        String expected = Arrays.toString(new String[]
+            {
+                "beta.setup",
+                "alpha.setup",
+                "alpha.tear-down",
+                "beta.tear-down",
+            });
+        String actual = Arrays.toString(RECORDER.steps().toArray());
+        assertThat(actual, equalTo(expected));
     }
 
 }

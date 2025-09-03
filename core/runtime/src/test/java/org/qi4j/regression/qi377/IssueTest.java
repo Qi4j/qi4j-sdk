@@ -19,12 +19,12 @@
  */
 package org.qi4j.regression.qi377;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -34,25 +34,25 @@ public class IssueTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TeamMember.class );
+        module.transients(TeamMember.class);
     }
 
     @Test
     public void propertyNameCollisionsShouldWork()
     {
-        TeamMember m = transientBuilderFactory.newTransient( TeamMember.class );
-        m.name().set( "Niclas" );
+        TeamMember m = transientBuilderFactory.newTransient(TeamMember.class);
+        m.name().set("Niclas");
         Person p = m;
-        p.name().set( "Chris" );
+        p.name().set("Chris");
         Employee e = m;
-        e.name().set( "Paul" );
+        e.name().set("Paul");
 
-        assertThat( m.name().get(), equalTo( "Paul" ) );
-        assertThat( e.name().get(), equalTo( "Paul" ) );
-        assertThat( p.name().get(), equalTo( "Paul" ) );
+        assertThat(m.name().get(), equalTo("Paul"));
+        assertThat(e.name().get(), equalTo("Paul"));
+        assertThat(p.name().get(), equalTo("Paul"));
     }
 
     public interface Person

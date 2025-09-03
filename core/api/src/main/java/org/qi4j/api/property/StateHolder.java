@@ -31,14 +31,12 @@ public interface StateHolder
     /**
      * Get a property for a specific accessor
      *
-     * @param <T> Property type
+     * @param <T>      Property type
      * @param accessor of the property
-     *
      * @return the property
-     *
      * @throws IllegalArgumentException if no property for given accessor exists
      */
-    <T> Property<T> propertyFor( AccessibleObject accessor )
+    <T> Property<T> propertyFor(AccessibleObject accessor)
         throws IllegalArgumentException;
 
     Stream<? extends Property<?>> properties();

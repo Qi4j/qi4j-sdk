@@ -19,22 +19,18 @@
  */
 package org.qi4j.api.constraint;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.api.util.Classes;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This Exception is thrown when there is one or more Constraint Violations in a method
@@ -47,8 +43,8 @@ import org.qi4j.api.util.Classes;
  */
 public class ConstraintViolationException extends IllegalArgumentException
 {
-    private static final String NL = System.getProperty( "line.separator" );
-    private static final boolean longNames = Boolean.getBoolean( "qi4j.constraints.longNames" );
+    private static final String NL = System.getProperty("line.separator");
+    private static final boolean longNames = Boolean.getBoolean("qi4j.constraints.longNames");
     private static final String DEFAULT_PATTERN = NL + "\tConstraint Violation(s) in {0} of types [{3}]." + NL;
     private static final String ENTITY_DEFAULT_PATTERN = NL + "\tConstraint Violation(s) in entity {0} with id=[{2}]." + NL;
     private static final String SERVICE_DEFAULT_PATTERN = NL + "\tConstraint Violation(s) in service {0} with id=[{2}]." + NL;
@@ -62,10 +58,10 @@ public class ConstraintViolationException extends IllegalArgumentException
     private boolean isService;
     private boolean isEntity;
 
-    public ConstraintViolationException( Collection<ValueConstraintViolation> violations )
+    public ConstraintViolationException(Collection<ValueConstraintViolation> violations)
     {
         this.constraintViolations = new ArrayList<>();
-        this.constraintViolations.addAll( violations );
+        this.constraintViolations.addAll(violations);
     }
 
     public Collection<ValueConstraintViolation> constraintViolations()
@@ -170,10 +166,10 @@ public class ConstraintViolationException extends IllegalArgumentException
      * @param bundle The ResourceBundle for Localization, or null if default formatting and locale to be used.
      * @return An array of localized messages of the violations incurred.
      */
-    public String localizedMessageFrom( ResourceBundle bundle )
+    public String localizedMessageFrom(ResourceBundle bundle)
     {
         Locale locale;
-        if( bundle != null )
+        if(bundle != null)
         {
             locale = bundle.getLocale();
         }
@@ -183,17 +179,17 @@ public class ConstraintViolationException extends IllegalArgumentException
         }
         StringBuffer message = new StringBuffer();
         {
-            String[] searchKeys = new String[]{ "qi4j.constraint." + primaryType, "qi4j.constraint.composite" };
-            String compositePattern = findPattern( bundle, searchKeys, defaultPattern() );
+            String[] searchKeys = new String[]{"qi4j.constraint." + primaryType, "qi4j.constraint.composite"};
+            String compositePattern = findPattern(bundle, searchKeys, defaultPattern());
             String types = instanceTypes == null
-                           ? null
-                           : instanceTypes.stream()
-                                          .map( this::nameOf )
-                                          .collect( Collectors.joining( "," ) );
+                ? null
+                : instanceTypes.stream()
+                .map(this::nameOf)
+                .collect(Collectors.joining(","));
             String name = "";
-            if( primaryType != null )
+            if(primaryType != null)
             {
-                if( longNames )
+                if(longNames)
                 {
                     name = primaryType.getName();
                 }
@@ -202,14 +198,14 @@ public class ConstraintViolationException extends IllegalArgumentException
                     name = primaryType.getSimpleName();
                 }
             }
-            Object[] args = new Object[]{ name, instanceToString, identity, types };
-            MessageFormat formatter = new MessageFormat( compositePattern, locale );
-            formatter.format( args, message, null );
+            Object[] args = new Object[]{name, instanceToString, identity, types};
+            MessageFormat formatter = new MessageFormat(compositePattern, locale);
+            formatter.format(args, message, null);
         }
-        for( ValueConstraintViolation violation : constraintViolations )
+        for(ValueConstraintViolation violation : constraintViolations)
         {
-            String[] searchKeys = new String[]{ "qi4j.constraint." + primaryType, "qi4j.constraint.composite" };
-            String mixinPattern = findPattern( bundle, searchKeys, MIXIN_DEFAULT_PATTERN );
+            String[] searchKeys = new String[]{"qi4j.constraint." + primaryType, "qi4j.constraint.composite"};
+            String mixinPattern = findPattern(bundle, searchKeys, MIXIN_DEFAULT_PATTERN);
 
             Annotation annotation = violation.constraint();
             Class<? extends Annotation> annotatioType = annotation.annotationType();
@@ -223,18 +219,18 @@ public class ConstraintViolationException extends IllegalArgumentException
                     violation.name(),
                     violation.value()
                 };
-            MessageFormat formatter = new MessageFormat( mixinPattern, locale );
-            formatter.format( args, message, null );
+            MessageFormat formatter = new MessageFormat(mixinPattern, locale);
+            formatter.format(args, message, null);
         }
         String result = message.toString();
-        message.setLength( 0 ); // TODO: is this still needed to avoid JVM memory leak??
+        message.setLength(0); // TODO: is this still needed to avoid JVM memory leak??
         return result;
     }
 
-    private String nameOf( Type type )
+    private String nameOf(Type type)
     {
-        Class<?> clazz = Classes.RAW_CLASS.apply( type );
-        if( longNames )
+        Class<?> clazz = Classes.RAW_CLASS.apply(type);
+        if(longNames)
         {
             return clazz.getName();
         }
@@ -247,18 +243,18 @@ public class ConstraintViolationException extends IllegalArgumentException
     @Override
     public String getMessage()
     {
-        return localizedMessageFrom( null );
+        return localizedMessageFrom(null);
     }
 
-    private String findPattern( ResourceBundle bundle, String[] searchKeys, String defaultPattern )
+    private String findPattern(ResourceBundle bundle, String[] searchKeys, String defaultPattern)
     {
         String compositePattern;
-        if( bundle != null )
+        if(bundle != null)
         {
-            compositePattern = Stream.of( searchKeys )
-                                     .map( name -> findPattern( bundle, name ) )
-                                     .filter( Objects::nonNull )
-                                     .findFirst().orElse( defaultPattern );
+            compositePattern = Stream.of(searchKeys)
+                .map(name -> findPattern(bundle, name))
+                .filter(Objects::nonNull)
+                .findFirst().orElse(defaultPattern);
         }
         else
         {
@@ -267,13 +263,13 @@ public class ConstraintViolationException extends IllegalArgumentException
         return compositePattern;
     }
 
-    private String findPattern( ResourceBundle bundle, String name )
+    private String findPattern(ResourceBundle bundle, String name)
     {
         try
         {
-            return bundle.getString( name );
+            return bundle.getString(name);
         }
-        catch( Exception e )
+        catch(Exception e)
         {
             return null;
         }
@@ -281,35 +277,35 @@ public class ConstraintViolationException extends IllegalArgumentException
 
     private String defaultPattern()
     {
-        if( isEntity )
+        if(isEntity)
         {
             return ENTITY_DEFAULT_PATTERN;
         }
-        if( isService )
+        if(isService)
         {
             return SERVICE_DEFAULT_PATTERN;
         }
         return DEFAULT_PATTERN;
     }
 
-    public void setCompositeDescriptor( CompositeDescriptor descriptor )
+    public void setCompositeDescriptor(CompositeDescriptor descriptor)
     {
         this.primaryType = descriptor.primaryType();
-        this.instanceTypes = descriptor.mixinTypes().collect( Collectors.toList() );
+        this.instanceTypes = descriptor.mixinTypes().collect(Collectors.toList());
         this.isEntity = descriptor instanceof EntityDescriptor;
         this.isService = descriptor instanceof ServiceDescriptor;
     }
 
-    public void setIdentity( Identity identity )
+    public void setIdentity(Identity identity)
     {
-        if( identity == null )
+        if(identity == null)
         {
             return;
         }
         this.identity = identity.toString();
     }
 
-    public void setInstanceString( String instanceString )
+    public void setInstanceString(String instanceString)
     {
         instanceToString = instanceString;
     }

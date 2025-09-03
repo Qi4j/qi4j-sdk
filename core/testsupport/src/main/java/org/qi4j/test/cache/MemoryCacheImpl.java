@@ -19,8 +19,9 @@
  */
 package org.qi4j.test.cache;
 
-import java.util.concurrent.ConcurrentHashMap;
 import org.qi4j.spi.cache.Cache;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * In-Memory Cache implementation based on ConcurrentHashMap.
@@ -39,7 +40,7 @@ public class MemoryCacheImpl<T>
     private int puts;
     private int exists;
 
-    public MemoryCacheImpl( String cacheId, ConcurrentHashMap<String, Object> cache, Class<T> valueType )
+    public MemoryCacheImpl(String cacheId, ConcurrentHashMap<String, Object> cache, Class<T> valueType)
     {
         this.id = cacheId;
         this.backingCache = cache;
@@ -47,11 +48,11 @@ public class MemoryCacheImpl<T>
     }
 
     @Override
-    public T get( String key )
+    public T get(String key)
     {
         try
         {
-            return valueType.cast( backingCache.get( key ) );
+            return valueType.cast(backingCache.get(key));
         }
         finally
         {
@@ -60,11 +61,11 @@ public class MemoryCacheImpl<T>
     }
 
     @Override
-    public T remove( String key )
+    public T remove(String key)
     {
         try
         {
-            return valueType.cast( backingCache.remove( key ) );
+            return valueType.cast(backingCache.remove(key));
         }
         finally
         {
@@ -73,11 +74,11 @@ public class MemoryCacheImpl<T>
     }
 
     @Override
-    public void put( String key, T value )
+    public void put(String key, T value)
     {
         try
         {
-            backingCache.put( key, value );
+            backingCache.put(key, value);
         }
         finally
         {
@@ -86,11 +87,11 @@ public class MemoryCacheImpl<T>
     }
 
     @Override
-    public boolean exists( String key )
+    public boolean exists(String key)
     {
         try
         {
-            return backingCache.containsKey( key );
+            return backingCache.containsKey(key);
         }
         finally
         {

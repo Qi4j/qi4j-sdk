@@ -20,28 +20,22 @@
 
 package org.qi4j.runtime.type;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import org.qi4j.api.common.InvalidApplicationException;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.type.ArrayType;
-import org.qi4j.api.type.CollectionType;
-import org.qi4j.api.type.EnumType;
-import org.qi4j.api.type.MapType;
-import org.qi4j.api.type.ValueCompositeType;
-import org.qi4j.api.type.ValueType;
+import org.qi4j.api.type.*;
 import org.qi4j.api.util.Classes;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.api.value.ValueDescriptor;
 import org.qi4j.runtime.entity.EntityInstance;
 import org.qi4j.runtime.value.ValueInstance;
 import org.qi4j.spi.type.ValueTypeFactory;
-import org.qi4j.runtime.entity.EntityInstance;
-import org.qi4j.runtime.value.ValueInstance;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 
 import static org.qi4j.api.composite.CompositeInstance.compositeInstanceOf;
 
@@ -55,114 +49,114 @@ public class ValueTypeFactoryInstance implements ValueTypeFactory
     }
 
     @Override
-    public ValueType valueTypeOf( ModuleDescriptor module, Object object )
+    public ValueType valueTypeOf(ModuleDescriptor module, Object object)
     {
-        if( object instanceof ValueComposite )
+        if(object instanceof ValueComposite)
         {
-            ValueInstance valueInstance = (ValueInstance) compositeInstanceOf( (Composite) object );
+            ValueInstance valueInstance = (ValueInstance) compositeInstanceOf((Composite) object);
             return valueInstance.descriptor().valueType();
         }
-        if( object instanceof EntityComposite )
+        if(object instanceof EntityComposite)
         {
-            return ( (EntityInstance) compositeInstanceOf( (Composite) object ) ).descriptor().valueType();
+            return ((EntityInstance) compositeInstanceOf((Composite) object)).descriptor().valueType();
         }
-        if( object instanceof Enum )
+        if(object instanceof Enum)
         {
-            return EnumType.of( ( (Enum) object ).getDeclaringClass() );
+            return EnumType.of(((Enum) object).getDeclaringClass());
         }
-        return valueTypeOf( module, object.getClass() );
+        return valueTypeOf(module, object.getClass());
     }
 
     @Override
-    public ValueType valueTypeOf( ModuleDescriptor module, Class<?> type )
+    public ValueType valueTypeOf(ModuleDescriptor module, Class<?> type)
     {
-        ValueDescriptor valueDescriptor = module.typeLookup().lookupValueModel( type );
-        if( valueDescriptor != null )
+        ValueDescriptor valueDescriptor = module.typeLookup().lookupValueModel(type);
+        if(valueDescriptor != null)
         {
             return valueDescriptor.valueType();
         }
-        EntityDescriptor entityDescriptor = module.typeLookup().lookupEntityModel( type );
-        if( entityDescriptor != null )
+        EntityDescriptor entityDescriptor = module.typeLookup().lookupEntityModel(type);
+        if(entityDescriptor != null)
         {
             return entityDescriptor.valueType();
         }
-        return newValueType( type, type, type, module );
+        return newValueType(type, type, type, module);
     }
 
-    public ValueType newValueType( Type type, Class declaringClass, Class compositeType, ModuleDescriptor module )
+    public ValueType newValueType(Type type, Class declaringClass, Class compositeType, ModuleDescriptor module)
     {
         ValueType valueType;
-        if( EnumType.isEnum( type ) )
+        if(EnumType.isEnum(type))
         {
-            valueType = EnumType.of( Classes.RAW_CLASS.apply( type ) );
+            valueType = EnumType.of(Classes.RAW_CLASS.apply(type));
         }
-        else if( ArrayType.isArray( type ) )
+        else if(ArrayType.isArray(type))
         {
-            valueType = ArrayType.of( Classes.RAW_CLASS.apply( type ) );
+            valueType = ArrayType.of(Classes.RAW_CLASS.apply(type));
         }
-        else if( CollectionType.isCollection( type ) )
+        else if(CollectionType.isCollection(type))
         {
-            if( type instanceof ParameterizedType )
+            if(type instanceof ParameterizedType)
             {
                 ParameterizedType pt = (ParameterizedType) type;
-                Type collectionType = pt.getActualTypeArguments()[ 0 ];
-                if( collectionType instanceof TypeVariable && declaringClass != null )
+                Type collectionType = pt.getActualTypeArguments()[0];
+                if(collectionType instanceof TypeVariable && declaringClass != null)
                 {
                     TypeVariable collectionTypeVariable = (TypeVariable) collectionType;
-                    collectionType = Classes.resolveTypeVariable( collectionTypeVariable, declaringClass,
-                                                                  compositeType );
+                    collectionType = Classes.resolveTypeVariable(collectionTypeVariable, declaringClass,
+                        compositeType);
                 }
-                ValueType collectedType = newValueType( collectionType, declaringClass, compositeType, module );
-                valueType = CollectionType.of( Classes.RAW_CLASS.apply( type ), collectedType );
+                ValueType collectedType = newValueType(collectionType, declaringClass, compositeType, module);
+                valueType = CollectionType.of(Classes.RAW_CLASS.apply(type), collectedType);
             }
             else
             {
-                ValueType collectedType = newValueType( Object.class, declaringClass, compositeType, module );
-                valueType = CollectionType.of( Classes.RAW_CLASS.apply( type ), collectedType );
+                ValueType collectedType = newValueType(Object.class, declaringClass, compositeType, module);
+                valueType = CollectionType.of(Classes.RAW_CLASS.apply(type), collectedType);
             }
         }
-        else if( MapType.isMap( type ) )
+        else if(MapType.isMap(type))
         {
-            if( type instanceof ParameterizedType )
+            if(type instanceof ParameterizedType)
             {
                 ParameterizedType pt = (ParameterizedType) type;
-                Type keyType = pt.getActualTypeArguments()[ 0 ];
-                if( keyType instanceof TypeVariable && declaringClass != null )
+                Type keyType = pt.getActualTypeArguments()[0];
+                if(keyType instanceof TypeVariable && declaringClass != null)
                 {
                     TypeVariable keyTypeVariable = (TypeVariable) keyType;
-                    keyType = Classes.resolveTypeVariable( keyTypeVariable, declaringClass, compositeType );
+                    keyType = Classes.resolveTypeVariable(keyTypeVariable, declaringClass, compositeType);
                 }
-                ValueType keyedType = newValueType( keyType, declaringClass, compositeType, module );
-                Type valType = pt.getActualTypeArguments()[ 1 ];
-                if( valType instanceof TypeVariable && declaringClass != null )
+                ValueType keyedType = newValueType(keyType, declaringClass, compositeType, module);
+                Type valType = pt.getActualTypeArguments()[1];
+                if(valType instanceof TypeVariable && declaringClass != null)
                 {
                     TypeVariable valueTypeVariable = (TypeVariable) valType;
-                    valType = Classes.resolveTypeVariable( valueTypeVariable, declaringClass, compositeType );
+                    valType = Classes.resolveTypeVariable(valueTypeVariable, declaringClass, compositeType);
                 }
-                ValueType valuedType = newValueType( valType, declaringClass, compositeType, module );
-                valueType = MapType.of( Classes.RAW_CLASS.apply( type ), keyedType, valuedType );
+                ValueType valuedType = newValueType(valType, declaringClass, compositeType, module);
+                valueType = MapType.of(Classes.RAW_CLASS.apply(type), keyedType, valuedType);
             }
             else
             {
-                ValueType keyType = newValueType( Object.class, declaringClass, compositeType, module );
-                ValueType valuesType = newValueType( Object.class, declaringClass, compositeType, module );
-                valueType = MapType.of( Classes.RAW_CLASS.apply( type ), keyType, valuesType );
+                ValueType keyType = newValueType(Object.class, declaringClass, compositeType, module);
+                ValueType valuesType = newValueType(Object.class, declaringClass, compositeType, module);
+                valueType = MapType.of(Classes.RAW_CLASS.apply(type), keyType, valuesType);
             }
         }
-        else if( ValueCompositeType.isValueComposite( type ) )
+        else if(ValueCompositeType.isValueComposite(type))
         {
-            ValueDescriptor model = module.typeLookup().lookupValueModel( Classes.RAW_CLASS.apply( type ) );
-            if( model == null )
+            ValueDescriptor model = module.typeLookup().lookupValueModel(Classes.RAW_CLASS.apply(type));
+            if(model == null)
             {
                 throw new InvalidApplicationException(
-                    "[" + module.name() + "] Could not find ValueComposite of type " + type );
+                    "[" + module.name() + "] Could not find ValueComposite of type " + type);
             }
 
             valueType = model.valueType();
         }
         else
         {
-            valueType = ValueType.of( Classes.RAW_CLASS.apply( type ) );
+            valueType = ValueType.of(Classes.RAW_CLASS.apply(type));
         }
 
         return valueType;

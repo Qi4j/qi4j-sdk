@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.value;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
@@ -26,7 +27,6 @@ import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -36,10 +36,10 @@ public class ValueCompositeBasicsTest
     extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.values( SomeValue.class );
+        module.values(SomeValue.class);
 
         module.defaultServices();
     }
@@ -47,33 +47,33 @@ public class ValueCompositeBasicsTest
     @Test
     public void testEqualsForValueComposite()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
-        builder.prototypeFor( SomeInternalState.class ).name().set( "Niclas" );
-        assertThat( builder.prototype().name(), equalTo( "Niclas" ) );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
+        builder.prototypeFor(SomeInternalState.class).name().set("Niclas");
+        assertThat(builder.prototype().name(), equalTo("Niclas"));
         SomeValue value1 = builder.newInstance();
         SomeValue value2 = builder.newInstance();
-        builder.prototypeFor( SomeInternalState.class ).name().set( "Niclas2" );
+        builder.prototypeFor(SomeInternalState.class).name().set("Niclas2");
         SomeValue value3 = builder.newInstance();
-        assertThat( value1, equalTo( value2 ) );
-        assertThat( value1.equals( value3 ), is( false ) );
+        assertThat(value1, equalTo(value2));
+        assertThat(value1.equals(value3), is(false));
     }
 
     @Test
     public void testToStringForValueComposite()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
-        builder.prototypeFor( SomeInternalState.class ).name().set( "Niclas" );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
+        builder.prototypeFor(SomeInternalState.class).name().set("Niclas");
         SomeValue underTest = builder.newInstance();
-        assertThat( underTest.toString(), equalTo( "{\"name\":\"Niclas\"}" ) );
+        assertThat(underTest.toString(), equalTo("{\"name\":\"Niclas\"}"));
     }
 
     @Test
     public void testToJSonForValueComposite()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
-        builder.prototypeFor( SomeInternalState.class ).name().set( "Niclas" );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
+        builder.prototypeFor(SomeInternalState.class).name().set("Niclas");
         SomeValue underTest = builder.newInstance();
-        assertThat( underTest.toString(), equalTo( "{\"name\":\"Niclas\"}" ) );
+        assertThat(underTest.toString(), equalTo("{\"name\":\"Niclas\"}"));
     }
 
     public abstract static class SomeMixin
@@ -89,7 +89,7 @@ public class ValueCompositeBasicsTest
         }
     }
 
-    @Mixins( SomeMixin.class )
+    @Mixins(SomeMixin.class)
     public interface SomeValue
         //extends ValueComposite
     {

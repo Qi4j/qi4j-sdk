@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.entity;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.entity.Aggregated;
@@ -33,7 +34,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -43,14 +43,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class AggregatedTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( CompanyEntity.class, EmployeeEntity.class, PersonEntity.class );
+        module.entities(CompanyEntity.class, EmployeeEntity.class, PersonEntity.class);
 
-        new EntityTestAssembler().assemble( module );
+        new EntityTestAssembler().assemble(module);
 
-        module.objects( getClass() );
+        module.objects(getClass());
     }
 
     @Test
@@ -60,84 +60,84 @@ public class AggregatedTest
         CompanyEntity companyEntity;
         PersonEntity personEntity, personEntity2;
         EmployeeEntity employeeEntity, employeeEntity2;
-        try( UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "Creation" ) ) )
+        try(UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork(UsecaseBuilder.newUsecase("Creation")))
         {
             {
-                EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+                EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder(PersonEntity.class);
                 personEntity = builder.instance();
-                personEntity.name().set( "Rickard" );
+                personEntity.name().set("Rickard");
                 personEntity = builder.newInstance();
             }
 
             {
-                EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+                EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder(PersonEntity.class);
                 personEntity2 = builder.instance();
-                personEntity2.name().set( "Niclas" );
+                personEntity2.name().set("Niclas");
                 builder.newInstance();
             }
 
             {
-                EntityBuilder<EmployeeEntity> builder = unitOfWork.newEntityBuilder( EmployeeEntity.class );
+                EntityBuilder<EmployeeEntity> builder = unitOfWork.newEntityBuilder(EmployeeEntity.class);
                 employeeEntity = builder.instance();
-                employeeEntity.person().set( personEntity );
-                employeeEntity.salary().set( 50000 );
-                employeeEntity.title().set( "Director" );
+                employeeEntity.person().set(personEntity);
+                employeeEntity.salary().set(50000);
+                employeeEntity.title().set("Director");
                 employeeEntity = builder.newInstance();
             }
 
             {
-                EntityBuilder<EmployeeEntity> builder = unitOfWork.newEntityBuilder( EmployeeEntity.class );
+                EntityBuilder<EmployeeEntity> builder = unitOfWork.newEntityBuilder(EmployeeEntity.class);
                 employeeEntity2 = builder.instance();
-                employeeEntity2.person().set( personEntity );
-                employeeEntity2.salary().set( 40000 );
-                employeeEntity2.title().set( "Developer" );
+                employeeEntity2.person().set(personEntity);
+                employeeEntity2.salary().set(40000);
+                employeeEntity2.title().set("Developer");
                 employeeEntity2 = builder.newInstance();
             }
 
             {
-                EntityBuilder<CompanyEntity> builder = unitOfWork.newEntityBuilder( CompanyEntity.class );
+                EntityBuilder<CompanyEntity> builder = unitOfWork.newEntityBuilder(CompanyEntity.class);
                 companyEntity = builder.instance();
-                companyEntity.director().set( employeeEntity );
-                companyEntity.employees().add( 0, employeeEntity );
-                companyEntity.employees().add( 0, employeeEntity2 );
+                companyEntity.director().set(employeeEntity);
+                companyEntity.employees().add(0, employeeEntity);
+                companyEntity.employees().add(0, employeeEntity2);
                 companyEntity = builder.newInstance();
             }
 
             unitOfWork.complete();
         }
 
-        try( UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "Removal" ) ) )
+        try(UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork(UsecaseBuilder.newUsecase("Removal")))
         {
-            companyEntity = unitOfWork.get( companyEntity );
-            unitOfWork.remove( companyEntity );
+            companyEntity = unitOfWork.get(companyEntity);
+            unitOfWork.remove(companyEntity);
 
             unitOfWork.complete();
         }
 
-        try( UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "No 1st employee" ) ) )
+        try(UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork(UsecaseBuilder.newUsecase("No 1st employee")))
         {
-            unitOfWork.get( employeeEntity );
-            fail( "Should not work" );
+            unitOfWork.get(employeeEntity);
+            fail("Should not work");
         }
-        catch( NoSuchEntityException e )
+        catch(NoSuchEntityException e)
         {
             // Expected
         }
 
-        try( UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "No 2nd employee" ) ) )
+        try(UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork(UsecaseBuilder.newUsecase("No 2nd employee")))
         {
-            unitOfWork.get( employeeEntity2 );
-            fail( "Should not work" );
+            unitOfWork.get(employeeEntity2);
+            fail("Should not work");
         }
-        catch( NoSuchEntityException e )
+        catch(NoSuchEntityException e)
         {
             // Expected
         }
 
-        try( UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "Persons not removed" ) ) )
+        try(UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork(UsecaseBuilder.newUsecase("Persons not removed")))
         {
-            unitOfWork.get( personEntity );
-            unitOfWork.get( personEntity2 );
+            unitOfWork.get(personEntity);
+            unitOfWork.get(personEntity2);
         }
     }
 

@@ -20,20 +20,11 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.api.structure.ApplicationDescriptor;
 import org.qi4j.api.structure.Layer;
 import org.qi4j.api.util.HierarchicalVisitor;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.ApplicationModelFactory;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.BindingException;
-import org.qi4j.bootstrap.LayerAssembly;
+import org.qi4j.bootstrap.*;
 import org.qi4j.runtime.activation.ActivatorsModel;
 import org.qi4j.runtime.composite.CompositeMethodModel;
 import org.qi4j.runtime.injection.InjectedFieldModel;
@@ -43,14 +34,8 @@ import org.qi4j.runtime.structure.ApplicationModel;
 import org.qi4j.runtime.structure.LayerModel;
 import org.qi4j.runtime.structure.ModuleModel;
 import org.qi4j.runtime.structure.UsedLayersModel;
-import org.qi4j.bootstrap.*;
-import org.qi4j.runtime.activation.ActivatorsModel;
-import org.qi4j.runtime.composite.CompositeMethodModel;
-import org.qi4j.runtime.injection.InjectedFieldModel;
-import org.qi4j.runtime.structure.ApplicationModel;
-import org.qi4j.runtime.structure.LayerModel;
-import org.qi4j.runtime.structure.ModuleModel;
-import org.qi4j.runtime.structure.UsedLayersModel;
+
+import java.util.*;
 
 /**
  * Factory for Applications.
@@ -59,30 +44,30 @@ public final class ApplicationModelFactoryImpl
     implements ApplicationModelFactory
 {
     @Override
-    public ApplicationDescriptor newApplicationModel( ApplicationAssembly assembly )
+    public ApplicationDescriptor newApplicationModel(ApplicationAssembly assembly)
     {
-        AssemblyHelper helper = createAssemblyHelper( assembly );
+        AssemblyHelper helper = createAssemblyHelper(assembly);
         AssemblyMaps maps = new AssemblyMaps();
         ApplicationAssemblyImpl applicationAssembly = (ApplicationAssemblyImpl) assembly;
 
-        List<LayerAssemblyImpl> layerAssemblies = new ArrayList<>( applicationAssembly.layerAssemblies() );
+        List<LayerAssemblyImpl> layerAssemblies = new ArrayList<>(applicationAssembly.layerAssemblies());
         List<LayerModel> layerModels = new ArrayList<>();
 
-        buildAllLayers( helper, maps, layerAssemblies, layerModels );
-        populateUsedLayerModels( maps, layerAssemblies );
+        buildAllLayers(helper, maps, layerAssemblies, layerModels);
+        populateUsedLayerModels(maps, layerAssemblies);
 
-        ApplicationModel applicationModel = buildApplicationModel( applicationAssembly, layerModels );
-        bindApplicationModel( applicationModel );
+        ApplicationModel applicationModel = buildApplicationModel(applicationAssembly, layerModels);
+        bindApplicationModel(applicationModel);
         return applicationModel;
     }
 
-    private AssemblyHelper createAssemblyHelper( ApplicationAssembly assembly )
+    private AssemblyHelper createAssemblyHelper(ApplicationAssembly assembly)
     {
-        if( assembly instanceof ApplicationAssemblyImpl )
+        if(assembly instanceof ApplicationAssemblyImpl)
         {
             ApplicationAssemblyImpl impl = (ApplicationAssemblyImpl) assembly;
-            AssemblyHelper helper = impl.metaInfo().get( AssemblyHelper.class );
-            if( helper != null )
+            AssemblyHelper helper = impl.metaInfo().get(AssemblyHelper.class);
+            if(helper != null)
             {
                 return helper;
             }
@@ -90,69 +75,69 @@ public final class ApplicationModelFactoryImpl
         return new AssemblyHelper();
     }
 
-    private void buildAllLayers( AssemblyHelper helper, AssemblyMaps maps,
-                                 List<LayerAssemblyImpl> layerAssemblies, List<LayerModel> layerModels )
+    private void buildAllLayers(AssemblyHelper helper, AssemblyMaps maps,
+                                List<LayerAssemblyImpl> layerAssemblies, List<LayerModel> layerModels)
     {
-        for( LayerAssemblyImpl layerAssembly : layerAssemblies )
+        for(LayerAssemblyImpl layerAssembly : layerAssemblies)
         {
-            UsedLayersModel usedLayersModel = new UsedLayersModel( maps.usedLayersOf( layerAssembly ) );
+            UsedLayersModel usedLayersModel = new UsedLayersModel(maps.usedLayersOf(layerAssembly));
             List<ModuleModel> moduleModels = new ArrayList<>();
             String name = layerAssembly.name();
-            if( name == null )
+            if(name == null)
             {
-                throw new AssemblyException( "Layer must have name set" );
+                throw new AssemblyException("Layer must have name set");
             }
-            ActivatorsModel<Layer> layerActivators = new ActivatorsModel<>( layerAssembly.activators() );
-            LayerModel layerModel = new LayerModel( name,
-                                                    layerAssembly.metaInfo(),
-                                                    usedLayersModel,
-                                                    layerActivators,
-                                                    moduleModels );
+            ActivatorsModel<Layer> layerActivators = new ActivatorsModel<>(layerAssembly.activators());
+            LayerModel layerModel = new LayerModel(name,
+                layerAssembly.metaInfo(),
+                usedLayersModel,
+                layerActivators,
+                moduleModels);
 
-            for( ModuleAssemblyImpl moduleAssembly : layerAssembly.moduleAssemblies() )
+            for(ModuleAssemblyImpl moduleAssembly : layerAssembly.moduleAssemblies())
             {
-                moduleModels.add( moduleAssembly.assembleModule( layerModel, helper ) );
+                moduleModels.add(moduleAssembly.assembleModule(layerModel, helper));
             }
-            maps.addModel( layerAssembly, layerModel );
-            layerModels.add( layerModel );
+            maps.addModel(layerAssembly, layerModel);
+            layerModels.add(layerModel);
         }
     }
 
-    private void populateUsedLayerModels( AssemblyMaps maps, List<LayerAssemblyImpl> layerAssemblies )
+    private void populateUsedLayerModels(AssemblyMaps maps, List<LayerAssemblyImpl> layerAssemblies)
     {
-        for( LayerAssemblyImpl layerAssembly : layerAssemblies )
+        for(LayerAssemblyImpl layerAssembly : layerAssemblies)
         {
             Set<LayerAssembly> usesLayers = layerAssembly.uses();
-            List<LayerModel> usedLayers = maps.usedLayersOf( layerAssembly );
-            for( LayerAssembly usesLayer : usesLayers )
+            List<LayerModel> usedLayers = maps.usedLayersOf(layerAssembly);
+            for(LayerAssembly usesLayer : usesLayers)
             {
-                usedLayers.add( maps.modelOf( usesLayer ) );
+                usedLayers.add(maps.modelOf(usesLayer));
             }
         }
     }
 
 
-    private ApplicationModel buildApplicationModel( ApplicationAssemblyImpl applicationAssembly,
-                                                    List<LayerModel> layerModels )
+    private ApplicationModel buildApplicationModel(ApplicationAssemblyImpl applicationAssembly,
+                                                   List<LayerModel> layerModels)
     {
-        return new ApplicationModel( applicationAssembly.name(),
-                                     applicationAssembly.version(),
-                                     applicationAssembly.mode(),
-                                     applicationAssembly.metaInfo(),
-                                     new ActivatorsModel<>( applicationAssembly.activators() ),
-                                     layerModels );
+        return new ApplicationModel(applicationAssembly.name(),
+            applicationAssembly.version(),
+            applicationAssembly.mode(),
+            applicationAssembly.metaInfo(),
+            new ActivatorsModel<>(applicationAssembly.activators()),
+            layerModels);
     }
 
-    private void bindApplicationModel( ApplicationModel applicationModel )
+    private void bindApplicationModel(ApplicationModel applicationModel)
     {
         // This will resolve all dependencies
         try
         {
-            applicationModel.accept( new BindingVisitor( applicationModel ) );
+            applicationModel.accept(new BindingVisitor(applicationModel));
         }
-        catch( BindingException e )
+        catch(BindingException e)
         {
-            throw new AssemblyException( "Unable to bind: " + applicationModel, e );
+            throw new AssemblyException("Unable to bind: " + applicationModel, e);
         }
     }
 
@@ -162,30 +147,30 @@ public final class ApplicationModelFactoryImpl
         private final Map<LayerModel, LayerAssembly> mapModelAssembly = new HashMap<>();
         private final Map<LayerAssembly, List<LayerModel>> mapUsedLayers = new HashMap<>();
 
-        void addModel( LayerAssembly assembly, LayerModel model )
+        void addModel(LayerAssembly assembly, LayerModel model)
         {
-            mapAssemblyModel.put( assembly, model );
-            mapModelAssembly.put( model, assembly );
-            usedLayersOf( assembly );
+            mapAssemblyModel.put(assembly, model);
+            mapModelAssembly.put(model, assembly);
+            usedLayersOf(assembly);
         }
 
-        LayerAssembly assemblyOf( LayerModel model )
+        LayerAssembly assemblyOf(LayerModel model)
         {
-            return mapModelAssembly.get( model );
+            return mapModelAssembly.get(model);
         }
 
-        LayerModel modelOf( LayerAssembly assembly )
+        LayerModel modelOf(LayerAssembly assembly)
         {
-            return mapAssemblyModel.get( assembly );
+            return mapAssemblyModel.get(assembly);
         }
 
-        List<LayerModel> usedLayersOf( LayerAssembly assembly )
+        List<LayerModel> usedLayersOf(LayerAssembly assembly)
         {
-            if( !mapUsedLayers.containsKey( assembly ) )
+            if(!mapUsedLayers.containsKey(assembly))
             {
-                mapUsedLayers.put( assembly, new ArrayList<>() );
+                mapUsedLayers.put(assembly, new ArrayList<>());
             }
-            return mapUsedLayers.get( assembly );
+            return mapUsedLayers.get(assembly);
         }
     }
 
@@ -200,45 +185,45 @@ public final class ApplicationModelFactoryImpl
         private Resolution resolution;
         private final ApplicationModel applicationModel;
 
-        private BindingVisitor( ApplicationModel applicationModel )
+        private BindingVisitor(ApplicationModel applicationModel)
         {
             this.applicationModel = applicationModel;
         }
 
         @Override
-        public boolean visitEnter( Object visited )
+        public boolean visitEnter(Object visited)
             throws BindingException
         {
-            if( visited instanceof Binder )
+            if(visited instanceof Binder)
             {
                 Binder binder = (Binder) visited;
-                binder.bind( resolution );
+                binder.bind(resolution);
 
                 return false;
             }
-            else if( visited instanceof CompositeMethodModel )
+            else if(visited instanceof CompositeMethodModel)
             {
                 compositeMethodModel = (CompositeMethodModel) visited;
-                resolution = new Resolution( applicationModel, layer, module,
-                                             objectDescriptor, compositeMethodModel, null );
+                resolution = new Resolution(applicationModel, layer, module,
+                    objectDescriptor, compositeMethodModel, null);
             }
-            else if( visited instanceof ModelDescriptor )
+            else if(visited instanceof ModelDescriptor)
             {
                 objectDescriptor = (ModelDescriptor) visited;
-                resolution = new Resolution( applicationModel, layer, module,
-                                             objectDescriptor, null, null );
+                resolution = new Resolution(applicationModel, layer, module,
+                    objectDescriptor, null, null);
             }
-            else if( visited instanceof InjectedFieldModel)
+            else if(visited instanceof InjectedFieldModel)
             {
                 InjectedFieldModel fieldModel = (InjectedFieldModel) visited;
-                fieldModel.bind( new Resolution( applicationModel, layer, module,
-                                                 objectDescriptor, compositeMethodModel, fieldModel.field() ) );
+                fieldModel.bind(new Resolution(applicationModel, layer, module,
+                    objectDescriptor, compositeMethodModel, fieldModel.field()));
             }
-            else if( visited instanceof ModuleModel )
+            else if(visited instanceof ModuleModel)
             {
                 module = (ModuleModel) visited;
             }
-            else if( visited instanceof LayerModel )
+            else if(visited instanceof LayerModel)
             {
                 layer = (LayerModel) visited;
             }
@@ -246,18 +231,18 @@ public final class ApplicationModelFactoryImpl
         }
 
         @Override
-        public boolean visitLeave( Object visited )
+        public boolean visitLeave(Object visited)
         {
             return true;
         }
 
         @Override
-        public boolean visit( Object visited )
+        public boolean visit(Object visited)
             throws BindingException
         {
-            if( visited instanceof Binder )
+            if(visited instanceof Binder)
             {
-                ( (Binder) visited ).bind( resolution );
+                ((Binder) visited).bind(resolution);
             }
             return true;
         }

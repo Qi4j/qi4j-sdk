@@ -20,20 +20,9 @@
 
 package org.qi4j.spi.metrics;
 
+import org.qi4j.api.metrics.*;
+
 import java.util.stream.Stream;
-import org.qi4j.api.metrics.Metric;
-import org.qi4j.api.metrics.MetricsCounter;
-import org.qi4j.api.metrics.MetricsCounterFactory;
-import org.qi4j.api.metrics.MetricsGauge;
-import org.qi4j.api.metrics.MetricsGaugeFactory;
-import org.qi4j.api.metrics.MetricsHealthCheck;
-import org.qi4j.api.metrics.MetricsHealthCheckFactory;
-import org.qi4j.api.metrics.MetricsHistogram;
-import org.qi4j.api.metrics.MetricsHistogramFactory;
-import org.qi4j.api.metrics.MetricsMeter;
-import org.qi4j.api.metrics.MetricsMeterFactory;
-import org.qi4j.api.metrics.MetricsTimer;
-import org.qi4j.api.metrics.MetricsTimerFactory;
 
 /**
  * Factory for Metrics null objects.
@@ -43,7 +32,7 @@ public final class NullMetricsFactory
     public static class NullCounterFactory implements MetricsCounterFactory
     {
         @Override
-        public MetricsCounter createCounter( String name )
+        public MetricsCounter createCounter(String name)
         {
             return DefaultMetric.NULL;
         }
@@ -51,15 +40,15 @@ public final class NullMetricsFactory
         @Override
         public Stream<Metric> registered()
         {
-            return Stream.of( DefaultMetric.NULL );
+            return Stream.of(DefaultMetric.NULL);
         }
     }
 
     public static class NullGaugeFactory implements MetricsGaugeFactory
     {
         @Override
-        @SuppressWarnings( "unchecked" )
-        public <T> MetricsGauge<T> registerGauge( String name, MetricsGauge<T> gauge )
+        @SuppressWarnings("unchecked")
+        public <T> MetricsGauge<T> registerGauge(String name, MetricsGauge<T> gauge)
         {
             return DefaultMetric.NULL;
         }
@@ -67,14 +56,14 @@ public final class NullMetricsFactory
         @Override
         public Stream<Metric> registered()
         {
-            return Stream.of( DefaultMetric.NULL );
+            return Stream.of(DefaultMetric.NULL);
         }
     }
 
     public static class NullHealthCheckFactory implements MetricsHealthCheckFactory
     {
         @Override
-        public MetricsHealthCheck registerHealthCheck( String name, MetricsHealthCheck check )
+        public MetricsHealthCheck registerHealthCheck(String name, MetricsHealthCheck check)
         {
             return DefaultMetric.NULL;
         }
@@ -82,14 +71,14 @@ public final class NullMetricsFactory
         @Override
         public Stream<Metric> registered()
         {
-            return Stream.of( DefaultMetric.NULL );
+            return Stream.of(DefaultMetric.NULL);
         }
     }
 
     public static class NullHistogramFactory implements MetricsHistogramFactory
     {
         @Override
-        public MetricsHistogram createHistogram( String name )
+        public MetricsHistogram createHistogram(String name)
         {
             return DefaultMetric.NULL;
         }
@@ -97,14 +86,14 @@ public final class NullMetricsFactory
         @Override
         public Stream<Metric> registered()
         {
-            return Stream.of( DefaultMetric.NULL );
+            return Stream.of(DefaultMetric.NULL);
         }
     }
 
     public static class NullMeterFactory implements MetricsMeterFactory
     {
         @Override
-        public MetricsMeter createMeter( String name )
+        public MetricsMeter createMeter(String name)
         {
 
             return DefaultMetric.NULL;
@@ -113,14 +102,14 @@ public final class NullMetricsFactory
         @Override
         public Stream<Metric> registered()
         {
-            return Stream.of( DefaultMetric.NULL );
+            return Stream.of(DefaultMetric.NULL);
         }
     }
 
     public static class NullTimerFactory implements MetricsTimerFactory
     {
         @Override
-        public MetricsTimer createTimer( String name )
+        public MetricsTimer createTimer(String name)
         {
             return DefaultMetric.NULL;
         }
@@ -128,7 +117,7 @@ public final class NullMetricsFactory
         @Override
         public Stream<Metric> registered()
         {
-            return Stream.of( DefaultMetric.NULL );
+            return Stream.of(DefaultMetric.NULL);
         }
     }
 }

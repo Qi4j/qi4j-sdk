@@ -26,18 +26,18 @@ package org.qi4j.bootstrap;
 public class InjectionException
     extends RuntimeException
 {
-    public InjectionException( String s )
+    public InjectionException(String s)
     {
-        super( s );
+        super(s);
     }
 
-    public InjectionException( String s, Throwable throwable )
+    public InjectionException(String s, Throwable throwable)
     {
-        super( s, throwable );
+        super(s, throwable);
     }
 
-    public InjectionException( Throwable throwable )
+    public InjectionException(Throwable throwable)
     {
-        super( throwable );
+        super(throwable);
     }
 }

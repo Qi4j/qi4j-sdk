@@ -35,42 +35,42 @@ public final class AssemblerCollection
 {
     Collection<Assembler> assemblers;
 
-    public AssemblerCollection( Assembler... assemblers )
+    public AssemblerCollection(Assembler... assemblers)
     {
-        this.assemblers = Arrays.asList( assemblers );
+        this.assemblers = Arrays.asList(assemblers);
     }
 
     @SafeVarargs
-    public AssemblerCollection( Class<? extends Assembler>... assemblyClasses )
+    public AssemblerCollection(Class<? extends Assembler>... assemblyClasses)
         throws AssemblyException
     {
         assemblers = new ArrayList<>();
-        for( Class<? extends Assembler> assemblyClass : assemblyClasses )
+        for(Class<? extends Assembler> assemblyClass : assemblyClasses)
         {
             try
             {
                 Assembler assembler = assemblyClass.getConstructor().newInstance();
-                assemblers.add( assembler );
+                assemblers.add(assembler);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
-                throw new AssemblyException( "Could not instantiate assembly with class " + assemblyClass.getName(), e );
+                throw new AssemblyException("Could not instantiate assembly with class " + assemblyClass.getName(), e);
             }
         }
     }
 
-    public AssemblerCollection( Collection<Assembler> assemblers )
+    public AssemblerCollection(Collection<Assembler> assemblers)
     {
         this.assemblers = assemblers;
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws Exception
     {
-        for( Assembler assembler : assemblers )
+        for(Assembler assembler : assemblers)
         {
-            assembler.assemble( module );
+            assembler.assemble(module);
         }
     }
 }

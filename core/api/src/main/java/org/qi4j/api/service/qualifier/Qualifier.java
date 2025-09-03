@@ -26,7 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Annotation used to declare Qualifiers annotations.
  */
-@Retention( RetentionPolicy.RUNTIME )
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Qualifier
 {
     Class<? extends AnnotationQualifier> value();

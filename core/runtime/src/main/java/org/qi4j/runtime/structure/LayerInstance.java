@@ -19,9 +19,6 @@
  */
 package org.qi4j.runtime.structure;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.activation.ActivationEventListener;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.PassivationException;
@@ -30,7 +27,10 @@ import org.qi4j.api.structure.Layer;
 import org.qi4j.api.structure.LayerDescriptor;
 import org.qi4j.api.structure.Module;
 import org.qi4j.runtime.activation.ActivationDelegate;
-import org.qi4j.runtime.activation.ActivationDelegate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Instance of a Qi4j application layer. Contains a list of modules which are managed by this layer.
@@ -47,8 +47,8 @@ public class LayerInstance
     private final ActivationDelegate activation;
     private final List<ModuleInstance> moduleInstances;
 
-    public LayerInstance( LayerModel model,
-                          ApplicationInstance applicationInstance
+    public LayerInstance(LayerModel model,
+                         ApplicationInstance applicationInstance
     )
     {
         // Constructor parameters
@@ -56,7 +56,7 @@ public class LayerInstance
         this.applicationInstance = applicationInstance;
 
         // Eager instance objects
-        activation = new ActivationDelegate( this );
+        activation = new ActivationDelegate(this);
         moduleInstances = new ArrayList<>();
     }
 
@@ -81,9 +81,9 @@ public class LayerInstance
 
     // Implementation of MetaInfoHolder
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return layerModel.metaInfo( infoType );
+        return layerModel.metaInfo(infoType);
     }
 
     // Implementation of Activation
@@ -91,7 +91,7 @@ public class LayerInstance
     public void activate()
         throws ActivationException
     {
-        activation.activate( layerModel.newActivatorsInstance(), moduleInstances );
+        activation.activate(layerModel.newActivatorsInstance(), moduleInstances);
     }
 
     @Override
@@ -102,15 +102,15 @@ public class LayerInstance
     }
 
     @Override
-    public void registerActivationEventListener( ActivationEventListener listener )
+    public void registerActivationEventListener(ActivationEventListener listener)
     {
-        activation.registerActivationEventListener( listener );
+        activation.registerActivationEventListener(listener);
     }
 
     @Override
-    public void deregisterActivationEventListener( ActivationEventListener listener )
+    public void deregisterActivationEventListener(ActivationEventListener listener)
     {
-        activation.deregisterActivationEventListener( listener );
+        activation.deregisterActivationEventListener(listener);
     }
 
     @Override
@@ -125,10 +125,10 @@ public class LayerInstance
         return layerModel;
     }
 
-    void addModule( ModuleInstance module )
+    void addModule(ModuleInstance module)
     {
-        module.registerActivationEventListener( activation );
-        moduleInstances.add( module );
+        module.registerActivationEventListener(activation);
+        moduleInstances.add(module);
     }
 
     public LayerModel model()
@@ -136,16 +136,16 @@ public class LayerInstance
         return layerModel;
     }
 
-    /* package */ ModuleInstance findModule( String moduleName )
+    /* package */ ModuleInstance findModule(String moduleName)
     {
-        for( ModuleInstance moduleInstance : moduleInstances )
+        for(ModuleInstance moduleInstance : moduleInstances)
         {
-            if( moduleInstance.model().name().equals( moduleName ) )
+            if(moduleInstance.model().name().equals(moduleName))
             {
                 return moduleInstance;
             }
         }
 
-        throw new IllegalArgumentException( "No such module:" + moduleName );
+        throw new IllegalArgumentException("No such module:" + moduleName);
     }
 }

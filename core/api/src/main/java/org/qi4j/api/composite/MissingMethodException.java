@@ -26,13 +26,13 @@ package org.qi4j.api.composite;
 public class MissingMethodException
     extends RuntimeException
 {
-    public MissingMethodException( String message )
+    public MissingMethodException(String message)
     {
-        super( message );
+        super(message);
     }
 
-    public MissingMethodException( String message, NoSuchMethodException e )
+    public MissingMethodException(String message, NoSuchMethodException e)
     {
-        super(message,e);
+        super(message, e);
     }
 }

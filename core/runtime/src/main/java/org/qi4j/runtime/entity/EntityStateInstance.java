@@ -19,12 +19,6 @@
  */
 package org.qi4j.runtime.entity;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.association.ManyAssociation;
@@ -33,18 +27,17 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.util.Classes;
-import org.qi4j.runtime.association.AssociationInstance;
-import org.qi4j.runtime.association.AssociationModel;
-import org.qi4j.runtime.association.ManyAssociationInstance;
-import org.qi4j.runtime.association.ManyAssociationModel;
-import org.qi4j.runtime.association.NamedAssociationInstance;
-import org.qi4j.runtime.association.NamedAssociationModel;
-import org.qi4j.runtime.property.PropertyModel;
-import org.qi4j.runtime.unitofwork.BuilderEntityState;
-import org.qi4j.spi.entity.EntityState;
 import org.qi4j.runtime.association.*;
 import org.qi4j.runtime.property.PropertyModel;
 import org.qi4j.runtime.unitofwork.BuilderEntityState;
+import org.qi4j.spi.entity.EntityState;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 /**
  * TODO
@@ -58,32 +51,32 @@ public final class EntityStateInstance
     private EntityState entityState;
     private final BiFunction<EntityReference, Type, Object> entityFunction;
 
-    EntityStateInstance( EntityStateModel stateModel, final UnitOfWork uow, EntityState entityState )
+    EntityStateInstance(EntityStateModel stateModel, final UnitOfWork uow, EntityState entityState)
     {
         this.stateModel = stateModel;
         this.entityState = entityState;
 
-        entityFunction = ( entityReference, type ) -> uow.get( Classes.RAW_CLASS.apply( type ), entityReference.identity() );
+        entityFunction = (entityReference, type) -> uow.get(Classes.RAW_CLASS.apply(type), entityReference.identity());
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> Property<T> propertyFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> Property<T> propertyFor(AccessibleObject accessor)
         throws IllegalArgumentException
     {
         Map<AccessibleObject, Object> state = state();
 
-        Property<T> property = (Property<T>) state.get( accessor );
+        Property<T> property = (Property<T>) state.get(accessor);
 
-        if( property == null )
+        if(property == null)
         {
-            PropertyModel entityPropertyModel = stateModel.propertyModelFor( accessor );
+            PropertyModel entityPropertyModel = stateModel.propertyModelFor(accessor);
             property = new EntityPropertyInstance<>(
                 entityState instanceof BuilderEntityState
-                ? entityPropertyModel.getBuilderInfo()
-                : entityPropertyModel,
-                entityState );
-            state.put( accessor, property );
+                    ? entityPropertyModel.getBuilderInfo()
+                    : entityPropertyModel,
+                entityState);
+            state.put(accessor, property);
         }
 
         return property;
@@ -92,20 +85,20 @@ public final class EntityStateInstance
     @Override
     public Stream<Property<?>> properties()
     {
-        return stateModel.properties().map( descriptor -> propertyFor( descriptor.accessor() ) );
+        return stateModel.properties().map(descriptor -> propertyFor(descriptor.accessor()));
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> Association<T> associationFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> Association<T> associationFor(AccessibleObject accessor)
         throws IllegalArgumentException
     {
         Map<AccessibleObject, Object> state = state();
-        Association<T> association = (Association<T>) state.get( accessor );
+        Association<T> association = (Association<T>) state.get(accessor);
 
-        if( association == null )
+        if(association == null)
         {
-            final AssociationModel associationModel = stateModel.getAssociation( accessor );
+            final AssociationModel associationModel = stateModel.getAssociation(accessor);
             association = new AssociationInstance<>(
                 entityState instanceof BuilderEntityState ? associationModel.builderInfo() : associationModel,
                 entityFunction,
@@ -114,17 +107,17 @@ public final class EntityStateInstance
                     @Override
                     public EntityReference get()
                     {
-                        return entityState.associationValueOf( associationModel.qualifiedName() );
+                        return entityState.associationValueOf(associationModel.qualifiedName());
                     }
 
                     @Override
-                    public void set( EntityReference newValue )
+                    public void set(EntityReference newValue)
                         throws IllegalArgumentException, IllegalStateException
                     {
-                        entityState.setAssociationValue( associationModel.qualifiedName(), newValue );
+                        entityState.setAssociationValue(associationModel.qualifiedName(), newValue);
                     }
-                } );
-            state.put( accessor, association );
+                });
+            state.put(accessor, association);
         }
         return association;
     }
@@ -132,23 +125,23 @@ public final class EntityStateInstance
     @Override
     public Stream<? extends Association<?>> allAssociations()
     {
-        return stateModel.associations().map( descriptor -> associationFor( descriptor.accessor() ) );
+        return stateModel.associations().map(descriptor -> associationFor(descriptor.accessor()));
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> ManyAssociation<T> manyAssociationFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> ManyAssociation<T> manyAssociationFor(AccessibleObject accessor)
     {
         Map<AccessibleObject, Object> state = state();
-        ManyAssociation<T> manyAssociation = (ManyAssociation<T>) state.get( accessor );
-        if( manyAssociation == null )
+        ManyAssociation<T> manyAssociation = (ManyAssociation<T>) state.get(accessor);
+        if(manyAssociation == null)
         {
-            ManyAssociationModel associationModel = stateModel.getManyAssociation( accessor );
+            ManyAssociationModel associationModel = stateModel.getManyAssociation(accessor);
             manyAssociation = new ManyAssociationInstance<>(
                 entityState instanceof BuilderEntityState ? associationModel.builderInfo() : associationModel,
                 entityFunction,
-                entityState.manyAssociationValueOf( associationModel.qualifiedName() ) );
-            state.put( accessor, manyAssociation );
+                entityState.manyAssociationValueOf(associationModel.qualifiedName()));
+            state.put(accessor, manyAssociation);
         }
         return manyAssociation;
     }
@@ -156,23 +149,23 @@ public final class EntityStateInstance
     @Override
     public Stream<ManyAssociation<?>> allManyAssociations()
     {
-        return stateModel.manyAssociations().map( descriptor -> manyAssociationFor( descriptor.accessor() ) );
+        return stateModel.manyAssociations().map(descriptor -> manyAssociationFor(descriptor.accessor()));
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> NamedAssociation<T> namedAssociationFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> NamedAssociation<T> namedAssociationFor(AccessibleObject accessor)
     {
         Map<AccessibleObject, Object> state = state();
-        NamedAssociation<T> namedAssociation = (NamedAssociation<T>) state.get( accessor );
-        if( namedAssociation == null )
+        NamedAssociation<T> namedAssociation = (NamedAssociation<T>) state.get(accessor);
+        if(namedAssociation == null)
         {
-            NamedAssociationModel associationModel = stateModel.getNamedAssociation( accessor );
+            NamedAssociationModel associationModel = stateModel.getNamedAssociation(accessor);
             namedAssociation = new NamedAssociationInstance<>(
                 entityState instanceof BuilderEntityState ? associationModel.builderInfo() : associationModel,
                 entityFunction,
-                entityState.namedAssociationValueOf( associationModel.qualifiedName() ) );
-            state.put( accessor, namedAssociation );
+                entityState.namedAssociationValueOf(associationModel.qualifiedName()));
+            state.put(accessor, namedAssociation);
         }
         return namedAssociation;
     }
@@ -180,29 +173,29 @@ public final class EntityStateInstance
     @Override
     public Stream<? extends NamedAssociation<?>> allNamedAssociations()
     {
-        return stateModel.namedAssociations().map( descriptor -> namedAssociationFor( descriptor.accessor() ) );
+        return stateModel.namedAssociations().map(descriptor -> namedAssociationFor(descriptor.accessor()));
     }
 
     public void checkConstraints()
     {
-        stateModel.properties().forEach( propertyDescriptor ->
-                                         {
-                                             Property<Object> property = this.propertyFor( propertyDescriptor.accessor() );
-                                             propertyDescriptor.checkConstraints( property.get() );
-                                         } );
+        stateModel.properties().forEach(propertyDescriptor ->
+        {
+            Property<Object> property = this.propertyFor(propertyDescriptor.accessor());
+            propertyDescriptor.checkConstraints(property.get());
+        });
 
-        stateModel.associations().forEach( associationDescriptor ->
-                                           {
-                                               Association<Object> association = this.associationFor( associationDescriptor.accessor() );
-                                               associationDescriptor.checkConstraints( association.get() );
-                                           } );
+        stateModel.associations().forEach(associationDescriptor ->
+        {
+            Association<Object> association = this.associationFor(associationDescriptor.accessor());
+            associationDescriptor.checkConstraints(association.get());
+        });
 
         // TODO Should ManyAssociations and NamedAssociations be checked too?
     }
 
     private Map<AccessibleObject, Object> state()
     {
-        if( state == null )
+        if(state == null)
         {
             state = new HashMap<>();
         }

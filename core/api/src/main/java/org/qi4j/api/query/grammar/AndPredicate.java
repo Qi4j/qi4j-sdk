@@ -19,10 +19,10 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.composite.Composite;
+
 import java.util.Collection;
 import java.util.function.Predicate;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.Composite;
 
 /**
  * AND Specification.
@@ -30,33 +30,33 @@ import org.qi4j.api.composite.Composite;
 public class AndPredicate
     extends BinaryPredicate
 {
-    public AndPredicate( Collection<Predicate<Composite>> operands )
+    public AndPredicate(Collection<Predicate<Composite>> operands)
     {
-        super( operands );
+        super(operands);
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
         Predicate<Composite> master = t -> true;
-        for( Predicate<Composite> p : operands )
+        for(Predicate<Composite> p : operands)
         {
-            master = master.and( p );
+            master = master.and(p);
         }
-        return master.test( item );
+        return master.test(item);
     }
 
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder( "(" );
+        StringBuilder sb = new StringBuilder("(");
         String and = "";
-        for( Predicate<Composite> operand : operands )
+        for(Predicate<Composite> operand : operands)
         {
-            sb.append( and ).append( operand );
+            sb.append(and).append(operand);
             and = " and ";
         }
-        return sb.append( ")" ).toString();
+        return sb.append(")").toString();
     }
 
 }

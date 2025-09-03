@@ -19,9 +19,9 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.composite.Composite;
+
 import java.util.function.Predicate;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.Composite;
 
 /**
  * This should be used when doing native queries, such as SQL, SPARQL or similar. EntityFinders can choose
@@ -30,20 +30,20 @@ import org.qi4j.api.composite.Composite;
 public class QuerySpecification
     implements Predicate<Composite>
 {
-    public static boolean isQueryLanguage( String language, Predicate<Composite> specification )
+    public static boolean isQueryLanguage(String language, Predicate<Composite> specification)
     {
-        if( !( specification instanceof QuerySpecification ) )
+        if(!(specification instanceof QuerySpecification))
         {
             return false;
         }
 
-        return ( (QuerySpecification) specification ).language().equals( language );
+        return ((QuerySpecification) specification).language().equals(language);
     }
 
     private String language;
     private String query;
 
-    public QuerySpecification( String language, String query )
+    public QuerySpecification(String language, String query)
     {
         this.language = language;
         this.query = query;
@@ -60,7 +60,7 @@ public class QuerySpecification
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
         return false;
     }

@@ -17,41 +17,40 @@
  */
 package org.qi4j.spi.serialization;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.UncheckedIOException;
-import java.util.Base64;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
+
+import java.io.*;
+import java.util.Base64;
 
 import static java.util.stream.Collectors.joining;
 
 // START SNIPPET: binary
+
 /**
  * Base Binary Deserializer.
- *
+ * <p>
  * Implementations work on bytes, this base deserializer decode Strings from Base64 to produce bytes.
- *
+ * <p>
  * See {@link AbstractBinarySerializer}.
  */
 public abstract class AbstractBinaryDeserializer extends AbstractDeserializer
 // END SNIPPET: binary
 {
     @Override
-    public <T> T deserialize( ModuleDescriptor module, ValueType valueType, Reader state )
+    public <T> T deserialize(ModuleDescriptor module, Options options, ValueType valueType, Reader state)
     {
         String stateString;
-        try( BufferedReader buffer = new BufferedReader( state ) )
+        try(BufferedReader buffer = new BufferedReader(state))
         {
-            stateString = buffer.lines().collect( joining( "\n" ) );
+            stateString = buffer.lines().collect(joining("\n"));
         }
-        catch( IOException ex )
+        catch(IOException ex)
         {
-            throw new UncheckedIOException( ex );
+            throw new UncheckedIOException(ex);
         }
-        byte[] decoded = Base64.getDecoder().decode( stateString );
-        return deserialize( module, valueType, new ByteArrayInputStream( decoded ) );
+        byte[] decoded = Base64.getDecoder().decode(stateString);
+        return deserialize(module, options, valueType, new ByteArrayInputStream(decoded));
     }
 }

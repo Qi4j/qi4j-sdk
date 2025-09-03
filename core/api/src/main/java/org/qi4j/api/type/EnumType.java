@@ -27,9 +27,9 @@ import java.lang.reflect.Type;
 public final class EnumType
     extends ValueType
 {
-    public static boolean isEnum( Type type )
+    public static boolean isEnum(Type type)
     {
-        if( type instanceof Class )
+        if(type instanceof Class)
         {
             Class<?> typeClass = (Class) type;
             return typeClass.isEnum();
@@ -37,17 +37,17 @@ public final class EnumType
         return false;
     }
 
-    public static EnumType of( Class<?> type )
+    public static EnumType of(Class<?> type)
     {
-        return new EnumType( type );
+        return new EnumType(type);
     }
 
-    private EnumType( Class<?> type )
+    private EnumType(Class<?> type)
     {
-        super( type );
-        if( !isEnum( type ) )
+        super(type);
+        if(!isEnum(type))
         {
-            throw new IllegalArgumentException( type + " is not an Enum." );
+            throw new IllegalArgumentException(type + " is not an Enum.");
         }
     }
 }

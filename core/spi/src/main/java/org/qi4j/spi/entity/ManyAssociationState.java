@@ -20,9 +20,10 @@
 
 package org.qi4j.spi.entity;
 
+import org.qi4j.api.entity.EntityReference;
+
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.qi4j.api.entity.EntityReference;
 
 /**
  * State holder for ManyAssociations. The actual state
@@ -33,17 +34,18 @@ public interface ManyAssociationState
 {
     int count();
 
-    boolean contains( EntityReference entityReference );
+    boolean contains(EntityReference entityReference);
 
-    boolean add( int index, EntityReference entityReference );
+    boolean add(int index, EntityReference entityReference);
 
-    boolean remove( EntityReference entityReference );
+    boolean remove(EntityReference entityReference);
 
     boolean clear();
 
-    EntityReference get( int index );
+    EntityReference get(int index);
 
-    default Stream<EntityReference> stream() {
-        return StreamSupport.stream( spliterator(), false );
+    default Stream<EntityReference> stream()
+    {
+        return StreamSupport.stream(spliterator(), false);
     }
 }

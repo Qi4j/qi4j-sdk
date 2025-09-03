@@ -20,14 +20,14 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.identity.StringIdentity;
 import org.qi4j.api.service.qualifier.ServiceTags;
 import org.qi4j.bootstrap.ServiceDeclaration;
-import org.qi4j.bootstrap.ServiceDeclaration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Arrays.asList;
 
@@ -39,15 +39,15 @@ public final class ServiceDeclarationImpl
 {
     private final Iterable<ServiceAssemblyImpl> serviceAssemblies;
 
-    public ServiceDeclarationImpl( Iterable<ServiceAssemblyImpl> serviceAssemblies )
+    public ServiceDeclarationImpl(Iterable<ServiceAssemblyImpl> serviceAssemblies)
     {
         this.serviceAssemblies = serviceAssemblies;
     }
 
     @Override
-    public ServiceDeclaration visibleIn( Visibility visibility )
+    public ServiceDeclaration visibleIn(Visibility visibility)
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
             serviceAssembly.visibility = visibility;
         }
@@ -55,33 +55,34 @@ public final class ServiceDeclarationImpl
     }
 
     @Override
-    public ServiceDeclaration identifiedBy( String identity )
+    public ServiceDeclaration identifiedBy(String identity)
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
-            if( identity != null ) {
-                serviceAssembly.identity = StringIdentity.identityOf( identity );
+            if(identity != null)
+            {
+                serviceAssembly.identity = StringIdentity.identityOf(identity);
             }
         }
         return this;
     }
 
     @Override
-    public ServiceDeclaration taggedWith( String... tags )
+    public ServiceDeclaration taggedWith(String... tags)
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
-            ServiceTags previousTags = serviceAssembly.metaInfo.get( ServiceTags.class );
-            if( previousTags != null )
+            ServiceTags previousTags = serviceAssembly.metaInfo.get(ServiceTags.class);
+            if(previousTags != null)
             {
                 List<String> tagList = new ArrayList<>();
-                tagList.addAll( asList( previousTags.tags() ) );
-                tagList.addAll( asList( tags ) );
-                serviceAssembly.metaInfo.set( new ServiceTags( tagList.toArray( new String[ tagList.size() ] ) ) );
+                tagList.addAll(asList(previousTags.tags()));
+                tagList.addAll(asList(tags));
+                serviceAssembly.metaInfo.set(new ServiceTags(tagList.toArray(new String[tagList.size()])));
             }
             else
             {
-                serviceAssembly.metaInfo.set( new ServiceTags( tags ) );
+                serviceAssembly.metaInfo.set(new ServiceTags(tags));
             }
         }
 
@@ -91,7 +92,7 @@ public final class ServiceDeclarationImpl
     @Override
     public ServiceDeclaration instantiateOnStartup()
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
             serviceAssembly.instantiateOnStartup = true;
         }
@@ -99,61 +100,62 @@ public final class ServiceDeclarationImpl
     }
 
     @Override
-    public ServiceDeclaration setMetaInfo( Object serviceAttribute )
+    public ServiceDeclaration setMetaInfo(Object serviceAttribute)
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
-            serviceAssembly.metaInfo.set( serviceAttribute );
+            serviceAssembly.metaInfo.set(serviceAttribute);
         }
         return this;
     }
 
     @Override
-    public ServiceDeclaration withConcerns( Class<?>... concerns )
+    public ServiceDeclaration withConcerns(Class<?>... concerns)
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
-            serviceAssembly.concerns.addAll( asList( concerns ) );
+            serviceAssembly.concerns.addAll(asList(concerns));
         }
         return this;
     }
 
     @Override
-    public ServiceDeclaration withSideEffects( Class<?>... sideEffects )
+    public ServiceDeclaration withSideEffects(Class<?>... sideEffects)
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
-            serviceAssembly.sideEffects.addAll( asList( sideEffects ) );
+            serviceAssembly.sideEffects.addAll(asList(sideEffects));
         }
         return this;
     }
 
     @Override
-    public ServiceDeclaration withMixins( Class<?>... mixins )
+    public ServiceDeclaration withMixins(Class<?>... mixins)
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
-            serviceAssembly.mixins.addAll( asList( mixins ) );
+            serviceAssembly.mixins.addAll(asList(mixins));
         }
         return this;
     }
 
     @Override
-    public ServiceDeclaration withTypes( Class<?>... types )
+    public ServiceDeclaration withTypes(Class<?>... types)
     {
-        for( ServiceAssemblyImpl serviceAssembly : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
         {
-            serviceAssembly.types.addAll( asList( types ) );
+            serviceAssembly.types.addAll(asList(types));
         }
         return this;
     }
 
     @Override
     @SafeVarargs
-    public final ServiceDeclaration withActivators( Class<? extends Activator<?>>... activators )
+    public final ServiceDeclaration withActivators(Class<? extends Activator<?>>... activators)
     {
-        for ( ServiceAssemblyImpl serviceAssembly : serviceAssemblies ) {
-            serviceAssembly.activators.addAll( asList( activators ) );
+        for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
+        {
+            serviceAssembly.activators.addAll(asList(activators));
         }
         return this;
     }

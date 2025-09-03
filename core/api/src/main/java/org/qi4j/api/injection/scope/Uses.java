@@ -19,14 +19,10 @@
  */
 package org.qi4j.api.injection.scope;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import org.qi4j.api.injection.InjectionScope;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.injection.InjectionScope;
+
+import java.lang.annotation.*;
 
 /**
  * Annotation to denote the injection of a dependency to be used by a Mixin. The injected
@@ -34,12 +30,12 @@ import org.qi4j.api.injection.InjectionScope;
  * found, then a new Transient or Object is instantiated.
  * Call {@link TransientBuilder#use} to provide the instance
  * to be injected.
- *
+ * <p>
  * Example:
  * <pre>@Uses SomeType someInstance</pre>
  */
-@Retention( RetentionPolicy.RUNTIME )
-@Target( { ElementType.PARAMETER, ElementType.FIELD } )
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.PARAMETER, ElementType.FIELD})
 @Documented
 @InjectionScope
 public @interface Uses

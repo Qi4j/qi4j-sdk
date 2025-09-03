@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.service;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.configuration.ConfigurationComposite;
@@ -34,7 +35,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -43,18 +43,18 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test of configuration for services
  */
 public class ConfigurationTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
     @Service
     ServiceReference<HelloWorldService> service;
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.objects( this.getClass() );
-        module.entities( HelloWorldConfiguration.class );
-        module.services( HelloWorldService.class ).identifiedBy( "HelloWorldService" );
-        new EntityTestAssembler().assemble( module );
+        module.objects(this.getClass());
+        module.entities(HelloWorldConfiguration.class);
+        module.services(HelloWorldService.class).identifiedBy("HelloWorldService");
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
@@ -62,21 +62,21 @@ public class ConfigurationTest
         throws Exception
     {
         UnitOfWork unit = unitOfWorkFactory.newUnitOfWork();
-        EntityBuilder<HelloWorldConfiguration> entityBuilder = unit.newEntityBuilder( HelloWorldConfiguration.class, service.identity() );
+        EntityBuilder<HelloWorldConfiguration> entityBuilder = unit.newEntityBuilder(HelloWorldConfiguration.class, service.identity());
         HelloWorldConfiguration config = entityBuilder.instance();
-        config.phrase().set( "Hey" );
-        config.name().set( "Universe" );
+        config.phrase().set("Hey");
+        config.name().set("Universe");
         entityBuilder.newInstance();
         unit.complete();
 
-        assertThat( "result is correct", service.get().sayHello(), equalTo( "Hey Universe" ) );
+        assertThat("result is correct", service.get().sayHello(), equalTo("Hey Universe"));
     }
 
     @Test
     public void whenUnconfiguredThenSayHelloGivesDefaults()
         throws Exception
     {
-        assertThat( "result is correct", service.get().sayHello(), equalTo( "Hello World" ) );
+        assertThat("result is correct", service.get().sayHello(), equalTo("Hello World"));
     }
 
     @Test
@@ -87,29 +87,29 @@ public class ConfigurationTest
 
         {
             UnitOfWork unit = unitOfWorkFactory.newUnitOfWork();
-            EntityBuilder<HelloWorldConfiguration> entityBuilder = unit.newEntityBuilder( HelloWorldConfiguration.class, service.identity() );
+            EntityBuilder<HelloWorldConfiguration> entityBuilder = unit.newEntityBuilder(HelloWorldConfiguration.class, service.identity());
             config = entityBuilder.instance();
-            config.phrase().set( "Hello" );
-            config.name().set( "World" );
+            config.phrase().set("Hello");
+            config.name().set("World");
             config = entityBuilder.newInstance();
             unit.complete();
         }
 
-        assertThat( "result is correct", service.get().sayHello(), equalTo( "Hello World" ) );
+        assertThat("result is correct", service.get().sayHello(), equalTo("Hello World"));
 
         {
             UnitOfWork unit = unitOfWorkFactory.newUnitOfWork();
-            config = unit.get( config );
-            config.phrase().set( "Hey" );
-            config.name().set( "Universe" );
+            config = unit.get(config);
+            config.phrase().set("Hey");
+            config.name().set("Universe");
             unit.complete();
         }
 
-        assertThat( "new configuration is not used", service.get().sayHello(), equalTo( "Hello World" ) );
+        assertThat("new configuration is not used", service.get().sayHello(), equalTo("Hello World"));
 
         service.get().refresh();
 
-        assertThat( "new configuration is used", service.get().sayHello(), equalTo( "Hey Universe" ) );
+        assertThat("new configuration is used", service.get().sayHello(), equalTo("Hey Universe"));
     }
 
     public interface HelloWorld
@@ -117,7 +117,7 @@ public class ConfigurationTest
         String sayHello();
     }
 
-    @Mixins( HelloWorldMixin.class )
+    @Mixins(HelloWorldMixin.class)
     public interface HelloWorldService
         extends HelloWorld, ServiceComposite, Configuration
     {

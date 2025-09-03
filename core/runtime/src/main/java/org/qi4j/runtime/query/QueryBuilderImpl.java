@@ -19,7 +19,6 @@
  */
 package org.qi4j.runtime.query;
 
-import java.util.function.Predicate;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.query.Query;
 import org.qi4j.api.query.QueryBuilder;
@@ -27,6 +26,8 @@ import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.spi.query.EntityFinder;
 import org.qi4j.spi.query.QueryBuilderSPI;
 import org.qi4j.spi.query.QuerySource;
+
+import java.util.function.Predicate;
 
 /**
  * Default implementation of {@link QueryBuilder}
@@ -56,9 +57,9 @@ final class QueryBuilderImpl<T>
      * @param resultType   type of queried entities; cannot be null
      * @param whereClause  current where-clause
      */
-    QueryBuilderImpl( final EntityFinder entityFinder,
-                      final Class<T> resultType,
-                      final Predicate<Composite> whereClause
+    QueryBuilderImpl(final EntityFinder entityFinder,
+                     final Class<T> resultType,
+                     final Predicate<Composite> whereClause
     )
     {
         this.entityFinder = entityFinder;
@@ -67,30 +68,30 @@ final class QueryBuilderImpl<T>
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public QueryBuilder<T> where( Predicate<Composite> specification )
+    @SuppressWarnings("unchecked")
+    public QueryBuilder<T> where(Predicate<Composite> specification)
     {
-        if( specification == null )
+        if(specification == null)
         {
-            throw new IllegalArgumentException( "Where clause cannot be null" );
+            throw new IllegalArgumentException("Where clause cannot be null");
         }
-        if( this.whereClause != null )
+        if(this.whereClause != null)
         {
-            specification = QueryExpressions.and( this.whereClause, specification );
+            specification = QueryExpressions.and(this.whereClause, specification);
         }
-        return new QueryBuilderImpl<>( entityFinder, resultType, specification );
+        return new QueryBuilderImpl<>(entityFinder, resultType, specification);
     }
 
     @Override
-    public Query<T> newQuery( Iterable<T> iterable )
+    public Query<T> newQuery(Iterable<T> iterable)
     {
-        return new QueryImpl<>( resultType, whereClause, new IterableQuerySource( iterable ) );
+        return new QueryImpl<>(resultType, whereClause, new IterableQuerySource(iterable));
     }
 
     // SPI
     @Override
-    public Query<T> newQuery( QuerySource querySource )
+    public Query<T> newQuery(QuerySource querySource)
     {
-        return new QueryImpl<>( resultType, whereClause, querySource );
+        return new QueryImpl<>(resultType, whereClause, querySource);
     }
 }

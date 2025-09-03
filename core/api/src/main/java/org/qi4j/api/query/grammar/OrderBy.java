@@ -46,16 +46,15 @@ public class OrderBy
      *
      * @param propertyReference property that determines the order; cannot be null
      * @param order             direction
-     *
      * @throws IllegalArgumentException - If property is null
      */
-    public OrderBy( final PropertyFunction<?> propertyReference,
-                    final Order order
+    public OrderBy(final PropertyFunction<?> propertyReference,
+                   final Order order
     )
     {
-        if( propertyReference == null )
+        if(propertyReference == null)
         {
-            throw new IllegalArgumentException( "Ordering property cannot be null" );
+            throw new IllegalArgumentException("Ordering property cannot be null");
         }
         this.propertyReference = propertyReference;
         this.order = order;
@@ -84,6 +83,6 @@ public class OrderBy
     @Override
     public String toString()
     {
-        return String.valueOf( propertyReference ) + " " + order;
+        return String.valueOf(propertyReference) + " " + order;
     }
 }

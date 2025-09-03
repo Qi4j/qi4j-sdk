@@ -19,9 +19,9 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.composite.Composite;
+
 import java.util.function.Predicate;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.Composite;
 
 /**
  * Base expression Specification.

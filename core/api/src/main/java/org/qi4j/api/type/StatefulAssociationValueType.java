@@ -19,40 +19,33 @@
  */
 package org.qi4j.api.type;
 
+import org.qi4j.api.association.AssociationDescriptor;
+import org.qi4j.api.composite.CompositeDescriptor;
+import org.qi4j.api.composite.StatefulAssociationCompositeDescriptor;
+import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.property.PropertyDescriptor;
+import org.qi4j.api.structure.ModuleDescriptor;
+import org.qi4j.api.util.Classes;
+import org.qi4j.api.value.ValueComposite;
+
 import java.lang.reflect.Type;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.qi4j.api.association.AssociationDescriptor;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.composite.StatefulAssociationCompositeDescriptor;
-import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.property.PropertyDescriptor;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.value.ValueComposite;
-import org.qi4j.api.association.AssociationDescriptor;
-import org.qi4j.api.composite.CompositeDescriptor;
-import org.qi4j.api.composite.StatefulAssociationCompositeDescriptor;
-import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.property.PropertyDescriptor;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.value.ValueComposite;
 
 public abstract class StatefulAssociationValueType<M extends StatefulAssociationCompositeDescriptor & CompositeDescriptor>
     extends ValueType
 {
-    public static boolean isStatefulAssociationValue( Type type )
+    public static boolean isStatefulAssociationValue(Type type)
     {
-        Class<?> rawClass = Classes.RAW_CLASS.apply( type );
-        return ValueComposite.class.isAssignableFrom( rawClass ) || EntityComposite.class.isAssignableFrom( rawClass );
+        Class<?> rawClass = Classes.RAW_CLASS.apply(type);
+        return ValueComposite.class.isAssignableFrom(rawClass) || EntityComposite.class.isAssignableFrom(rawClass);
     }
 
     protected final M model;
 
-    protected StatefulAssociationValueType( M model )
+    protected StatefulAssociationValueType(M model)
     {
-        super( model.types().collect( Collectors.toList() ) );
+        super(model.types().collect(Collectors.toList()));
         this.model = model;
     }
 

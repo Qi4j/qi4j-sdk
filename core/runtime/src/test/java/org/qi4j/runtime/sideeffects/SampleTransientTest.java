@@ -20,6 +20,7 @@
 
 package org.qi4j.runtime.sideeffects;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.composite.TransientBuilderFactory;
 import org.qi4j.api.injection.scope.Structure;
@@ -30,7 +31,6 @@ import org.qi4j.api.sideeffect.SideEffects;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,22 +42,22 @@ public class SampleTransientTest extends AbstractQi4jTest
     TransientBuilderFactory transientBuilderFactory;
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( SampleTransient.class );
+        module.transients(SampleTransient.class);
     }
 
     @Test
     public void givenTransientWithSideEffectsWhenInvokingMethodShouldExecuteSideEffectOnlyOnce()
     {
-        SampleTransient sample = transientBuilderFactory.newTransient( SampleTransient.class );
+        SampleTransient sample = transientBuilderFactory.newTransient(SampleTransient.class);
         sample.execute();
-        assertThat( sample.count().get(), equalTo(1));
+        assertThat(sample.count().get(), equalTo(1));
     }
 
-    @SideEffects( SampleSideEffect.class )
-    @Mixins( SampleTransientMixin.class )
+    @SideEffects(SampleSideEffect.class)
+    @Mixins(SampleTransientMixin.class)
     public static interface SampleTransient
     {
         void execute();
@@ -72,7 +72,7 @@ public class SampleTransientTest extends AbstractQi4jTest
         @Override
         public void execute()
         {
-            System.out.println( "Invocation of Transient" );
+            System.out.println("Invocation of Transient");
         }
     }
 
@@ -82,8 +82,8 @@ public class SampleTransientTest extends AbstractQi4jTest
         @Override
         public void execute()
         {
-            System.out.println( "Invocation of SideEffect" );
-            count().set( count().get() + 1 );
+            System.out.println("Invocation of SideEffect");
+            count().set(count().get() + 1);
         }
     }
 }

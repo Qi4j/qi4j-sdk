@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class TransientsModel extends CompositesModel<TransientModel>
 {
-    public TransientsModel( List<TransientModel> transientModels )
+    public TransientsModel(List<TransientModel> transientModels)
     {
         super(transientModels);
     }

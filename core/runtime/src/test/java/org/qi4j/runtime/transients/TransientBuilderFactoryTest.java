@@ -20,7 +20,8 @@
 
 package org.qi4j.runtime.transients;
 
-import java.lang.reflect.Method;
+import org.hamcrest.core.IsEqual;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.composite.NoSuchTransientTypeException;
@@ -36,12 +37,8 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
 import org.qi4j.library.constraints.annotation.MaxLength;
-import org.hamcrest.core.IsEqual;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.qi4j.library.constraints.annotation.MaxLength;
+
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -61,16 +58,16 @@ public class TransientBuilderFactoryTest
     public void newBuilderForUnregisteredComposite()
         throws Exception
     {
-        assertThrows( NoSuchTransientTypeException.class, () -> {
+        assertThrows(NoSuchTransientTypeException.class, () -> {
             SingletonAssembler assembler = new SingletonAssembler()
             {
-                public void assemble( ModuleAssembly module )
+                public void assemble(ModuleAssembly module)
                     throws AssemblyException
                 {
                 }
             };
-            assembler.module().newTransientBuilder( AnyComposite.class );
-        } );
+            assembler.module().newTransientBuilder(AnyComposite.class);
+        });
     }
 
     /**
@@ -82,16 +79,16 @@ public class TransientBuilderFactoryTest
     public void newBuilderForNullType()
         throws Exception
     {
-        assertThrows( NullPointerException.class, () -> {
+        assertThrows(NullPointerException.class, () -> {
             SingletonAssembler assembler = new SingletonAssembler()
             {
-                public void assemble( ModuleAssembly module )
+                public void assemble(ModuleAssembly module)
                     throws AssemblyException
                 {
                 }
             };
-            assembler.module().newTransientBuilder( null );
-        } );
+            assembler.module().newTransientBuilder(null);
+        });
     }
 
     /**
@@ -103,16 +100,16 @@ public class TransientBuilderFactoryTest
     public void newInstanceForNullType()
         throws Exception
     {
-        assertThrows( NullPointerException.class, () -> {
+        assertThrows(NullPointerException.class, () -> {
             SingletonAssembler assembler = new SingletonAssembler()
             {
-                public void assemble( ModuleAssembly module )
+                public void assemble(ModuleAssembly module)
                     throws AssemblyException
                 {
                 }
             };
-            assembler.module().newTransient( null );
-        } );
+            assembler.module().newTransient(null);
+        });
     }
 
     /**
@@ -124,13 +121,13 @@ public class TransientBuilderFactoryTest
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.transients( AnyComposite.class );
+                module.transients(AnyComposite.class);
             }
         };
-        assembler.module().newTransientBuilder( AnyComposite.class );
+        assembler.module().newTransientBuilder(AnyComposite.class);
     }
 
     /**
@@ -142,36 +139,36 @@ public class TransientBuilderFactoryTest
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.transients( AnyComposite.class );
+                module.transients(AnyComposite.class);
             }
         };
-        assembler.module().newTransientBuilder( AnyComposite.class );
+        assembler.module().newTransientBuilder(AnyComposite.class);
     }
 
     @Test
     public void testClassAsTransient()
         throws ActivationException, AssemblyException
     {
-        assertThrows( ConstraintViolationException.class, () -> {
+        assertThrows(ConstraintViolationException.class, () -> {
             SingletonAssembler assembler = new SingletonAssembler()
             {
                 @Override
-                public void assemble( ModuleAssembly module )
+                public void assemble(ModuleAssembly module)
                     throws AssemblyException
                 {
-                    module.transients( AnyTransient.class );
+                    module.transients(AnyTransient.class);
                 }
             };
 
-            AnyTransient anyTransient = assembler.module().newTransient( AnyTransient.class );
-            assertThat( anyTransient.hello( "me" ), new IsEqual<>( "Hello ME from Module 1" ) );
+            AnyTransient anyTransient = assembler.module().newTransient(AnyTransient.class);
+            assertThat(anyTransient.hello("me"), new IsEqual<>("Hello ME from Module 1"));
 
-            assertThat( anyTransient.hello( "World" ), new IsEqual<>( "Hello WORLD from ME" ) );
-            anyTransient.hello( "Universe" );
-        } );
+            assertThat(anyTransient.hello("World"), new IsEqual<>("Hello WORLD from ME"));
+            anyTransient.hello("Universe");
+        });
     }
 
     public interface AnyComposite
@@ -183,34 +180,34 @@ public class TransientBuilderFactoryTest
         extends GenericConcern
     {
         @Override
-        public Object invoke( Object proxy, Method method, Object[] args )
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
-            if( args != null )
+            if(args != null)
             {
-                args[ 0 ] = ( (String) args[ 0 ] ).toUpperCase();
-                return next.invoke( proxy, method, args );
+                args[0] = ((String) args[0]).toUpperCase();
+                return next.invoke(proxy, method, args);
             }
             else
             {
-                return next.invoke( proxy, method, args );
+                return next.invoke(proxy, method, args);
             }
         }
     }
 
-    @Concerns( CapitalizeConcern.class )
+    @Concerns(CapitalizeConcern.class)
     public static class AnyTransient
         implements TransientComposite
     {
         @Structure
         Module module;
 
-        public String hello( @MaxLength( 5 ) String name )
+        public String hello(@MaxLength(5) String name)
         {
             try
             {
                 String from = data.foo().get();
-                if( from.length() == 0 )
+                if(from.length() == 0)
                 {
                     from = module.name();
                 }
@@ -218,7 +215,7 @@ public class TransientBuilderFactoryTest
             }
             finally
             {
-                data.foo().set( name );
+                data.foo().set(name);
             }
         }
 

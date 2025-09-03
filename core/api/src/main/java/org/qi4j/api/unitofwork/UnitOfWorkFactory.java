@@ -19,10 +19,11 @@
  */
 package org.qi4j.api.unitofwork;
 
-import java.time.Instant;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.time.SystemTime;
 import org.qi4j.api.usecase.Usecase;
+
+import java.time.Instant;
 
 /**
  * Factory for UnitOfWork.
@@ -37,6 +38,7 @@ public interface UnitOfWorkFactory
      * <p>
      * Current time will be set to {@link SystemTime#now()}
      * </p>
+     *
      * @return a new UnitOfWork
      */
     UnitOfWork newUnitOfWork();
@@ -48,32 +50,29 @@ public interface UnitOfWorkFactory
      * </p>
      *
      * @param currentTime the current time for this UnitOfWork
-     *
      * @return a new UnitOfWork
      */
-    UnitOfWork newUnitOfWork( Instant currentTime );
+    UnitOfWork newUnitOfWork(Instant currentTime);
 
     /**
      * Create a new UnitOfWork for the given Usecase and associate it with the current thread.
      * <p>
      * Current time will be set to {@link SystemTime#now()}
      * </p>
-     * @param usecase the Usecase for this UnitOfWork
      *
+     * @param usecase the Usecase for this UnitOfWork
      * @return a new UnitOfWork
      */
-    UnitOfWork newUnitOfWork( Usecase usecase );
+    UnitOfWork newUnitOfWork(Usecase usecase);
 
     /**
      * Create a new UnitOfWork for the given Usecase and associate it with the current thread.
      *
-     * @param usecase the Usecase for this UnitOfWork
+     * @param usecase     the Usecase for this UnitOfWork
      * @param currentTime the current time for this UnitOfWork
-     *
-     *
      * @return a new UnitOfWork
      */
-    UnitOfWork newUnitOfWork( Usecase usecase, Instant currentTime );
+    UnitOfWork newUnitOfWork(Usecase usecase, Instant currentTime);
 
     /**
      * @return true if there is an active UnitOfWork associated with the executing thread
@@ -84,7 +83,6 @@ public interface UnitOfWorkFactory
      * Returns the UnitOfWork that is currently associated with the executing thread.
      *
      * @return The current UnitOfWork associated with the executing thread
-     *
      * @throws IllegalStateException if no current UnitOfWork is active
      */
     UnitOfWork currentUnitOfWork()
@@ -94,9 +92,8 @@ public interface UnitOfWorkFactory
      * Returns the UnitOfWork that the EntityComposite is bound to.
      *
      * @param entity the entity to be checked.
-     *
      * @return The UnitOfWork instance that the Entity is bound to, or null if the entity is not associated with
-     *         any UnitOfWork.
+     * any UnitOfWork.
      */
-    UnitOfWork getUnitOfWork( EntityComposite entity );
+    UnitOfWork getUnitOfWork(EntityComposite entity);
 }

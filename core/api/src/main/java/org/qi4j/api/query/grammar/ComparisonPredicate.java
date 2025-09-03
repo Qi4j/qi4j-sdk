@@ -21,8 +21,6 @@ package org.qi4j.api.query.grammar;
 
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.property.Property;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.property.Property;
 
 /**
  * Base comparison Specification.
@@ -33,7 +31,7 @@ public abstract class ComparisonPredicate<T>
     protected final PropertyFunction<T> property;
     protected final T value;
 
-    public ComparisonPredicate( PropertyFunction<T> property, T value )
+    public ComparisonPredicate(PropertyFunction<T> property, T value)
     {
         this.property = property;
         this.value = value;
@@ -45,32 +43,32 @@ public abstract class ComparisonPredicate<T>
     }
 
     @Override
-    public final boolean test( Composite item )
+    public final boolean test(Composite item)
     {
         try
         {
-            Property<T> prop = property.apply( item );
+            Property<T> prop = property.apply(item);
 
-            if( prop == null )
+            if(prop == null)
             {
                 return false;
             }
 
             T propValue = prop.get();
-            if( propValue == null )
+            if(propValue == null)
             {
                 return false;
             }
 
-            return compare( propValue );
+            return compare(propValue);
         }
-        catch( IllegalArgumentException e )
+        catch(IllegalArgumentException e)
         {
             return false;
         }
     }
 
-    protected abstract boolean compare( T value );
+    protected abstract boolean compare(T value);
 
     public T value()
     {

@@ -40,7 +40,7 @@ public abstract class ConcernOf<T>
      * the next concern in the chain or the mixin
      * to be invoked.
      */
-    @SuppressWarnings( "ConstantConditions" )
+    @SuppressWarnings("ConstantConditions")
     @ConcernFor
     protected final T next = null;
 }

@@ -20,6 +20,7 @@
 
 package org.qi4j.spi.service.importer;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.injection.scope.Service;
@@ -27,15 +28,10 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.api.service.qualifier.ServiceQualifier;
 import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ImportedServiceDeclaration;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
 
-import static org.qi4j.bootstrap.ImportedServiceDeclaration.SERVICE_SELECTOR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -50,18 +46,18 @@ public class ServiceSelectorImporterTest
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.objects( ServiceConsumer.class );
-                module.services( TestServiceComposite1.class,
-                                 TestServiceComposite2.class );
+                module.objects(ServiceConsumer.class);
+                module.services(TestServiceComposite1.class,
+                    TestServiceComposite2.class);
             }
         };
 
-        TestService service = assembler.module().newObject( ServiceConsumer.class ).getService();
+        TestService service = assembler.module().newObject(ServiceConsumer.class).getService();
 
-        assertThat( "service is first one", service.test(), equalTo( "mixin1" ) );
+        assertThat("service is first one", service.test(), equalTo("mixin1"));
     }
 
     @Test
@@ -70,24 +66,24 @@ public class ServiceSelectorImporterTest
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.objects( ServiceConsumer.class );
+                module.objects(ServiceConsumer.class);
 
-                module.importedServices( TestService.class )
-                    .importedBy( ImportedServiceDeclaration.SERVICE_SELECTOR )
-                    .setMetaInfo( ServiceQualifier.withId( TestServiceComposite2.class.getSimpleName() ) );
+                module.importedServices(TestService.class)
+                    .importedBy(ImportedServiceDeclaration.SERVICE_SELECTOR)
+                    .setMetaInfo(ServiceQualifier.withId(TestServiceComposite2.class.getSimpleName()));
 
-                ModuleAssembly module2 = module.layer().module( "Other module" );
-                module2.services( TestServiceComposite2.class, TestServiceComposite2.class )
-                    .visibleIn( Visibility.layer );
+                ModuleAssembly module2 = module.layer().module("Other module");
+                module2.services(TestServiceComposite2.class, TestServiceComposite2.class)
+                    .visibleIn(Visibility.layer);
             }
         };
 
-        TestService service = assembler.module().newObject( ServiceConsumer.class ).getService();
+        TestService service = assembler.module().newObject(ServiceConsumer.class).getService();
 
-        assertThat( "service is specified one", service.test(), equalTo( "mixin2" ) );
+        assertThat("service is specified one", service.test(), equalTo("mixin2"));
     }
 
     @Test
@@ -96,24 +92,24 @@ public class ServiceSelectorImporterTest
     {
         SingletonAssembler assembler = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.objects( ServiceConsumer.class );
+                module.objects(ServiceConsumer.class);
 
-                module.importedServices( TestService.class )
-                    .importedBy( ImportedServiceDeclaration.SERVICE_SELECTOR )
-                    .setMetaInfo( ServiceQualifier.withId( "TestServiceComposite2_1" ) );
+                module.importedServices(TestService.class)
+                    .importedBy(ImportedServiceDeclaration.SERVICE_SELECTOR)
+                    .setMetaInfo(ServiceQualifier.withId("TestServiceComposite2_1"));
 
-                ModuleAssembly module2 = module.layer().module( "Other module" );
-                module2.addServices( TestServiceComposite2.class, TestServiceComposite2.class )
-                    .visibleIn( Visibility.layer );
+                ModuleAssembly module2 = module.layer().module("Other module");
+                module2.addServices(TestServiceComposite2.class, TestServiceComposite2.class)
+                    .visibleIn(Visibility.layer);
             }
         };
 
-        TestService service = assembler.module().newObject( ServiceConsumer.class ).getService();
+        TestService service = assembler.module().newObject(ServiceConsumer.class).getService();
 
-        assertThat( "service is specified one", service.test(), equalTo( "mixin2" ) );
+        assertThat("service is specified one", service.test(), equalTo("mixin2"));
     }
 
     public static class ServiceConsumer
@@ -128,13 +124,13 @@ public class ServiceSelectorImporterTest
         }
     }
 
-    @Mixins( TestMixin1.class )
+    @Mixins(TestMixin1.class)
     public interface TestServiceComposite1
         extends TestServiceComposite
     {
     }
 
-    @Mixins( TestMixin2.class )
+    @Mixins(TestMixin2.class)
     public interface TestServiceComposite2
         extends TestServiceComposite
     {

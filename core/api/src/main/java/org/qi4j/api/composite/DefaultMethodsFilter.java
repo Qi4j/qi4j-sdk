@@ -19,8 +19,9 @@
  */
 package org.qi4j.api.composite;
 
-import java.lang.reflect.Method;
 import org.qi4j.api.common.AppliesToFilter;
+
+import java.lang.reflect.Method;
 
 /**
  * Filter Default Interface Methods to apply a generic fragment.
@@ -29,7 +30,7 @@ public class DefaultMethodsFilter
     implements AppliesToFilter
 {
     @Override
-    public boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> modifierClass )
+    public boolean appliesTo(Method method, Class<?> mixin, Class<?> compositeType, Class<?> modifierClass)
     {
         return method.isDefault();
     }

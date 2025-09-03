@@ -20,8 +20,6 @@
 
 package org.qi4j.spi;
 
-import java.util.Map;
-import java.util.stream.Stream;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.AssociationStateHolder;
@@ -34,20 +32,23 @@ import org.qi4j.api.property.StateHolder;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.spi.entity.EntityState;
 
+import java.util.Map;
+import java.util.stream.Stream;
+
 /**
  * Encapsulation of the Qi4j SPI. This is implemented by the runtime.
  */
 public interface Qi4jSPI
     extends Qi4jAPI
 {
-    StateHolder stateOf( TransientComposite composite );
+    StateHolder stateOf(TransientComposite composite);
 
-    AssociationStateHolder stateOf( EntityComposite composite );
+    AssociationStateHolder stateOf(EntityComposite composite);
 
-    AssociationStateHolder stateOf( ValueComposite composite );
+    AssociationStateHolder stateOf(ValueComposite composite);
 
     // Entities
-    EntityState entityStateOf(EntityComposite composite );
+    EntityState entityStateOf(EntityComposite composite);
 
     /**
      * Fetches the EntityReference without loading the referenced entity.
@@ -55,7 +56,7 @@ public interface Qi4jSPI
      * @param assoc The Association for which we want to obtain the EntityReference
      * @return The EntityReference of the given Association.
      */
-    EntityReference entityReferenceOf( Association<?> assoc );
+    EntityReference entityReferenceOf(Association<?> assoc);
 
     /**
      * Fetches the EntityReferences without loading the referenced entities.
@@ -63,7 +64,7 @@ public interface Qi4jSPI
      * @param assoc The ManyAssociation for which we want to obtain the EntityReferences.
      * @return A stream of all the EntityReferences of the given ManyAssociation.
      */
-    Stream<EntityReference> entityReferencesOf( ManyAssociation<?> assoc );
+    Stream<EntityReference> entityReferencesOf(ManyAssociation<?> assoc);
 
     /**
      * Fetches the EntityReferences without loading the referenced entities.
@@ -71,5 +72,5 @@ public interface Qi4jSPI
      * @param assoc The NamedAssociation for which we want to obtain the EntityReference
      * @return A stream of Map.Entry with the names and EntityReferences of the given NamedAssociation.
      */
-    Stream<Map.Entry<String, EntityReference>> entityReferencesOf( NamedAssociation<?> assoc );
+    Stream<Map.Entry<String, EntityReference>> entityReferencesOf(NamedAssociation<?> assoc);
 }

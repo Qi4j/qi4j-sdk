@@ -19,8 +19,9 @@
  */
 package org.qi4j.api.type;
 
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -30,30 +31,30 @@ public class HasTypesPredicatesTest
     @Test
     public void hasEqualTypePredicate()
     {
-        assertThat( new HasEqualType<>( Integer.class ).test( ValueType.of( Integer.class ) ), is( true ) );
-        assertThat( new HasEqualType<>( Integer.class ).test( ValueType.of( String.class, Integer.class ) ), is( true ) );
-        assertThat( new HasEqualType<>( Number.class ).test( ValueType.of( String.class, Integer.class ) ), is( false ) );
-        assertThat( new HasEqualType<>( String.class ).test( ValueType.of( LocalDate.class, Integer.class ) ), is( false ) );
+        assertThat(new HasEqualType<>(Integer.class).test(ValueType.of(Integer.class)), is(true));
+        assertThat(new HasEqualType<>(Integer.class).test(ValueType.of(String.class, Integer.class)), is(true));
+        assertThat(new HasEqualType<>(Number.class).test(ValueType.of(String.class, Integer.class)), is(false));
+        assertThat(new HasEqualType<>(String.class).test(ValueType.of(LocalDate.class, Integer.class)), is(false));
 
-        assertThat( new HasEqualType<>( ValueType.of( Integer.class ) ).test( ValueType.of( Integer.class ) ), is( true ) );
-        assertThat( new HasEqualType<>( ValueType.of( Integer.class ) ).test( ValueType.of( String.class, Integer.class ) ), is( true ) );
-        assertThat( new HasEqualType<>( ValueType.of( Number.class ) ).test( ValueType.of( String.class, Integer.class ) ), is( false ) );
-        assertThat( new HasEqualType<>( ValueType.of( String.class ) ).test( ValueType.of( LocalDate.class, Integer.class ) ), is( false ) );
+        assertThat(new HasEqualType<>(ValueType.of(Integer.class)).test(ValueType.of(Integer.class)), is(true));
+        assertThat(new HasEqualType<>(ValueType.of(Integer.class)).test(ValueType.of(String.class, Integer.class)), is(true));
+        assertThat(new HasEqualType<>(ValueType.of(Number.class)).test(ValueType.of(String.class, Integer.class)), is(false));
+        assertThat(new HasEqualType<>(ValueType.of(String.class)).test(ValueType.of(LocalDate.class, Integer.class)), is(false));
     }
 
     @Test
     public void hasAssignableTypePredicate()
     {
-        assertThat( new HasAssignableFromType<>( Number.class ).test( ValueType.of( String.class, Integer.class ) ), is( true ) );
-        assertThat( new HasAssignableFromType<>( Integer.class ).test( ValueType.of( Integer.class ) ), is( false ) );
-        assertThat( new HasAssignableFromType<>( String.class ).test( ValueType.of( LocalDate.class, Integer.class ) ), is( false ) );
+        assertThat(new HasAssignableFromType<>(Number.class).test(ValueType.of(String.class, Integer.class)), is(true));
+        assertThat(new HasAssignableFromType<>(Integer.class).test(ValueType.of(Integer.class)), is(false));
+        assertThat(new HasAssignableFromType<>(String.class).test(ValueType.of(LocalDate.class, Integer.class)), is(false));
     }
 
     @Test
     public void hasEqualOrAssignablePredicate()
     {
-        assertThat( new HasEqualOrAssignableFromType<>( Number.class ).test( ValueType.of( String.class, Integer.class ) ), is( true ) );
-        assertThat( new HasEqualOrAssignableFromType<>( Integer.class ).test( ValueType.of( Integer.class ) ), is( true ) );
-        assertThat( new HasEqualOrAssignableFromType<>( String.class ).test( ValueType.of( LocalDate.class, Integer.class ) ), is( false ) );
+        assertThat(new HasEqualOrAssignableFromType<>(Number.class).test(ValueType.of(String.class, Integer.class)), is(true));
+        assertThat(new HasEqualOrAssignableFromType<>(Integer.class).test(ValueType.of(Integer.class)), is(true));
+        assertThat(new HasEqualOrAssignableFromType<>(String.class).test(ValueType.of(LocalDate.class, Integer.class)), is(false));
     }
 }

@@ -25,13 +25,13 @@ package org.qi4j.bootstrap;
 public class InvalidInjectionException
     extends Exception
 {
-    public InvalidInjectionException( String s )
+    public InvalidInjectionException(String s)
     {
-        super( s );
+        super(s);
     }
 
-    public InvalidInjectionException( String s, Throwable throwable )
+    public InvalidInjectionException(String s, Throwable throwable)
     {
-        super( s, throwable );
+        super(s, throwable);
     }
 }

@@ -32,13 +32,13 @@ import java.util.stream.Stream;
 public final class Fields
 {
     public static final Function<Type, Stream<Field>> FIELDS_OF =
-        Classes.forClassHierarchy( type -> Arrays.stream( type.getDeclaredFields() ) );
+        Classes.forClassHierarchy(type -> Arrays.stream(type.getDeclaredFields()));
 
-    public static final BiFunction<Class<?>, String, Field> FIELD_NAMED = ( clazz, name ) ->
-        FIELDS_OF.apply( clazz ).filter( Classes.memberNamed( name ) ).findFirst().orElse( null );
+    public static final BiFunction<Class<?>, String, Field> FIELD_NAMED = (clazz, name) ->
+        FIELDS_OF.apply(clazz).filter(Classes.memberNamed(name)).findFirst().orElse(null);
 
-    public static Stream<Field> fieldsOf( Type type )
+    public static Stream<Field> fieldsOf(Type type)
     {
-        return Stream.of( type ).flatMap( FIELDS_OF );
+        return Stream.of(type).flatMap(FIELDS_OF);
     }
 }

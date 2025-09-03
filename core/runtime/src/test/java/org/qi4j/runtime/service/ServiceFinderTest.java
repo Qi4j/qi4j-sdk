@@ -20,12 +20,12 @@
 
 package org.qi4j.runtime.service;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,34 +35,34 @@ public class ServiceFinderTest extends AbstractQi4jTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( CompileTimeService.class );
-        module.services( RuntimeService.class )
-            .withTypes( MyRuntimeService.class )
-            .withMixins( MyRuntimeServiceMixin.class );
+        module.services(CompileTimeService.class);
+        module.services(RuntimeService.class)
+            .withTypes(MyRuntimeService.class)
+            .withMixins(MyRuntimeServiceMixin.class);
     }
 
     @Test
     public void givenServiceCompileTimeWeavingWhenFindingServiceBySuperTypeExceptServiceToBeFound()
     {
-        ServiceReference<MyCompileTimeService> service = serviceFinder.findService( MyCompileTimeService.class );
-        assertThat( service, notNullValue() );
-        assertThat( service.get(), notNullValue() );
-        assertThat( service.get().doSomething(), equalTo( "Niclas" ) );
+        ServiceReference<MyCompileTimeService> service = serviceFinder.findService(MyCompileTimeService.class);
+        assertThat(service, notNullValue());
+        assertThat(service.get(), notNullValue());
+        assertThat(service.get().doSomething(), equalTo("Niclas"));
     }
 
     @Test
     public void givenServiceRuntimeWeavingWhenFindingServiceBySuperTypeExceptServiceToBeFound()
     {
-        ServiceReference<MyRuntimeService> service = serviceFinder.findService( MyRuntimeService.class );
-        assertThat( service, notNullValue() );
-        assertThat( service.get(), notNullValue() );
-        assertThat( service.get().doSomething(), equalTo( "Niclas" ) );
+        ServiceReference<MyRuntimeService> service = serviceFinder.findService(MyRuntimeService.class);
+        assertThat(service, notNullValue());
+        assertThat(service.get(), notNullValue());
+        assertThat(service.get().doSomething(), equalTo("Niclas"));
     }
 
-    @Mixins( MyCompileTimeServiceMixin.class )
+    @Mixins(MyCompileTimeServiceMixin.class)
     public interface MyCompileTimeService
     {
         String doSomething();
@@ -95,13 +95,13 @@ public class ServiceFinderTest extends AbstractQi4jTest
         }
     }
 
-    @Mixins( CompileTimeServiceMixin.class )
+    @Mixins(CompileTimeServiceMixin.class)
     public interface CompileTimeService extends MyCompileTimeService
     {
         String anotherMethod();
     }
 
-    @Mixins( RuntimeServiceMixin.class )
+    @Mixins(RuntimeServiceMixin.class)
     public interface RuntimeService
     {
         String anotherMethod();

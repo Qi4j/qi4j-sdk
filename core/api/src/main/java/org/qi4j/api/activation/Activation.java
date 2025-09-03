@@ -38,6 +38,7 @@ public interface Activation
      *   <li>Fire {@link ActivationEvent.EventType#ACTIVATED}</li>
      * </ul>
      * <p>If an Exception is thrown, already activated nodes are passivated.</p>
+     *
      * @throws ActivationException with first Exception of activation plus the PassivationException if any
      */
     void activate()
@@ -53,6 +54,7 @@ public interface Activation
      *   <li>Call {@link Activator#afterPassivation(java.lang.Object)} on each Activator</li>
      *   <li>Fire {@link ActivationEvent.EventType#PASSIVATED}</li>
      * </ul>
+     *
      * @throws PassivationException after passivation with all Exceptions of passivation if any
      */
     void passivate()

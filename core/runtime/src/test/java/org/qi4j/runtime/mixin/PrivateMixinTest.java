@@ -19,13 +19,13 @@
  */
 package org.qi4j.runtime.mixin;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -38,10 +38,10 @@ public class PrivateMixinTest
     extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( SpeakComposite.class );
+        module.transients(SpeakComposite.class);
     }
 
     /**
@@ -50,11 +50,11 @@ public class PrivateMixinTest
     @Test
     public void privateMixinFieldAndConstructorInjection()
     {
-        SpeakComposite test = transientBuilderFactory.newTransient( SpeakComposite.class );
-        assertThat( "Speak", test.speak(), is( equalTo( "I say it works!" ) ) );
+        SpeakComposite test = transientBuilderFactory.newTransient(SpeakComposite.class);
+        assertThat("Speak", test.speak(), is(equalTo("I say it works!")));
     }
 
-    @Mixins( SpeakMixin.class )
+    @Mixins(SpeakMixin.class)
     public interface Speak
     {
         String speak();
@@ -64,9 +64,10 @@ public class PrivateMixinTest
         implements Speak
     {
         private final Word word;
-        @This Punctuation punctuation;
+        @This
+        Punctuation punctuation;
 
-        public SpeakMixin( @This Word word )
+        public SpeakMixin(@This Word word)
         {
             this.word = word;
         }
@@ -83,7 +84,7 @@ public class PrivateMixinTest
     {
     }
 
-    @Mixins( WordMixin.class )
+    @Mixins(WordMixin.class)
     public interface Word
     {
         String get();
@@ -99,7 +100,7 @@ public class PrivateMixinTest
         }
     }
 
-    @Mixins( PunctuationMixin.class )
+    @Mixins(PunctuationMixin.class)
     public interface Punctuation
     {
         String punctuate();

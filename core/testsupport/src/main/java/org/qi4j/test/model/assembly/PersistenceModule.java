@@ -30,9 +30,9 @@ class PersistenceModule
     implements ModuleAssembler
 {
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
     {
-        module.services( MemoryEntityStoreService.class ).visibleIn( Visibility.application );
+        module.services(MemoryEntityStoreService.class).visibleIn(Visibility.application);
         return module;
     }
 }

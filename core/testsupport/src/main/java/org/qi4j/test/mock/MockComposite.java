@@ -26,7 +26,7 @@ import org.qi4j.test.mock.internal.MockRecorderMixin;
 /**
  * A mocked composite. Adds {@link MockRecorder} to the mocked composite.
  */
-@Mixins( { MockRecorderMixin.class } )
+@Mixins({MockRecorderMixin.class})
 public interface MockComposite
     extends MockRecorder, TransientComposite
 {

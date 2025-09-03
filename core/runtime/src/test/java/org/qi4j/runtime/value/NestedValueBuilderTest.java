@@ -19,10 +19,7 @@
  */
 package org.qi4j.runtime.value;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.value.ValueBuilder;
@@ -30,12 +27,16 @@ import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class NestedValueBuilderTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
 
     interface InnerValue
@@ -74,10 +75,10 @@ public class NestedValueBuilderTest
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.values( InnerValue.class, InnerDefaultedValue.class, OuterValue.class, OuterDefaultedValue.class );
+        module.values(InnerValue.class, InnerDefaultedValue.class, OuterValue.class, OuterDefaultedValue.class);
 
         module.defaultServices();
     }
@@ -85,27 +86,27 @@ public class NestedValueBuilderTest
     @Test
     public void testInner()
     {
-        ValueBuilder<InnerValue> innerBuilder = valueBuilderFactory.newValueBuilder( InnerValue.class );
+        ValueBuilder<InnerValue> innerBuilder = valueBuilderFactory.newValueBuilder(InnerValue.class);
         InnerValue inner = innerBuilder.prototype();
-        inner.listProp().set( new ArrayList<>() );
-        inner.mapProp().set( new HashMap<>() );
+        inner.listProp().set(new ArrayList<>());
+        inner.mapProp().set(new HashMap<>());
         inner = innerBuilder.newInstance();
         // If we reach this point, value creation went well
         try
         {
-            inner.listProp().get().add( "Should be immutable now!" ); // Must not be allowed
-            fail( "List is not immutable!" );
+            inner.listProp().get().add("Should be immutable now!"); // Must not be allowed
+            fail("List is not immutable!");
         }
-        catch( UnsupportedOperationException e )
+        catch(UnsupportedOperationException e)
         {
             // expected
         }
         try
         {
-            inner.mapProp().get().put( "Should be immutable now!", "" ); // Must not be allowed
-            fail( "Map is not immutable!" );
+            inner.mapProp().get().put("Should be immutable now!", ""); // Must not be allowed
+            fail("Map is not immutable!");
         }
-        catch( UnsupportedOperationException e )
+        catch(UnsupportedOperationException e)
         {
             // expected
         }
@@ -114,25 +115,25 @@ public class NestedValueBuilderTest
     @Test
     public void testOuter()
     {
-        ValueBuilder<InnerValue> innerBuilder = valueBuilderFactory.newValueBuilder( InnerValue.class );
+        ValueBuilder<InnerValue> innerBuilder = valueBuilderFactory.newValueBuilder(InnerValue.class);
         InnerValue innerPrototype = innerBuilder.prototype();
-        innerPrototype.listProp().set( new ArrayList<>() );
-        innerPrototype.mapProp().set( new HashMap<>() );
+        innerPrototype.listProp().set(new ArrayList<>());
+        innerPrototype.mapProp().set(new HashMap<>());
         InnerValue innerInstance = innerBuilder.newInstance();
-        ValueBuilder<OuterValue> outerBuilder = valueBuilderFactory.newValueBuilder( OuterValue.class );
+        ValueBuilder<OuterValue> outerBuilder = valueBuilderFactory.newValueBuilder(OuterValue.class);
         OuterValue outerPrototype = outerBuilder.prototype();
         List<InnerValue> inners = new ArrayList<>();
-        inners.add( innerInstance );
-        outerPrototype.innerListProp().set( inners );
+        inners.add(innerInstance);
+        outerPrototype.innerListProp().set(inners);
         OuterValue outerInstance = outerBuilder.newInstance();
-        System.out.println( outerInstance.toString() );
+        System.out.println(outerInstance.toString());
         // If we reach this point, value creation went well
         try
         {
-            outerInstance.innerListProp().get().add( innerInstance ); // Must not be allowed
-            fail( "List is not immutable!" );
+            outerInstance.innerListProp().get().add(innerInstance); // Must not be allowed
+            fail("List is not immutable!");
         }
-        catch( UnsupportedOperationException e )
+        catch(UnsupportedOperationException e)
         {
             // expected
         }
@@ -141,24 +142,24 @@ public class NestedValueBuilderTest
     @Test
     public void testDefaultedInner()
     {
-        ValueBuilder<InnerDefaultedValue> innerBuilder = valueBuilderFactory.newValueBuilder( InnerDefaultedValue.class );
+        ValueBuilder<InnerDefaultedValue> innerBuilder = valueBuilderFactory.newValueBuilder(InnerDefaultedValue.class);
         InnerDefaultedValue inner = innerBuilder.newInstance();
         // If we reach this point, value creation went well
         try
         {
-            inner.listPropDefault().get().add( "Should not work!" ); // Must not be allowed
-            fail( "List is not immutable!" );
+            inner.listPropDefault().get().add("Should not work!"); // Must not be allowed
+            fail("List is not immutable!");
         }
-        catch( UnsupportedOperationException e )
+        catch(UnsupportedOperationException e)
         {
             // expected
         }
         try
         {
-            inner.mapPropDefault().get().put( "Should not work!", "" ); // Must not be allowed
-            fail( "List is not immutable!" );
+            inner.mapPropDefault().get().put("Should not work!", ""); // Must not be allowed
+            fail("List is not immutable!");
         }
-        catch( UnsupportedOperationException e )
+        catch(UnsupportedOperationException e)
         {
             // expected
         }
@@ -167,22 +168,22 @@ public class NestedValueBuilderTest
     @Test
     public void testDefaultedOuter()
     {
-        ValueBuilder<InnerDefaultedValue> innerBuilder = valueBuilderFactory.newValueBuilder( InnerDefaultedValue.class );
+        ValueBuilder<InnerDefaultedValue> innerBuilder = valueBuilderFactory.newValueBuilder(InnerDefaultedValue.class);
         InnerDefaultedValue innerInstance = innerBuilder.newInstance();
-        ValueBuilder<OuterDefaultedValue> outerBuilder = valueBuilderFactory.newValueBuilder( OuterDefaultedValue.class );
+        ValueBuilder<OuterDefaultedValue> outerBuilder = valueBuilderFactory.newValueBuilder(OuterDefaultedValue.class);
         OuterDefaultedValue outerPrototype = outerBuilder.prototype();
         List<InnerDefaultedValue> inners = new ArrayList<>();
-        inners.add( innerInstance );
-        outerPrototype.innerListPropDefault().set( inners );
+        inners.add(innerInstance);
+        outerPrototype.innerListPropDefault().set(inners);
         OuterDefaultedValue outerInstance = outerBuilder.newInstance();
-        System.out.println( outerPrototype.toString() );
+        System.out.println(outerPrototype.toString());
         // If we reach this point, value creation went well
         try
         {
-            outerInstance.innerListPropDefault().get().add( innerInstance ); // Must not be allowed
-            fail( "List is not immutable!" );
+            outerInstance.innerListPropDefault().get().add(innerInstance); // Must not be allowed
+            fail("List is not immutable!");
         }
-        catch( UnsupportedOperationException e )
+        catch(UnsupportedOperationException e)
         {
             // expected
         }

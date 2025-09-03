@@ -19,9 +19,9 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.composite.Composite;
+
 import java.util.Collection;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.Composite;
 
 /**
  * Contains Specification.
@@ -32,7 +32,7 @@ public class ContainsPredicate<T>
     private PropertyFunction<? extends Collection<T>> collectionProperty;
     private T value;
 
-    public ContainsPredicate( PropertyFunction<? extends Collection<T>> collectionProperty, T value )
+    public ContainsPredicate(PropertyFunction<? extends Collection<T>> collectionProperty, T value)
     {
         this.collectionProperty = collectionProperty;
         this.value = value;
@@ -49,16 +49,16 @@ public class ContainsPredicate<T>
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
-        Collection<T> collection = collectionProperty.apply( item ).get();
+        Collection<T> collection = collectionProperty.apply(item).get();
 
-        if( collection == null )
+        if(collection == null)
         {
             return false;
         }
 
-        return collection.contains( value );
+        return collection.contains(value);
     }
 
     @Override

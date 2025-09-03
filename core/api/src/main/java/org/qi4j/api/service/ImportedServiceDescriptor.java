@@ -20,10 +20,8 @@
 
 package org.qi4j.api.service;
 
-import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.api.identity.Identifiable;
 import org.qi4j.api.util.VisitableModelDescriptor;
-import org.qi4j.api.identity.Identifiable;
 
 /**
  * {@code ServiceDescriptor} provides meta information of a service.

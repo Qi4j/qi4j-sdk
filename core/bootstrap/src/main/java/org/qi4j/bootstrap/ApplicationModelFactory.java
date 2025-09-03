@@ -28,6 +28,6 @@ import org.qi4j.api.structure.ApplicationDescriptor;
  */
 public interface ApplicationModelFactory
 {
-    ApplicationDescriptor newApplicationModel( ApplicationAssembly assembly )
+    ApplicationDescriptor newApplicationModel(ApplicationAssembly assembly)
         throws AssemblyException;
 }

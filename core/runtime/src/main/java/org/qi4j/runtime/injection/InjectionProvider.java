@@ -21,13 +21,12 @@
 package org.qi4j.runtime.injection;
 
 import org.qi4j.runtime.injection.provider.InjectionProviderException;
-import org.qi4j.runtime.injection.provider.InjectionProviderException;
 
 /**
  * JAVADOC
  */
 public interface InjectionProvider
 {
-    Object provideInjection( InjectionContext context )
+    Object provideInjection(InjectionContext context)
         throws InjectionProviderException;
 }

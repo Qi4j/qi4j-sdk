@@ -21,5 +21,5 @@ package org.qi4j.test.mock;
 
 public interface MockResolverType
 {
-    void forClass( Class clazz );
+    void forClass(Class clazz);
 }

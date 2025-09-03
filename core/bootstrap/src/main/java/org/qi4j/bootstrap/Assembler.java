@@ -42,10 +42,10 @@ public interface Assembler
      * This allows an Assembler to bootstrap an entire Layer with
      * more Modules.
      * </p>
-     * @param module the Module to assemble
      *
+     * @param module the Module to assemble
      * @throws AssemblyException thrown if the assembler tries to do something illegal
      */
-    void assemble( ModuleAssembly module )
+    void assemble(ModuleAssembly module)
         throws Exception;
 }

@@ -19,11 +19,11 @@
  */
 package org.qi4j.api.value;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 /**
  * TODO
@@ -32,29 +32,29 @@ public class ValueBuilderTemplateTest
     extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.values( TestValue.class );
+        module.values(TestValue.class);
     }
 
     @Test
     public void testTemplate()
     {
-        new TestBuilder( "Rickard" ).newInstance( module );
+        new TestBuilder("Rickard").newInstance(module);
     }
 
     @Test
     public void testAnonymousTemplate()
     {
-        new ValueBuilderTemplate<TestValue>( TestValue.class )
+        new ValueBuilderTemplate<TestValue>(TestValue.class)
         {
             @Override
-            protected void build( TestValue prototype )
+            protected void build(TestValue prototype)
             {
-                prototype.name().set( "Rickard" );
+                prototype.name().set("Rickard");
             }
-        }.newInstance( module );
+        }.newInstance(module);
     }
 
     interface TestValue
@@ -68,16 +68,16 @@ public class ValueBuilderTemplateTest
     {
         String name;
 
-        TestBuilder( String name )
+        TestBuilder(String name)
         {
-            super( TestValue.class );
+            super(TestValue.class);
             this.name = name;
         }
 
         @Override
-        protected void build( TestValue prototype )
+        protected void build(TestValue prototype)
         {
-            prototype.name().set( name );
+            prototype.name().set(name);
         }
     }
 

@@ -17,7 +17,7 @@
  */
 package org.qi4j.test.serialization;
 
-import java.util.Objects;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.serialization.ConvertedBy;
@@ -26,7 +26,8 @@ import org.qi4j.api.serialization.Serialization;
 import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -34,33 +35,34 @@ import static org.hamcrest.Matchers.equalTo;
 public abstract class AbstractConvertersSerializationTest extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.values( SomeValue.class );
-        module.forMixin( SomeValue.class )
-              .setMetaInfo( new CustomPropertyConverter() )
-              .declareDefaults()
-              .customAssemblyConvertedProperty();
+        module.values(SomeValue.class);
+        module.forMixin(SomeValue.class)
+            .setMetaInfo(new CustomPropertyConverter())
+            .declareDefaults()
+            .customAssemblyConvertedProperty();
     }
 
-    protected abstract String getStringFromValueState( String state, String key ) throws Exception;
+    protected abstract String getStringFromValueState(String state, String key)
+        throws Exception;
 
     public interface SomeValue
     {
         Property<CustomPlainValue> customPlainValue();
 
-        @ConvertedBy( CustomPropertyConverter.class )
+        @ConvertedBy(CustomPropertyConverter.class)
         Property<String> customConvertedProperty();
 
         Property<String> customAssemblyConvertedProperty();
     }
 
-    @ConvertedBy( CustomPlainValueConverter.class )
+    @ConvertedBy(CustomPlainValueConverter.class)
     public static class CustomPlainValue
     {
         private final String state;
 
-        CustomPlainValue( String state )
+        CustomPlainValue(String state)
         {
             this.state = state;
         }
@@ -71,18 +73,24 @@ public abstract class AbstractConvertersSerializationTest extends AbstractQi4jTe
         }
 
         @Override
-        public boolean equals( final Object o )
+        public boolean equals(final Object o)
         {
-            if( this == o ) { return true; }
-            if( o == null || getClass() != o.getClass() ) { return false; }
+            if(this == o)
+            {
+                return true;
+            }
+            if(o == null || getClass() != o.getClass())
+            {
+                return false;
+            }
             CustomPlainValue that = (CustomPlainValue) o;
-            return Objects.equals( state, that.state );
+            return Objects.equals(state, that.state);
         }
 
         @Override
         public int hashCode()
         {
-            return Objects.hash( state );
+            return Objects.hash(state);
         }
     }
 
@@ -95,15 +103,15 @@ public abstract class AbstractConvertersSerializationTest extends AbstractQi4jTe
         }
 
         @Override
-        public String toString( CustomPlainValue object )
+        public String toString(CustomPlainValue object)
         {
-            return rot13( object.getState() );
+            return rot13(object.getState());
         }
 
         @Override
-        public CustomPlainValue fromString( String string )
+        public CustomPlainValue fromString(String string)
         {
-            return new CustomPlainValue( rot13( string ) );
+            return new CustomPlainValue(rot13(string));
         }
     }
 
@@ -116,15 +124,15 @@ public abstract class AbstractConvertersSerializationTest extends AbstractQi4jTe
         }
 
         @Override
-        public String toString( String object )
+        public String toString(String object)
         {
-            return rot13( object );
+            return rot13(object);
         }
 
         @Override
-        public String fromString( String string )
+        public String fromString(String string)
         {
-            return rot13( string );
+            return rot13(string);
         }
     }
 
@@ -132,37 +140,50 @@ public abstract class AbstractConvertersSerializationTest extends AbstractQi4jTe
     private Serialization serialization;
 
     @Test
-    public void testConvertedByAnnotation() throws Exception
+    public void testConvertedByAnnotation()
+        throws Exception
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
-        builder.prototype().customPlainValue().set( new CustomPlainValue( "foo" ) );
-        builder.prototype().customConvertedProperty().set( "bar" );
-        builder.prototype().customAssemblyConvertedProperty().set( "bazar" );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
+        builder.prototype().customPlainValue().set(new CustomPlainValue("foo"));
+        builder.prototype().customConvertedProperty().set("bar");
+        builder.prototype().customAssemblyConvertedProperty().set("bazar");
         SomeValue value = builder.newInstance();
 
-        String serialized = serialization.serialize( value );
-        assertThat( getStringFromValueState( serialized, "customPlainValue" ),
-                    equalTo( rot13( "foo" ) ) );
-        assertThat( getStringFromValueState( serialized, "customConvertedProperty" ),
-                    equalTo( rot13( "bar" ) ) );
-        assertThat( getStringFromValueState( serialized, "customAssemblyConvertedProperty" ),
-                    equalTo( rot13( "bazar" ) ) );
+        String serialized = serialization.serialize(module, Serialization.Options.DEFAULT, value);
+        assertThat(getStringFromValueState(serialized, "customPlainValue"),
+            equalTo(rot13("foo")));
+        assertThat(getStringFromValueState(serialized, "customConvertedProperty"),
+            equalTo(rot13("bar")));
+        assertThat(getStringFromValueState(serialized, "customAssemblyConvertedProperty"),
+            equalTo(rot13("bazar")));
 
-        SomeValue deserialized = serialization.deserialize( module, SomeValue.class, serialized );
-        assertThat( deserialized, equalTo( value ) );
+        SomeValue deserialized = serialization.deserialize(module, Serialization.Options.DEFAULT, SomeValue.class, serialized);
+        assertThat(deserialized, equalTo(value));
     }
 
-    private static String rot13( String string )
+    private static String rot13(String string)
     {
         StringBuilder builder = new StringBuilder();
-        for( int i = 0; i < string.length(); i++ )
+        for(int i = 0; i < string.length(); i++)
         {
-            char c = string.charAt( i );
-            if( c >= 'a' && c <= 'm' ) { c += 13; }
-            else if( c >= 'A' && c <= 'M' ) { c += 13; }
-            else if( c >= 'n' && c <= 'z' ) { c -= 13; }
-            else if( c >= 'N' && c <= 'Z' ) { c -= 13; }
-            builder.append( c );
+            char c = string.charAt(i);
+            if(c >= 'a' && c <= 'm')
+            {
+                c += 13;
+            }
+            else if(c >= 'A' && c <= 'M')
+            {
+                c += 13;
+            }
+            else if(c >= 'n' && c <= 'z')
+            {
+                c -= 13;
+            }
+            else if(c >= 'N' && c <= 'Z')
+            {
+                c -= 13;
+            }
+            builder.append(c);
         }
         return builder.toString();
     }

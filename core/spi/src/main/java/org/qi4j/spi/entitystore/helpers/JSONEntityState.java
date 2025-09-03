@@ -17,19 +17,13 @@
  */
 package org.qi4j.spi.entitystore.helpers;
 
-import java.time.Instant;
-import java.util.Objects;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
+import jakarta.json.*;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.serialization.SerializationException;
 import org.qi4j.api.structure.ModuleDescriptor;
+import org.qi4j.api.time.SystemTime;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.EntityState;
@@ -39,7 +33,10 @@ import org.qi4j.spi.entity.NamedAssociationState;
 import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.serialization.JsonSerialization;
 
-import static org.qi4j.api.serialization.Serializer.Options.ALL_TYPE_INFO;
+import java.time.Instant;
+import java.util.Objects;
+
+import static org.qi4j.api.serialization.Serialization.Options.ENTITY_STORAGE;
 
 /**
  * Standard JSON implementation of EntityState.
@@ -58,15 +55,15 @@ public final class JSONEntityState
     private Instant lastModified;
     private JsonObject state;
 
-    /* package */ JSONEntityState( ModuleDescriptor module,
-                                   JsonSerialization serialization,
-                                   JakartaJsonFactories jsonFactories,
-                                   String version,
-                                   Instant lastModified,
-                                   EntityReference reference,
-                                   EntityStatus status,
-                                   EntityDescriptor entityDescriptor,
-                                   JsonObject state
+    /* package */ JSONEntityState(ModuleDescriptor module,
+                                  JsonSerialization serialization,
+                                  JakartaJsonFactories jsonFactories,
+                                  String version,
+                                  Instant lastModified,
+                                  EntityReference reference,
+                                  EntityStatus status,
+                                  EntityDescriptor entityDescriptor,
+                                  JsonObject state
     )
     {
         this.module = module;
@@ -100,67 +97,67 @@ public final class JSONEntityState
     }
 
     @Override
-    public Object propertyValueOf( QualifiedName stateName )
+    public Object propertyValueOf(QualifiedName stateName)
     {
         try
         {
-            ValueType valueType = entityDescriptor.state().findPropertyModelByQualifiedName( stateName ).valueType();
-            JsonValue jsonValue = state.getJsonObject( JSONKeys.VALUE ).get( stateName.name() );
-            return serialization.fromJson( module, valueType, jsonValue );
+            ValueType valueType = entityDescriptor.state().findPropertyModelByQualifiedName(stateName).valueType();
+            JsonValue jsonValue = state.getJsonObject(JSONKeys.VALUE).get(stateName.name());
+            return serialization.fromJson(module, ENTITY_STORAGE, valueType, jsonValue);
         }
-        catch( SerializationException e )
+        catch(SerializationException e)
         {
-            throw new EntityStoreException( e );
+            throw new EntityStoreException(e);
         }
     }
 
     @Override
-    public void setPropertyValue( QualifiedName stateName, Object newValue )
+    public void setPropertyValue(QualifiedName stateName, Object newValue)
     {
         try
         {
-            JsonValue jsonValue = serialization.toJson( ALL_TYPE_INFO, newValue );
-            if( stateCloneWithProperty( stateName.name(), jsonValue ) )
+            JsonValue jsonValue = serialization.toJson(module, ENTITY_STORAGE, newValue);
+            if(stateCloneWithProperty(stateName.name(), jsonValue))
             {
                 markUpdated();
             }
         }
-        catch( SerializationException e )
+        catch(SerializationException e)
         {
-            throw new EntityStoreException( "Unable to set property " + stateName + " value " + newValue, e );
+            throw new EntityStoreException("Unable to set property " + stateName + " value " + newValue, e);
         }
     }
 
     @Override
-    public EntityReference associationValueOf( QualifiedName stateName )
+    public EntityReference associationValueOf(QualifiedName stateName)
     {
-        JsonValue associationValue = state.getJsonObject( JSONKeys.VALUE ).get( stateName.name() );
-        if( associationValue == JsonValue.NULL )
+        JsonValue associationValue = state.getJsonObject(JSONKeys.VALUE).get(stateName.name());
+        if(associationValue == JsonValue.NULL)
         {
             return null;
         }
-        return EntityReference.parseEntityReference( ( (JsonString) associationValue ).getString() );
+        return EntityReference.parseEntityReference(((JsonString) associationValue).getString());
     }
 
     @Override
-    public void setAssociationValue( QualifiedName stateName, EntityReference entityReference )
+    public void setAssociationValue(QualifiedName stateName, EntityReference entityReference)
     {
-        if( stateCloneWithAssociation( stateName.name(), entityReference ) )
+        if(stateCloneWithAssociation(stateName.name(), entityReference))
         {
             markUpdated();
         }
     }
 
     @Override
-    public ManyAssociationState manyAssociationValueOf( QualifiedName stateName )
+    public ManyAssociationState manyAssociationValueOf(QualifiedName stateName)
     {
-        return new JSONManyAssociationState( jsonFactories, this, stateName.name() );
+        return new JSONManyAssociationState(jsonFactories, this, stateName.name());
     }
 
     @Override
-    public NamedAssociationState namedAssociationValueOf( QualifiedName stateName )
+    public NamedAssociationState namedAssociationValueOf(QualifiedName stateName)
     {
-        return new JSONNamedAssociationState( jsonFactories, this, stateName.name() );
+        return new JSONNamedAssociationState(jsonFactories, this, stateName.name());
     }
 
     @Override
@@ -176,9 +173,9 @@ public final class JSONEntityState
     }
 
     @Override
-    public boolean isAssignableTo( Class<?> type )
+    public boolean isAssignableTo(Class<?> type)
     {
-        return entityDescriptor.isAssignableTo( type );
+        return entityDescriptor.isAssignableTo(type);
     }
 
     @Override
@@ -200,169 +197,170 @@ public final class JSONEntityState
 
     void markUpdated()
     {
-        if( status == EntityStatus.LOADED )
+        if(status == EntityStatus.LOADED)
         {
             status = EntityStatus.UPDATED;
+            lastModified = SystemTime.now();
         }
     }
 
-    void stateCloneWithVersionAndModified( String version, Instant lastModified )
+    void stateCloneWithVersionAndModified(String version, Instant lastModified)
     {
-        state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VERSION, JSONKeys.MODIFIED )
-                             .add( JSONKeys.VERSION, version )
-                             .add( JSONKeys.MODIFIED, lastModified.toEpochMilli() )
-                             .build();
+        state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VERSION, JSONKeys.MODIFIED)
+            .add(JSONKeys.VERSION, version)
+            .add(JSONKeys.MODIFIED, lastModified.toEpochMilli())
+            .build();
     }
 
-    private boolean stateCloneWithProperty( String stateName, JsonValue value )
+    private boolean stateCloneWithProperty(String stateName, JsonValue value)
     {
-        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
-        if( Objects.equals( valueState.get( stateName ), value ) )
+        JsonObject valueState = state.getJsonObject(JSONKeys.VALUE);
+        if(Objects.equals(valueState.get(stateName), value))
         {
             return false;
         }
-        JsonObjectBuilder valueBuilder = jsonFactories.cloneBuilderExclude( valueState, stateName );
-        if( value == null )
+        JsonObjectBuilder valueBuilder = jsonFactories.cloneBuilderExclude(valueState, stateName);
+        if(value == null)
         {
-            valueBuilder.addNull( stateName );
+            valueBuilder.addNull(stateName);
         }
         else
         {
-            valueBuilder.add( stateName, value );
+            valueBuilder.add(stateName, value);
         }
-        state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
-                             .add( JSONKeys.VALUE, valueBuilder.build() )
-                             .build();
+        state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VALUE)
+            .add(JSONKeys.VALUE, valueBuilder.build())
+            .build();
         return true;
     }
 
-    private boolean stateCloneWithAssociation( String stateName, EntityReference ref )
+    private boolean stateCloneWithAssociation(String stateName, EntityReference ref)
     {
-        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
-        JsonValue jsonRef = ref == null ? JsonValue.NULL : jsonFactories.toJsonString( ref.identity().toString() );
-        if( Objects.equals( valueState.get( stateName ), jsonRef ) )
+        JsonObject valueState = state.getJsonObject(JSONKeys.VALUE);
+        JsonValue jsonRef = ref == null ? JsonValue.NULL : jsonFactories.toJsonString(ref.identity().toString());
+        if(Objects.equals(valueState.get(stateName), jsonRef))
         {
             return false;
         }
-        valueState = jsonFactories.cloneBuilderExclude( valueState, stateName )
-                                  .add( stateName, jsonRef )
-                                  .build();
-        state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
-                             .add( JSONKeys.VALUE, valueState )
-                             .build();
+        valueState = jsonFactories.cloneBuilderExclude(valueState, stateName)
+            .add(stateName, jsonRef)
+            .build();
+        state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VALUE)
+            .add(JSONKeys.VALUE, valueState)
+            .build();
         return true;
     }
 
-    void stateCloneAddManyAssociation( int idx, String stateName, EntityReference ref )
+    void stateCloneAddManyAssociation(int idx, String stateName, EntityReference ref)
     {
-        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
+        JsonObject valueState = state.getJsonObject(JSONKeys.VALUE);
         String identity = ref.identity().toString();
         JsonArray manyAssoc;
-        if( valueState.containsKey( stateName ) )
+        if(valueState.containsKey(stateName))
         {
             JsonArrayBuilder manyAssocBuilder = jsonFactories.builderFactory().createArrayBuilder();
-            JsonArray previousManyAssoc = valueState.getJsonArray( stateName );
+            JsonArray previousManyAssoc = valueState.getJsonArray(stateName);
             int currentIdx = 0;
-            for( JsonValue jsonRef : previousManyAssoc )
+            for(JsonValue jsonRef : previousManyAssoc)
             {
-                if( currentIdx == idx )
+                if(currentIdx == idx)
                 {
-                    manyAssocBuilder.add( identity );
+                    manyAssocBuilder.add(identity);
                 }
-                manyAssocBuilder.add( jsonRef );
+                manyAssocBuilder.add(jsonRef);
                 currentIdx++;
             }
-            if( idx >= previousManyAssoc.size() )
+            if(idx >= previousManyAssoc.size())
             {
-                manyAssocBuilder.add( identity );
+                manyAssocBuilder.add(identity);
             }
             manyAssoc = manyAssocBuilder.build();
         }
         else
         {
-            manyAssoc = jsonFactories.builderFactory().createArrayBuilder().add( identity ).build();
+            manyAssoc = jsonFactories.builderFactory().createArrayBuilder().add(identity).build();
         }
-        valueState = jsonFactories.cloneBuilderExclude( valueState, stateName )
-                                  .add( stateName, manyAssoc )
-                                  .build();
-        state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
-                             .add( JSONKeys.VALUE, valueState )
-                             .build();
+        valueState = jsonFactories.cloneBuilderExclude(valueState, stateName)
+            .add(stateName, manyAssoc)
+            .build();
+        state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VALUE)
+            .add(JSONKeys.VALUE, valueState)
+            .build();
     }
 
-    void stateCloneRemoveManyAssociation( String stateName, EntityReference ref )
+    void stateCloneRemoveManyAssociation(String stateName, EntityReference ref)
     {
-        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
-        if( valueState.containsKey( stateName ) )
+        JsonObject valueState = state.getJsonObject(JSONKeys.VALUE);
+        if(valueState.containsKey(stateName))
         {
             String identity = ref.identity().toString();
-            JsonArray manyAssoc = jsonFactories.cloneBuilderExclude( valueState.getJsonArray( stateName ),
-                                                                     jsonFactories.toJsonString( identity ) )
-                                               .build();
-            valueState = jsonFactories.cloneBuilderExclude( valueState, stateName )
-                                      .add( stateName, manyAssoc ).build();
-            state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
-                                 .add( JSONKeys.VALUE, valueState )
-                                 .build();
+            JsonArray manyAssoc = jsonFactories.cloneBuilderExclude(valueState.getJsonArray(stateName),
+                    jsonFactories.toJsonString(identity))
+                .build();
+            valueState = jsonFactories.cloneBuilderExclude(valueState, stateName)
+                .add(stateName, manyAssoc).build();
+            state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VALUE)
+                .add(JSONKeys.VALUE, valueState)
+                .build();
         }
     }
 
-    void stateCloneClearManyAssociation( String stateName )
+    void stateCloneClearManyAssociation(String stateName)
     {
-        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
-        if( valueState.containsKey( stateName ) )
+        JsonObject valueState = state.getJsonObject(JSONKeys.VALUE);
+        if(valueState.containsKey(stateName))
         {
-            valueState = jsonFactories.cloneBuilderExclude( valueState, stateName )
-                                      .add( stateName, jsonFactories.builderFactory().createArrayBuilder().build() )
-                                      .build();
-            state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
-                                 .add( JSONKeys.VALUE, valueState )
-                                 .build();
+            valueState = jsonFactories.cloneBuilderExclude(valueState, stateName)
+                .add(stateName, jsonFactories.builderFactory().createArrayBuilder().build())
+                .build();
+            state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VALUE)
+                .add(JSONKeys.VALUE, valueState)
+                .build();
         }
     }
 
-    void stateCloneAddNamedAssociation( String stateName, String name, EntityReference ref )
+    void stateCloneAddNamedAssociation(String stateName, String name, EntityReference ref)
     {
-        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
-        JsonObjectBuilder namedAssoc = valueState.containsKey( stateName )
-                                       ? jsonFactories.cloneBuilder( valueState.getJsonObject( stateName ) )
-                                       : jsonFactories.builderFactory().createObjectBuilder();
-        namedAssoc.add( name, ref.identity().toString() );
-        valueState = jsonFactories.cloneBuilderExclude( valueState, stateName )
-                                  .add( stateName, namedAssoc.build() )
-                                  .build();
-        state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
-                             .add( JSONKeys.VALUE, valueState )
-                             .build();
+        JsonObject valueState = state.getJsonObject(JSONKeys.VALUE);
+        JsonObjectBuilder namedAssoc = valueState.containsKey(stateName)
+            ? jsonFactories.cloneBuilder(valueState.getJsonObject(stateName))
+            : jsonFactories.builderFactory().createObjectBuilder();
+        namedAssoc.add(name, ref.identity().toString());
+        valueState = jsonFactories.cloneBuilderExclude(valueState, stateName)
+            .add(stateName, namedAssoc.build())
+            .build();
+        state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VALUE)
+            .add(JSONKeys.VALUE, valueState)
+            .build();
     }
 
-    void stateCloneRemoveNamedAssociation( String stateName, String name )
+    void stateCloneRemoveNamedAssociation(String stateName, String name)
     {
-        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
-        if( valueState.containsKey( stateName ) )
+        JsonObject valueState = state.getJsonObject(JSONKeys.VALUE);
+        if(valueState.containsKey(stateName))
         {
-            JsonObject namedAssoc = jsonFactories.cloneBuilderExclude( valueState.getJsonObject( stateName ), name )
-                                                 .build();
-            valueState = jsonFactories.cloneBuilderExclude( valueState, stateName )
-                                      .add( stateName, namedAssoc )
-                                      .build();
-            state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
-                                 .add( JSONKeys.VALUE, valueState )
-                                 .build();
+            JsonObject namedAssoc = jsonFactories.cloneBuilderExclude(valueState.getJsonObject(stateName), name)
+                .build();
+            valueState = jsonFactories.cloneBuilderExclude(valueState, stateName)
+                .add(stateName, namedAssoc)
+                .build();
+            state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VALUE)
+                .add(JSONKeys.VALUE, valueState)
+                .build();
         }
     }
 
-    void stateCloneClearNamedAssociation( String stateName )
+    void stateCloneClearNamedAssociation(String stateName)
     {
-        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
-        if( valueState.containsKey( stateName ) )
+        JsonObject valueState = state.getJsonObject(JSONKeys.VALUE);
+        if(valueState.containsKey(stateName))
         {
-            valueState = jsonFactories.cloneBuilderExclude( valueState, stateName )
-                                      .add( stateName, jsonFactories.builderFactory().createObjectBuilder().build() )
-                                      .build();
-            state = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
-                                 .add( JSONKeys.VALUE, valueState )
-                                 .build();
+            valueState = jsonFactories.cloneBuilderExclude(valueState, stateName)
+                .add(stateName, jsonFactories.builderFactory().createObjectBuilder().build())
+                .build();
+            state = jsonFactories.cloneBuilderExclude(state, JSONKeys.VALUE)
+                .add(JSONKeys.VALUE, valueState)
+                .build();
         }
     }
 }

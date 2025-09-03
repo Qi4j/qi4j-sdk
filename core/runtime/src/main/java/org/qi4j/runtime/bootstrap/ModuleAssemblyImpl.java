@@ -20,17 +20,6 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
@@ -48,28 +37,7 @@ import org.qi4j.api.type.HasEqualOrAssignableFromType;
 import org.qi4j.api.type.HasTypes;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.api.value.ValueComposite;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.AssemblyReportException;
-import org.qi4j.bootstrap.AssemblySpecifications;
-import org.qi4j.bootstrap.AssemblyVisitor;
-import org.qi4j.bootstrap.ConfigurationDeclaration;
-import org.qi4j.bootstrap.EntityAssembly;
-import org.qi4j.bootstrap.EntityDeclaration;
-import org.qi4j.bootstrap.ImportedServiceAssembly;
-import org.qi4j.bootstrap.ImportedServiceDeclaration;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.qi4j.bootstrap.MetaInfoDeclaration;
-import org.qi4j.bootstrap.MixinDeclaration;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.ObjectAssembly;
-import org.qi4j.bootstrap.ObjectDeclaration;
-import org.qi4j.bootstrap.ServiceAssembly;
-import org.qi4j.bootstrap.ServiceDeclaration;
-import org.qi4j.bootstrap.TransientAssembly;
-import org.qi4j.bootstrap.TransientDeclaration;
-import org.qi4j.bootstrap.ValueAssembly;
-import org.qi4j.bootstrap.ValueDeclaration;
+import org.qi4j.bootstrap.*;
 import org.qi4j.bootstrap.defaults.DefaultIdentityGeneratorAssembler;
 import org.qi4j.bootstrap.defaults.DefaultMetricsProviderAssembler;
 import org.qi4j.bootstrap.defaults.DefaultSerializationAssembler;
@@ -89,16 +57,11 @@ import org.qi4j.runtime.structure.LayerModel;
 import org.qi4j.runtime.structure.ModuleModel;
 import org.qi4j.runtime.value.ValueModel;
 import org.qi4j.runtime.value.ValuesModel;
-import org.qi4j.bootstrap.*;
-import org.qi4j.bootstrap.defaults.DefaultIdentityGeneratorAssembler;
-import org.qi4j.bootstrap.defaults.DefaultMetricsProviderAssembler;
-import org.qi4j.bootstrap.defaults.DefaultSerializationAssembler;
-import org.qi4j.bootstrap.defaults.DefaultUnitOfWorkAssembler;
-import org.qi4j.runtime.activation.ActivatorsModel;
-import org.qi4j.runtime.composite.TransientModel;
-import org.qi4j.runtime.composite.TransientsModel;
-import org.qi4j.runtime.structure.LayerModel;
-import org.qi4j.runtime.structure.ModuleModel;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
@@ -112,7 +75,7 @@ import static java.util.stream.Collectors.toList;
  * call.
  */
 final class ModuleAssemblyImpl
-        implements ModuleAssembly
+    implements ModuleAssembly
 {
     /**
      * Assemblers required on all modules, keyed by service type, assembled by {@link #addRequiredAssemblers()}.
@@ -126,13 +89,13 @@ final class ModuleAssemblyImpl
 
     static
     {
-        REQUIRED_ASSEMBLERS = new HashMap<>( 1 );
-        REQUIRED_ASSEMBLERS.put( UnitOfWorkFactory.class, new DefaultUnitOfWorkAssembler() );
+        REQUIRED_ASSEMBLERS = new HashMap<>(1);
+        REQUIRED_ASSEMBLERS.put(UnitOfWorkFactory.class, new DefaultUnitOfWorkAssembler());
 
-        DEFAULT_ASSEMBLERS = new HashMap<>( 3 );
-        DEFAULT_ASSEMBLERS.put( IdentityGenerator.class, new DefaultIdentityGeneratorAssembler() );
-        DEFAULT_ASSEMBLERS.put( Serialization.class, new DefaultSerializationAssembler() );
-        DEFAULT_ASSEMBLERS.put( MetricsProvider.class, new DefaultMetricsProviderAssembler() );
+        DEFAULT_ASSEMBLERS = new HashMap<>(3);
+        DEFAULT_ASSEMBLERS.put(IdentityGenerator.class, new DefaultIdentityGeneratorAssembler());
+        DEFAULT_ASSEMBLERS.put(Serialization.class, new DefaultSerializationAssembler());
+        DEFAULT_ASSEMBLERS.put(MetricsProvider.class, new DefaultMetricsProviderAssembler());
     }
 
     private final LayerAssembly layerAssembly;
@@ -196,31 +159,31 @@ final class ModuleAssemblyImpl
             .stream()
             .filter(
                 entry -> serviceAssemblies.stream().noneMatch(
-                    serviceAssembly -> serviceAssembly.hasType( entry.getKey() ) ) )
-            .peek( entry -> {
+                    serviceAssembly -> serviceAssembly.hasType(entry.getKey())))
+            .peek(entry -> {
                 try
                 {
-                    entry.getValue().assemble( this );
+                    entry.getValue().assemble(this);
                 }
-                catch( Exception e )
+                catch(Exception e)
                 {
-                    problems.add( e );
+                    problems.add(e);
                 }
-            } )
-            .map( Map.Entry::getKey )
-            .toArray( Class[]::new );
-        if( problems.size() > 0 )
+            })
+            .map(Map.Entry::getKey)
+            .toArray(Class[]::new);
+        if(problems.size() > 0)
         {
-            throw new AssemblyReportException( problems );
+            throw new AssemblyReportException(problems);
         }
-        return services( assembledServicesTypes );
+        return services(assembledServicesTypes);
     }
 
     @Override
     @SafeVarargs
     public final ModuleAssembly withActivators(Class<? extends Activator<Module>>... activators)
     {
-        this.activators.addAll( asList( activators ) );
+        this.activators.addAll(asList(activators));
         return this;
     }
 
@@ -230,9 +193,9 @@ final class ModuleAssemblyImpl
     {
         List<ValueAssemblyImpl> assemblies = new ArrayList<>();
 
-        for (Class valueType : valueTypes)
+        for(Class valueType : valueTypes)
         {
-            if (valueAssemblies.containsKey(valueType))
+            if(valueAssemblies.containsKey(valueType))
             {
                 assemblies.add(valueAssemblies.get(valueType));
             }
@@ -251,8 +214,8 @@ final class ModuleAssemblyImpl
     public ValueDeclaration values(Predicate<? super ValueAssembly> specification)
     {
         List<ValueAssemblyImpl> assemblies = valueAssemblies.values().stream()
-                .filter(specification::test)
-                .collect(toList());
+            .filter(specification::test)
+            .collect(toList());
         return new ValueDeclarationImpl(assemblies);
     }
 
@@ -262,9 +225,9 @@ final class ModuleAssemblyImpl
     {
         List<TransientAssemblyImpl> assemblies = new ArrayList<>();
 
-        for (Class valueType : transientTypes)
+        for(Class valueType : transientTypes)
         {
-            if (transientAssemblies.containsKey(valueType))
+            if(transientAssemblies.containsKey(valueType))
             {
                 assemblies.add(transientAssemblies.get(valueType));
             }
@@ -283,8 +246,8 @@ final class ModuleAssemblyImpl
     public TransientDeclaration transients(Predicate<? super TransientAssembly> specification)
     {
         List<TransientAssemblyImpl> assemblies = transientAssemblies.values().stream()
-                .filter(specification::test)
-                .collect(toList());
+            .filter(specification::test)
+            .collect(toList());
 
         return new TransientDeclarationImpl(assemblies);
     }
@@ -295,9 +258,9 @@ final class ModuleAssemblyImpl
     {
         List<EntityAssemblyImpl> assemblies = new ArrayList<>();
 
-        for (Class entityType : entityTypes)
+        for(Class entityType : entityTypes)
         {
-            if (entityAssemblies.containsKey(entityType))
+            if(entityAssemblies.containsKey(entityType))
             {
                 assemblies.add(entityAssemblies.get(entityType));
             }
@@ -316,8 +279,8 @@ final class ModuleAssemblyImpl
     public EntityDeclaration entities(Predicate<? super EntityAssembly> specification)
     {
         List<EntityAssemblyImpl> assemblies = entityAssemblies.values().stream()
-                .filter(specification::test)
-                .collect(toList());
+            .filter(specification::test)
+            .collect(toList());
 
         return new EntityDeclarationImpl(assemblies);
     }
@@ -328,9 +291,9 @@ final class ModuleAssemblyImpl
     {
         List<EntityAssemblyImpl> entityAssemblyList = new ArrayList<>();
 
-        for (Class entityType : configurationTypes)
+        for(Class entityType : configurationTypes)
         {
-            if (this.entityAssemblies.containsKey(entityType))
+            if(this.entityAssemblies.containsKey(entityType))
             {
                 entityAssemblyList.add(this.entityAssemblies.get(entityType));
             }
@@ -344,9 +307,9 @@ final class ModuleAssemblyImpl
 
         List<ValueAssemblyImpl> valueAssemblyList = new ArrayList<>();
 
-        for (Class valueType : configurationTypes)
+        for(Class valueType : configurationTypes)
         {
-            if (valueAssemblies.containsKey(valueType))
+            if(valueAssemblies.containsKey(valueType))
             {
                 valueAssemblyList.add(valueAssemblies.get(valueType));
             }
@@ -363,27 +326,27 @@ final class ModuleAssemblyImpl
     }
 
     @Override
-    public ConfigurationDeclaration configurations( Predicate<HasTypes> specification )
+    public ConfigurationDeclaration configurations(Predicate<HasTypes> specification)
     {
-        Predicate<HasTypes> isConfigurationComposite = new HasEqualOrAssignableFromType<>( HasIdentity.class );
-        specification = specification.and( isConfigurationComposite );
+        Predicate<HasTypes> isConfigurationComposite = new HasEqualOrAssignableFromType<>(HasIdentity.class);
+        specification = specification.and(isConfigurationComposite);
         List<EntityAssemblyImpl> entityAssemblyList = new ArrayList<>();
-        for( EntityAssemblyImpl entityAssembly : entityAssemblies.values() )
+        for(EntityAssemblyImpl entityAssembly : entityAssemblies.values())
         {
-            if( specification.test( entityAssembly ) )
+            if(specification.test(entityAssembly))
             {
-                entityAssemblyList.add( entityAssembly );
+                entityAssemblyList.add(entityAssembly);
             }
         }
         List<ValueAssemblyImpl> valueAssemblyList = new ArrayList<>();
-        for( ValueAssemblyImpl transientAssembly : valueAssemblies.values() )
+        for(ValueAssemblyImpl transientAssembly : valueAssemblies.values())
         {
-            if( specification.test( transientAssembly ) )
+            if(specification.test(transientAssembly))
             {
-                valueAssemblyList.add( transientAssembly );
+                valueAssemblyList.add(transientAssembly);
             }
         }
-        return new ConfigurationDeclarationImpl( entityAssemblyList, valueAssemblyList );
+        return new ConfigurationDeclarationImpl(entityAssemblyList, valueAssemblyList);
     }
 
     @Override
@@ -391,13 +354,13 @@ final class ModuleAssemblyImpl
     {
         List<ObjectAssemblyImpl> assemblies = new ArrayList<>();
 
-        for (Class<?> objectType : objectTypes)
+        for(Class<?> objectType : objectTypes)
         {
-            if (objectType.isInterface())
+            if(objectType.isInterface())
             {
                 throw new AssemblyException("Interfaces can not be Qi4j Objects.");
             }
-            if (objectAssemblies.containsKey(objectType))
+            if(objectAssemblies.containsKey(objectType))
             {
                 assemblies.add(objectAssemblies.get(objectType));
             }
@@ -416,8 +379,8 @@ final class ModuleAssemblyImpl
     public ObjectDeclaration objects(Predicate<? super ObjectAssembly> specification)
     {
         List<ObjectAssemblyImpl> assemblies = objectAssemblies.values().stream()
-                .filter(specification::test)
-                .collect(toList());
+            .filter(specification::test)
+            .collect(toList());
 
         return new ObjectDeclarationImpl(assemblies);
     }
@@ -427,7 +390,7 @@ final class ModuleAssemblyImpl
     {
         List<ServiceAssemblyImpl> assemblies = new ArrayList<>();
 
-        for (Class<?> serviceType : serviceTypes)
+        for(Class<?> serviceType : serviceTypes)
         {
             ServiceAssemblyImpl serviceAssembly = new ServiceAssemblyImpl(serviceType);
             serviceAssemblies.add(serviceAssembly);
@@ -442,12 +405,12 @@ final class ModuleAssemblyImpl
     {
         List<ServiceAssemblyImpl> assemblies = new ArrayList<>();
 
-        for (Class<?> serviceType : serviceTypes)
+        for(Class<?> serviceType : serviceTypes)
         {
-            if( serviceAssemblies.stream().anyMatch( AssemblySpecifications.ofAnyType( serviceType ) ) )
+            if(serviceAssemblies.stream().anyMatch(AssemblySpecifications.ofAnyType(serviceType)))
             {
-                serviceAssemblies.stream().filter( AssemblySpecifications.ofAnyType( serviceType ) )
-                                 .forEach( assemblies::add );
+                serviceAssemblies.stream().filter(AssemblySpecifications.ofAnyType(serviceType))
+                    .forEach(assemblies::add);
             }
             else
             {
@@ -464,8 +427,8 @@ final class ModuleAssemblyImpl
     public ServiceDeclaration services(Predicate<? super ServiceAssembly> specification)
     {
         List<ServiceAssemblyImpl> assemblies = serviceAssemblies.stream()
-                .filter(specification::test)
-                .collect(toList());
+            .filter(specification::test)
+            .collect(toList());
         return new ServiceDeclarationImpl(assemblies);
     }
 
@@ -474,9 +437,9 @@ final class ModuleAssemblyImpl
     {
         List<ImportedServiceAssemblyImpl> assemblies = new ArrayList<>();
 
-        for (Class<?> serviceType : serviceTypes)
+        for(Class<?> serviceType : serviceTypes)
         {
-            if (importedServiceAssemblies.containsKey(serviceType))
+            if(importedServiceAssemblies.containsKey(serviceType))
             {
                 assemblies.add(importedServiceAssemblies.get(serviceType));
             }
@@ -495,8 +458,8 @@ final class ModuleAssemblyImpl
     public ImportedServiceDeclaration importedServices(Predicate<? super ImportedServiceAssembly> specification)
     {
         List<ImportedServiceAssemblyImpl> assemblies = importedServiceAssemblies.values().stream()
-                .filter(specification::test)
-                .collect(toList());
+            .filter(specification::test)
+            .collect(toList());
 
         return new ImportedServiceDeclarationImpl(assemblies);
     }
@@ -509,44 +472,44 @@ final class ModuleAssemblyImpl
 
     @Override
     public <ThrowableType extends Throwable> void visit(AssemblyVisitor<ThrowableType> visitor)
-            throws ThrowableType
+        throws ThrowableType
     {
-        visitor.visitModule( this );
+        visitor.visitModule(this);
 
-        for( TransientAssemblyImpl compositeDeclaration : transientAssemblies.values() )
+        for(TransientAssemblyImpl compositeDeclaration : transientAssemblies.values())
         {
-            visitor.visitComposite( new TransientDeclarationImpl( singleton( compositeDeclaration ) ) );
+            visitor.visitComposite(new TransientDeclarationImpl(singleton(compositeDeclaration)));
         }
 
-        for( EntityAssemblyImpl entityDeclaration : entityAssemblies.values() )
+        for(EntityAssemblyImpl entityDeclaration : entityAssemblies.values())
         {
-            visitor.visitEntity( new EntityDeclarationImpl( singleton( entityDeclaration ) ) );
+            visitor.visitEntity(new EntityDeclarationImpl(singleton(entityDeclaration)));
         }
 
-        for( ObjectAssemblyImpl objectDeclaration : objectAssemblies.values() )
+        for(ObjectAssemblyImpl objectDeclaration : objectAssemblies.values())
         {
-            visitor.visitObject( new ObjectDeclarationImpl( singleton( objectDeclaration ) ) );
+            visitor.visitObject(new ObjectDeclarationImpl(singleton(objectDeclaration)));
         }
 
-        for( ServiceAssemblyImpl serviceDeclaration : serviceAssemblies )
+        for(ServiceAssemblyImpl serviceDeclaration : serviceAssemblies)
         {
-            visitor.visitService( new ServiceDeclarationImpl( singleton( serviceDeclaration ) ) );
+            visitor.visitService(new ServiceDeclarationImpl(singleton(serviceDeclaration)));
         }
 
-        for( ImportedServiceAssemblyImpl importedServiceDeclaration : importedServiceAssemblies.values() )
+        for(ImportedServiceAssemblyImpl importedServiceDeclaration : importedServiceAssemblies.values())
         {
-            visitor.visitImportedService( new ImportedServiceDeclarationImpl( singleton( importedServiceDeclaration ) ) );
+            visitor.visitImportedService(new ImportedServiceDeclarationImpl(singleton(importedServiceDeclaration)));
         }
 
-        for( ValueAssemblyImpl valueDeclaration : valueAssemblies.values() )
+        for(ValueAssemblyImpl valueDeclaration : valueAssemblies.values())
         {
-            visitor.visitValue( new ValueDeclarationImpl( singleton( valueDeclaration ) ) );
+            visitor.visitValue(new ValueDeclarationImpl(singleton(valueDeclaration)));
         }
     }
 
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     ModuleModel assembleModule(LayerModel layerModel, AssemblyHelper helper)
-            throws AssemblyException
+        throws AssemblyException
     {
         addRequiredAssemblers();
         Set<Throwable> exceptions = new HashSet<>();
@@ -557,75 +520,75 @@ final class ModuleAssemblyImpl
         List<ImportedServiceModel> importedServiceModels = new ArrayList<>();
         List<EntityModel> entityModels = new ArrayList<>();
         ModuleModel moduleModel = new ModuleModel(name,
-                metaInfo,
-                layerModel,
-                new ActivatorsModel<>(activators),
-                new TransientsModel(transientModels),
-                new EntitiesModel(entityModels),
-                new ObjectsModel(objectModels),
-                new ValuesModel(valueModels),
-                new ServicesModel(serviceModels),
-                new ImportedServicesModel(importedServiceModels));
+            metaInfo,
+            layerModel,
+            new ActivatorsModel<>(activators),
+            new TransientsModel(transientModels),
+            new EntitiesModel(entityModels),
+            new ObjectsModel(objectModels),
+            new ValuesModel(valueModels),
+            new ServicesModel(serviceModels),
+            new ImportedServicesModel(importedServiceModels));
 
-        if (name == null)
+        if(name == null)
         {
             throw new AssemblyException("Module must have name set");
         }
 
         transientModels.addAll(transientAssemblies.values().stream()
-                .map( composite ->
-                      {
-                          try
-                          {
-                              return composite.newTransientModel( moduleModel, metaInfoDeclaration, helper );
-                          }
-                          catch( Exception e )
-                          {
-                              exceptions.add( e );
-                              return null;
-                          }
-                      } )
-                .filter( Objects::nonNull )
-                .collect(toList()));
+            .map(composite ->
+            {
+                try
+                {
+                    return composite.newTransientModel(moduleModel, metaInfoDeclaration, helper);
+                }
+                catch(Exception e)
+                {
+                    exceptions.add(e);
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .collect(toList()));
 
         valueModels.addAll(valueAssemblies.values().stream()
-                .map( value ->
-                      {
-                          try
-                          {
-                              return value.newValueModel( moduleModel, metaInfoDeclaration, helper );
-                          }
-                          catch( Exception e )
-                          {
-                              exceptions.add( e );
-                              return null;
-                          }
-                      } )
-                .filter( Objects::nonNull )
-                .collect(toList()));
+            .map(value ->
+            {
+                try
+                {
+                    return value.newValueModel(moduleModel, metaInfoDeclaration, helper);
+                }
+                catch(Exception e)
+                {
+                    exceptions.add(e);
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .collect(toList()));
 
         entityModels.addAll(entityAssemblies.values().stream()
-                .map( entityDeclaration ->
-                      {
-                          try
-                          {
-                              return entityDeclaration.newEntityModel( moduleModel,
-                                                                       metaInfoDeclaration,
-                                                                       metaInfoDeclaration,
-                                                                       metaInfoDeclaration,
-                                                                       metaInfoDeclaration,
-                                                                       helper );
-                          }
-                          catch( Exception e )
-                          {
-                              exceptions.add( e );
-                              return null;
-                          }
-                      } )
-                .filter( Objects::nonNull )
-                .collect(Collectors.toList()));
+            .map(entityDeclaration ->
+            {
+                try
+                {
+                    return entityDeclaration.newEntityModel(moduleModel,
+                        metaInfoDeclaration,
+                        metaInfoDeclaration,
+                        metaInfoDeclaration,
+                        metaInfoDeclaration,
+                        helper);
+                }
+                catch(Exception e)
+                {
+                    exceptions.add(e);
+                    return null;
+                }
+            })
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()));
 
-        for (ObjectAssemblyImpl objectDeclaration : objectAssemblies.values())
+        for(ObjectAssemblyImpl objectDeclaration : objectAssemblies.values())
         {
             objectDeclaration.addObjectModel(moduleModel, objectModels);
         }
@@ -633,59 +596,60 @@ final class ModuleAssemblyImpl
         serviceModels.addAll(
             serviceAssemblies
                 .stream()
-                .map( serviceDeclaration ->
-                      {
-                          try
-                          {
-                              if( serviceDeclaration.identity == null )
-                              {
-                                  serviceDeclaration.identity = generateId( serviceDeclaration.types() );
-                              }
-                              return ( serviceDeclaration.newServiceModel( moduleModel, metaInfoDeclaration, helper ) );
-                          }
-                          catch( Exception e )
-                          {
-                              exceptions.add( e );
-                              return null;
-                          }
-                      } )
-                .filter( Objects::nonNull )
-                .collect( Collectors.toList() ) );
+                .map(serviceDeclaration ->
+                {
+                    try
+                    {
+                        if(serviceDeclaration.identity == null)
+                        {
+                            serviceDeclaration.identity = generateId(serviceDeclaration.types());
+                        }
+                        return (serviceDeclaration.newServiceModel(moduleModel, metaInfoDeclaration, helper));
+                    }
+                    catch(Exception e)
+                    {
+                        exceptions.add(e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
 
-        for (ImportedServiceAssemblyImpl importedServiceDeclaration : importedServiceAssemblies.values())
+        for(ImportedServiceAssemblyImpl importedServiceDeclaration : importedServiceAssemblies.values())
         {
             importedServiceDeclaration.addImportedServiceModel(moduleModel, importedServiceModels);
         }
 
         // Check for duplicate service identities
         Set<String> identities = new HashSet<>();
-        for (ServiceModel serviceModel : serviceModels)
+        for(ServiceModel serviceModel : serviceModels)
         {
             String identity = serviceModel.identity().toString();
-            if (identities.contains(identity))
+            if(identities.contains(identity))
             {
                 DuplicateServiceIdentityException exception = new DuplicateServiceIdentityException(
                     "Duplicated service reference: " + identity + " in module " + moduleModel.name()
                 );
-                exceptions.add( exception.fillInStackTrace() );
-            } else
-            {
-                identities.add( identity );
-            }
-        }
-        for (ImportedServiceModel serviceModel : importedServiceModels)
-        {
-            String identity = serviceModel.identity().toString();
-            if (identities.contains(identity))
-            {
-                DuplicateServiceIdentityException exception = new DuplicateServiceIdentityException(
-                        "Duplicated service reference: " + identity + " in module " + moduleModel.name()
-                );
-                exceptions.add( exception.fillInStackTrace() );
+                exceptions.add(exception.fillInStackTrace());
             }
             else
             {
-                identities.add( identity );
+                identities.add(identity);
+            }
+        }
+        for(ImportedServiceModel serviceModel : importedServiceModels)
+        {
+            String identity = serviceModel.identity().toString();
+            if(identities.contains(identity))
+            {
+                DuplicateServiceIdentityException exception = new DuplicateServiceIdentityException(
+                    "Duplicated service reference: " + identity + " in module " + moduleModel.name()
+                );
+                exceptions.add(exception.fillInStackTrace());
+            }
+            else
+            {
+                identities.add(identity);
             }
         }
 
@@ -693,50 +657,50 @@ final class ModuleAssemblyImpl
             .stream()
             .filter(
                 importedServiceModel ->
-                    objectModels.stream().noneMatch( model -> model.types().findFirst().get()
-                                                                   .equals( importedServiceModel.serviceImporter() ) ) )
+                    objectModels.stream().noneMatch(model -> model.types().findFirst().get()
+                        .equals(importedServiceModel.serviceImporter())))
             .forEach(
                 importedServiceModel ->
                 {
                     try
                     {
-                        objectModels.add( new ObjectModel( moduleModel, importedServiceModel.serviceImporter(),
-                                                           Visibility.module, new MetaInfo() ) );
+                        objectModels.add(new ObjectModel(moduleModel, importedServiceModel.serviceImporter(),
+                            Visibility.module, new MetaInfo()));
                     }
-                    catch( Exception e )
+                    catch(Exception e)
                     {
-                        exceptions.add( e );
+                        exceptions.add(e);
                     }
-                } );
-        if( exceptions.size() == 0 )
+                });
+        if(exceptions.size() == 0)
         {
             return moduleModel;
         }
-        throw new AssemblyReportException( exceptions );
+        throw new AssemblyReportException(exceptions);
     }
 
     private void addRequiredAssemblers()
     {
-        Set<Throwable> problems = new HashSet<>( );
+        Set<Throwable> problems = new HashSet<>();
         REQUIRED_ASSEMBLERS
             .entrySet()
             .stream()
             .filter(
                 entry -> serviceAssemblies.stream().noneMatch(
-                    serviceAssembly -> serviceAssembly.hasType( entry.getKey() ) ) )
-            .forEach( entry -> {
+                    serviceAssembly -> serviceAssembly.hasType(entry.getKey())))
+            .forEach(entry -> {
                 try
                 {
-                    entry.getValue().assemble( this );
+                    entry.getValue().assemble(this);
                 }
-                catch( Exception e )
+                catch(Exception e)
                 {
-                    problems.add( e );
+                    problems.add(e);
                 }
-            } );
-        if( problems.size() > 0 )
+            });
+        if(problems.size() > 0)
         {
-            throw new AssemblyReportException( problems );
+            throw new AssemblyReportException(problems);
         }
     }
 
@@ -744,25 +708,25 @@ final class ModuleAssemblyImpl
     {
         // Find service reference that is not yet used
         Class<?> serviceType = serviceTypes.findFirst()
-                .orElse(null); // Use the first, which *SHOULD* be the main serviceType
+            .orElse(null); // Use the first, which *SHOULD* be the main serviceType
         int idx = 0;
-        Identity id = StringIdentity.identityOf( serviceType.getSimpleName() );
+        Identity id = StringIdentity.identityOf(serviceType.getSimpleName());
         boolean invalid;
         do
         {
             invalid = false;
-            for (ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
+            for(ServiceAssemblyImpl serviceAssembly : serviceAssemblies)
             {
-                if (serviceAssembly.identity() != null && serviceAssembly.identity().equals(id))
+                if(serviceAssembly.identity() != null && serviceAssembly.identity().equals(id))
                 {
                     idx++;
-                    id = StringIdentity.identityOf( serviceType.getSimpleName() + "_" + idx );
+                    id = StringIdentity.identityOf(serviceType.getSimpleName() + "_" + idx);
                     invalid = true;
                     break;
                 }
             }
         }
-        while (invalid);
+        while(invalid);
         return id;
     }
 }

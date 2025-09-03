@@ -45,27 +45,23 @@ public interface ServiceFinder
     /**
      * Find a ServiceReference that implements the given type.
      *
-     * @param <T> Service type
+     * @param <T>         Service type
      * @param serviceType the type that the Service must implement
-     *
      * @return a ServiceReference if one is found
-     *
      * @throws NoSuchServiceTypeException if no service of serviceType is found
      */
-    <T> ServiceReference<T> findService( Class<T> serviceType )
+    <T> ServiceReference<T> findService(Class<T> serviceType)
         throws NoSuchServiceTypeException;
 
     /**
      * Find a ServiceReference that implements the given type.
      *
-     * @param <T> Service type
+     * @param <T>         Service type
      * @param serviceType the type that the Service must implement
-     *
      * @return a ServiceReference if one is found
-     *
      * @throws NoSuchServiceTypeException if no service of serviceType is found
      */
-    <T> ServiceReference<T> findService( Type serviceType )
+    <T> ServiceReference<T> findService(Type serviceType)
         throws NoSuchServiceTypeException;
 
     /**
@@ -75,12 +71,11 @@ public interface ServiceFinder
      * Module is earlier in the list.
      * </p>
      *
-     * @param <T> Service type
+     * @param <T>         Service type
      * @param serviceType the type that the Services must implement
-     *
      * @return a stream of ServiceReferences for the given type. It is empty if none exist
      */
-    <T> Stream<ServiceReference<T>> findServices( Class<T> serviceType );
+    <T> Stream<ServiceReference<T>> findServices(Class<T> serviceType);
 
     /**
      * Find ServiceReferences that implements the given type.
@@ -89,10 +84,9 @@ public interface ServiceFinder
      * Module is earlier in the list.
      * </p>
      *
-     * @param <T> Service type
+     * @param <T>         Service type
      * @param serviceType the type that the Services must implement
-     *
      * @return a stream of ServiceReferences for the given type. It is empty if none exist
      */
-    <T> Stream<ServiceReference<T>> findServices( Type serviceType );
+    <T> Stream<ServiceReference<T>> findServices(Type serviceType);
 }

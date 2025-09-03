@@ -27,22 +27,22 @@ import static java.util.stream.Collectors.toList;
 
 public class HasAssignableToType<T extends HasTypes> extends HasTypesPredicate<T>
 {
-    public HasAssignableToType( Type type )
+    public HasAssignableToType(Type type)
     {
-        super( Collections.singletonList( type ) );
+        super(Collections.singletonList(type));
     }
 
-    public HasAssignableToType( T hasTypes )
+    public HasAssignableToType(T hasTypes)
     {
-        super( hasTypes.types().collect( toList() ) );
+        super(hasTypes.types().collect(toList()));
     }
 
     @Override
-    protected Predicate<Type> matchPredicate( Type candidate )
+    protected Predicate<Type> matchPredicate(Type candidate)
     {
         // TODO; what to do if there is ParameterizedType here??
         // Now set to ClassCastException and see if anything surfaces
         Class<?> clazz = (Class<?>) candidate;
-        return input -> !input.equals( candidate ) && ( (Class<?>) input ).isAssignableFrom( clazz );
+        return input -> !input.equals(candidate) && ((Class<?>) input).isAssignableFrom(clazz);
     }
 }

@@ -23,14 +23,14 @@ import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.mixin.Mixins;
 
 // START SNIPPET: private
-@Mixins( CargoMixin.class )
+@Mixins(CargoMixin.class)
 public interface Cargo extends EntityComposite
 {
     String origin();
 
     String destination();
 
-    void changeDestination( String newDestination );
+    void changeDestination(String newDestination);
 
 }
 

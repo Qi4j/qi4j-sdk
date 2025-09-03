@@ -19,6 +19,7 @@
  */
 package org.qi4j.regression.qi377;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.Optional;
@@ -31,7 +32,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -42,11 +42,11 @@ public class InterfaceCollisionWithRelatedReturnTypesTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( Employee.class, Company.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(Employee.class, Company.class);
     }
 
     @Test
@@ -54,23 +54,23 @@ public class InterfaceCollisionWithRelatedReturnTypesTest
         throws UnitOfWorkCompletionException
     {
         Identity identity;
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Company startUp = uow.newEntity( Company.class );
-            startUp.name().set( "Acme" );
+            Company startUp = uow.newEntity(Company.class);
+            startUp.name().set("Acme");
             identity = ((HasIdentity) startUp).identity().get();
             uow.complete();
         }
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Company startUp = uow.get( Company.class, identity );
-            assertThat( startUp.name().get(), equalTo( "Acme" ) );
+            Company startUp = uow.get(Company.class, identity);
+            assertThat(startUp.name().get(), equalTo("Acme"));
 
-            SalesTeam sales = uow.get( SalesTeam.class, identity );
-            assertThat( sales.name().get(), equalTo( "Acme" ) );
+            SalesTeam sales = uow.get(SalesTeam.class, identity);
+            assertThat(sales.name().get(), equalTo("Acme"));
 
-            ResearchTeam research = uow.get( ResearchTeam.class, identity );
-            assertThat( research.name().get(), equalTo( "Acme" ) );
+            ResearchTeam research = uow.get(ResearchTeam.class, identity);
+            assertThat(research.name().get(), equalTo("Acme"));
         }
     }
 
@@ -79,89 +79,89 @@ public class InterfaceCollisionWithRelatedReturnTypesTest
         throws UnitOfWorkCompletionException
     {
         Identity identity;
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Company startUp = uow.newEntity( Company.class );
-            Employee niclas = uow.newEntity( Employee.class );
+            Company startUp = uow.newEntity(Company.class);
+            Employee niclas = uow.newEntity(Employee.class);
 
-            startUp.lead().set( niclas );
+            startUp.lead().set(niclas);
             identity = ((HasIdentity) startUp).identity().get();
 
             uow.complete();
         }
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Company startUp = uow.get( Company.class, identity );
+            Company startUp = uow.get(Company.class, identity);
             Employee niclas = startUp.lead().get();
-            assertThat( niclas, notNullValue() );
+            assertThat(niclas, notNullValue());
 
-            SalesTeam sales = uow.get( SalesTeam.class, identity );
-            assertThat( sales.lead().get(), equalTo( niclas ) );
+            SalesTeam sales = uow.get(SalesTeam.class, identity);
+            assertThat(sales.lead().get(), equalTo(niclas));
 
-            ResearchTeam research = uow.get( ResearchTeam.class, identity );
-            assertThat( research.lead().get(), equalTo( niclas ) );
+            ResearchTeam research = uow.get(ResearchTeam.class, identity);
+            assertThat(research.lead().get(), equalTo(niclas));
         }
     }
 
     @Test
     public void shouldBeAbleToSetLeadToTheSalesTeam()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            SalesTeam startUp = uow.newEntity( SalesTeam.class );
-            Employee niclas = uow.newEntity( Employee.class );
+            SalesTeam startUp = uow.newEntity(SalesTeam.class);
+            Employee niclas = uow.newEntity(Employee.class);
 
-            startUp.lead().set( niclas );
+            startUp.lead().set(niclas);
         }
     }
 
     @Test
     public void shouldBeAbleToSetLeadToTheResearchTeam()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            ResearchTeam startUp = uow.newEntity( ResearchTeam.class );
-            Employee niclas = uow.newEntity( Employee.class );
+            ResearchTeam startUp = uow.newEntity(ResearchTeam.class);
+            Employee niclas = uow.newEntity(Employee.class);
 
-            startUp.lead().set( niclas );
+            startUp.lead().set(niclas);
         }
     }
 
     @Test
     public void shouldBeAbleToAddEmployeesToTheCompany()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Company startUp = uow.newEntity( Company.class );
-            Employee niclas = uow.newEntity( Employee.class );
+            Company startUp = uow.newEntity(Company.class);
+            Employee niclas = uow.newEntity(Employee.class);
 
             // To which team is Niclas added? Seems to be the interface listed first in the interface declaration?
             // This contrived example is probably just bad design...
-            startUp.employees().add( niclas );
+            startUp.employees().add(niclas);
         }
     }
 
     @Test
     public void shouldBeAbleToAddEmployeesToTheSalesTeam()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            SalesTeam startUp = uow.newEntity( SalesTeam.class );
-            Employee niclas = uow.newEntity( Employee.class );
+            SalesTeam startUp = uow.newEntity(SalesTeam.class);
+            Employee niclas = uow.newEntity(Employee.class);
 
-            startUp.employees().add( niclas );
+            startUp.employees().add(niclas);
         }
     }
 
     @Test
     public void shouldBeAbleToAddEmployeesToTheResearchTeam()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            ResearchTeam startUp = uow.newEntity( ResearchTeam.class );
-            Employee niclas = uow.newEntity( Employee.class );
+            ResearchTeam startUp = uow.newEntity(ResearchTeam.class);
+            Employee niclas = uow.newEntity(Employee.class);
 
-            startUp.employees().add( niclas );
+            startUp.employees().add(niclas);
         }
     }
 

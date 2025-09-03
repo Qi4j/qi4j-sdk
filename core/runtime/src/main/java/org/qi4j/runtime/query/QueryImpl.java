@@ -19,14 +19,6 @@
  */
 package org.qi4j.runtime.query;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.query.Query;
@@ -34,6 +26,10 @@ import org.qi4j.api.query.QueryExecutionException;
 import org.qi4j.api.query.QueryExpressions;
 import org.qi4j.api.query.grammar.OrderBy;
 import org.qi4j.spi.query.QuerySource;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Default implementation of {@link Query}.
@@ -73,10 +69,10 @@ class QueryImpl<T>
      * @param resultType  type of queried entities; cannot be null
      * @param whereClause where clause
      */
-    QueryImpl( final Class<T> resultType,
-               final Predicate<Composite> whereClause,
-               final QuerySource querySource
-             )
+    QueryImpl(final Class<T> resultType,
+              final Predicate<Composite> whereClause,
+              final QuerySource querySource
+    )
     {
         this.resultType = resultType;
         this.whereClause = whereClause;
@@ -87,9 +83,9 @@ class QueryImpl<T>
      * @see Query#orderBy(OrderBy[])
      */
     @Override
-    public Query<T> orderBy( final OrderBy... segments )
+    public Query<T> orderBy(final OrderBy... segments)
     {
-        orderBySegments = Arrays.asList( segments );
+        orderBySegments = Arrays.asList(segments);
         return this;
     }
 
@@ -97,13 +93,13 @@ class QueryImpl<T>
      * @see Query#orderBy(Property, OrderBy.Order)
      */
     @Override
-    public Query<T> orderBy( Property<?> property, OrderBy.Order order )
+    public Query<T> orderBy(Property<?> property, OrderBy.Order order)
     {
-        if( orderBySegments == null )
+        if(orderBySegments == null)
         {
             orderBySegments = new ArrayList<>();
         }
-        orderBySegments.add( new OrderBy( QueryExpressions.property( property ), order ) );
+        orderBySegments.add(new OrderBy(QueryExpressions.property(property), order));
         return this;
     }
 
@@ -111,9 +107,9 @@ class QueryImpl<T>
      * @see Query#orderBy(Property)
      */
     @Override
-    public Query<T> orderBy( Property<?> property )
+    public Query<T> orderBy(Property<?> property)
     {
-        orderBy( property, OrderBy.Order.ASCENDING );
+        orderBy(property, OrderBy.Order.ASCENDING);
         return this;
     }
 
@@ -121,7 +117,7 @@ class QueryImpl<T>
      * @see Query#firstResult(int)
      */
     @Override
-    public Query<T> firstResult( int firstResult )
+    public Query<T> firstResult(int firstResult)
     {
         this.firstResult = firstResult;
         return this;
@@ -131,7 +127,7 @@ class QueryImpl<T>
      * @see Query#maxResults(int)
      */
     @Override
-    public Query<T> maxResults( int maxResults )
+    public Query<T> maxResults(int maxResults)
     {
         this.maxResults = maxResults;
         return this;
@@ -140,15 +136,15 @@ class QueryImpl<T>
     /**
      * @see Query#setVariable(String, Object)
      */
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     @Override
-    public Query<T> setVariable( final String name, final Object value )
+    public Query<T> setVariable(final String name, final Object value)
     {
-        if( variables == null )
+        if(variables == null)
         {
             variables = new HashMap<>();
         }
-        variables.put( name, value );
+        variables.put(name, value);
 
         return this;
     }
@@ -156,17 +152,17 @@ class QueryImpl<T>
     /**
      * @see Query#getVariable(String)
      */
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     @Override
-    public <V> V getVariable( final String name )
+    public <V> V getVariable(final String name)
     {
-        if( variables == null )
+        if(variables == null)
         {
             return null;
         }
         else
         {
-            return (V) variables.get( name );
+            return (V) variables.get(name);
         }
     }
 
@@ -180,14 +176,14 @@ class QueryImpl<T>
     public T find()
         throws QueryExecutionException
     {
-        return querySource.find( resultType, whereClause, orderBySegments, firstResult, maxResults, variables );
+        return querySource.find(resultType, whereClause, orderBySegments, firstResult, maxResults, variables);
     }
 
     @Override
     public long count()
         throws QueryExecutionException
     {
-        return querySource.count( resultType, whereClause, orderBySegments, firstResult, maxResults, variables );
+        return querySource.count(resultType, whereClause, orderBySegments, firstResult, maxResults, variables);
     }
 
     @Override
@@ -199,20 +195,20 @@ class QueryImpl<T>
     @Override
     public Stream<T> stream()
     {
-        return querySource.stream( resultType, whereClause, orderBySegments, firstResult, maxResults, variables );
+        return querySource.stream(resultType, whereClause, orderBySegments, firstResult, maxResults, variables);
     }
 
     @Override
     public String toString()
     {
         return "Query{" +
-               " FROM " + querySource +
-               " WHERE " + whereClause +
-               ( orderBySegments != null ? " ORDER BY " + orderBySegments : "" ) +
-               ( firstResult != null ? " FIRST " + firstResult : "" ) +
-               ( maxResults != null ? " MAX " + maxResults : "" ) +
-               " EXPECT " + resultType +
-               ( variables != null ? " WITH VARIABLES " + variables : "" ) +
-               '}';
+            " FROM " + querySource +
+            " WHERE " + whereClause +
+            (orderBySegments != null ? " ORDER BY " + orderBySegments : "") +
+            (firstResult != null ? " FIRST " + firstResult : "") +
+            (maxResults != null ? " MAX " + maxResults : "") +
+            " EXPECT " + resultType +
+            (variables != null ? " WITH VARIABLES " + variables : "") +
+            '}';
     }
 }

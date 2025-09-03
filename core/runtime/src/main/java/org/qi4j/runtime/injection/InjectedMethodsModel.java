@@ -20,6 +20,13 @@
 
 package org.qi4j.runtime.injection;
 
+import org.qi4j.api.injection.InjectionScope;
+import org.qi4j.api.util.Classes;
+import org.qi4j.api.util.HierarchicalVisitor;
+import org.qi4j.api.util.Methods;
+import org.qi4j.api.util.VisitableHierarchy;
+
+import javax.annotation.PostConstruct;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -29,12 +36,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.PostConstruct;
-import org.qi4j.api.injection.InjectionScope;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.util.Methods;
-import org.qi4j.api.util.HierarchicalVisitor;
-import org.qi4j.api.util.VisitableHierarchy;
 
 import static org.qi4j.api.util.Annotations.typeHasAnnotation;
 
@@ -47,41 +48,41 @@ public final class InjectedMethodsModel
     // Model
     private final List<InjectedMethodModel> methodModels = new ArrayList<>();
 
-    public InjectedMethodsModel( Class fragmentClass )
+    public InjectedMethodsModel(Class fragmentClass)
     {
-        Methods.methodsOf( fragmentClass ).forEach( method -> {
+        Methods.methodsOf(fragmentClass).forEach(method -> {
             Annotation[][] parameterAnnotations = method.getParameterAnnotations();
-            if( parameterAnnotations.length > 0 )
+            if(parameterAnnotations.length > 0)
             {
                 InjectedParametersModel parametersModel = new InjectedParametersModel();
                 final Type[] genericParameterTypes = method.getGenericParameterTypes();
                 boolean found = true;
-                for( int i = 0; i < parameterAnnotations.length; i++ )
+                for(int i = 0; i < parameterAnnotations.length; i++)
                 {
-                    Optional<Annotation> opt = Arrays.stream( parameterAnnotations[ i ] )
-                        .filter( typeHasAnnotation( InjectionScope.class ) )
+                    Optional<Annotation> opt = Arrays.stream(parameterAnnotations[i])
+                        .filter(typeHasAnnotation(InjectionScope.class))
                         .findFirst();
-                    if( opt.isPresent() )
+                    if(opt.isPresent())
                     {
                         Annotation injectionAnnotation = opt.get();
-                        Type genericType = genericParameterTypes[ i ];
-                        if( genericType instanceof ParameterizedType )
+                        Type genericType = genericParameterTypes[i];
+                        if(genericType instanceof ParameterizedType)
                         {
-                            genericType = createParameterizedTypeInstance( (ParameterizedType) genericType );
+                            genericType = createParameterizedTypeInstance((ParameterizedType) genericType);
 
-                            for( int j = 0; j < ( (ParameterizedType) genericType ).getActualTypeArguments().length; j++ )
+                            for(int j = 0; j < ((ParameterizedType) genericType).getActualTypeArguments().length; j++)
                             {
-                                Type type = ( (ParameterizedType) genericType ).getActualTypeArguments()[ j ];
-                                if( type instanceof TypeVariable )
+                                Type type = ((ParameterizedType) genericType).getActualTypeArguments()[j];
+                                if(type instanceof TypeVariable)
                                 {
-                                    type = Classes.resolveTypeVariable( (TypeVariable) type, method.getDeclaringClass(), fragmentClass );
-                                    ( (ParameterizedType) genericType ).getActualTypeArguments()[ j ] = type;
+                                    type = Classes.resolveTypeVariable((TypeVariable) type, method.getDeclaringClass(), fragmentClass);
+                                    ((ParameterizedType) genericType).getActualTypeArguments()[j] = type;
                                 }
                             }
                         }
-                        boolean optional = DependencyModel.isOptional( injectionAnnotation, parameterAnnotations[ i ] );
-                        DependencyModel dependencyModel = new DependencyModel( injectionAnnotation, genericType, fragmentClass, optional, parameterAnnotations[ i ] );
-                        parametersModel.addDependency( dependencyModel );
+                        boolean optional = DependencyModel.isOptional(injectionAnnotation, parameterAnnotations[i]);
+                        DependencyModel dependencyModel = new DependencyModel(injectionAnnotation, genericType, fragmentClass, optional, parameterAnnotations[i]);
+                        parametersModel.addDependency(dependencyModel);
                     }
                     else
                     {
@@ -89,16 +90,16 @@ public final class InjectedMethodsModel
                         break;
                     }
                 }
-                if( found )
+                if(found)
                 {
-                    methodModels.add( new InjectedMethodModel( method, parametersModel ) );
+                    methodModels.add(new InjectedMethodModel(method, parametersModel));
                 }
             }
-        } );
+        });
     }
 
     @PostConstruct
-    private Type createParameterizedTypeInstance( ParameterizedType genericType )
+    private Type createParameterizedTypeInstance(ParameterizedType genericType)
     {
         return new ParameterizedTypeInstance(
             genericType.getActualTypeArguments(), genericType.getRawType(), genericType.getOwnerType()
@@ -108,32 +109,32 @@ public final class InjectedMethodsModel
     @Override
     public Stream<DependencyModel> dependencies()
     {
-        return methodModels.stream().flatMap( InjectedMethodModel::dependencies );
+        return methodModels.stream().flatMap(InjectedMethodModel::dependencies);
     }
 
     // Context
-    public void inject( InjectionContext context, Object instance )
+    public void inject(InjectionContext context, Object instance)
     {
-        for( InjectedMethodModel methodModel : methodModels )
+        for(InjectedMethodModel methodModel : methodModels)
         {
-            methodModel.inject( context, instance );
+            methodModel.inject(context, instance);
         }
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            for( InjectedMethodModel methodModel : methodModels )
+            for(InjectedMethodModel methodModel : methodModels)
             {
-                if( !methodModel.accept( visitor ) )
+                if(!methodModel.accept(visitor))
                 {
                     break;
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 }

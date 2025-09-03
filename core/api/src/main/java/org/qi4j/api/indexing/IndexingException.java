@@ -23,12 +23,13 @@ package org.qi4j.api.indexing;
  */
 public abstract class IndexingException extends RuntimeException
 {
-    public IndexingException( String message )
+    public IndexingException(String message)
     {
-        super( message );
+        super(message);
     }
-    public IndexingException( String message, Throwable cause )
+
+    public IndexingException(String message, Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 }

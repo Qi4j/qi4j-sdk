@@ -19,19 +19,13 @@
  */
 package org.qi4j.runtime.activation;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.identity.StringIdentity;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.service.ImportedServiceDescriptor;
-import org.qi4j.api.service.ServiceComposite;
-import org.qi4j.api.service.ServiceImporter;
-import org.qi4j.api.service.ServiceImporterException;
-import org.qi4j.api.service.ServiceReference;
+import org.qi4j.api.service.*;
 import org.qi4j.api.structure.Application;
-import org.qi4j.bootstrap.ImportedServiceDeclaration;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.ImportedServiceDeclaration;
 import org.qi4j.bootstrap.SingletonAssembler;
 
@@ -51,43 +45,43 @@ public class ImportedServiceActivationTest
         implements Activator<ServiceReference<TestedService>>
     {
 
-        public void beforeActivation( ServiceReference<TestedService> activating )
+        public void beforeActivation(ServiceReference<TestedService> activating)
         {
-            assertThat( "Service should not be active before activation", activating.isActive(), is( false ) );
+            assertThat("Service should not be active before activation", activating.isActive(), is(false));
             try
             {
                 activating.get();
-                fail( "Service is not activated yet, the reference get method should throw IllegalStateException." );
+                fail("Service is not activated yet, the reference get method should throw IllegalStateException.");
             }
-            catch( IllegalStateException expected )
+            catch(IllegalStateException expected)
             {
             }
             activationLevel++;
         }
 
-        public void afterActivation( ServiceReference<TestedService> activated )
+        public void afterActivation(ServiceReference<TestedService> activated)
         {
-            assertThat( "Service should be active after activation", activated.isActive(), is( true ) );
-            assertThat( "After activation", activated.get().foo(), equalTo( "bar" ) );
+            assertThat("Service should be active after activation", activated.isActive(), is(true));
+            assertThat("After activation", activated.get().foo(), equalTo("bar"));
             activationLevel++;
         }
 
-        public void beforePassivation( ServiceReference<TestedService> passivating )
+        public void beforePassivation(ServiceReference<TestedService> passivating)
         {
-            assertThat( "Service should be active before passivation", passivating.isActive(), is( true ) );
-            assertThat( "Before passivation", passivating.get().foo(), equalTo( "bar" ) );
+            assertThat("Service should be active before passivation", passivating.isActive(), is(true));
+            assertThat("Before passivation", passivating.get().foo(), equalTo("bar"));
             passivationLevel++;
         }
 
-        public void afterPassivation( ServiceReference<TestedService> passivated )
+        public void afterPassivation(ServiceReference<TestedService> passivated)
         {
-            assertThat( "Service should not be active after passivation", passivated.isActive(), is( false ) );
+            assertThat("Service should not be active after passivation", passivated.isActive(), is(false));
             try
             {
                 passivated.get();
-                fail( "Service is passivated, the reference get method should throw IllegalStateException." );
+                fail("Service is passivated, the reference get method should throw IllegalStateException.");
             }
-            catch( IllegalStateException expected )
+            catch(IllegalStateException expected)
             {
             }
             passivationLevel++;
@@ -110,7 +104,7 @@ public class ImportedServiceActivationTest
         }
     }
 
-    @Mixins( TestedServiceImporterService.Mixin.class )
+    @Mixins(TestedServiceImporterService.Mixin.class)
     interface TestedServiceImporterService
         extends ServiceComposite, ServiceImporter<TestedService>
     {
@@ -119,13 +113,13 @@ public class ImportedServiceActivationTest
             implements ServiceImporter<TestedService>
         {
 
-            public TestedService importService( ImportedServiceDescriptor serviceDescriptor )
+            public TestedService importService(ImportedServiceDescriptor serviceDescriptor)
                 throws ServiceImporterException
             {
                 return new TestedServiceInstance();
             }
 
-            public boolean isAvailable( TestedService instance )
+            public boolean isAvailable(TestedService instance)
             {
                 return true;
             }
@@ -144,15 +138,15 @@ public class ImportedServiceActivationTest
         throws Exception
     {
         SingletonAssembler assembler = new SingletonAssembler(
-            module -> module.importedServices( TestedService.class )
-                .withActivators( TestedActivator.class )
-                .setMetaInfo( new TestedServiceInstance() )
+            module -> module.importedServices(TestedService.class)
+                .withActivators(TestedActivator.class)
+                .setMetaInfo(new TestedServiceInstance())
                 .importOnStartup()
         );
         Application application = assembler.application();
-        assertThat( "Activation Level", activationLevel, equalTo( 2 ) );
+        assertThat("Activation Level", activationLevel, equalTo(2));
         application.passivate();
-        assertThat( "Passivation Level", passivationLevel, equalTo( 2 ) );
+        assertThat("Passivation Level", passivationLevel, equalTo(2));
     }
 
     @Test
@@ -161,17 +155,17 @@ public class ImportedServiceActivationTest
     {
         SingletonAssembler assembler = new SingletonAssembler(
             module -> {
-                module.importedServices( TestedService.class ).
-                    importedBy( ImportedServiceDeclaration.NEW_OBJECT ).
-                    withActivators( TestedActivator.class ).
+                module.importedServices(TestedService.class).
+                    importedBy(ImportedServiceDeclaration.NEW_OBJECT).
+                    withActivators(TestedActivator.class).
                     importOnStartup();
-                module.objects( TestedServiceInstance.class );
+                module.objects(TestedServiceInstance.class);
             }
         );
         Application application = assembler.application();
-        assertThat( "Activation Level", activationLevel, equalTo( 2 ) );
+        assertThat("Activation Level", activationLevel, equalTo(2));
         application.passivate();
-        assertThat( "Passivation Level", passivationLevel, equalTo( 2 ) );
+        assertThat("Passivation Level", passivationLevel, equalTo(2));
     }
 
     @Test
@@ -180,17 +174,17 @@ public class ImportedServiceActivationTest
     {
         SingletonAssembler assembler = new SingletonAssembler(
             module -> {
-                module.importedServices( TestedService.class ).
-                    importedBy( ImportedServiceDeclaration.SERVICE_IMPORTER ).
-                    setMetaInfo( StringIdentity.identityOf( "testimporter" ) ).
-                    withActivators( TestedActivator.class ).
+                module.importedServices(TestedService.class).
+                    importedBy(ImportedServiceDeclaration.SERVICE_IMPORTER).
+                    setMetaInfo(StringIdentity.identityOf("testimporter")).
+                    withActivators(TestedActivator.class).
                     importOnStartup();
-                module.services( TestedServiceImporterService.class ).identifiedBy( "testimporter" );
+                module.services(TestedServiceImporterService.class).identifiedBy("testimporter");
             }
         );
         Application application = assembler.application();
-        assertThat( "Activation Level", activationLevel, equalTo( 2 ) );
+        assertThat("Activation Level", activationLevel, equalTo(2));
         application.passivate();
-        assertThat( "Passivation Level", passivationLevel, equalTo( 2 ) );
+        assertThat("Passivation Level", passivationLevel, equalTo(2));
     }
 }

@@ -19,11 +19,10 @@
  */
 package org.qi4j.spi.entitystore.helpers;
 
-import java.util.ArrayList;
-import java.util.List;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.time.SystemTime;
@@ -32,7 +31,9 @@ import org.qi4j.serialization.jakartajson.JakartaJsonFactories;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.serialization.JsonSerialization;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -41,7 +42,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class JSONManyAssociationStateTest extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
         module.defaultServices();
     }
@@ -57,23 +58,23 @@ public class JSONManyAssociationStateTest extends AbstractQi4jTest
     {
         // Fake JSONManyAssociationState
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add( JSONKeys.VALUE, Json.createObjectBuilder().build() );
+        builder.add(JSONKeys.VALUE, Json.createObjectBuilder().build());
         JsonObject state = builder.build();
-        JSONEntityState entityState = new JSONEntityState( module,
-                                                           serialization,
-                                                           jsonFactories,
-                                                           "0",
-                                                           SystemTime.now(),
-                                                           EntityReference.parseEntityReference( "123" ),
-                                                           EntityStatus.NEW,
-                                                           null,
-                                                           state );
-        JSONManyAssociationState jsonState = new JSONManyAssociationState( jsonFactories, entityState, "under-test" );
+        JSONEntityState entityState = new JSONEntityState(module,
+            serialization,
+            jsonFactories,
+            "0",
+            SystemTime.now(),
+            EntityReference.parseEntityReference("123"),
+            EntityStatus.NEW,
+            null,
+            state);
+        JSONManyAssociationState jsonState = new JSONManyAssociationState(jsonFactories, entityState, "under-test");
 
-        jsonState.add( 0, EntityReference.parseEntityReference( "first" ) );
-        jsonState.add( 0, EntityReference.parseEntityReference( "second" ) );
+        jsonState.add(0, EntityReference.parseEntityReference("first"));
+        jsonState.add(0, EntityReference.parseEntityReference("second"));
 
-        assertThat( jsonState.count(), equalTo( 2 ) );
+        assertThat(jsonState.count(), equalTo(2));
     }
 
     @Test
@@ -81,67 +82,67 @@ public class JSONManyAssociationStateTest extends AbstractQi4jTest
     {
         // Fake JSONManyAssociationState
         JsonObjectBuilder builder = Json.createObjectBuilder();
-        builder.add( JSONKeys.VALUE, Json.createObjectBuilder().build() );
+        builder.add(JSONKeys.VALUE, Json.createObjectBuilder().build());
         JsonObject state = builder.build();
-        JSONEntityState entityState = new JSONEntityState( module,
-                                                           serialization,
-                                                           jsonFactories,
-                                                           "0",
-                                                           SystemTime.now(),
-                                                           EntityReference.parseEntityReference( "123" ),
-                                                           EntityStatus.NEW,
-                                                           null,
-                                                           state );
-        JSONManyAssociationState jsonState = new JSONManyAssociationState( jsonFactories, entityState, "under-test" );
+        JSONEntityState entityState = new JSONEntityState(module,
+            serialization,
+            jsonFactories,
+            "0",
+            SystemTime.now(),
+            EntityReference.parseEntityReference("123"),
+            EntityStatus.NEW,
+            null,
+            state);
+        JSONManyAssociationState jsonState = new JSONManyAssociationState(jsonFactories, entityState, "under-test");
 
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "NOT_PRESENT" ) ), is( false ) );
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("NOT_PRESENT")), is(false));
 
-        jsonState.add( 0, EntityReference.parseEntityReference( "0" ) );
-        jsonState.add( 1, EntityReference.parseEntityReference( "1" ) );
-        jsonState.add( 2, EntityReference.parseEntityReference( "2" ) );
+        jsonState.add(0, EntityReference.parseEntityReference("0"));
+        jsonState.add(1, EntityReference.parseEntityReference("1"));
+        jsonState.add(2, EntityReference.parseEntityReference("2"));
 
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "1" ) ), is( true ) );
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("1")), is(true));
 
-        assertThat( jsonState.get( 0 ).identity().toString(), equalTo( "0" ) );
-        assertThat( jsonState.get( 1 ).identity().toString(), equalTo( "1" ) );
-        assertThat( jsonState.get( 2 ).identity().toString(), equalTo( "2" ) );
+        assertThat(jsonState.get(0).identity().toString(), equalTo("0"));
+        assertThat(jsonState.get(1).identity().toString(), equalTo("1"));
+        assertThat(jsonState.get(2).identity().toString(), equalTo("2"));
 
-        assertThat( jsonState.count(), equalTo( 3 ) );
+        assertThat(jsonState.count(), equalTo(3));
 
-        jsonState.remove( EntityReference.parseEntityReference( "1" ) );
+        jsonState.remove(EntityReference.parseEntityReference("1"));
 
-        assertThat( jsonState.count(), equalTo( 2 ) );
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "1" ) ), is( false ) );
-        assertThat( jsonState.get( 0 ).identity().toString(), equalTo( "0" ) );
-        assertThat( jsonState.get( 1 ).identity().toString(), equalTo( "2" ) );
+        assertThat(jsonState.count(), equalTo(2));
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("1")), is(false));
+        assertThat(jsonState.get(0).identity().toString(), equalTo("0"));
+        assertThat(jsonState.get(1).identity().toString(), equalTo("2"));
 
-        jsonState.add( 2, EntityReference.parseEntityReference( "1" ) );
+        jsonState.add(2, EntityReference.parseEntityReference("1"));
 
-        assertThat( jsonState.count(), equalTo( 3 ) );
+        assertThat(jsonState.count(), equalTo(3));
 
-        jsonState.add( 0, EntityReference.parseEntityReference( "A" ) );
-        jsonState.add( 0, EntityReference.parseEntityReference( "B" ) );
-        jsonState.add( 0, EntityReference.parseEntityReference( "C" ) );
+        jsonState.add(0, EntityReference.parseEntityReference("A"));
+        jsonState.add(0, EntityReference.parseEntityReference("B"));
+        jsonState.add(0, EntityReference.parseEntityReference("C"));
 
-        assertThat( jsonState.count(), equalTo( 6 ) );
+        assertThat(jsonState.count(), equalTo(6));
 
-        assertThat( jsonState.get( 0 ).identity().toString(), equalTo( "C" ) );
-        assertThat( jsonState.get( 1 ).identity().toString(), equalTo( "B" ) );
-        assertThat( jsonState.get( 2 ).identity().toString(), equalTo( "A" ) );
+        assertThat(jsonState.get(0).identity().toString(), equalTo("C"));
+        assertThat(jsonState.get(1).identity().toString(), equalTo("B"));
+        assertThat(jsonState.get(2).identity().toString(), equalTo("A"));
 
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "C" ) ), is( true ) );
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "B" ) ), is( true ) );
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "A" ) ), is( true ) );
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "0" ) ), is( true ) );
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "2" ) ), is( true ) );
-        assertThat( jsonState.contains( EntityReference.parseEntityReference( "1" ) ), is( true ) );
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("C")), is(true));
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("B")), is(true));
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("A")), is(true));
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("0")), is(true));
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("2")), is(true));
+        assertThat(jsonState.contains(EntityReference.parseEntityReference("1")), is(true));
 
         List<String> refList = new ArrayList<>();
-        for( EntityReference ref : jsonState )
+        for(EntityReference ref : jsonState)
         {
-            refList.add( ref.identity().toString() );
+            refList.add(ref.identity().toString());
         }
-        assertThat( refList.isEmpty(), is( false ) );
-        assertThat( refList.toArray(), equalTo( new String[]{ "C", "B", "A", "0", "2", "1" } ) );
+        assertThat(refList.isEmpty(), is(false));
+        assertThat(refList.toArray(), equalTo(new String[]{"C", "B", "A", "0", "2", "1"}));
     }
 }

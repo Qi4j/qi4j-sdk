@@ -34,9 +34,9 @@ public final class ConcernsInstance
     private final FragmentInvocationHandler mixinInvocationHandler;
     private final ProxyReferenceInvocationHandler proxyHandler;
 
-    public ConcernsInstance( InvocationHandler firstConcern,
-                             FragmentInvocationHandler mixinInvocationHandler,
-                             ProxyReferenceInvocationHandler proxyHandler
+    public ConcernsInstance(InvocationHandler firstConcern,
+                            FragmentInvocationHandler mixinInvocationHandler,
+                            ProxyReferenceInvocationHandler proxyHandler
     )
     {
         this.firstConcern = firstConcern;
@@ -50,15 +50,15 @@ public final class ConcernsInstance
     }
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] params )
+    public Object invoke(Object proxy, Method method, Object[] params)
         throws Throwable
     {
-        proxyHandler.setProxy( proxy );
+        proxyHandler.setProxy(proxy);
         try
         {
-            return firstConcern.invoke( proxy, method, params );
+            return firstConcern.invoke(proxy, method, params);
         }
-        catch( InvocationTargetException e )
+        catch(InvocationTargetException e)
         {
             throw e.getTargetException();
         }

@@ -32,7 +32,7 @@ public class Collectors
 {
     /**
      * Collect a single element.
-     *
+     * <p>
      * The Collector throws {@link IllegalArgumentException} if no or more than one element.
      *
      * @param <T> Element type
@@ -44,15 +44,15 @@ public class Collectors
     {
         Supplier<T> thrower = () ->
         {
-            throw new IllegalArgumentException( "No or more than one element in stream" );
+            throw new IllegalArgumentException("No or more than one element in stream");
         };
-        return java.util.stream.Collectors.collectingAndThen( java.util.stream.Collectors.reducing( ( a, b ) -> null ),
-                                                              optional -> optional.orElseGet( thrower ) );
+        return java.util.stream.Collectors.collectingAndThen(java.util.stream.Collectors.reducing((a, b) -> null),
+            optional -> optional.orElseGet(thrower));
     }
 
     /**
      * Eventually collect a single element.
-     *
+     * <p>
      * The Collector throws {@link IllegalArgumentException} if more than one element.
      *
      * @param <T> Element type
@@ -62,23 +62,23 @@ public class Collectors
     Collector<T, ?, Optional<T>> singleOrEmpty()
     {
         return java.util.stream.Collectors.reducing(
-            ( left, right ) ->
+            (left, right) ->
             {
-                if( left != null && right != null )
+                if(left != null && right != null)
                 {
-                    throw new IllegalArgumentException( "More than one element in stream" );
+                    throw new IllegalArgumentException("More than one element in stream");
                 }
-                if( left != null )
+                if(left != null)
                 {
                     return left;
                 }
                 return right;
-            } );
+            });
     }
 
     /**
      * Collect map entries into a {@link HashMap}.
-     *
+     * <p>
      * The Collector throws {@link NullPointerException} if one entry has a {@literal null} value.
      * The Collector throws {@link IllegalStateException} if duplicate keys are found.
      *
@@ -90,61 +90,61 @@ public class Collectors
     public static <T extends Map.Entry<K, U>, K, U>
     Collector<T, ?, Map<K, U>> toMap()
     {
-        return toMap( Map.Entry::getKey, Map.Entry::getValue, HashMap::new );
+        return toMap(Map.Entry::getKey, Map.Entry::getValue, HashMap::new);
     }
 
     /**
      * Collect map entries into a map.
-     *
+     * <p>
      * The Collector throws {@link NullPointerException} if one entry has a {@literal null} value.
      * The Collector throws {@link IllegalStateException} if duplicate keys are found.
      *
-     * @param <M> the type of the resulting {@code Map}
-     * @param <T> the Map entry type
-     * @param <K> the collected map key type
-     * @param <U> the collected map value type
+     * @param <M>         the type of the resulting {@code Map}
+     * @param <T>         the Map entry type
+     * @param <K>         the collected map key type
+     * @param <U>         the collected map value type
      * @param mapSupplier a function which returns a new, empty {@code Map} into
      *                    which the results will be inserted
      * @return The map collector
      */
     public static <T extends Map.Entry<K, U>, K, U, M extends Map<K, U>>
-    Collector<T, ?, M> toMap( Supplier<M> mapSupplier )
+    Collector<T, ?, M> toMap(Supplier<M> mapSupplier)
     {
-        return toMap( Map.Entry::getKey, Map.Entry::getValue, mapSupplier );
+        return toMap(Map.Entry::getKey, Map.Entry::getValue, mapSupplier);
     }
 
     /**
      * Collect map entries into a map.
-     *
+     * <p>
      * The Collector throws {@link NullPointerException} if one entry has a {@literal null} value.
      * The Collector throws {@link IllegalStateException} if duplicate keys are found.
      *
-     * @param <M> the type of the resulting {@code Map}
-     * @param <T> the Map entry type
-     * @param <K> the collected map key type
-     * @param <U> the collected map value type
-     * @param keyMapper a mapping function to produce keys
+     * @param <M>         the type of the resulting {@code Map}
+     * @param <T>         the Map entry type
+     * @param <K>         the collected map key type
+     * @param <U>         the collected map value type
+     * @param keyMapper   a mapping function to produce keys
      * @param valueMapper a mapping function to produce values
      * @param mapSupplier a function which returns a new, empty {@code Map} into
      *                    which the results will be inserted
      * @return The map collector
      */
     public static <T, K, U, M extends Map<K, U>>
-    Collector<T, ?, M> toMap( Function<? super T, ? extends K> keyMapper,
-                              Function<? super T, ? extends U> valueMapper,
-                              Supplier<M> mapSupplier )
+    Collector<T, ?, M> toMap(Function<? super T, ? extends K> keyMapper,
+                             Function<? super T, ? extends U> valueMapper,
+                             Supplier<M> mapSupplier)
     {
-        return java.util.stream.Collectors.toMap( keyMapper,
-                                                  valueMapper,
-                                                  throwingMerger(),
-                                                  mapSupplier );
+        return java.util.stream.Collectors.toMap(keyMapper,
+            valueMapper,
+            throwingMerger(),
+            mapSupplier);
     }
 
     /**
      * Collect map entries into a {@link HashMap}, allowing null values.
-     *
+     * <p>
      * The Collector throws {@link IllegalStateException} if duplicate keys are found.
-     *
+     * <p>
      * See https://bugs.openjdk.java.net/browse/JDK-8148463
      *
      * @param <T> the Map entry type
@@ -155,80 +155,82 @@ public class Collectors
     public static <T extends Map.Entry<K, U>, K, U>
     Collector<T, ?, Map<K, U>> toMapWithNullValues()
     {
-        return toMapWithNullValues( Map.Entry::getKey, Map.Entry::getValue, HashMap::new );
+        return toMapWithNullValues(Map.Entry::getKey, Map.Entry::getValue, HashMap::new);
     }
 
     /**
      * Collect map entries into a map, allowing null values.
-     *
+     * <p>
      * The Collector throws {@link IllegalStateException} if duplicate keys are found.
-     *
+     * <p>
      * See https://bugs.openjdk.java.net/browse/JDK-8148463
      *
-     * @param <M> the type of the resulting {@code Map}
-     * @param <T> the Map entry type
-     * @param <K> the collected map key type
-     * @param <U> the collected map value type
+     * @param <M>         the type of the resulting {@code Map}
+     * @param <T>         the Map entry type
+     * @param <K>         the collected map key type
+     * @param <U>         the collected map value type
      * @param mapSupplier a function which returns a new, empty {@code Map} into
      *                    which the results will be inserted
      * @return The map collector
      */
     public static <T extends Map.Entry<K, U>, K, U, M extends Map<K, U>>
-    Collector<T, ?, M> toMapWithNullValues( Supplier<M> mapSupplier )
+    Collector<T, ?, M> toMapWithNullValues(Supplier<M> mapSupplier)
     {
-        return toMapWithNullValues( Map.Entry::getKey, Map.Entry::getValue, mapSupplier );
+        return toMapWithNullValues(Map.Entry::getKey, Map.Entry::getValue, mapSupplier);
     }
 
     /**
      * Collect map entries into a map, allowing null values.
-     *
+     * <p>
      * The Collector throws {@link IllegalStateException} if duplicate keys are found.
-     *
+     * <p>
      * See https://bugs.openjdk.java.net/browse/JDK-8148463
      *
-     * @param <M> the type of the resulting {@code Map}
-     * @param <T> the Map entry type
-     * @param <K> the collected map key type
-     * @param <U> the collected map value type
-     * @param keyMapper a mapping function to produce keys
+     * @param <M>         the type of the resulting {@code Map}
+     * @param <T>         the Map entry type
+     * @param <K>         the collected map key type
+     * @param <U>         the collected map value type
+     * @param keyMapper   a mapping function to produce keys
      * @param valueMapper a mapping function to produce values
      * @param mapSupplier a function which returns a new, empty {@code Map} into
      *                    which the results will be inserted
      * @return The map collector
      */
     public static <T, K, U, M extends Map<K, U>>
-    Collector<T, ?, M> toMapWithNullValues( Function<? super T, ? extends K> keyMapper,
-                                            Function<? super T, ? extends U> valueMapper,
-                                            Supplier<M> mapSupplier )
+    Collector<T, ?, M> toMapWithNullValues(Function<? super T, ? extends K> keyMapper,
+                                           Function<? super T, ? extends U> valueMapper,
+                                           Supplier<M> mapSupplier)
     {
         return Collector
-            .of( mapSupplier,
-                 ( map, entry ) -> map.put( keyMapper.apply( entry ),
-                                            valueMapper.apply( entry ) ),
-                 ( left, right ) ->
-                 {
-                     M result = mapSupplier.get();
-                     result.putAll( left );
-                     for( Map.Entry<K, U> entry : right.entrySet() )
-                     {
-                         K key = entry.getKey();
-                         if( result.containsKey( key ) )
-                         {
-                             throw new IllegalStateException( String.format( "Duplicate key %s", key ) );
-                         }
-                         result.put( key, entry.getValue() );
-                     }
-                     return result;
-                 } );
+            .of(mapSupplier,
+                (map, entry) -> map.put(keyMapper.apply(entry),
+                    valueMapper.apply(entry)),
+                (left, right) ->
+                {
+                    M result = mapSupplier.get();
+                    result.putAll(left);
+                    for(Map.Entry<K, U> entry : right.entrySet())
+                    {
+                        K key = entry.getKey();
+                        if(result.containsKey(key))
+                        {
+                            throw new IllegalStateException(String.format("Duplicate key %s", key));
+                        }
+                        result.put(key, entry.getValue());
+                    }
+                    return result;
+                });
     }
 
     private static <T> BinaryOperator<T> throwingMerger()
     {
-        return ( left, right ) ->
+        return (left, right) ->
         {
-            throw new IllegalStateException( String.format( "Duplicate key %s", left ) );
+            throw new IllegalStateException(String.format("Duplicate key %s", left));
         };
     }
 
-    private Collectors() {}
+    private Collectors()
+    {
+    }
 }

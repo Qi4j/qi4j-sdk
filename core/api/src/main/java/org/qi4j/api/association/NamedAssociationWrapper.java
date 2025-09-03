@@ -19,10 +19,11 @@
  */
 package org.qi4j.api.association;
 
+import org.qi4j.api.entity.EntityReference;
+
 import java.util.Iterator;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.qi4j.api.entity.EntityReference;
 
 /**
  * If you want to catch calls to NamedAssociations, then create a GenericConcern
@@ -34,7 +35,7 @@ public class NamedAssociationWrapper
 {
     protected NamedAssociation<Object> next;
 
-    public NamedAssociationWrapper( NamedAssociation<Object> next )
+    public NamedAssociationWrapper(NamedAssociation<Object> next)
     {
         this.next = next;
     }
@@ -57,21 +58,21 @@ public class NamedAssociationWrapper
     }
 
     @Override
-    public boolean containsName( String name )
+    public boolean containsName(String name)
     {
-        return next.containsName( name );
+        return next.containsName(name);
     }
 
     @Override
-    public boolean put( String name, Object entity )
+    public boolean put(String name, Object entity)
     {
-        return next.put( name, entity );
+        return next.put(name, entity);
     }
 
     @Override
-    public boolean remove( String name )
+    public boolean remove(String name)
     {
-        return next.remove( name );
+        return next.remove(name);
     }
 
     @Override
@@ -81,15 +82,15 @@ public class NamedAssociationWrapper
     }
 
     @Override
-    public Object get( String name )
+    public Object get(String name)
     {
-        return next.get( name );
+        return next.get(name);
     }
 
     @Override
-    public String nameOf( Object entity )
+    public String nameOf(Object entity)
     {
-        return next.nameOf( entity );
+        return next.nameOf(entity);
     }
 
     @Override
@@ -105,9 +106,9 @@ public class NamedAssociationWrapper
     }
 
     @Override
-    public EntityReference referenceOf( String name )
+    public EntityReference referenceOf(String name)
     {
-        return next.referenceOf( name );
+        return next.referenceOf(name);
     }
 
     @Override
@@ -118,9 +119,9 @@ public class NamedAssociationWrapper
 
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public boolean equals( Object obj )
+    public boolean equals(Object obj)
     {
-        return next.equals( obj );
+        return next.equals(obj);
     }
 
     @Override

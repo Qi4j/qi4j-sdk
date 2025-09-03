@@ -19,11 +19,12 @@
  */
 package org.qi4j.spi.entity;
 
+import org.qi4j.api.entity.EntityReference;
+
 import java.util.AbstractMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.qi4j.api.entity.EntityReference;
 
 /**
  * State holder for NamedAssociations.
@@ -36,21 +37,21 @@ public interface NamedAssociationState
 {
     int count();
 
-    boolean containsName( String name );
+    boolean containsName(String name);
 
-    boolean put( String name, EntityReference entityReference );
+    boolean put(String name, EntityReference entityReference);
 
-    boolean remove( String name );
+    boolean remove(String name);
 
     boolean clear();
 
-    EntityReference get( String name );
+    EntityReference get(String name);
 
-    String nameOf( EntityReference entityReference );
+    String nameOf(EntityReference entityReference);
 
     default Stream<Map.Entry<String, EntityReference>> stream()
     {
-        return StreamSupport.stream( spliterator(), false )
-                            .map( name -> new AbstractMap.SimpleImmutableEntry<>( name, get( name ) ) );
+        return StreamSupport.stream(spliterator(), false)
+            .map(name -> new AbstractMap.SimpleImmutableEntry<>(name, get(name)));
     }
 }

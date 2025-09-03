@@ -20,11 +20,12 @@
 
 package org.qi4j.api.association;
 
+import org.qi4j.api.entity.EntityReference;
+import org.qi4j.api.identity.Identity;
+
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.qi4j.api.entity.EntityReference;
-import org.qi4j.api.identity.Identity;
 
 /**
  * Association to a collection of entities.
@@ -43,7 +44,7 @@ public interface ManyAssociation<T> extends Iterable<T>, AbstractAssociation
      * @return true if there is an entity in this ManyAssociation with the same {@link Identity} as the given
      * entity , otherwise false.
      */
-    boolean contains( T entity );
+    boolean contains(T entity);
 
     /**
      * Adds an entity reference representing the given entity to the {@code index} slot of this collection.
@@ -58,7 +59,7 @@ public interface ManyAssociation<T> extends Iterable<T>, AbstractAssociation
      *               will be added at the beginning, position 0.
      * @return true if the entity reference has been added, false otherwise.
      */
-    boolean add( int index, T entity );
+    boolean add(int index, T entity);
 
     /**
      * Adds an entity reference representing the given entity to the end of this collection.
@@ -66,7 +67,7 @@ public interface ManyAssociation<T> extends Iterable<T>, AbstractAssociation
      * @param entity The entity whose entity reference is to be added to this collection.
      * @return true if the entity reference has been added, false otherwise.
      */
-    boolean add( T entity );
+    boolean add(T entity);
 
     /**
      * Removes the given entity from this {@code ManyAssociation}.
@@ -77,7 +78,7 @@ public interface ManyAssociation<T> extends Iterable<T>, AbstractAssociation
      * @param entity The entity reference to be removed.
      * @return true if an entity reference was removed, otherwise false
      */
-    boolean remove( T entity );
+    boolean remove(T entity);
 
     /**
      * Clear all entities from this {@code ManyAssociation}.
@@ -95,7 +96,7 @@ public interface ManyAssociation<T> extends Iterable<T>, AbstractAssociation
      * @param index The index location in the collection of the entity reference to be fetched.
      * @return The retrieved entity that the entity reference of this collection represents.
      */
-    T get( int index );
+    T get(int index);
 
     /**
      * Returns the number of references in this association.

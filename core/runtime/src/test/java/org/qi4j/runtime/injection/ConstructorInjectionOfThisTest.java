@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.injection;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.concern.ConcernOf;
@@ -27,8 +28,6 @@ import org.qi4j.api.mixin.NoopMixin;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.sideeffect.SideEffectOf;
 import org.qi4j.api.structure.Module;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.SingletonAssembler;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,10 +44,10 @@ public class ConstructorInjectionOfThisTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.values( Does.class ).withMixins( DoesMixin.class )
+            module -> module.values(Does.class).withMixins(DoesMixin.class)
         );
-        Module module = singletonAssembler.application().findModule( "Layer 1", "Module 1" );
-        Does does = module.newValue( Does.class );
+        Module module = singletonAssembler.application().findModule("Layer 1", "Module 1");
+        Does does = module.newValue(Does.class);
         does.doSomething();
     }
 
@@ -57,10 +56,10 @@ public class ConstructorInjectionOfThisTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.values( Does.class ).withMixins( NoopMixin.class ).withConcerns( DoesConcern.class )
+            module -> module.values(Does.class).withMixins(NoopMixin.class).withConcerns(DoesConcern.class)
         );
-        Module module = singletonAssembler.application().findModule( "Layer 1", "Module 1" );
-        Does does = module.newValue( Does.class );
+        Module module = singletonAssembler.application().findModule("Layer 1", "Module 1");
+        Does does = module.newValue(Does.class);
         does.doSomething();
     }
 
@@ -69,10 +68,10 @@ public class ConstructorInjectionOfThisTest
         throws ActivationException
     {
         SingletonAssembler singletonAssembler = new SingletonAssembler(
-            module -> module.values( Does.class ).withMixins( NoopMixin.class ).withSideEffects( DoesSideEffect.class )
+            module -> module.values(Does.class).withMixins(NoopMixin.class).withSideEffects(DoesSideEffect.class)
         );
-        Module module = singletonAssembler.application().findModule( "Layer 1", "Module 1" );
-        Does does = module.newValue( Does.class );
+        Module module = singletonAssembler.application().findModule("Layer 1", "Module 1");
+        Does does = module.newValue(Does.class);
         does.doSomething();
     }
 
@@ -81,9 +80,9 @@ public class ConstructorInjectionOfThisTest
     {
         private DoesPrivateFragment doesPrivateFragment;
 
-        public DoesMixin( @This DoesPrivateFragment doesPrivateFragment )
+        public DoesMixin(@This DoesPrivateFragment doesPrivateFragment)
         {
-            if( doesPrivateFragment == null )
+            if(doesPrivateFragment == null)
             {
                 throw new NullPointerException();
             }
@@ -93,7 +92,7 @@ public class ConstructorInjectionOfThisTest
         @Override
         public void doSomething()
         {
-            assertThat( doesPrivateFragment.someState().get(), is( false ) );
+            assertThat(doesPrivateFragment.someState().get(), is(false));
         }
     }
 
@@ -102,13 +101,13 @@ public class ConstructorInjectionOfThisTest
         implements Does
     {
 
-        public DoesConcern( @This Does work )
+        public DoesConcern(@This Does work)
         {
-            if( work == null )
+            if(work == null)
             {
                 throw new NullPointerException();
             }
-            System.out.print( "Niclas " );
+            System.out.print("Niclas ");
         }
 
         @Override
@@ -123,13 +122,13 @@ public class ConstructorInjectionOfThisTest
         implements Does
     {
 
-        public DoesSideEffect( @This Does work )
+        public DoesSideEffect(@This Does work)
         {
-            if( work == null )
+            if(work == null)
             {
                 throw new NullPointerException();
             }
-            System.out.print( "Niclas " );
+            System.out.print("Niclas ");
         }
 
         @Override

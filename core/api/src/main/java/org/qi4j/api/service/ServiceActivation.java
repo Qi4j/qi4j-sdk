@@ -20,15 +20,14 @@
 package org.qi4j.api.service;
 
 import org.qi4j.api.activation.Activators;
-import org.qi4j.api.activation.Activators;
 
 /**
  * Convenience interface for simple Service Activation.
- *
+ * <p>
  * Let your ServiceComposite extends ServiceActivation and implement it in one of its Mixins.
  * A corresponding Activator is automatically registered.
  */
-@Activators( ServiceActivation.ServiceActivator.class )
+@Activators(ServiceActivation.ServiceActivator.class)
 public interface ServiceActivation
 {
 
@@ -56,14 +55,14 @@ public interface ServiceActivation
     {
 
         @Override
-        public void afterActivation( ServiceReference<ServiceActivation> activated )
+        public void afterActivation(ServiceReference<ServiceActivation> activated)
             throws Exception
         {
             activated.get().activateService();
         }
 
         @Override
-        public void beforePassivation( ServiceReference<ServiceActivation> passivating )
+        public void beforePassivation(ServiceReference<ServiceActivation> passivating)
             throws Exception
         {
             passivating.get().passivateService();

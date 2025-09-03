@@ -33,7 +33,7 @@ public final class CachingInjectionProviderDecorator
     private final InjectionProvider decoratedProvider;
     private volatile Object singletonInstance;
 
-    public CachingInjectionProviderDecorator( InjectionProvider injectionProvider )
+    public CachingInjectionProviderDecorator(InjectionProvider injectionProvider)
     {
         this.decoratedProvider = injectionProvider;
     }
@@ -44,16 +44,16 @@ public final class CachingInjectionProviderDecorator
     }
 
     @Override
-    public Object provideInjection( InjectionContext context )
+    public Object provideInjection(InjectionContext context)
         throws InjectionProviderException
     {
-        if( singletonInstance == null )
+        if(singletonInstance == null)
         {
-            synchronized( this )
+            synchronized(this)
             {
-                if( singletonInstance == null )
+                if(singletonInstance == null)
                 {
-                    singletonInstance = decoratedProvider.provideInjection( context );
+                    singletonInstance = decoratedProvider.provideInjection(context);
                 }
             }
         }

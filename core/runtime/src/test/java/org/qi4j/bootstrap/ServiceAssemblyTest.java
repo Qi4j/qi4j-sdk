@@ -20,11 +20,11 @@
 
 package org.qi4j.bootstrap;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceActivation;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,7 +35,7 @@ public class ServiceAssemblyTest extends AbstractQi4jTest
     public void givenMyServiceWithTwoDeclarationsWhenActivatingServiceExpectServiceActivatedOnce()
         throws Exception
     {
-        ServiceReference<MyService> ref = serviceFinder.findService( MyService.class );
+        ServiceReference<MyService> ref = serviceFinder.findService(MyService.class);
         MyService underTest = ref.get();
         assertThat(underTest.activated(), equalTo(1));
         underTest.passivateService();
@@ -43,17 +43,18 @@ public class ServiceAssemblyTest extends AbstractQi4jTest
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( MyService.class ).instantiateOnStartup();
-        module.services( MyService.class ).setMetaInfo( "Hello" );
+        module.services(MyService.class).instantiateOnStartup();
+        module.services(MyService.class).setMetaInfo("Hello");
     }
 
-    @Mixins( MyServiceMixin.class )
+    @Mixins(MyServiceMixin.class)
     public static interface MyService extends ServiceActivation
     {
         int activated();
+
         int passivated();
     }
 

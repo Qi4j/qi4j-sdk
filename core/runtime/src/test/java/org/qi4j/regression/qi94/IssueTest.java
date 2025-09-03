@@ -19,6 +19,7 @@
  */
 package org.qi4j.regression.qi94;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
@@ -28,20 +29,19 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 public class IssueTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    @SuppressWarnings( "unchecked" )
-    public void assemble( ModuleAssembly aModule )
+    @SuppressWarnings("unchecked")
+    public void assemble(ModuleAssembly aModule)
         throws AssemblyException
     {
-        aModule.entities( Item.class, ItemType.class );
-        new EntityTestAssembler().assemble( aModule );
+        aModule.entities(Item.class, ItemType.class);
+        new EntityTestAssembler().assemble(aModule);
     }
 
     @Test
@@ -50,13 +50,13 @@ public class IssueTest
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<Item> builder = uow.newEntityBuilder( Item.class );
-            assertThat( qi4j.api()
-                            .entityDescriptorFor( builder.instance() )
-                            .state()
-                            .getAssociationByName( "typeOfItem" )
-                            .type(),
-                        equalTo( ItemType.class )
+            EntityBuilder<Item> builder = uow.newEntityBuilder(Item.class);
+            assertThat(qi4j.api()
+                    .entityDescriptorFor(builder.instance())
+                    .state()
+                    .getAssociationByName("typeOfItem")
+                    .type(),
+                equalTo(ItemType.class)
             );
         }
         finally

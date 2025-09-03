@@ -19,8 +19,6 @@
  */
 package org.qi4j.api.indexing;
 
-import org.qi4j.api.query.QueryException;
-
 /**
  * This Exception is thrown in <code>QueryBuilderFactory.newQueryBuilder()</code> method if
  * no indexing subsystem has been declared in the assembly.
@@ -29,6 +27,6 @@ public final class MissingIndexingSystemException extends IndexingException
 {
     public MissingIndexingSystemException()
     {
-        super( "No EntityFinder has been declared in the assembly of the application." );
+        super("No EntityFinder has been declared in the assembly of the application.");
     }
 }

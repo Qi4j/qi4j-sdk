@@ -17,39 +17,43 @@
  */
 package org.qi4j.spi.serialization;
 
+import org.qi4j.api.common.Optional;
+import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.structure.ModuleDescriptor;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.Base64;
-import org.qi4j.api.common.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 // START SNIPPET: binary
+
 /**
  * Base Binary Serializer.
- *
+ * <p>
  * Implementations work on bytes, this base serializer encode these bytes in Base64 to produce Strings.
- *
+ * <p>
  * See {@link AbstractBinaryDeserializer}.
  */
 public abstract class AbstractBinarySerializer extends AbstractSerializer
 // END SNIPPET: binary
 {
     @Override
-    public void serialize( Options options, Writer writer, @Optional Object object )
+    public void serialize(ModuleDescriptor module, Serialization.Options options, Writer writer, @Optional Object object)
     {
         try
         {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
-            serialize( options, output, object );
-            byte[] base64 = Base64.getEncoder().encode( output.toByteArray() );
-            writer.write( new String( base64, UTF_8 ) );
+            serialize(module, options, output, object);
+            byte[] base64 = Base64.getEncoder().encode(output.toByteArray());
+            writer.write(new String(base64, UTF_8));
         }
-        catch( IOException ex )
+        catch(IOException ex)
         {
-            throw new UncheckedIOException( ex );
+            throw new UncheckedIOException(ex);
         }
     }
 }

@@ -19,7 +19,6 @@
  */
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.AccessibleObject;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.util.Classes;
@@ -28,6 +27,8 @@ import org.qi4j.runtime.unitofwork.BuilderEntityState;
 import org.qi4j.runtime.unitofwork.ModuleUnitOfWork;
 import org.qi4j.spi.entity.EntityState;
 
+import java.lang.reflect.AccessibleObject;
+
 /**
  * Model for a ManyAssociation.
  *
@@ -35,21 +36,21 @@ import org.qi4j.spi.entity.EntityState;
  */
 public final class ManyAssociationModel extends AbstractAssociationModel<ManyAssociationModel>
 {
-    public ManyAssociationModel( AccessibleObject accessor,
-                                 ValueConstraintsInstance valueConstraintsInstance,
-                                 ValueConstraintsInstance associationConstraintsInstance,
-                                 MetaInfo metaInfo
+    public ManyAssociationModel(AccessibleObject accessor,
+                                ValueConstraintsInstance valueConstraintsInstance,
+                                ValueConstraintsInstance associationConstraintsInstance,
+                                MetaInfo metaInfo
     )
     {
-        super( accessor, valueConstraintsInstance, associationConstraintsInstance, metaInfo );
+        super(accessor, valueConstraintsInstance, associationConstraintsInstance, metaInfo);
     }
 
-    public <T> ManyAssociation<T> newInstance( final ModuleUnitOfWork uow, EntityState state )
+    public <T> ManyAssociation<T> newInstance(final ModuleUnitOfWork uow, EntityState state)
     {
         return new ManyAssociationInstance<>(
             state instanceof BuilderEntityState ? builderInfo() : this,
-            ( entityReference, type ) -> uow.get( Classes.RAW_CLASS.apply( type ), entityReference.identity() ),
-            state.manyAssociationValueOf( qualifiedName() )
+            (entityReference, type) -> uow.get(Classes.RAW_CLASS.apply(type), entityReference.identity()),
+            state.manyAssociationValueOf(qualifiedName())
         );
     }
 }

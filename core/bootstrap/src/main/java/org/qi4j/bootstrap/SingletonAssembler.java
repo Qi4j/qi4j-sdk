@@ -57,14 +57,14 @@ public class SingletonAssembler
      *                             the programming model makes it impossible to create it.
      * @throws ActivationException If the automatic {@code activate()} method is throwing this Exception..
      */
-    public SingletonAssembler( Assembler assemble )
+    public SingletonAssembler(Assembler assemble)
         throws ActivationException
     {
         this.assemble = assemble;
         qi4j = new Energy4Java();
         applicationInstance = createApplicationInstance();
         activateApplication();
-        moduleInstance = applicationInstance.findModule( layerName(), moduleName() );
+        moduleInstance = applicationInstance.findModule(layerName(), moduleName());
     }
 
     /**
@@ -85,15 +85,15 @@ public class SingletonAssembler
         applicationInstance = createApplicationInstance();
         activateApplication();
 // END SNIPPET: actual
-        moduleInstance = applicationInstance.findModule( layerName(), moduleName() );
+        moduleInstance = applicationInstance.findModule(layerName(), moduleName());
     }
 
     // START SNIPPET: actual
     private Application createApplicationInstance()
     {
         return qi4j.newApplication(
-            applicationFactory -> applicationFactory.newApplicationAssembly( SingletonAssembler.this )
-                                  );
+            applicationFactory -> applicationFactory.newApplicationAssembly(SingletonAssembler.this)
+        );
     }
 
     private void activateApplication()
@@ -101,16 +101,16 @@ public class SingletonAssembler
     {
         try
         {
-            beforeActivation( applicationInstance );
+            beforeActivation(applicationInstance);
             applicationInstance.activate();
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            if( e instanceof ActivationException )
+            if(e instanceof ActivationException)
             {
-                throw ( (ActivationException) e );
+                throw ((ActivationException) e);
             }
-            throw new ActivationException( "Could not activate application", e );
+            throw new ActivationException("Could not activate application", e);
         }
     }
 // END SNIPPET: actual
@@ -140,7 +140,7 @@ public class SingletonAssembler
         return "Module 1";
     }
 
-    protected void beforeActivation( Application application )
+    protected void beforeActivation(Application application)
         throws Exception
     {
     }
@@ -171,12 +171,12 @@ public class SingletonAssembler
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws Exception
     {
-        if( assemble != null )
+        if(assemble != null)
         {
-            assemble.assemble( module );
+            assemble.assemble(module);
         }
     }
 }

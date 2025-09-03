@@ -20,13 +20,13 @@
 
 package org.qi4j.runtime.mixin;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.mixin.NoopMixin;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -36,23 +36,23 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class InvokeServiceFromModuleAssemblyTest
     extends AbstractQi4jTest
 {
-    @Mixins( NoopMixin.class )
+    @Mixins(NoopMixin.class)
     public interface TestService
         extends ServiceComposite
     {
         public void voidMethod();
     }
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
         try
         {
-            module.services( TestService.class );
-            module.forMixin( TestService.class ).declareDefaults().voidMethod();
-            fail( "It is not allowed to declareDefaults on methods not returning Property." );
+            module.services(TestService.class);
+            module.forMixin(TestService.class).declareDefaults().voidMethod();
+            fail("It is not allowed to declareDefaults on methods not returning Property.");
         }
-        catch( IllegalArgumentException e )
+        catch(IllegalArgumentException e)
         {
             // expected
         }

@@ -29,11 +29,10 @@ public interface MetricsHealthCheckFactory extends MetricsFactory
      * Create a MetricsHealthCheck instance.
      * If the same arguments are given twice, the same instance must be returned.
      *
-     * @param name   A human readable, short name of the metric.
-     * @param check  The health check to be performed regularly.
-     *
+     * @param name  A human readable, short name of the metric.
+     * @param check The health check to be performed regularly.
      * @return A MetricsHealthCheck instance to be used, OR org.qi4j.spi.metrics.DefaultMetric.NULL if not supported.
      *
      */
-    MetricsHealthCheck registerHealthCheck( String name, MetricsHealthCheck check );
+    MetricsHealthCheck registerHealthCheck(String name, MetricsHealthCheck check);
 }

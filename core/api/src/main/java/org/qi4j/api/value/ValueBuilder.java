@@ -22,8 +22,6 @@ package org.qi4j.api.value;
 
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.common.ConstructionException;
-import org.qi4j.api.association.AssociationStateHolder;
-import org.qi4j.api.common.ConstructionException;
 
 /**
  * Builder for Values.
@@ -47,25 +45,23 @@ public interface ValueBuilder<T>
      * Get a representation of the state of the given type for the new ValueComposite.
      * This is primarily used if you want to provide state for a private mixin type.
      *
-     * @param <K> Mixin type
+     * @param <K>       Mixin type
      * @param mixinType the mixin which you want to provide state for
-     *
      * @return a proxy implementing the given mixin type
      */
-    <K> K prototypeFor( Class<K> mixinType );
+    <K> K prototypeFor(Class<K> mixinType);
 
     /**
      * Create a new Composite instance.
      *
      * @return a new Composite instance
-     *
-     * @throws ConstructionException
-     *          thrown if it was not possible to instantiate the Composite
+     * @throws ConstructionException thrown if it was not possible to instantiate the Composite
      */
     T newInstance()
         throws ConstructionException;
 
-    /** Returns the primaryType that this builder is configured to build.
+    /**
+     * Returns the primaryType that this builder is configured to build.
      *
      * @return the primaryType to be built.
      */

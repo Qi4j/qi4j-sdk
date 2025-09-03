@@ -30,29 +30,29 @@ import static org.qi4j.api.util.Classes.typeOf;
  */
 public final class GenericPropertyInfo
 {
-    public static Type propertyTypeOf( AccessibleObject accessor )
+    public static Type propertyTypeOf(AccessibleObject accessor)
     {
-        return toPropertyType( typeOf( accessor ) );
+        return toPropertyType(typeOf(accessor));
     }
 
-    public static Type toPropertyType( Type methodReturnType )
+    public static Type toPropertyType(Type methodReturnType)
     {
-        if( methodReturnType instanceof ParameterizedType )
+        if(methodReturnType instanceof ParameterizedType)
         {
             ParameterizedType parameterizedType = (ParameterizedType) methodReturnType;
-            if( Property.class.isAssignableFrom( (Class<?>) parameterizedType.getRawType() ) )
+            if(Property.class.isAssignableFrom((Class<?>) parameterizedType.getRawType()))
             {
-                return parameterizedType.getActualTypeArguments()[ 0 ];
+                return parameterizedType.getActualTypeArguments()[0];
             }
         }
 
-        if( methodReturnType instanceof Class<?> )
+        if(methodReturnType instanceof Class<?>)
         {
-            Type[] interfaces = ( (Class<?>) methodReturnType ).getGenericInterfaces();
-            for( Type anInterface : interfaces )
+            Type[] interfaces = ((Class<?>) methodReturnType).getGenericInterfaces();
+            for(Type anInterface : interfaces)
             {
-                Type propertyType = toPropertyType( anInterface );
-                if( propertyType != null )
+                Type propertyType = toPropertyType(anInterface);
+                if(propertyType != null)
                 {
                     return propertyType;
                 }

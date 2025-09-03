@@ -19,11 +19,12 @@
  */
 package org.qi4j.api.association;
 
+import org.qi4j.api.entity.EntityReference;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.qi4j.api.entity.EntityReference;
 
 /**
  * If you want to catch calls to ManyAssociations, then create a GenericConcern
@@ -35,7 +36,7 @@ public class ManyAssociationWrapper
 {
     protected ManyAssociation<Object> next;
 
-    public ManyAssociationWrapper( ManyAssociation<Object> next )
+    public ManyAssociationWrapper(ManyAssociation<Object> next)
     {
         this.next = next;
     }
@@ -52,27 +53,27 @@ public class ManyAssociationWrapper
     }
 
     @Override
-    public boolean contains( Object entity )
+    public boolean contains(Object entity)
     {
-        return next.contains( entity );
+        return next.contains(entity);
     }
 
     @Override
-    public boolean add( int i, Object entity )
+    public boolean add(int i, Object entity)
     {
-        return next.add( i, entity );
+        return next.add(i, entity);
     }
 
     @Override
-    public boolean add( Object entity )
+    public boolean add(Object entity)
     {
-        return next.add( entity );
+        return next.add(entity);
     }
 
     @Override
-    public boolean remove( Object entity )
+    public boolean remove(Object entity)
     {
-        return next.remove( entity );
+        return next.remove(entity);
     }
 
     @Override
@@ -82,9 +83,9 @@ public class ManyAssociationWrapper
     }
 
     @Override
-    public Object get( int i )
+    public Object get(int i)
     {
-        return next.get( i );
+        return next.get(i);
     }
 
     @Override
@@ -119,9 +120,9 @@ public class ManyAssociationWrapper
 
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public boolean equals( Object obj )
+    public boolean equals(Object obj)
     {
-        return next.equals( obj );
+        return next.equals(obj);
     }
 
     @Override

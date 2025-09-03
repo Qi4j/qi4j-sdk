@@ -19,11 +19,10 @@
  */
 package org.qi4j.api.query;
 
+import org.qi4j.api.property.Property;
+import org.qi4j.api.query.grammar.OrderBy;
+
 import java.util.stream.Stream;
-import org.qi4j.api.property.Property;
-import org.qi4j.api.query.grammar.OrderBy;
-import org.qi4j.api.property.Property;
-import org.qi4j.api.query.grammar.OrderBy;
 
 /**
  * This represents a Query in an indexing system. It is created from a
@@ -47,55 +46,49 @@ public interface Query<T> extends Iterable<T>
      * then they will be applied in order.
      *
      * @param segments the segments to order by
-     *
      * @return the Query
      */
-    Query<T> orderBy( OrderBy... segments );
+    Query<T> orderBy(OrderBy... segments);
 
     /**
      * Append an ordering rule to the existing segments.
      *
      * @param property the property to order by
-     * @param order the order to apply
-     *
+     * @param order    the order to apply
      * @return the Query
      */
-    Query<T> orderBy(final Property<?> property, final OrderBy.Order order );
+    Query<T> orderBy(final Property<?> property, final OrderBy.Order order);
 
     /**
      * Append an ascending ordering rule to the existing segments.
      *
      * @param property the property to order by
-     *
      * @return the Query
      */
-    Query<T> orderBy( Property<?> property );
+    Query<T> orderBy(Property<?> property);
 
     /**
      * Set the index of the first result. Default is 0 (zero).
      *
      * @param firstResult which index to use as the first one
-     *
      * @return the Query
      */
-    Query<T> firstResult( int firstResult );
+    Query<T> firstResult(int firstResult);
 
     /**
      * Set how many results should be returned. Default is that
      * there is no limit set.
      *
      * @param maxResults that shouldbe returned
-     *
      * @return the query
      */
-    Query<T> maxResults( int maxResults );
+    Query<T> maxResults(int maxResults);
 
     /**
      * Get the first Entity that matches the criteria. This
      * executes the Query.
      *
      * @return the first found Entity or null if none were found
-     *
      * @throws QueryExecutionException if the query fails
      */
     T find()
@@ -106,20 +99,18 @@ public interface Query<T> extends Iterable<T>
      *
      * @param name  of the variable
      * @param value of the variable
-     *
      * @return the query
      */
-    Query<T> setVariable( String name, Object value );
+    Query<T> setVariable(String name, Object value);
 
     /**
      * Get the value of a named variable.
      *
-     * @param <V> Variable type
+     * @param <V>  Variable type
      * @param name of the variable
-     *
      * @return value of the variable
      */
-    <V> V getVariable( String name );
+    <V> V getVariable(String name);
 
     /**
      * Get the result type of this Query
@@ -133,7 +124,6 @@ public interface Query<T> extends Iterable<T>
      * This executes the Query.
      *
      * @return result count
-     *
      * @throws QueryExecutionException if the query fails
      */
     long count()

@@ -19,20 +19,22 @@
  */
 package org.qi4j.api.association;
 
+import org.qi4j.api.entity.EntityReference;
+
 import java.util.Map;
 import java.util.stream.Stream;
-import org.qi4j.api.entity.EntityReference;
 
 /**
  * Named Association to Entities.
  * <p>
- *     This works similar to a Map with a String key.
+ * This works similar to a Map with a String key.
  * </p>
  * <p>
  * The Iterable&lt;String&gt; returns the names in the association set. The order during iteration is random by
  * definition, even if other behaviors can possibly be observed. The depends on the underlying entity store
  * implementation.
  * </p>
+ *
  * @param <T> Parameterized associatee type
  */
 public interface NamedAssociation<T>
@@ -45,46 +47,52 @@ public interface NamedAssociation<T>
 
     /**
      * Checks if there is an association with the given name.
+     *
      * @param name The name of the association we are checking if it exists.
      * @return true if it exists, false otherwise
      */
-    boolean containsName( String name );
+    boolean containsName(String name);
 
     /**
      * Adds a named association.
-     * @param name The name of the association.
+     *
+     * @param name   The name of the association.
      * @param entity The entity for this named association.
      * @return true if value has been updated to a new value.
      */
-    boolean put( String name, T entity );
+    boolean put(String name, T entity);
 
     /**
      * Remove a named association.
+     *
      * @param name The name of the association.
      * @return true if removed, false otherwise
      */
-    boolean remove( String name );
+    boolean remove(String name);
 
     /**
      * Clear all named associations.
+     *
      * @return true if cleared, false otherwise
      */
     boolean clear();
 
     /**
      * Retrieves a named association.
+     *
      * @param name The name of the association.
      * @return The entity that has previously been associated.
      */
-    T get( String name );
+    T get(String name);
 
     /**
      * Checks if the entity is present.
      * Note that this is potentially a very slow operation, depending on the size of the NamedAssociation.
+     *
      * @param entity The entity to look for.
      * @return The name of the entity if found, otherwise null.
      */
-    String nameOf( T entity );
+    String nameOf(T entity);
 
     /**
      * @return A fully populated Map with the content of this NamedAssociation.
@@ -93,14 +101,16 @@ public interface NamedAssociation<T>
 
     /**
      * Returns a stream of the references to the associated entities.
+     *
      * @return the references to the associated entities.
      */
     Stream<Map.Entry<String, EntityReference>> references();
 
-    /** Returns the EntityReference for the Association with the given name.
+    /**
+     * Returns the EntityReference for the Association with the given name.
      *
      * @param name The name of the association to return the EntityReference for
      * @return The EntityReference of the association.
      */
-    EntityReference referenceOf( String name );
+    EntityReference referenceOf(String name);
 }

@@ -55,7 +55,7 @@ public final class EntityBuilderInstance<T>
         Identity identity
     )
     {
-        this( model, uow, store, identity, null );
+        this(model, uow, store, identity, null);
     }
 
     public EntityBuilderInstance(
@@ -70,18 +70,18 @@ public final class EntityBuilderInstance<T>
         this.uow = uow;
         this.store = store;
         this.identity = identity;
-        EntityReference reference = EntityReference.create( identity );
-        entityState = new BuilderEntityState( model, reference );
-        this.model.initState( model.module(), entityState );
-        if( stateResolver != null )
+        EntityReference reference = EntityReference.create(identity);
+        entityState = new BuilderEntityState(model, reference);
+        this.model.initState(model.module(), entityState);
+        if(stateResolver != null)
         {
-            stateResolver.populateState( this.model, entityState );
+            stateResolver.populateState(this.model, entityState);
         }
-        entityState.setPropertyValue( IDENTITY_STATE_NAME, identity );
-        prototypeInstance = this.model.newInstance( uow, (ModuleSpi) model.module().instance(), entityState );
+        entityState.setPropertyValue(IDENTITY_STATE_NAME, identity);
+        prototypeInstance = this.model.newInstance(uow, (ModuleSpi) model.module().instance(), entityState);
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     @Override
     public T instance()
     {
@@ -90,37 +90,37 @@ public final class EntityBuilderInstance<T>
     }
 
     @Override
-    public <K> K instanceFor( Class<K> mixinType )
+    public <K> K instanceFor(Class<K> mixinType)
     {
         checkValid();
-        return prototypeInstance.newProxy( mixinType );
+        return prototypeInstance.newProxy(mixinType);
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public T newInstance()
         throws LifecycleException
     {
         checkValid();
 
         // Figure out whether to use given or generated reference
-        Identity identity = (Identity) entityState.propertyValueOf( IDENTITY_STATE_NAME );
-        EntityReference entityReference = EntityReference.create( identity );
-        EntityState newEntityState = model.newEntityState( store, entityReference );
+        Identity identity = (Identity) entityState.propertyValueOf(IDENTITY_STATE_NAME);
+        EntityReference entityReference = EntityReference.create(identity);
+        EntityState newEntityState = model.newEntityState(store, entityReference);
 
         prototypeInstance.invokeCreate();
 
         // Check constraints
         prototypeInstance.checkConstraints();
 
-        entityState.copyTo( newEntityState );
+        entityState.copyTo(newEntityState);
 
-        EntityInstance instance = model.newInstance( uow, (ModuleSpi) model.module().instance(), newEntityState );
+        EntityInstance instance = model.newInstance(uow, (ModuleSpi) model.module().instance(), newEntityState);
 
         Object proxy = instance.proxy();
 
         // Add entity in UOW
-        uow.addEntity( instance );
+        uow.addEntity(instance);
 
         // Invalidate builder
         this.identity = null;
@@ -131,9 +131,9 @@ public final class EntityBuilderInstance<T>
     private void checkValid()
         throws IllegalStateException
     {
-        if( identity == null )
+        if(identity == null)
         {
-            throw new IllegalStateException( "EntityBuilder is not valid after call to newInstance()" );
+            throw new IllegalStateException("EntityBuilder is not valid after call to newInstance()");
         }
     }
 }

@@ -21,7 +21,6 @@ package org.qi4j.test.entity.model.people;
 
 import org.qi4j.api.composite.TransientBuilderFactory;
 import org.qi4j.api.injection.scope.Structure;
-import org.qi4j.api.object.ObjectFactory;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.api.value.ValueBuilderFactory;
@@ -38,15 +37,15 @@ public interface Rent
         @Structure
         private ValueBuilderFactory vbf;
 
-        public Builder( @Structure TransientBuilderFactory tbf )
+        public Builder(@Structure TransientBuilderFactory tbf)
         {
-            currencyBuilder = tbf.newTransient( Currency.Builder.class );
+            currencyBuilder = tbf.newTransient(Currency.Builder.class);
         }
 
-        public Rent create( int amount, String currency )
+        public Rent create(int amount, String currency)
         {
-            ValueBuilder<Rent> builder = vbf.newValueBuilder( Rent.class );
-            builder.prototype().amount().set( currencyBuilder.create( amount, currency ) );
+            ValueBuilder<Rent> builder = vbf.newValueBuilder(Rent.class);
+            builder.prototype().amount().set(currencyBuilder.create(amount, currency));
             return builder.newInstance();
         }
     }

@@ -19,13 +19,13 @@
  */
 package org.qi4j.runtime.structure;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.CompositeDescriptor;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.composite.TransientDescriptor;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -33,19 +33,19 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.hamcrest.core.IsNull.notNullValue;
 
 public class CompositeDescriptorTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
     @Test
     public final void testCompositeDescriptorWithComposite()
         throws Throwable
     {
         // Test with Standard composite
-        AddressComposite address = transientBuilderFactory.newTransient( AddressComposite.class );
-        CompositeDescriptor addressDescriptor = spi.compositeDescriptorFor( address );
+        AddressComposite address = transientBuilderFactory.newTransient(AddressComposite.class);
+        CompositeDescriptor addressDescriptor = spi.compositeDescriptorFor(address);
 
-        assertThat( addressDescriptor, notNullValue() );
-        assertThat( addressDescriptor.types().findFirst().orElse( null ), equalTo( AddressComposite.class ) );
-        assertThat( TransientDescriptor.class.isAssignableFrom( addressDescriptor.getClass() ), is( true ) );
+        assertThat(addressDescriptor, notNullValue());
+        assertThat(addressDescriptor.types().findFirst().orElse(null), equalTo(AddressComposite.class));
+        assertThat(TransientDescriptor.class.isAssignableFrom(addressDescriptor.getClass()), is(true));
     }
 
     @Test
@@ -53,28 +53,28 @@ public class CompositeDescriptorTest
         throws Throwable
     {
         // Test with Standard composite
-        AddressComposite address = transientBuilderFactory.newTransient( AddressComposite.class );
-        TransientDescriptor addressDescriptor = spi.transientDescriptorFor( address );
+        AddressComposite address = transientBuilderFactory.newTransient(AddressComposite.class);
+        TransientDescriptor addressDescriptor = spi.transientDescriptorFor(address);
 
-        assertThat( addressDescriptor, notNullValue() );
-        assertThat( addressDescriptor.types().findFirst().orElse( null ), equalTo( AddressComposite.class ) );
-        assertThat( TransientDescriptor.class.isAssignableFrom( addressDescriptor.getClass() ), is( true ) );
+        assertThat(addressDescriptor, notNullValue());
+        assertThat(addressDescriptor.types().findFirst().orElse(null), equalTo(AddressComposite.class));
+        assertThat(TransientDescriptor.class.isAssignableFrom(addressDescriptor.getClass()), is(true));
     }
 
     @Test
     public final void testCompositeDescriptorWithMixin()
     {
         // Test with composite
-        TransientDescriptor addressDesc = module.transientDescriptor( AddressComposite.class.getName() );
-        assertThat( addressDesc, notNullValue() );
+        TransientDescriptor addressDesc = module.transientDescriptor(AddressComposite.class.getName());
+        assertThat(addressDesc, notNullValue());
 
-        assertThat( addressDesc.types().findFirst().orElse( null ), equalTo( AddressComposite.class ) );
+        assertThat(addressDesc.types().findFirst().orElse(null), equalTo(AddressComposite.class));
     }
 
-    public final void assemble( ModuleAssembly aModule )
+    public final void assemble(ModuleAssembly aModule)
         throws AssemblyException
     {
-        aModule.transients( AddressComposite.class );
+        aModule.transients(AddressComposite.class);
     }
 
     private interface AddressComposite

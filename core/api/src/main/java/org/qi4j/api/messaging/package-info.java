@@ -1,6 +1,6 @@
 /**
  * The Messaging Extension is to automatically connect Qi4j services to Messaging systems, such as RabbitMQ and Kafka.
- *
+ * <p>
  * Example;
  * <pre><code>
  *  &#64;TopicTypeFactory( CustomerTypeFactory.class )

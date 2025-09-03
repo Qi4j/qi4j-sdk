@@ -19,23 +19,26 @@
  */
 package org.qi4j.test.entity.model.monetary;
 
-import java.math.BigDecimal;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.api.value.ValueBuilderFactory;
 
+import java.math.BigDecimal;
+
 public interface Currency
 {
     Property<BigDecimal> amount();
+
     Property<String> name();
 
-    @Mixins( Currency.BuilderImpl.class)
+    @Mixins(Currency.BuilderImpl.class)
     interface Builder
     {
-        Currency create( int amount, String currencyName );
-        Currency create( BigDecimal amount, String currencyName );
+        Currency create(int amount, String currencyName);
+
+        Currency create(BigDecimal amount, String currencyName);
     }
 
     class BuilderImpl
@@ -44,16 +47,16 @@ public interface Currency
         @Structure
         private ValueBuilderFactory vbf;
 
-        public Currency create( int amount, String currencyName )
+        public Currency create(int amount, String currencyName)
         {
-            return create( new BigDecimal( amount ), currencyName );
+            return create(new BigDecimal(amount), currencyName);
         }
 
-        public Currency create( BigDecimal amount, String currencyName )
+        public Currency create(BigDecimal amount, String currencyName)
         {
-            ValueBuilder<Currency> builder = vbf.newValueBuilder( Currency.class );
-            builder.prototype().name().set( currencyName );
-            builder.prototype().amount().set( amount );
+            ValueBuilder<Currency> builder = vbf.newValueBuilder(Currency.class);
+            builder.prototype().name().set(currencyName);
+            builder.prototype().amount().set(amount);
             return builder.newInstance();
         }
     }

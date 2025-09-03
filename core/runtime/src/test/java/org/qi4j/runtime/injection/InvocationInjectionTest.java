@@ -20,17 +20,17 @@
 
 package org.qi4j.runtime.injection;
 
-import java.lang.annotation.Retention;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.concern.ConcernOf;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.injection.scope.Invocation;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.SingletonAssembler;
+
+import java.lang.annotation.Retention;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Method;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -45,9 +45,9 @@ public class InvocationInjectionTest
     public void whenInvocationInjectionWithMethodWhenInjectedThenInjectMethod()
         throws Exception
     {
-        SingletonAssembler assembly = new SingletonAssembler(module -> module.transients( MyComposite.class ) );
+        SingletonAssembler assembly = new SingletonAssembler(module -> module.transients(MyComposite.class));
 
-        MyComposite composite = assembly.module().newTransient( MyComposite.class );
+        MyComposite composite = assembly.module().newTransient(MyComposite.class);
 
         composite.doStuff();
         composite.doStuff();
@@ -55,19 +55,19 @@ public class InvocationInjectionTest
         composite.doStuff3();
     }
 
-    @Mixins( MyMixin.class )
-    @Concerns( MyConcern.class )
+    @Mixins(MyMixin.class)
+    @Concerns(MyConcern.class)
 // START SNIPPET: declaration
     public interface MyComposite
         extends TransientComposite
     {
-        @Foo( "1" )
+        @Foo("1")
         void doStuff();
 
         // END SNIPPET: declaration
         void doStuff2();
 
-        @Foo( "X" )
+        @Foo("X")
         void doStuff3();
     }
 
@@ -87,25 +87,25 @@ public class InvocationInjectionTest
 
         public void doStuff()
         {
-            assertThat( "interface has been injected", foo.value(), equalTo( "1" ) );
-            assertThat( "annotations have been injected", ae.getAnnotation( Foo.class ).value(), equalTo( "1" ) );
-            assertThat( "Method has been injected", method.getName(), equalTo( "doStuff" ) );
+            assertThat("interface has been injected", foo.value(), equalTo("1"));
+            assertThat("annotations have been injected", ae.getAnnotation(Foo.class).value(), equalTo("1"));
+            assertThat("Method has been injected", method.getName(), equalTo("doStuff"));
             next.doStuff();
         }
 
         public void doStuff2()
         {
-            assertThat( "mixin has been injected", foo.value(), equalTo( "2" ) );
-            assertThat( "annotations have been injected", ae.getAnnotation( Foo.class ).value(), equalTo( "2" ) );
-            assertThat( "Method has been injected", method.getName(), equalTo( "doStuff2" ) );
+            assertThat("mixin has been injected", foo.value(), equalTo("2"));
+            assertThat("annotations have been injected", ae.getAnnotation(Foo.class).value(), equalTo("2"));
+            assertThat("Method has been injected", method.getName(), equalTo("doStuff2"));
             next.doStuff2();
         }
 
         public void doStuff3()
         {
-            assertThat( "mixin has overridden interface", foo.value(), equalTo( "3" ) );
-            assertThat( "annotations have been injected", ae.getAnnotation( Foo.class ).value(), equalTo( "3" ) );
-            assertThat( "Method has been injected", method.getName(), equalTo( "doStuff3" ) );
+            assertThat("mixin has overridden interface", foo.value(), equalTo("3"));
+            assertThat("annotations have been injected", ae.getAnnotation(Foo.class).value(), equalTo("3"));
+            assertThat("Method has been injected", method.getName(), equalTo("doStuff3"));
             next.doStuff3();
         }
     }
@@ -117,19 +117,19 @@ public class InvocationInjectionTest
         {
         }
 
-        @Foo( "2" )
+        @Foo("2")
         public void doStuff2()
         {
         }
 
-        @Foo( "3" )
+        @Foo("3")
         public void doStuff3()
         {
         }
     }
 
     // START SNIPPET: annotation
-    @Retention( RUNTIME )
+    @Retention(RUNTIME)
     @interface Foo
     {
         String value();

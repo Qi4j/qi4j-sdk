@@ -21,7 +21,7 @@ package org.qi4j.test.mock.internal;
 
 public interface MockRepository
 {
-    void add( MockResolver mockResolver );
+    void add(MockResolver mockResolver);
 
     Iterable<MockResolver> getAll();
 }

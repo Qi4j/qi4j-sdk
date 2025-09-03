@@ -19,27 +19,28 @@
  */
 package org.qi4j.api.property;
 
-import java.lang.reflect.AccessibleObject;
 import org.qi4j.api.common.ConstructionException;
+
+import java.lang.reflect.AccessibleObject;
 
 /**
  * Thrown when attempting to subclass Property.
  */
 public class InvalidPropertyTypeException extends ConstructionException
 {
-    public InvalidPropertyTypeException( String message )
+    public InvalidPropertyTypeException(String message)
     {
         super(message);
     }
 
-    public InvalidPropertyTypeException( AccessibleObject accessor )
+    public InvalidPropertyTypeException(AccessibleObject accessor)
     {
-        super( createMessage( accessor ) );
+        super(createMessage(accessor));
     }
 
-    private static String createMessage( AccessibleObject accessor )
+    private static String createMessage(AccessibleObject accessor)
     {
         return "Not allowed to subclass " + Property.class.getName() + ". Property accessor " +
-               accessor + " is returning a Property subclass.";
+            accessor + " is returning a Property subclass.";
     }
 }

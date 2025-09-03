@@ -17,12 +17,14 @@
  */
 package org.qi4j.spi.entitystore;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.identity.StringIdentity;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.service.qualifier.Tagged;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.api.usecase.UsecaseBuilder;
@@ -30,20 +32,19 @@ import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
-public class Poly_gene142Test extends AbstractQi4jTest
+public class Polygene142Test extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.values( Regression142Type.class );
-        module.entities( Regression142Type.class );
-        new EntityTestAssembler().assemble( module );
+        module.values(Regression142Type.class);
+        module.entities(Regression142Type.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Service
-    @Tagged( Serialization.Format.JSON )
+    @Tagged(Serialization.Format.JSON)
     private Serialization serialization;
 
     @Test
@@ -52,43 +53,44 @@ public class Poly_gene142Test extends AbstractQi4jTest
     {
         Regression142Type value;
         {
-            ValueBuilder<Regression142Type> builder = valueBuilderFactory.newValueBuilder( Regression142Type.class );
-            builder.prototype().price().set( 23.45 );
-            builder.prototype().testenum().set( Regression142Enum.B );
+            ValueBuilder<Regression142Type> builder = valueBuilderFactory.newValueBuilder(Regression142Type.class);
+            builder.prototype().price().set(23.45);
+            builder.prototype().testenum().set(Regression142Enum.B);
             value = builder.newInstance();
-            String serialized = serialization.serialize( value );
-            System.out.println( serialized ); // ok
-            value = serialization.deserialize( module, Regression142Type.class, serialized ); // ok
+            String serialized = serialization.serialize(module, Options.DEFAULT, value);
+            System.out.println(serialized); // ok
+            value = serialization.deserialize(module, Options.DEFAULT, Regression142Type.class, serialized); // ok
         }
         {
-            Identity valueId = StringIdentity.identityOf( "abcdefg" );
+            Identity valueId = StringIdentity.identityOf("abcdefg");
             {
-                try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "create" ) ) )
+                try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(UsecaseBuilder.newUsecase("create")))
                 {
-                    EntityBuilder<Regression142Type> builder = uow.newEntityBuilder( Regression142Type.class, valueId );
-                    builder.instance().price().set( 45.67 );
-                    builder.instance().testenum().set( Regression142Enum.A );
+                    EntityBuilder<Regression142Type> builder = uow.newEntityBuilder(Regression142Type.class, valueId);
+                    builder.instance().price().set(45.67);
+                    builder.instance().testenum().set(Regression142Enum.A);
                     value = builder.newInstance();
-                    System.out.println( value.testenum().get() );
+                    System.out.println(value.testenum().get());
                     uow.complete();
                 }
-                catch( Exception e_ )
+                catch(Exception e)
                 {
-                    e_.printStackTrace();
+                    e.printStackTrace();
+                    throw e;
                 }
             }
             {
-                try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork( UsecaseBuilder.newUsecase( "read" ) ) )
+                try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork(UsecaseBuilder.newUsecase("read")))
                 {
-                    value = uow.get( Regression142Type.class, valueId );
-                    System.out.println( value.price().get() );
-                    System.out.println( value.testenum().get() ); // FAIL
+                    value = uow.get(Regression142Type.class, valueId);
+                    System.out.println(value.price().get());
+                    System.out.println(value.testenum().get()); // FAIL
                 }
             }
         }
     }
 
-    private enum Regression142Enum
+    enum Regression142Enum
     {
         A,
         B,

@@ -20,13 +20,6 @@
 
 package org.qi4j.runtime.structure;
 
-import org.qi4j.bootstrap.ApplicationAssemblerAdapter;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.Assembler;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.Energy4Java;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.qi4j.bootstrap.ModuleAssembly;
 import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.*;
 
@@ -41,20 +34,20 @@ public class StructureTest
         throws AssemblyException
     {
         Energy4Java qi4j = new Energy4Java();
-        qi4j.newApplication( factory -> {
+        qi4j.newApplication(factory -> {
             ApplicationAssembly applicationAssembly = factory.newApplicationAssembly();
             // Application Layer
-            LayerAssembly applicationLayer = applicationAssembly.layer( "Application" );
-            ModuleAssembly applicationModule = applicationLayer.module( "Application" );
-            new DomainApplicationAssembler().assemble( applicationModule );
+            LayerAssembly applicationLayer = applicationAssembly.layer("Application");
+            ModuleAssembly applicationModule = applicationLayer.module("Application");
+            new DomainApplicationAssembler().assemble(applicationModule);
 
             // View Layer
-            LayerAssembly viewLayer = applicationAssembly.layer( "View" );
-            ModuleAssembly viewModule = viewLayer.module( "View" );
-            new ViewAssembler().assemble( viewModule );
-            viewLayer.uses( applicationLayer );
+            LayerAssembly viewLayer = applicationAssembly.layer("View");
+            ModuleAssembly viewModule = viewLayer.module("View");
+            new ViewAssembler().assemble(viewModule);
+            viewLayer.uses(applicationLayer);
             return applicationAssembly;
-        } );
+        });
     }
 
     @Test
@@ -65,36 +58,36 @@ public class StructureTest
         Assembler[][][] assemblers = new Assembler[][][]
             {
                 { // User Interface layer
-                  {
-                      new ViewAssembler()
-                  }
+                    {
+                        new ViewAssembler()
+                    }
                 },
                 { // Application layer
-                  {
-                      new DomainApplicationAssembler()
-                  }
+                    {
+                        new DomainApplicationAssembler()
+                    }
                 },
                 { // Domain layer
-                  {
-                      new DomainModelAssembler()
-                  }
+                    {
+                        new DomainModelAssembler()
+                    }
                 },
                 { // Infrastructure layer
-                  {
-                      new InfrastructureAssembler()
-                  }
+                    {
+                        new InfrastructureAssembler()
+                    }
                 }
             };
 
-        qi4j.newApplication( new ApplicationAssemblerAdapter( assemblers )
+        qi4j.newApplication(new ApplicationAssemblerAdapter(assemblers)
         {
-        } );
+        });
     }
 
     static class ViewAssembler
         implements Assembler
     {
-        public void assemble( ModuleAssembly module )
+        public void assemble(ModuleAssembly module)
             throws AssemblyException
         {
         }
@@ -103,7 +96,7 @@ public class StructureTest
     static class DomainApplicationAssembler
         implements Assembler
     {
-        public void assemble( ModuleAssembly module )
+        public void assemble(ModuleAssembly module)
             throws AssemblyException
         {
         }
@@ -112,7 +105,7 @@ public class StructureTest
     static class DomainModelAssembler
         implements Assembler
     {
-        public void assemble( ModuleAssembly module )
+        public void assemble(ModuleAssembly module)
             throws AssemblyException
         {
         }
@@ -121,7 +114,7 @@ public class StructureTest
     static class InfrastructureAssembler
         implements Assembler
     {
-        public void assemble( ModuleAssembly module )
+        public void assemble(ModuleAssembly module)
             throws AssemblyException
         {
         }

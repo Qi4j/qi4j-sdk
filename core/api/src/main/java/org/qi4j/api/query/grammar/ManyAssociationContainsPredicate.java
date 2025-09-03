@@ -21,8 +21,6 @@ package org.qi4j.api.query.grammar;
 
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.composite.Composite;
-import org.qi4j.api.association.ManyAssociation;
-import org.qi4j.api.composite.Composite;
 
 /**
  * ManyAssociation Contains Specification.
@@ -33,7 +31,7 @@ public class ManyAssociationContainsPredicate<T>
     private final ManyAssociationFunction<T> manyAssociationFunction;
     private final T value;
 
-    public ManyAssociationContainsPredicate( ManyAssociationFunction<T> manyAssociationFunction, T value )
+    public ManyAssociationContainsPredicate(ManyAssociationFunction<T> manyAssociationFunction, T value)
     {
         this.manyAssociationFunction = manyAssociationFunction;
         this.value = value;
@@ -50,14 +48,14 @@ public class ManyAssociationContainsPredicate<T>
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
-        ManyAssociation<T> collection = manyAssociationFunction.apply( item );
-        if( collection == null )
+        ManyAssociation<T> collection = manyAssociationFunction.apply(item);
+        if(collection == null)
         {
             return false;
         }
-        return collection.contains( value );
+        return collection.contains(value);
     }
 
     @Override

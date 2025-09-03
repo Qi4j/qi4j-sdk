@@ -26,7 +26,7 @@ import org.qi4j.spi.cache.CachePool;
 /**
  * In-Memory CachePool Service.
  */
-@Mixins( MemoryCachePoolMixin.class )
+@Mixins(MemoryCachePoolMixin.class)
 public interface MemoryCachePoolService
     extends CachePool, ServiceActivation
 {

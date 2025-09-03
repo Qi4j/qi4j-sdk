@@ -19,18 +19,15 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.association.AssociationStateHolder;
+import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.composite.Composite;
+import org.qi4j.api.composite.CompositeInstance;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.lang.reflect.Proxy;
 import java.util.function.Function;
-import org.qi4j.api.association.AssociationStateHolder;
-import org.qi4j.api.association.ManyAssociation;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.CompositeInstance;
-import org.qi4j.api.association.AssociationStateHolder;
-import org.qi4j.api.association.ManyAssociation;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.CompositeInstance;
 
 /**
  * Function to get Entity ManyAssociations.
@@ -43,10 +40,10 @@ public class ManyAssociationFunction<T>
     private final NamedAssociationFunction<?> traversedNamedAssociation;
     private final AccessibleObject accessor;
 
-    public ManyAssociationFunction( AssociationFunction<?> traversedAssociation,
-                                    ManyAssociationFunction<?> traversedManyAssociation,
-                                    NamedAssociationFunction<?> traversedNamedAssociation,
-                                    AccessibleObject accessor
+    public ManyAssociationFunction(AssociationFunction<?> traversedAssociation,
+                                   ManyAssociationFunction<?> traversedManyAssociation,
+                                   NamedAssociationFunction<?> traversedNamedAssociation,
+                                   AccessibleObject accessor
     )
     {
         this.traversedAssociation = traversedAssociation;
@@ -76,47 +73,47 @@ public class ManyAssociationFunction<T>
     }
 
     @Override
-    public ManyAssociation<T> apply( Composite entity )
+    public ManyAssociation<T> apply(Composite entity)
     {
         try
         {
             Object target = entity;
-            if( traversedAssociation != null )
+            if(traversedAssociation != null)
             {
-                target = traversedAssociation.apply( entity ).get();
+                target = traversedAssociation.apply(entity).get();
             }
-            if( traversedManyAssociation != null )
+            if(traversedManyAssociation != null)
             {
-                throw new IllegalArgumentException( "Cannot traverse ManyAssociations" );
+                throw new IllegalArgumentException("Cannot traverse ManyAssociations");
             }
-            if( traversedNamedAssociation != null )
+            if(traversedNamedAssociation != null)
             {
-                throw new IllegalArgumentException( "Cannot traverse NamedAssociations" );
+                throw new IllegalArgumentException("Cannot traverse NamedAssociations");
             }
 
-            CompositeInstance handler = (CompositeInstance) Proxy.getInvocationHandler( target );
-            return ( (AssociationStateHolder) handler.state() ).manyAssociationFor( accessor );
+            CompositeInstance handler = (CompositeInstance) Proxy.getInvocationHandler(target);
+            return ((AssociationStateHolder) handler.state()).manyAssociationFor(accessor);
         }
-        catch( IllegalArgumentException e )
+        catch(IllegalArgumentException e)
         {
             throw e;
         }
-        catch( Throwable e )
+        catch(Throwable e)
         {
-            throw new IllegalArgumentException( e );
+            throw new IllegalArgumentException(e);
         }
     }
 
     @Override
     public String toString()
     {
-        if( traversedAssociation != null )
+        if(traversedAssociation != null)
         {
-            return traversedAssociation.toString() + "." + ( (Member) accessor ).getName();
+            return traversedAssociation.toString() + "." + ((Member) accessor).getName();
         }
         else
         {
-            return ( (Member) accessor ).getName();
+            return ((Member) accessor).getName();
         }
     }
 }

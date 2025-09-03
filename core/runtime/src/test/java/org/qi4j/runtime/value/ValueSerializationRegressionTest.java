@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.value;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.association.NamedAssociation;
@@ -31,27 +32,26 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 public class ValueSerializationRegressionTest extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( SimpleEntity.class );
-        module.entities( DualFaced.class );
-        module.values( DualFaced.class );
-        module.services( MemoryEntityStoreService.class );
+        module.entities(SimpleEntity.class);
+        module.entities(DualFaced.class);
+        module.values(DualFaced.class);
+        module.services(MemoryEntityStoreService.class);
     }
 
     @Test
     public void givenNewValueWhenConvertingToEntityExpectNewEntityInStore()
         throws UnitOfWorkCompletionException
     {
-        ValueBuilder<DualFaced> builder = valueBuilderFactory.newValueBuilder( DualFaced.class );
-        builder.prototype().identity().set( StringIdentity.identityOf( "1234" ) );
-        builder.prototype().name().set( "Hedhman" );
+        ValueBuilder<DualFaced> builder = valueBuilderFactory.newValueBuilder(DualFaced.class);
+        builder.prototype().identity().set(StringIdentity.identityOf("1234"));
+        builder.prototype().name().set("Hedhman");
         DualFaced value = builder.newInstance();
     }
 

@@ -20,7 +20,7 @@ package org.qi4j.serialization.jakartajson;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.spi.serialization.JsonSerialization;
 
-@Mixins( { JakartaJsonSerializer.class, JakartaJsonDeserializer.class } )
+@Mixins({JakartaJsonSerializer.class, JakartaJsonDeserializer.class})
 public interface JakartaJsonSerialization extends JsonSerialization
 {
 }

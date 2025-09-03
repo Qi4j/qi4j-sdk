@@ -24,10 +24,13 @@ import java.lang.reflect.Proxy;
 /**
  * generates proxyclasses
  */
-public class ProxyGenerator {
-    public static Class<?> createProxyClass(ClassLoader mainTypeClassLoader, Class<?>[] interfaces) {
+public class ProxyGenerator
+{
+    public static Class<?> createProxyClass(ClassLoader mainTypeClassLoader, Class<?>[] interfaces)
+    {
         ClassLoader effectiveClassLoader = Thread.currentThread().getContextClassLoader();
-        if (effectiveClassLoader == null) {
+        if(effectiveClassLoader == null)
+        {
             effectiveClassLoader = mainTypeClassLoader;
         }
         return Proxy.getProxyClass(effectiveClassLoader, interfaces);

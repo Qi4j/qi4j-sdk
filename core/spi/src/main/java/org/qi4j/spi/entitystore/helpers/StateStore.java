@@ -28,5 +28,6 @@ import org.qi4j.spi.entitystore.EntityStoreException;
  */
 public interface StateStore
 {
-    JsonObject jsonStateOf( String id ) throws EntityStoreException;
+    JsonObject jsonStateOf(String id)
+        throws EntityStoreException;
 }

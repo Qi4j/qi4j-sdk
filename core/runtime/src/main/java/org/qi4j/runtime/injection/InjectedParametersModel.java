@@ -20,12 +20,13 @@
 
 package org.qi4j.runtime.injection;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.composite.InjectedParametersDescriptor;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -47,49 +48,49 @@ public final class InjectedParametersModel
     }
 
     // Context
-    public Object[] newParametersInstance( InjectionContext context )
+    public Object[] newParametersInstance(InjectionContext context)
     {
-        Object[] parametersInstance = new Object[ parameterDependencies.size() ];
+        Object[] parametersInstance = new Object[parameterDependencies.size()];
 
         // Inject parameterDependencies
-        for( int j = 0; j < parameterDependencies.size(); j++ )
+        for(int j = 0; j < parameterDependencies.size(); j++)
         {
-            DependencyModel dependencyModel = parameterDependencies.get( j );
-            Object parameter = dependencyModel.inject( context );
-            parametersInstance[ j ] = parameter;
+            DependencyModel dependencyModel = parameterDependencies.get(j);
+            Object parameter = dependencyModel.inject(context);
+            parametersInstance[j] = parameter;
         }
 
         return parametersInstance;
     }
 
-    public void addDependency( DependencyModel dependency )
+    public void addDependency(DependencyModel dependency)
     {
-        parameterDependencies.add( dependency );
+        parameterDependencies.add(dependency);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            for( DependencyModel parameterDependency : parameterDependencies )
+            for(DependencyModel parameterDependency : parameterDependencies)
             {
-                if( !visitor.visit( parameterDependency ) )
+                if(!visitor.visit(parameterDependency))
                 {
                     break;
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
     @Override
     public String toString()
     {
         return "InjectedParametersModel{" +
-               "parameterDependencies=" + parameterDependencies +
-               '}';
+            "parameterDependencies=" + parameterDependencies +
+            '}';
     }
 }
 

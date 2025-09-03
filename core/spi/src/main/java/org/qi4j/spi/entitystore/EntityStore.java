@@ -19,18 +19,19 @@
  */
 package org.qi4j.spi.entitystore;
 
-import java.time.Instant;
-import java.util.stream.Stream;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.spi.entity.EntityState;
+
+import java.time.Instant;
+import java.util.stream.Stream;
 
 /**
  * Interface that must be implemented by store for persistent state of EntityComposites.
  */
 public interface EntityStore
 {
-    EntityStoreUnitOfWork newUnitOfWork( ModuleDescriptor module, Usecase usecase, Instant currentTime );
+    EntityStoreUnitOfWork newUnitOfWork(ModuleDescriptor module, Usecase usecase, Instant currentTime);
 
     /**
      * Stream of all entity states, must be closed.
@@ -38,5 +39,5 @@ public interface EntityStore
      * @param module Module
      * @return Stream of all entity states, must be closed
      */
-    Stream<EntityState> entityStates( ModuleDescriptor module );
+    Stream<EntityState> entityStates(ModuleDescriptor module);
 }

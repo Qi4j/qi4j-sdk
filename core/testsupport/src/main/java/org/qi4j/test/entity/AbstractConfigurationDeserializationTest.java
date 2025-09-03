@@ -20,6 +20,7 @@
 
 package org.qi4j.test.entity;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.identity.HasIdentity;
@@ -30,7 +31,6 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -39,29 +39,29 @@ import static org.hamcrest.core.IsNull.notNullValue;
 public abstract class AbstractConfigurationDeserializationTest extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        ModuleAssembly storageModule = module.layer().module( "storage" );
-        module.configurations( ConfigSerializationConfig.class );
-        module.values( Host.class );
-        module.services( MyService.class ).identifiedBy( "configtest" );
-        new EntityTestAssembler().visibleIn( Visibility.layer ).assemble( storageModule );
+        ModuleAssembly storageModule = module.layer().module("storage");
+        module.configurations(ConfigSerializationConfig.class);
+        module.values(Host.class);
+        module.services(MyService.class).identifiedBy("configtest");
+        new EntityTestAssembler().visibleIn(Visibility.layer).assemble(storageModule);
     }
 
     @Test
     public void givenServiceWhenInitializingExpectCorrectDeserialization()
     {
-        ServiceReference<MyService> ref = module.instance().findService( MyService.class );
-        assertThat( ref, notNullValue() );
-        assertThat( ref.isAvailable(), equalTo( true ) );
+        ServiceReference<MyService> ref = module.instance().findService(MyService.class);
+        assertThat(ref, notNullValue());
+        assertThat(ref.isAvailable(), equalTo(true));
         MyService myService = ref.get();
-        assertThat( myService, notNullValue() );
-        assertThat( myService.name(), equalTo( "main" ) );
-        assertThat( myService.hostIp(), equalTo( "12.23.34.45" ) );
-        assertThat( myService.hostPort(), equalTo( 1234 ) );
+        assertThat(myService, notNullValue());
+        assertThat(myService.name(), equalTo("main"));
+        assertThat(myService.hostIp(), equalTo("12.23.34.45"));
+        assertThat(myService.hostPort(), equalTo(1234));
     }
 
-    @Mixins( MyServiceMixin.class )
+    @Mixins(MyServiceMixin.class)
     public interface MyService
     {
 

@@ -25,7 +25,6 @@ import org.qi4j.api.serialization.Serialization;
 import org.qi4j.api.structure.Module;
 import org.qi4j.spi.entitystore.EntityStore;
 import org.qi4j.spi.type.ValueTypeFactory;
-import org.qi4j.spi.entitystore.EntityStore;
 
 public interface ModuleSpi extends Module
 {

@@ -19,12 +19,12 @@
  */
 package org.qi4j.api.composite;
 
+import org.qi4j.api.injection.scope.Uses;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import org.qi4j.api.injection.scope.Uses;
-import org.qi4j.api.injection.scope.Uses;
 
 /**
  * Generic decorator mixin that allows a Composite to wrap
@@ -38,13 +38,13 @@ import org.qi4j.api.injection.scope.Uses;
 public class DecoratorMixin
     implements InvocationHandler
 {
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
 
     private Object delegate;
 
-    public DecoratorMixin( @Uses Object delegate )
+    public DecoratorMixin(@Uses Object delegate)
     {
-        if( delegate instanceof Class )
+        if(delegate instanceof Class)
         {
             Thread.dumpStack();
         }
@@ -52,57 +52,57 @@ public class DecoratorMixin
     }
 
     @Override
-    public Object invoke( Object object, Method method, Object[] args )
+    public Object invoke(Object object, Method method, Object[] args)
         throws Throwable
     {
-        if( delegate instanceof InvocationHandler )
+        if(delegate instanceof InvocationHandler)
         {
             InvocationHandler handler = (InvocationHandler) delegate;
-            return handler.invoke( object, method, args );
+            return handler.invoke(object, method, args);
         }
         else
         {
             try
             {
-                return method.invoke( delegate, args );
+                return method.invoke(delegate, args);
             }
-            catch( InvocationTargetException e )
+            catch(InvocationTargetException e)
             {
                 throw e.getCause();
             }
-            catch( IllegalArgumentException e )
+            catch(IllegalArgumentException e)
             {
-                String message = constructMessage( method, args );
-                throw new IllegalArgumentException( message, e );
+                String message = constructMessage(method, args);
+                throw new IllegalArgumentException(message, e);
             }
         }
     }
 
-    private String constructMessage( Method method, Object[] args )
+    private String constructMessage(Method method, Object[] args)
     {
         StringBuilder builder = new StringBuilder();
-        builder.append( NL ).append( "method: " );
-        builder.append( method.getDeclaringClass().getName() );
-        builder.append( "." );
-        builder.append( method.getName() );
-        builder.append( NL ).append( "delegate: " );
-        builder.append( delegate );
-        builder.append( NL ).append( "delegateType: " );
-        builder.append( delegate == null ? "n/a" : delegate.getClass().getName() );
-        builder.append( NL ).append( "arguments:" ).append( NL );
-        for( Object arg : args )
+        builder.append(NL).append("method: ");
+        builder.append(method.getDeclaringClass().getName());
+        builder.append(".");
+        builder.append(method.getName());
+        builder.append(NL).append("delegate: ");
+        builder.append(delegate);
+        builder.append(NL).append("delegateType: ");
+        builder.append(delegate == null ? "n/a" : delegate.getClass().getName());
+        builder.append(NL).append("arguments:").append(NL);
+        for(Object arg : args)
         {
-            builder.append( "    " );
+            builder.append("    ");
             Class argClass = arg.getClass();
-            if( Proxy.isProxyClass( argClass ) )
+            if(Proxy.isProxyClass(argClass))
             {
-                builder.append( Proxy.getInvocationHandler( arg ).getClass().getName() );
+                builder.append(Proxy.getInvocationHandler(arg).getClass().getName());
             }
             else
             {
-                builder.append( argClass.getName() );
+                builder.append(argClass.getName());
             }
-            builder.append( NL );
+            builder.append(NL);
         }
         return builder.toString();
     }

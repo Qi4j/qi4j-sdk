@@ -20,36 +20,37 @@
 
 package org.qi4j.runtime.mixin;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class Qi228Test
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( SomeLogicService.class );
+        module.services(SomeLogicService.class);
     }
 
     @Test
     public void test1()
         throws Exception
     {
-        SomeLogic service = serviceFinder.findService( SomeLogic.class ).get();
+        SomeLogic service = serviceFinder.findService(SomeLogic.class).get();
         try
         {
             service.getNumbers();
             // Either should succeed.
         }
-        catch( Exception e )
+        catch(Exception e)
         {
             // Or fail with a decent Excpetion.
         }
@@ -69,7 +70,7 @@ public class Qi228Test
         }
     }
 
-    @Mixins( { SomeLogicMixin.class } )
+    @Mixins({SomeLogicMixin.class})
     public interface SomeLogicService
         extends SomeLogic, ServiceComposite
     {

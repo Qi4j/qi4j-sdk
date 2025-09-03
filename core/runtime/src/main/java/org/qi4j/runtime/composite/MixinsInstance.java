@@ -27,9 +27,9 @@ import java.lang.reflect.Method;
  */
 public interface MixinsInstance
 {
-    Object invoke( Object composite, Object[] params, CompositeMethodInstance methodInstance )
+    Object invoke(Object composite, Object[] params, CompositeMethodInstance methodInstance)
         throws Throwable;
 
-    Object invokeObject( Object proxy, Object[] args, Method method )
+    Object invokeObject(Object proxy, Object[] args, Method method)
         throws Throwable;
 }

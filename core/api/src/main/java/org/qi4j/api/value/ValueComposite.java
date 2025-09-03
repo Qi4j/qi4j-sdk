@@ -26,11 +26,6 @@ import org.qi4j.api.association.NamedAssociationMixin;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Immutable;
-import org.qi4j.api.association.AssociationMixin;
-import org.qi4j.api.association.ManyAssociationMixin;
-import org.qi4j.api.association.NamedAssociationMixin;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.property.Immutable;
 
 /**
  * ValueComposites are Composites that has state, and equality is defined from its values and not any reference nor
@@ -47,7 +42,7 @@ import org.qi4j.api.property.Immutable;
  * </ul>
  */
 @Immutable
-@Mixins( { AssociationMixin.class, ManyAssociationMixin.class, NamedAssociationMixin.class } )
+@Mixins({AssociationMixin.class, ManyAssociationMixin.class, NamedAssociationMixin.class})
 public interface ValueComposite
     extends Composite
 {

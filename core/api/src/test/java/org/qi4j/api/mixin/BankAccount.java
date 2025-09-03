@@ -27,5 +27,7 @@ public interface BankAccount
 }
 // END SNIPPET: mixinType
 
-class Money {}
+class Money
+{
+}
 

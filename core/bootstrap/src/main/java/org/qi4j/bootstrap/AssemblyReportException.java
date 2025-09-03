@@ -29,12 +29,12 @@ import java.util.stream.Collectors;
  */
 public class AssemblyReportException extends AssemblyException
 {
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
 
     private Set<Throwable> problems;
     private String modelReport;
 
-    public AssemblyReportException( Set<Throwable> problems )
+    public AssemblyReportException(Set<Throwable> problems)
     {
         this.problems = problems;
     }
@@ -43,41 +43,41 @@ public class AssemblyReportException extends AssemblyException
     public String getMessage()
     {
         String message;
-        if( modelReport == null )
+        if(modelReport == null)
         {
-            message = NL+ "Composition Problems Report:" + NL;
+            message = NL + "Composition Problems Report:" + NL;
         }
         else
         {
             message = modelReport;
         }
         return message + problems.stream()
-                                 .map( this::composeMessage )
-                                 .map( m -> m + NL + "--" + NL )
-                                 .collect( Collectors.joining() );
+            .map(this::composeMessage)
+            .map(m -> m + NL + "--" + NL)
+            .collect(Collectors.joining());
     }
 
-    public void attacheModelReport( String modelReport )
+    public void attacheModelReport(String modelReport)
     {
         this.modelReport = modelReport;
     }
 
-    private String composeMessage( Throwable exception )
+    private String composeMessage(Throwable exception)
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream( baos );
-        if( Boolean.getBoolean( "qi4j.report.exceptions" ) )
+        PrintStream ps = new PrintStream(baos);
+        if(Boolean.getBoolean("qi4j.report.exceptions"))
         {
-            exception.printStackTrace( ps );
+            exception.printStackTrace(ps);
         }
         else
         {
             StringBuilder indent = new StringBuilder();
-            while( exception != null )
+            while(exception != null)
             {
-                indent = indent.append( "  " );
-                ps.println( indent.toString() + exception.getMessage() );
-                ps.println( "---" );
+                indent = indent.append("  ");
+                ps.println(indent.toString() + exception.getMessage());
+                ps.println("---");
                 exception = exception.getCause();
             }
         }

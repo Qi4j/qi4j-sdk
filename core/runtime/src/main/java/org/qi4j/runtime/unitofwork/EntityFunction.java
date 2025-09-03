@@ -20,10 +20,11 @@
 
 package org.qi4j.runtime.unitofwork;
 
-import java.lang.reflect.Type;
-import java.util.function.BiFunction;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
+
+import java.lang.reflect.Type;
+import java.util.function.BiFunction;
 
 import static org.qi4j.api.util.Classes.RAW_CLASS;
 
@@ -33,14 +34,14 @@ public class EntityFunction
 
     private final UnitOfWorkFactory uowf;
 
-    public EntityFunction( UnitOfWorkFactory uowf )
+    public EntityFunction(UnitOfWorkFactory uowf)
     {
         this.uowf = uowf;
     }
 
     @Override
-    public Object apply( EntityReference entityReference, Type type )
+    public Object apply(EntityReference entityReference, Type type)
     {
-        return uowf.currentUnitOfWork().get( RAW_CLASS.apply( type ), entityReference.identity() );
+        return uowf.currentUnitOfWork().get(RAW_CLASS.apply(type), entityReference.identity());
     }
 }

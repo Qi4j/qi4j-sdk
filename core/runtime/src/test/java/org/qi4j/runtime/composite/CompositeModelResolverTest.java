@@ -19,15 +19,12 @@
  */
 package org.qi4j.runtime.composite;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.structure.Module;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
@@ -43,22 +40,22 @@ public class CompositeModelResolverTest
     {
         Module module = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.transients( TestComposite1.class );
+                module.transients(TestComposite1.class);
             }
         }.module();
 
-        assertThat( module.newTransient( TestComposite1.class ).testB(), equalTo( "ok" ) );
+        assertThat(module.newTransient(TestComposite1.class).testB(), equalTo("ok"));
     }
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
     }
 
-    @Mixins( TestA.TestAMixin.class )
+    @Mixins(TestA.TestAMixin.class)
     public static interface TestA
     {
         public String test();
@@ -73,7 +70,7 @@ public class CompositeModelResolverTest
         }
     }
 
-    @Mixins( TestB.TestBMixin.class )
+    @Mixins(TestB.TestBMixin.class)
     public static interface TestB
     {
         public String testB();
@@ -83,7 +80,7 @@ public class CompositeModelResolverTest
         {
             private TestA testA;
 
-            public TestBMixin( @This TestA testA )
+            public TestBMixin(@This TestA testA)
             {
                 this.testA = testA;
                 testA.test();
@@ -96,7 +93,7 @@ public class CompositeModelResolverTest
         }
     }
 
-    @Mixins( TestC.TestCMixin.class )
+    @Mixins(TestC.TestCMixin.class)
     public static interface TestC
     {
         public String testC();
@@ -106,7 +103,7 @@ public class CompositeModelResolverTest
         {
             private TestD testD;
 
-            public TestCMixin( @This TestD testD )
+            public TestCMixin(@This TestD testD)
             {
                 this.testD = testD;
                 testD.testD();
@@ -119,7 +116,7 @@ public class CompositeModelResolverTest
         }
     }
 
-    @Mixins( TestD.TestDMixin.class )
+    @Mixins(TestD.TestDMixin.class)
     public static interface TestD
     {
         public String testD();
@@ -129,7 +126,7 @@ public class CompositeModelResolverTest
         {
             private TestC testC;
 
-            public TestDMixin( @This TestC testC )
+            public TestDMixin(@This TestC testC)
             {
                 this.testC = testC;
                 testC.testC();

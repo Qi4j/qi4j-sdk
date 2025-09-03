@@ -19,11 +19,6 @@
  */
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Member;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.QualifiedName;
@@ -32,6 +27,12 @@ import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.unitofwork.ModuleUnitOfWork;
 import org.qi4j.runtime.value.ValueStateInstance;
 import org.qi4j.spi.entity.EntityState;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Member;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Model for ManyAssociations.
@@ -51,84 +52,84 @@ public final class ManyAssociationsModel
         return mapAccessorAssociationModel.values().stream();
     }
 
-    public void addManyAssociation( ManyAssociationModel model )
+    public void addManyAssociation(ManyAssociationModel model)
     {
-        mapAccessorAssociationModel.put( model.accessor(), model );
-        mapNameAssociationModel.put( model.qualifiedName(), model );
+        mapAccessorAssociationModel.put(model.accessor(), model);
+        mapNameAssociationModel.put(model.qualifiedName(), model);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super ManyAssociationsModel, ? super ManyAssociationModel, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super ManyAssociationsModel, ? super ManyAssociationModel, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            for( ManyAssociationModel associationModel : mapAccessorAssociationModel.values() )
+            for(ManyAssociationModel associationModel : mapAccessorAssociationModel.values())
             {
-                if( !associationModel.accept( visitor ) )
+                if(!associationModel.accept(visitor))
                 {
                     break;
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
-    public <T> ManyAssociation<T> newInstance( AccessibleObject accessor,
-                                               EntityState entityState,
-                                               ModuleUnitOfWork uow )
+    public <T> ManyAssociation<T> newInstance(AccessibleObject accessor,
+                                              EntityState entityState,
+                                              ModuleUnitOfWork uow)
     {
-        return mapAccessorAssociationModel.get( accessor ).newInstance( uow, entityState );
+        return mapAccessorAssociationModel.get(accessor).newInstance(uow, entityState);
     }
 
-    public ManyAssociationModel getManyAssociation( AccessibleObject accessor )
+    public ManyAssociationModel getManyAssociation(AccessibleObject accessor)
         throws IllegalArgumentException
     {
-        ManyAssociationModel manyAssociationModel = mapAccessorAssociationModel.get( accessor );
-        if( manyAssociationModel == null )
+        ManyAssociationModel manyAssociationModel = mapAccessorAssociationModel.get(accessor);
+        if(manyAssociationModel == null)
         {
-            throw new IllegalArgumentException( "No many-association found with name:" + ( (Member) accessor ).getName() );
+            throw new IllegalArgumentException("No many-association found with name:" + ((Member) accessor).getName());
         }
         return manyAssociationModel;
     }
 
-    public AssociationDescriptor getManyAssociationByName( String name )
+    public AssociationDescriptor getManyAssociationByName(String name)
         throws IllegalArgumentException
     {
-        for( ManyAssociationModel associationModel : mapAccessorAssociationModel.values() )
+        for(ManyAssociationModel associationModel : mapAccessorAssociationModel.values())
         {
-            if( associationModel.qualifiedName().name().equals( name ) )
+            if(associationModel.qualifiedName().name().equals(name))
             {
                 return associationModel;
             }
         }
-        throw new IllegalArgumentException( "No many-association found with name:" + name );
+        throw new IllegalArgumentException("No many-association found with name:" + name);
     }
 
-    public AssociationDescriptor getManyAssociationByQualifiedName( QualifiedName name )
+    public AssociationDescriptor getManyAssociationByQualifiedName(QualifiedName name)
         throws IllegalArgumentException
     {
 
-        ManyAssociationModel associationModel = mapNameAssociationModel.get( name );
-        if( associationModel != null )
+        ManyAssociationModel associationModel = mapNameAssociationModel.get(name);
+        if(associationModel != null)
         {
             return associationModel;
         }
-        throw new IllegalArgumentException( "No many-association found with qualified name:" + name );
+        throw new IllegalArgumentException("No many-association found with qualified name:" + name);
     }
 
-    public boolean hasAssociation( QualifiedName name )
+    public boolean hasAssociation(QualifiedName name)
     {
-        return mapNameAssociationModel.containsKey( name );
+        return mapNameAssociationModel.containsKey(name);
     }
 
-    public void checkConstraints( ValueStateInstance state )
+    public void checkConstraints(ValueStateInstance state)
     {
-        for( ManyAssociationModel manyAssociationModel : mapAccessorAssociationModel.values() )
+        for(ManyAssociationModel manyAssociationModel : mapAccessorAssociationModel.values())
         {
             AccessibleObject accessor = manyAssociationModel.accessor();
-            ManyAssociationInstance<?> instance = state.manyAssociationFor( accessor );
-            manyAssociationModel.checkAssociationConstraints( instance );
+            ManyAssociationInstance<?> instance = state.manyAssociationFor(accessor);
+            manyAssociationModel.checkAssociationConstraints(instance);
         }
     }
 }

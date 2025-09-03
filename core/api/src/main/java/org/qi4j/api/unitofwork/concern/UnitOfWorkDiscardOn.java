@@ -63,11 +63,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * {@code myBusinessMethod} method.
  * </p>
  */
-@Retention( RUNTIME )
-@Target( METHOD )
+@Retention(RUNTIME)
+@Target(METHOD)
 @Inherited
 @Documented
 public @interface UnitOfWorkDiscardOn
 {
-    Class<? extends Throwable>[] value() default { Throwable.class };
+    Class<? extends Throwable>[] value() default {Throwable.class};
 }

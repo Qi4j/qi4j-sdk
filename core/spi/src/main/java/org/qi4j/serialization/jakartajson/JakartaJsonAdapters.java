@@ -17,11 +17,6 @@
  */
 package org.qi4j.serialization.jakartajson;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
@@ -30,24 +25,32 @@ import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.serialization.Converters;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.serialization.SerializationException;
 import org.qi4j.api.service.ServiceDescriptor;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.spi.serialization.BuiltInConverters;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.qi4j.api.type.HasTypesCollectors.closestType;
 import static org.qi4j.serialization.jakartajson.JakartaJsonSettings.orDefault;
 
-@Mixins( JakartaJsonAdapters.Mixin.class )
+@Mixins(JakartaJsonAdapters.Mixin.class)
 public interface JakartaJsonAdapters
 {
-    void registerAdapter( ValueType valueType, JakartaJsonAdapter<?> adapter );
+    void registerAdapter(ValueType valueType, JakartaJsonAdapter<?> adapter);
 
-    <T> JakartaJsonAdapter<T> adapterFor(ValueType valueType );
+    <T> JakartaJsonAdapter<T> adapterFor(ValueType valueType);
 
-    default <T> JakartaJsonAdapter<T> adapterFor(Class<T> type )
+    default <T> JakartaJsonAdapter<T> adapterFor(Class<T> type)
     {
-        return adapterFor( ValueType.of( type ) );
+        return adapterFor(ValueType.of(type));
     }
 
     class Mixin implements JakartaJsonAdapters, Initializable
@@ -67,38 +70,38 @@ public interface JakartaJsonAdapters
         @Override
         public void initialize()
         {
-            JakartaJsonSettings settings = orDefault( descriptor.metaInfo( JakartaJsonSettings.class ) );
+            JakartaJsonSettings settings = orDefault(descriptor.metaInfo(JakartaJsonSettings.class));
             settings.getConverters()
-                    .forEach( ( type, converter ) -> converters.registerConverter( type, converter ) );
-            builtInConverters.registerBuiltInConverters( converters );
-            settings.getAdapters().forEach( adapters::put );
+                .forEach((type, converter) -> converters.registerConverter(type, converter));
+            builtInConverters.registerBuiltInConverters(converters);
+            settings.getAdapters().forEach(adapters::put);
             registerBaseJakartaJsonAdapters();
         }
 
         @Override
-        public void registerAdapter( ValueType valueType, JakartaJsonAdapter<?> adapter )
+        public void registerAdapter(ValueType valueType, JakartaJsonAdapter<?> adapter)
         {
-            adapters.put( valueType, adapter );
-            resolvedAdaptersCache.put( valueType, adapter );
+            adapters.put(valueType, adapter);
+            resolvedAdaptersCache.put(valueType, adapter);
         }
 
         @Override
-        public <T> JakartaJsonAdapter<T> adapterFor(ValueType valueType )
+        public <T> JakartaJsonAdapter<T> adapterFor(ValueType valueType)
         {
-            if( resolvedAdaptersCache.containsKey( valueType ) )
+            if(resolvedAdaptersCache.containsKey(valueType))
             {
-                return castAdapter( resolvedAdaptersCache.get( valueType ) );
+                return castAdapter(resolvedAdaptersCache.get(valueType));
             }
-            JakartaJsonAdapter<T> adapter = castAdapter( adapters.keySet().stream()
-                                                               .collect( closestType( valueType ) )
-                                                               .map( adapters::get )
-                                                               .orElse( null ) );
-            resolvedAdaptersCache.put( valueType, adapter );
+            JakartaJsonAdapter<T> adapter = castAdapter(adapters.keySet().stream()
+                .collect(closestType(valueType))
+                .map(adapters::get)
+                .orElse(null));
+            resolvedAdaptersCache.put(valueType, adapter);
             return adapter;
         }
 
-        @SuppressWarnings( "unchecked" )
-        private <T> JakartaJsonAdapter<T> castAdapter(JakartaJsonAdapter<?> adapter )
+        @SuppressWarnings("unchecked")
+        private <T> JakartaJsonAdapter<T> castAdapter(JakartaJsonAdapter<?> adapter)
         {
             return (JakartaJsonAdapter<T>) adapter;
         }
@@ -106,68 +109,76 @@ public interface JakartaJsonAdapters
         private void registerBaseJakartaJsonAdapters()
         {
             // Primitive Value types
-            adapters.put( ValueType.STRING, new StringAdapter() );
-            adapters.put( ValueType.CHARACTER, new CharacterAdapter() );
-            adapters.put( ValueType.BOOLEAN, new BooleanAdapter() );
-            adapters.put( ValueType.INTEGER, new IntegerAdapter() );
-            adapters.put( ValueType.LONG, new LongAdapter() );
-            adapters.put( ValueType.SHORT, new ShortAdapter() );
-            adapters.put( ValueType.BYTE, new ByteAdapter() );
-            adapters.put( ValueType.FLOAT, new FloatAdapter() );
-            adapters.put( ValueType.DOUBLE, new DoubleAdapter() );
+            adapters.put(ValueType.STRING, new StringAdapter());
+            adapters.put(ValueType.CHARACTER, new CharacterAdapter());
+            adapters.put(ValueType.BOOLEAN, new BooleanAdapter());
+            adapters.put(ValueType.INTEGER, new IntegerAdapter());
+            adapters.put(ValueType.LONG, new LongAdapter());
+            adapters.put(ValueType.SHORT, new ShortAdapter());
+            adapters.put(ValueType.BYTE, new ByteAdapter());
+            adapters.put(ValueType.FLOAT, new FloatAdapter());
+            adapters.put(ValueType.DOUBLE, new DoubleAdapter());
         }
 
         private static abstract class ToJsonStringAdapter<T> implements JakartaJsonAdapter<T>
         {
             @Override
-            public JsonValue serialize(JakartaJsonFactories jsonFactories, T object,
-                                       Function<Object, JsonValue> serialize )
+            public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories, T object, Function<Object, JsonValue> serialize)
             {
-                return jsonFactories.toJsonString( object );
+                return jsonFactories.toJsonString(object);
             }
         }
 
         private static class StringAdapter extends ToJsonStringAdapter<String>
         {
             @Override
-            public Class<String> type() { return String.class; }
+            public Class<String> type()
+            {
+                return String.class;
+            }
 
             @Override
-            public String deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public String deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
             {
-                return JakartaJson.asString( json );
+                return JakartaJson.asString(json);
             }
         }
 
         private static class CharacterAdapter extends ToJsonStringAdapter<Character>
         {
             @Override
-            public Class<Character> type() { return Character.class; }
+            public Class<Character> type()
+            {
+                return Character.class;
+            }
 
             @Override
-            public Character deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public Character deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
             {
-                String string = JakartaJson.asString( json );
-                return string.isEmpty() ? null : string.charAt( 0 );
+                String string = JakartaJson.asString(json);
+                return string.isEmpty() ? null : string.charAt(0);
             }
         }
 
         private static class BooleanAdapter implements JakartaJsonAdapter<Boolean>
         {
             @Override
-            public Class<Boolean> type() { return Boolean.class; }
-
-            @Override
-            public JsonValue serialize(JakartaJsonFactories jsonFactories, Boolean object,
-                                       Function<Object, JsonValue> serialize )
+            public Class<Boolean> type()
             {
-                return type().cast( object ) ? JsonValue.TRUE : JsonValue.FALSE;
+                return Boolean.class;
             }
 
             @Override
-            public Boolean deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories, Boolean object,
+                                       Function<Object, JsonValue> serialize)
             {
-                switch( json.getValueType() )
+                return type().cast(object) ? JsonValue.TRUE : JsonValue.FALSE;
+            }
+
+            @Override
+            public Boolean deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+            {
+                switch(json.getValueType())
                 {
                     case TRUE:
                         return true;
@@ -176,11 +187,11 @@ public interface JakartaJsonAdapters
                     case NULL:
                         return null;
                     case NUMBER:
-                        return ( (JsonNumber) json ).doubleValue() > 0;
+                        return ((JsonNumber) json).doubleValue() > 0;
                     case STRING:
-                        return Boolean.valueOf( ( (JsonString) json ).getString() );
+                        return Boolean.valueOf(((JsonString) json).getString());
                     default:
-                        throw new SerializationException( "Don't know how to deserialize Boolean from " + json );
+                        throw new SerializationException("Don't know how to deserialize Boolean from " + json);
                 }
             }
         }
@@ -188,32 +199,35 @@ public interface JakartaJsonAdapters
         private static class IntegerAdapter implements JakartaJsonAdapter<Integer>
         {
             @Override
-            public Class<Integer> type() { return Integer.class; }
-
-            @Override
-            public JsonValue serialize( JakartaJsonFactories jsonFactories,
-                                        Integer object, Function<Object, JsonValue> serialize )
+            public Class<Integer> type()
             {
-                return jsonFactories.builderFactory().createObjectBuilder()
-                                    .add( "value", type().cast( object ) )
-                                    .build()
-                                    .getJsonNumber( "value" );
+                return Integer.class;
             }
 
             @Override
-            public Integer deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories,
+                                       Integer object, Function<Object, JsonValue> serialize)
             {
-                switch( json.getValueType() )
+                return jsonFactories.builderFactory().createObjectBuilder()
+                    .add("value", type().cast(object))
+                    .build()
+                    .getJsonNumber("value");
+            }
+
+            @Override
+            public Integer deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+            {
+                switch(json.getValueType())
                 {
                     case NULL:
                         return null;
                     case NUMBER:
-                        return ( (JsonNumber) json ).intValueExact();
+                        return ((JsonNumber) json).intValueExact();
                     case STRING:
-                        String string = ( (JsonString) json ).getString();
-                        return string.isEmpty() ? 0 : Integer.parseInt( string );
+                        String string = ((JsonString) json).getString();
+                        return string.isEmpty() ? 0 : Integer.parseInt(string);
                     default:
-                        throw new SerializationException( "Don't know how to deserialize Integer from " + json );
+                        throw new SerializationException("Don't know how to deserialize Integer from " + json);
                 }
             }
         }
@@ -221,32 +235,35 @@ public interface JakartaJsonAdapters
         private static class LongAdapter implements JakartaJsonAdapter<Long>
         {
             @Override
-            public Class<Long> type() { return Long.class; }
-
-            @Override
-            public JsonValue serialize( JakartaJsonFactories jsonFactories,
-                                        Long object, Function<Object, JsonValue> serialize )
+            public Class<Long> type()
             {
-                return jsonFactories.builderFactory().createObjectBuilder()
-                                    .add( "value", type().cast( object ) )
-                                    .build()
-                                    .getJsonNumber( "value" );
+                return Long.class;
             }
 
             @Override
-            public Long deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories,
+                                       Long object, Function<Object, JsonValue> serialize)
             {
-                switch( json.getValueType() )
+                return jsonFactories.builderFactory().createObjectBuilder()
+                    .add("value", type().cast(object))
+                    .build()
+                    .getJsonNumber("value");
+            }
+
+            @Override
+            public Long deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+            {
+                switch(json.getValueType())
                 {
                     case NULL:
                         return null;
                     case NUMBER:
-                        return ( (JsonNumber) json ).longValueExact();
+                        return ((JsonNumber) json).longValueExact();
                     case STRING:
-                        String string = ( (JsonString) json ).getString();
-                        return string.isEmpty() ? 0L : Long.parseLong( string );
+                        String string = ((JsonString) json).getString();
+                        return string.isEmpty() ? 0L : Long.parseLong(string);
                     default:
-                        throw new SerializationException( "Don't know how to deserialize Long from " + json );
+                        throw new SerializationException("Don't know how to deserialize Long from " + json);
                 }
             }
         }
@@ -254,32 +271,35 @@ public interface JakartaJsonAdapters
         private static class ShortAdapter implements JakartaJsonAdapter<Short>
         {
             @Override
-            public Class<Short> type() { return Short.class; }
-
-            @Override
-            public JsonValue serialize( JakartaJsonFactories jsonFactories,
-                                        Short object, Function<Object, JsonValue> serialize )
+            public Class<Short> type()
             {
-                return jsonFactories.builderFactory().createObjectBuilder()
-                                    .add( "value", type().cast( object ) )
-                                    .build()
-                                    .getJsonNumber( "value" );
+                return Short.class;
             }
 
             @Override
-            public Short deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories,
+                                       Short object, Function<Object, JsonValue> serialize)
             {
-                switch( json.getValueType() )
+                return jsonFactories.builderFactory().createObjectBuilder()
+                    .add("value", type().cast(object))
+                    .build()
+                    .getJsonNumber("value");
+            }
+
+            @Override
+            public Short deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+            {
+                switch(json.getValueType())
                 {
                     case NULL:
                         return null;
                     case NUMBER:
-                        return (short) ( (JsonNumber) json ).intValueExact();
+                        return (short) ((JsonNumber) json).intValueExact();
                     case STRING:
-                        String string = ( (JsonString) json ).getString();
-                        return string.isEmpty() ? 0 : Short.parseShort( string );
+                        String string = ((JsonString) json).getString();
+                        return string.isEmpty() ? 0 : Short.parseShort(string);
                     default:
-                        throw new SerializationException( "Don't know how to deserialize Short from " + json );
+                        throw new SerializationException("Don't know how to deserialize Short from " + json);
                 }
             }
         }
@@ -287,32 +307,35 @@ public interface JakartaJsonAdapters
         private static class ByteAdapter implements JakartaJsonAdapter<Byte>
         {
             @Override
-            public Class<Byte> type() { return Byte.class; }
-
-            @Override
-            public JsonValue serialize( JakartaJsonFactories jsonFactories,
-                                        Byte object, Function<Object, JsonValue> serialize )
+            public Class<Byte> type()
             {
-                return jsonFactories.builderFactory().createObjectBuilder()
-                                    .add( "value", type().cast( object ) )
-                                    .build()
-                                    .getJsonNumber( "value" );
+                return Byte.class;
             }
 
             @Override
-            public Byte deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories,
+                                       Byte object, Function<Object, JsonValue> serialize)
             {
-                switch( json.getValueType() )
+                return jsonFactories.builderFactory().createObjectBuilder()
+                    .add("value", type().cast(object))
+                    .build()
+                    .getJsonNumber("value");
+            }
+
+            @Override
+            public Byte deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+            {
+                switch(json.getValueType())
                 {
                     case NULL:
                         return null;
                     case NUMBER:
-                        return (byte) ( (JsonNumber) json ).intValueExact();
+                        return (byte) ((JsonNumber) json).intValueExact();
                     case STRING:
-                        String string = ( (JsonString) json ).getString();
-                        return string.isEmpty() ? 0 : Byte.parseByte( string );
+                        String string = ((JsonString) json).getString();
+                        return string.isEmpty() ? 0 : Byte.parseByte(string);
                     default:
-                        throw new SerializationException( "Don't know how to deserialize Byte from " + json );
+                        throw new SerializationException("Don't know how to deserialize Byte from " + json);
                 }
             }
         }
@@ -320,32 +343,35 @@ public interface JakartaJsonAdapters
         private static class FloatAdapter implements JakartaJsonAdapter<Float>
         {
             @Override
-            public Class<Float> type() { return Float.class; }
-
-            @Override
-            public JsonValue serialize( JakartaJsonFactories jsonFactories,
-                                        Float object, Function<Object, JsonValue> serialize )
+            public Class<Float> type()
             {
-                return jsonFactories.builderFactory().createObjectBuilder()
-                                    .add( "value", type().cast( object ) )
-                                    .build()
-                                    .getJsonNumber( "value" );
+                return Float.class;
             }
 
             @Override
-            public Float deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories,
+                                       Float object, Function<Object, JsonValue> serialize)
             {
-                switch( json.getValueType() )
+                return jsonFactories.builderFactory().createObjectBuilder()
+                    .add("value", type().cast(object))
+                    .build()
+                    .getJsonNumber("value");
+            }
+
+            @Override
+            public Float deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+            {
+                switch(json.getValueType())
                 {
                     case NULL:
                         return null;
                     case NUMBER:
-                        return (float) ( (JsonNumber) json ).doubleValue();
+                        return (float) ((JsonNumber) json).doubleValue();
                     case STRING:
-                        String string = ( (JsonString) json ).getString();
-                        return string.isEmpty() ? 0F : Float.parseFloat( string );
+                        String string = ((JsonString) json).getString();
+                        return string.isEmpty() ? 0F : Float.parseFloat(string);
                     default:
-                        throw new SerializationException( "Don't know how to deserialize Float from " + json );
+                        throw new SerializationException("Don't know how to deserialize Float from " + json);
                 }
             }
         }
@@ -353,32 +379,35 @@ public interface JakartaJsonAdapters
         private static class DoubleAdapter implements JakartaJsonAdapter<Double>
         {
             @Override
-            public Class<Double> type() { return Double.class; }
-
-            @Override
-            public JsonValue serialize( JakartaJsonFactories jsonFactories,
-                                        Double object, Function<Object, JsonValue> serialize )
+            public Class<Double> type()
             {
-                return jsonFactories.builderFactory().createObjectBuilder()
-                                    .add( "value", type().cast( object ) )
-                                    .build()
-                                    .getJsonNumber( "value" );
+                return Double.class;
             }
 
             @Override
-            public Double deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+            public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories,
+                                       Double object, Function<Object, JsonValue> serialize)
             {
-                switch( json.getValueType() )
+                return jsonFactories.builderFactory().createObjectBuilder()
+                    .add("value", type().cast(object))
+                    .build()
+                    .getJsonNumber("value");
+            }
+
+            @Override
+            public Double deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+            {
+                switch(json.getValueType())
                 {
                     case NULL:
                         return null;
                     case NUMBER:
-                        return ( (JsonNumber) json ).doubleValue();
+                        return ((JsonNumber) json).doubleValue();
                     case STRING:
-                        String string = ( (JsonString) json ).getString();
-                        return string.isEmpty() ? 0D : Double.parseDouble( string );
+                        String string = ((JsonString) json).getString();
+                        return string.isEmpty() ? 0D : Double.parseDouble(string);
                     default:
-                        throw new SerializationException( "Don't know how to deserialize Double from " + json );
+                        throw new SerializationException("Don't know how to deserialize Double from " + json);
                 }
             }
         }

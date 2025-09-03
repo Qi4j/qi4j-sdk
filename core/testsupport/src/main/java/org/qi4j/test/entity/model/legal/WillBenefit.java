@@ -21,9 +21,7 @@ package org.qi4j.test.entity.model.legal;
 
 import org.qi4j.api.association.Association;
 import org.qi4j.api.common.Optional;
-import org.qi4j.api.identity.HasIdentity;
 import org.qi4j.api.property.Property;
-import org.qi4j.test.entity.model.people.Person;
 import org.qi4j.test.entity.model.people.Person;
 
 public interface WillBenefit

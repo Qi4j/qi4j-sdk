@@ -25,13 +25,13 @@ package org.qi4j.api.service;
 public class ServiceUnavailableException
     extends RuntimeException
 {
-    public ServiceUnavailableException( String message )
+    public ServiceUnavailableException(String message)
     {
-        super( message );
+        super(message);
     }
 
-    public ServiceUnavailableException( String message, Throwable cause )
+    public ServiceUnavailableException(String message, Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 }

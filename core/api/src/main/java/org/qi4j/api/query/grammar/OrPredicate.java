@@ -19,10 +19,10 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.composite.Composite;
+
 import java.util.Collection;
 import java.util.function.Predicate;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.Composite;
 
 /**
  * OR Specification.
@@ -31,33 +31,33 @@ public class OrPredicate
     extends BinaryPredicate
 {
 
-    public OrPredicate( Collection<Predicate<Composite>> operands )
+    public OrPredicate(Collection<Predicate<Composite>> operands)
     {
-        super( operands );
+        super(operands);
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
         Predicate<Composite> master = t -> false;
-        for( Predicate<Composite> p : operands )
+        for(Predicate<Composite> p : operands)
         {
-            master = master.or( p );
+            master = master.or(p);
         }
-        return master.test( item );
+        return master.test(item);
     }
 
     @Override
     public String toString()
     {
-        StringBuilder sb = new StringBuilder( "(" );
+        StringBuilder sb = new StringBuilder("(");
         String or = "";
-        for( Predicate<Composite> operand : operands )
+        for(Predicate<Composite> operand : operands)
         {
-            sb.append( or ).append( operand );
+            sb.append(or).append(operand);
             or = " or ";
         }
-        return sb.append( ")" ).toString();
+        return sb.append(")").toString();
     }
 
 }

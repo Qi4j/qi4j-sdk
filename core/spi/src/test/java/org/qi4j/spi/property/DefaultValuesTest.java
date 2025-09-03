@@ -20,12 +20,13 @@
 
 package org.qi4j.spi.property;
 
+import org.junit.jupiter.api.Test;
+import org.qi4j.api.property.DefaultValues;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import org.qi4j.api.property.DefaultValues;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,35 +39,35 @@ public class DefaultValuesTest
     @Test
     public void givenDefaultValuesWhenRequestStringThenGetEmptyString()
     {
-        assertThat( "Empty string", DefaultValues.getDefaultValueOf( String.class ), equalTo( "" ) );
+        assertThat("Empty string", DefaultValues.getDefaultValueOf(String.class), equalTo(""));
     }
 
     @Test
     public void givenDefaultValuesWhenRequestListThenGetEmptyList()
     {
-        assertThat( "Empty list", DefaultValues.getDefaultValueOf( List.class ), equalTo( Collections.emptyList() ) );
+        assertThat("Empty list", DefaultValues.getDefaultValueOf(List.class), equalTo(Collections.emptyList()));
     }
 
     @Test
     public void givenDefaultValuesWhenRequestSetThenGetEmptySet()
     {
-        assertThat( "Empty set", DefaultValues.getDefaultValueOf( Set.class ), equalTo( Collections.emptySet() ) );
+        assertThat("Empty set", DefaultValues.getDefaultValueOf(Set.class), equalTo(Collections.emptySet()));
     }
 
     @Test
     public void givenDefaultValuesWhenRequestCollectionThenGetEmptyCollection()
     {
-        Collection<Object> coll = (Collection<Object>) DefaultValues.getDefaultValueOf( Collection.class );
+        Collection<Object> coll = (Collection<Object>) DefaultValues.getDefaultValueOf(Collection.class);
         Collection<Object> empty = Collections.EMPTY_LIST;
-        assertThat( "Empty collection", coll, equalTo( empty ) );
+        assertThat("Empty collection", coll, equalTo(empty));
     }
 
     @Test
     public void givenDefaultValuesWhenRequestEnumThenGetFirstValue()
     {
-        Object val = DefaultValues.getDefaultValueOf( ValueTest.class );
+        Object val = DefaultValues.getDefaultValueOf(ValueTest.class);
         Object value1 = ValueTest.VALUE1;
-        assertThat( "Enum first value", val, equalTo( value1 ) );
+        assertThat("Enum first value", val, equalTo(value1));
     }
 
     public enum ValueTest

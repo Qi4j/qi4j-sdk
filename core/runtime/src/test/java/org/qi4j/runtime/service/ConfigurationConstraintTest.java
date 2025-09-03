@@ -19,8 +19,7 @@
  */
 package org.qi4j.runtime.service;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.configuration.ConfigurationComposite;
 import org.qi4j.api.constraint.Constraint;
@@ -33,8 +32,9 @@ import org.qi4j.api.property.Property;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.bootstrap.SingletonAssembler;
 import org.qi4j.entitystore.memory.MemoryEntityStoreService;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.SingletonAssembler;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -53,12 +53,12 @@ public class ConfigurationConstraintTest
             module ->
             {
                 module.defaultServices();
-                module.services( MemoryEntityStoreService.class );
-                module.services( TestService.class ).identifiedBy( "TestService1" );
-                module.configurations( TestConfiguration.class );
+                module.services(MemoryEntityStoreService.class);
+                module.services(TestService.class).identifiedBy("TestService1");
+                module.configurations(TestConfiguration.class);
             }
         );
-        ServiceReference<TestService> service = underTest.module().findService( TestService.class );
+        ServiceReference<TestService> service = underTest.module().findService(TestService.class);
         service.get().test();
     }
 
@@ -66,22 +66,22 @@ public class ConfigurationConstraintTest
     public void givenConstrainedConfigurationWhenIncorrectValueExpectConstraintViolationFailure()
         throws Exception
     {
-        assertThrows( ConstraintViolationException.class, () -> {
+        assertThrows(ConstraintViolationException.class, () -> {
             SingletonAssembler underTest = new SingletonAssembler(
                 module ->
                 {
                     module.defaultServices();
-                    module.services( MemoryEntityStoreService.class );
-                    module.services( TestService.class ).identifiedBy( "TestService2" );
-                    module.configurations( TestConfiguration.class );
+                    module.services(MemoryEntityStoreService.class);
+                    module.services(TestService.class).identifiedBy("TestService2");
+                    module.configurations(TestConfiguration.class);
                 }
             );
-            ServiceReference<TestService> service = underTest.module().findService( TestService.class );
+            ServiceReference<TestService> service = underTest.module().findService(TestService.class);
             service.get().test();
-        } );
+        });
     }
 
-    @Mixins( TestMixin.class )
+    @Mixins(TestMixin.class)
     public interface TestService
     {
         void test();
@@ -103,13 +103,13 @@ public class ConfigurationConstraintTest
         @Override
         public void test()
         {
-            assertThat( config.get().constrained().get(), equalTo( "constrained" ) );
+            assertThat(config.get().constrained().get(), equalTo("constrained"));
         }
     }
 
     @ConstraintDeclaration
-    @Retention( RetentionPolicy.RUNTIME )
-    @Constraints( ConstrainedConstraint.class )
+    @Retention(RetentionPolicy.RUNTIME)
+    @Constraints(ConstrainedConstraint.class)
     public @interface Constrained
     {
     }
@@ -118,9 +118,9 @@ public class ConfigurationConstraintTest
         implements Constraint<Constrained, String>
     {
         @Override
-        public boolean isValid( Constrained annotation, String value )
+        public boolean isValid(Constrained annotation, String value)
         {
-            return value.equals( "constrained" );
+            return value.equals("constrained");
         }
     }
 }

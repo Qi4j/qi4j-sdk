@@ -20,12 +20,12 @@
 
 package org.qi4j.spi.service.importer;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,20 +39,20 @@ public class InstanceImporterTest
     @Service
     TestInterface service;
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        ModuleAssembly serviceModule = module.layer().module( "Service module" );
-        serviceModule.importedServices( TestInterface.class )
-            .setMetaInfo( new TestService() )
-            .visibleIn( Visibility.layer );
-        module.objects( InstanceImporterTest.class );
+        ModuleAssembly serviceModule = module.layer().module("Service module");
+        serviceModule.importedServices(TestInterface.class)
+            .setMetaInfo(new TestService())
+            .visibleIn(Visibility.layer);
+        module.objects(InstanceImporterTest.class);
     }
 
     @Test
     public void givenSingletonServiceObjectWhenServicesAreInjectedThenSingletonIsFound()
     {
-        assertThat( "service is injected properly", service.helloWorld(), equalTo( "Hello World" ) );
+        assertThat("service is injected properly", service.helloWorld(), equalTo("Hello World"));
     }
 
     public interface TestInterface

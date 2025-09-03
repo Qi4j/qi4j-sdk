@@ -31,30 +31,30 @@ package org.qi4j.bootstrap;
  */
 public interface AssemblyVisitor<ThrowableType extends Throwable>
 {
-    void visitApplication( ApplicationAssembly assembly )
+    void visitApplication(ApplicationAssembly assembly)
         throws ThrowableType;
 
-    void visitLayer( LayerAssembly assembly )
+    void visitLayer(LayerAssembly assembly)
         throws ThrowableType;
 
-    void visitModule( ModuleAssembly assembly )
+    void visitModule(ModuleAssembly assembly)
         throws ThrowableType;
 
-    void visitComposite( TransientDeclaration declaration )
+    void visitComposite(TransientDeclaration declaration)
         throws ThrowableType;
 
-    void visitEntity( EntityDeclaration declaration )
+    void visitEntity(EntityDeclaration declaration)
         throws ThrowableType;
 
-    void visitService( ServiceDeclaration declaration )
+    void visitService(ServiceDeclaration declaration)
         throws ThrowableType;
 
-    void visitImportedService( ImportedServiceDeclaration declaration )
+    void visitImportedService(ImportedServiceDeclaration declaration)
         throws ThrowableType;
 
-    void visitValue( ValueDeclaration declaration )
+    void visitValue(ValueDeclaration declaration)
         throws ThrowableType;
 
-    void visitObject( ObjectDeclaration declaration )
+    void visitObject(ObjectDeclaration declaration)
         throws ThrowableType;
 }

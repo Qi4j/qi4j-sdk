@@ -19,9 +19,6 @@
  */
 package org.qi4j.runtime.structure;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.activation.ActivationEventListener;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.PassivationException;
@@ -32,6 +29,10 @@ import org.qi4j.api.structure.Layer;
 import org.qi4j.api.structure.Module;
 import org.qi4j.bootstrap.Qi4jRuntime;
 import org.qi4j.runtime.activation.ActivationDelegate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Instance of a Qi4j application. Contains a list of layers which are managed by this application
@@ -48,7 +49,7 @@ public class ApplicationInstance
     private final ActivationDelegate activation;
     private final List<LayerInstance> layerInstances;
 
-    public ApplicationInstance( ApplicationModel model, Qi4jRuntime runtime, MetaInfo instanceMetaInfo )
+    public ApplicationInstance(ApplicationModel model, Qi4jRuntime runtime, MetaInfo instanceMetaInfo)
     {
         // Constructor parameters
         this.applicationModel = model;
@@ -56,7 +57,7 @@ public class ApplicationInstance
         this.instanceMetaInfo = instanceMetaInfo;
 
         // Eager instance objects
-        activation = new ActivationDelegate( this );
+        activation = new ActivationDelegate(this);
         layerInstances = new ArrayList<>();
     }
 
@@ -86,31 +87,31 @@ public class ApplicationInstance
     }
 
     @Override
-    public Layer findLayer( String layerName )
+    public Layer findLayer(String layerName)
     {
-        for( LayerInstance layerInstance : layerInstances )
+        for(LayerInstance layerInstance : layerInstances)
         {
-            if( layerInstance.model().name().equals( layerName ) )
+            if(layerInstance.model().name().equals(layerName))
             {
                 return layerInstance;
             }
         }
 
-        throw new IllegalArgumentException( "No such layer:" + layerName );
+        throw new IllegalArgumentException("No such layer:" + layerName);
     }
 
     @Override
-    public Module findModule( String layerName, String moduleName )
+    public Module findModule(String layerName, String moduleName)
     {
-        for( LayerInstance layerInstance : layerInstances )
+        for(LayerInstance layerInstance : layerInstances)
         {
-            if( layerInstance.model().name().equals( layerName ) )
+            if(layerInstance.model().name().equals(layerName))
             {
-                return layerInstance.findModule( moduleName );
+                return layerInstance.findModule(moduleName);
             }
         }
 
-        throw new IllegalArgumentException( "No such layer:" + layerName );
+        throw new IllegalArgumentException("No such layer:" + layerName);
     }
 
     @Override
@@ -127,9 +128,9 @@ public class ApplicationInstance
 
     // Implementation of MetaInfoHolder
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return instanceMetaInfo.get( infoType );
+        return instanceMetaInfo.get(infoType);
     }
 
     // Implementation of Activation
@@ -137,7 +138,7 @@ public class ApplicationInstance
     public void activate()
         throws ActivationException
     {
-        activation.activate( applicationModel.newActivatorsInstance(), layerInstances );
+        activation.activate(applicationModel.newActivatorsInstance(), layerInstances);
     }
 
     @Override
@@ -148,22 +149,22 @@ public class ApplicationInstance
     }
 
     @Override
-    public void registerActivationEventListener( ActivationEventListener listener )
+    public void registerActivationEventListener(ActivationEventListener listener)
     {
-        activation.registerActivationEventListener( listener );
+        activation.registerActivationEventListener(listener);
     }
 
     @Override
-    public void deregisterActivationEventListener( ActivationEventListener listener )
+    public void deregisterActivationEventListener(ActivationEventListener listener)
     {
-        activation.deregisterActivationEventListener( listener );
+        activation.deregisterActivationEventListener(listener);
     }
 
     // Other methods
-    void addLayer( LayerInstance layer )
+    void addLayer(LayerInstance layer)
     {
-        layer.registerActivationEventListener( activation );
-        layerInstances.add( layer );
+        layer.registerActivationEventListener(activation);
+        layerInstances.add(layer);
     }
 
     public Qi4jRuntime runtime()

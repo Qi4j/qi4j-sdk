@@ -23,11 +23,11 @@ package org.qi4j.bootstrap;
 /**
  * Implement this interface to create the root class that
  * is responsible for assembling your entire application.
- *
+ * <p>
  * Model introspectors will instantiate this class and call assemble
  * to create the application, which will then be visited to get
  * information about its structure.
- *
+ * <p>
  * Application deployment servers will instantiate this, call assemble,
  * and then activate the created application, which will be the runtime
  * instance that forms your application.
@@ -35,6 +35,6 @@ package org.qi4j.bootstrap;
 @FunctionalInterface
 public interface ApplicationAssembler
 {
-    ApplicationAssembly assemble( ApplicationAssemblyFactory applicationFactory )
+    ApplicationAssembly assemble(ApplicationAssemblyFactory applicationFactory)
         throws AssemblyException;
 }

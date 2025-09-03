@@ -19,6 +19,7 @@
  */
 package org.qi4j.regression.qi74;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.constraint.ConstraintViolationException;
@@ -26,17 +27,16 @@ import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class IssueTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( ValueHolder.class );
+        module.transients(ValueHolder.class);
     }
 
     @Test
@@ -44,11 +44,11 @@ public class IssueTest
     {
         try
         {
-            TransientBuilder<ValueHolder> builder = transientBuilderFactory.newTransientBuilder( ValueHolder.class );
+            TransientBuilder<ValueHolder> builder = transientBuilderFactory.newTransientBuilder(ValueHolder.class);
             builder.newInstance();
-            fail( "NotNull constraint violated but no exception is raised" );
+            fail("NotNull constraint violated but no exception is raised");
         }
-        catch( ConstraintViolationException e )
+        catch(ConstraintViolationException e)
         {
             // expected
         }

@@ -26,7 +26,7 @@ import org.qi4j.api.service.ServiceReference;
 /**
  * Activation for JSONMapEntityStoreMixin.
  */
-@Activators( JSONMapEntityStoreActivation.Activator.class )
+@Activators(JSONMapEntityStoreActivation.Activator.class)
 public interface JSONMapEntityStoreActivation
 {
 
@@ -44,14 +44,14 @@ public interface JSONMapEntityStoreActivation
     {
 
         @Override
-        public void afterActivation( ServiceReference<JSONMapEntityStoreActivation> activated )
+        public void afterActivation(ServiceReference<JSONMapEntityStoreActivation> activated)
             throws Exception
         {
             activated.get().setUpJSONMapES();
         }
 
         @Override
-        public void beforePassivation( ServiceReference<JSONMapEntityStoreActivation> passivating )
+        public void beforePassivation(ServiceReference<JSONMapEntityStoreActivation> passivating)
             throws Exception
         {
             passivating.get().tearDownJSONMapES();

@@ -19,7 +19,7 @@
  */
 package org.qi4j.runtime.value;
 
-import java.security.Guard;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
@@ -33,10 +33,8 @@ import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.SingletonAssembler;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
+
+import java.security.Guard;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -50,32 +48,32 @@ public class ValueComposite2Test
     {
         SingletonAssembler app = new SingletonAssembler()
         {
-            public void assemble( ModuleAssembly module )
+            public void assemble(ModuleAssembly module)
                 throws AssemblyException
             {
-                module.values( SomeValue.class );
-                module.services( DummyService.class );
+                module.values(SomeValue.class);
+                module.services(DummyService.class);
             }
         };
-        ValueBuilder<Some> builder = app.module().newValueBuilder( Some.class );
+        ValueBuilder<Some> builder = app.module().newValueBuilder(Some.class);
         Some prototype = builder.prototype();
         Property<String> otherProperty = prototype.other();
-        otherProperty.set( "Abc" );
+        otherProperty.set("Abc");
         Some value = builder.newInstance();
-        assertThat( value.other().get(), equalTo( "Abc" ) );
+        assertThat(value.other().get(), equalTo("Abc"));
     }
 
     @Test
     public void testUsesAnnotationIsNotAllowedInValueComposite()
         throws ActivationException, AssemblyException
     {
-        assertThrows( AssemblyException.class, () ->
+        assertThrows(AssemblyException.class, () ->
             new SingletonAssembler()
             {
-                public void assemble( ModuleAssembly module )
+                public void assemble(ModuleAssembly module)
                     throws AssemblyException
                 {
-                    module.values( SomeValue2.class );
+                    module.values(SomeValue2.class);
                 }
             }
         );
@@ -90,7 +88,7 @@ public class ValueComposite2Test
         Property<String> other();
     }
 
-    @Mixins( SomeMixin.class )
+    @Mixins(SomeMixin.class)
     public interface SomeValue
         extends Some, ValueComposite
     {
@@ -115,7 +113,7 @@ public class ValueComposite2Test
         }
     }
 
-    @Mixins( SomeMixin2.class )
+    @Mixins(SomeMixin2.class)
     public interface SomeValue2
         extends Some, ValueComposite
     {

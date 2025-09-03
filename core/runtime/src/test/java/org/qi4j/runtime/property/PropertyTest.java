@@ -20,9 +20,7 @@
 
 package org.qi4j.runtime.property;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import javax.swing.Icon;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.AppliesTo;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
@@ -33,7 +31,10 @@ import org.qi4j.api.property.PropertyWrapper;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import javax.swing.*;
+import java.io.Serializable;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -48,17 +49,17 @@ public class PropertyTest
     extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( Company.class ).withConcerns( LogConcern.class );
-        module.forMixin( Nameable.class )
-            .setMetaInfo( new DisplayInfo( "Name", "Name of something", "The name" ) )  // Add UI info
+        module.transients(Company.class).withConcerns(LogConcern.class);
+        module.forMixin(Nameable.class)
+            .setMetaInfo(new DisplayInfo("Name", "Name of something", "The name"))  // Add UI info
             .setMetaInfo(
-                new RdfInfo( "label", "http://www.w3.org/1999/02/22-rdf-syntax-ns#" ) )  // Add persistence info
+                new RdfInfo("label", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"))  // Add persistence info
             .declareDefaults()
             .name()  // Select accessor
-            .set( "Hello World" ); // Set default value
+            .set("Hello World"); // Set default value
     }
 
     @Test
@@ -66,14 +67,14 @@ public class PropertyTest
     {
         Company company;
         {
-            TransientBuilder<Company> builder = transientBuilderFactory.newTransientBuilder( Company.class );
-            builder.prototype().name().set( "JayWay" );
+            TransientBuilder<Company> builder = transientBuilderFactory.newTransientBuilder(Company.class);
+            builder.prototype().name().set("JayWay");
             company = builder.newInstance();
         }
 
-        company.name().set( "CodeDragons" );
-        assertThat( company.name().get(), equalTo( "CodeDragons" ) );
-        System.out.println( "Name is:" + company.name().get() );
+        company.name().set("CodeDragons");
+        assertThat(company.name().get(), equalTo("CodeDragons"));
+        System.out.println("Name is:" + company.name().get());
     }
 
     public interface Company
@@ -90,38 +91,38 @@ public class PropertyTest
         Property<String> name();
     }
 
-    @AppliesTo( PropertyMixin.PropertyFilter.class )
+    @AppliesTo(PropertyMixin.PropertyFilter.class)
     public static class LogConcern
         extends GenericConcern
     {
         @Override
-        public Object invoke( Object o, final Method method, Object[] objects )
+        public Object invoke(Object o, final Method method, Object[] objects)
             throws Throwable
         {
-            final Property<Object> property = (Property<Object>) next.invoke( o, method, objects );
+            final Property<Object> property = (Property<Object>) next.invoke(o, method, objects);
 
-            return new PropertyWrapper( property )
+            return new PropertyWrapper(property)
             {
                 @Override
                 public Object get()
                 {
                     Object result = next.get();
 
-                    System.out.println( "Property " + method.getName() + " accessed with value " + result );
+                    System.out.println("Property " + method.getName() + " accessed with value " + result);
 
                     return result;
                 }
 
                 @Override
-                public void set( Object newValue )
+                public void set(Object newValue)
                     throws IllegalArgumentException, IllegalStateException
                 {
                     Object current = next.get();
 
-                    next.set( newValue );
+                    next.set(newValue);
 
                     System.out
-                        .println( "Property " + method.getName() + " changed from " + current + " to " + newValue );
+                        .println("Property " + method.getName() + " changed from " + current + " to " + newValue);
                 }
             };
         }
@@ -135,14 +136,14 @@ public class PropertyTest
         private String toolTip;
         private Icon icon;
 
-        public DisplayInfo( String name, String description, String toolTip )
+        public DisplayInfo(String name, String description, String toolTip)
         {
             this.name = name;
             this.description = description;
             this.toolTip = toolTip;
         }
 
-        public DisplayInfo( String name, String description, String toolTip, Icon icon )
+        public DisplayInfo(String name, String description, String toolTip, Icon icon)
         {
             this.name = name;
             this.description = description;
@@ -177,7 +178,7 @@ public class PropertyTest
         private String predicate;
         private String namespace;
 
-        public RdfInfo( String predicate, String namespace )
+        public RdfInfo(String predicate, String namespace)
         {
             this.predicate = predicate;
             this.namespace = namespace;

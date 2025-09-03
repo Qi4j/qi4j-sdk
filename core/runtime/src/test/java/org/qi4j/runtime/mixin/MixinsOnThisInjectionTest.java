@@ -19,13 +19,13 @@
  */
 package org.qi4j.runtime.mixin;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -34,22 +34,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Test of declaring Mixin in @This declared interface
  */
 public class MixinsOnThisInjectionTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestCase.class );
+        module.transients(TestCase.class);
     }
 
     @Test
     public void givenCompositeWithThisInjectionAndNoMixinDeclarationWhenBindingCompositeThenUseInterfaceDeclaredMixin()
     {
-        TestCase TestCase = transientBuilderFactory.newTransient( TestCase.class );
-        assertThat( "Composite can be instantiated", TestCase.sayHello(), equalTo( "Hello" ) );
+        TestCase TestCase = transientBuilderFactory.newTransient(TestCase.class);
+        assertThat("Composite can be instantiated", TestCase.sayHello(), equalTo("Hello"));
     }
 
-    @Mixins( TestMixin.class )
+    @Mixins(TestMixin.class)
     public interface TestCase
         extends TransientComposite
     {
@@ -68,7 +68,7 @@ public class MixinsOnThisInjectionTest
         }
     }
 
-    @Mixins( TestMixin2.class )
+    @Mixins(TestMixin2.class)
     public interface TestCase2
     {
         String sayHello();

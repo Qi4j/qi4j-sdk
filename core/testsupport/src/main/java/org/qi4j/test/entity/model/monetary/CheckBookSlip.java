@@ -23,7 +23,7 @@ import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.Property;
 
-@Mixins( CheckBookSlip.CheckBookSlipMixin.class )
+@Mixins(CheckBookSlip.CheckBookSlipMixin.class)
 public interface CheckBookSlip
 {
     String name();

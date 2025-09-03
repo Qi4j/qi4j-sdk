@@ -19,16 +19,16 @@
  */
 package org.qi4j.bootstrap.builder;
 
+import org.qi4j.api.structure.Layer;
+import org.qi4j.bootstrap.ApplicationAssembly;
+import org.qi4j.bootstrap.LayerAssembly;
+import org.qi4j.bootstrap.ModuleAssembly;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
-import org.qi4j.bootstrap.ApplicationAssembly;
-import org.qi4j.bootstrap.LayerAssembly;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.api.structure.Layer;
-import org.qi4j.bootstrap.ModuleAssembly;
 
 /**
  * Provides declared {@link Layer} information that the {@link ApplicationBuilder} can use.
@@ -40,70 +40,73 @@ public class LayerDeclaration
     private final Map<String, ModuleDeclaration> modules = new HashMap<>();
     private LayerAssembly layer;
 
-    LayerDeclaration( String layerName )
+    LayerDeclaration(String layerName)
     {
         this.layerName = layerName;
     }
 
     /**
      * Declare using layer.
+     *
      * @param layerName Used layer name
      * @return This Layer declaration
      */
-    public LayerDeclaration using( String layerName )
+    public LayerDeclaration using(String layerName)
     {
-        this.using.add( layerName );
+        this.using.add(layerName);
         return this;
     }
 
     /**
      * Declare using layers.
+     *
      * @param layerNames Used layers names
      * @return This Layer declaration
      */
-    public LayerDeclaration using( Iterable<String> layerNames )
+    public LayerDeclaration using(Iterable<String> layerNames)
     {
-        StreamSupport.stream( layerNames.spliterator(), false )
-                     .forEach( using::add );
+        StreamSupport.stream(layerNames.spliterator(), false)
+            .forEach(using::add);
         return this;
     }
 
     /**
      * Declare Module.
+     *
      * @param moduleName Name of the Module
      * @return Module declaration for the given name, new if did not already exists
      */
-    public ModuleDeclaration withModule( String moduleName )
+    public ModuleDeclaration withModule(String moduleName)
     {
-        ModuleDeclaration module = modules.get( moduleName );
-        if( module != null )
+        ModuleDeclaration module = modules.get(moduleName);
+        if(module != null)
         {
             return module;
         }
-        module = new ModuleDeclaration( moduleName );
-        modules.put( moduleName, module );
+        module = new ModuleDeclaration(moduleName);
+        modules.put(moduleName, module);
         return module;
     }
 
-    LayerAssembly createLayer( ApplicationAssembly application )
+    LayerAssembly createLayer(ApplicationAssembly application)
     {
-        layer = application.layer( layerName );
-        layer.setName( layerName );
-        for( ModuleDeclaration module : modules.values() )
+        layer = application.layer(layerName);
+        layer.setName(layerName);
+        for(ModuleDeclaration module : modules.values())
         {
-            ModuleAssembly assembly = module.createModule( layer );
+            ModuleAssembly assembly = module.createModule(layer);
         }
         return layer;
     }
 
-    void initialize( HashMap<String, LayerAssembly> createdLayers )
+    void initialize(HashMap<String, LayerAssembly> createdLayers)
     {
-        for( String uses : using )
+        for(String uses : using)
         {
-            LayerAssembly usedLayer = createdLayers.get( uses );
-            layer.uses( usedLayer );
+            LayerAssembly usedLayer = createdLayers.get(uses);
+            layer.uses(usedLayer);
         }
-        for( ModuleDeclaration module : modules.values() )
+        for(ModuleDeclaration module : modules.values())
         {
             module.initialize();
         }

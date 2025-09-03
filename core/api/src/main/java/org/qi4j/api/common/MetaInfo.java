@@ -20,18 +20,17 @@
 
 package org.qi4j.api.common;
 
+import org.qi4j.api.concern.Concerns;
+import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.sideeffect.SideEffects;
+import org.qi4j.api.util.Classes;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.qi4j.api.concern.Concerns;
-import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.sideeffect.SideEffects;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.concern.Concerns;
-import org.qi4j.api.sideeffect.SideEffects;
 
 import static java.util.Arrays.asList;
 import static org.qi4j.api.util.Classes.typesOf;
@@ -87,8 +86,8 @@ public final class MetaInfo
 
     static
     {
-        ignored = new HashSet<>( 4, 0.8f ); // Optimize size used.
-        ignored.addAll( asList( Mixins.class, Concerns.class, SideEffects.class ) );
+        ignored = new HashSet<>(4, 0.8f); // Optimize size used.
+        ignored.addAll(asList(Mixins.class, Concerns.class, SideEffects.class));
     }
 
     private final Map<Class<?>, Object> metaInfoMap;
@@ -98,46 +97,46 @@ public final class MetaInfo
         metaInfoMap = new LinkedHashMap<>();
     }
 
-    public MetaInfo( MetaInfo metaInfo )
+    public MetaInfo(MetaInfo metaInfo)
     {
         metaInfoMap = new LinkedHashMap<>();
-        metaInfoMap.putAll( metaInfo.metaInfoMap );
+        metaInfoMap.putAll(metaInfo.metaInfoMap);
     }
 
-    public void set( Object metaInfo )
+    public void set(Object metaInfo)
     {
-        if( metaInfo instanceof Annotation )
+        if(metaInfo instanceof Annotation)
         {
             Annotation annotation = (Annotation) metaInfo;
-            metaInfoMap.put( annotation.annotationType(), metaInfo );
+            metaInfoMap.put(annotation.annotationType(), metaInfo);
         }
         else
         {
             Class<?> metaInfoclass = metaInfo.getClass();
-            typesOf( metaInfoclass )
-                .map( Classes.RAW_CLASS )
-                .forEach( type -> metaInfoMap.put( type, metaInfo ) );
+            typesOf(metaInfoclass)
+                .map(Classes.RAW_CLASS)
+                .forEach(type -> metaInfoMap.put(type, metaInfo));
         }
     }
 
-    public <T> T get( Class<T> metaInfoType )
+    public <T> T get(Class<T> metaInfoType)
     {
-        return metaInfoType.cast( metaInfoMap.get( metaInfoType ) );
+        return metaInfoType.cast(metaInfoMap.get(metaInfoType));
     }
 
-    public <T> void add( Class<T> infoType, T info )
+    public <T> void add(Class<T> infoType, T info)
     {
-        metaInfoMap.put( infoType, info );
+        metaInfoMap.put(infoType, info);
     }
 
-    public MetaInfo withAnnotations( AnnotatedElement annotatedElement )
+    public MetaInfo withAnnotations(AnnotatedElement annotatedElement)
     {
-        for( Annotation annotation : annotatedElement.getAnnotations() )
+        for(Annotation annotation : annotatedElement.getAnnotations())
         {
-            if( !ignored.contains( annotation.annotationType() )
-                && get( annotation.annotationType() ) == null )
+            if(!ignored.contains(annotation.annotationType())
+                && get(annotation.annotationType()) == null)
             {
-                set( annotation );
+                set(annotation);
             }
         }
         return this;
@@ -149,8 +148,8 @@ public final class MetaInfo
         return metaInfoMap.toString();
     }
 
-    public void remove( Class serviceFinderClass )
+    public void remove(Class serviceFinderClass)
     {
-        metaInfoMap.remove( serviceFinderClass );
+        metaInfoMap.remove(serviceFinderClass);
     }
 }

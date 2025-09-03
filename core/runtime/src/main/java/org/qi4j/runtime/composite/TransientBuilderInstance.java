@@ -42,9 +42,9 @@ public final class TransientBuilderInstance<T>
 
     private TransientStateInstance state;
 
-    public TransientBuilderInstance( TransientDescriptor model,
-                                     TransientStateInstance state,
-                                     UsesInstance uses
+    public TransientBuilderInstance(TransientDescriptor model,
+                                    TransientStateInstance state,
+                                    UsesInstance uses
     )
     {
         this.model = (TransientModel) model;
@@ -53,9 +53,9 @@ public final class TransientBuilderInstance<T>
     }
 
     @Override
-    public TransientBuilder<T> use( Object... usedObjects )
+    public TransientBuilder<T> use(Object... usedObjects)
     {
-        uses = uses.use( usedObjects );
+        uses = uses.use(usedObjects);
         return this;
     }
 
@@ -63,24 +63,24 @@ public final class TransientBuilderInstance<T>
     public T prototype()
     {
         // Instantiate given value type
-        if( prototypeInstance == null )
+        if(prototypeInstance == null)
         {
-            prototypeInstance = model.newInstance( uses, state );
+            prototypeInstance = model.newInstance(uses, state);
         }
 
         return prototypeInstance.proxy();
     }
 
     @Override
-    public <K> K prototypeFor( Class<K> mixinType )
+    public <K> K prototypeFor(Class<K> mixinType)
     {
         // Instantiate given value type
-        if( prototypeInstance == null )
+        if(prototypeInstance == null)
         {
-            prototypeInstance = model.newInstance( uses, state );
+            prototypeInstance = model.newInstance(uses, state);
         }
 
-        return prototypeInstance.newProxy( mixinType );
+        return prototypeInstance.newProxy(mixinType);
     }
 
     @Override
@@ -91,12 +91,12 @@ public final class TransientBuilderInstance<T>
         model.state().properties()
             .forEach(
                 propertyDescriptor ->
-                    ( (PropertyInstance<Object>) state.propertyFor( propertyDescriptor.accessor() ) )
-                        .setPropertyInfo( propertyDescriptor ) );
+                    ((PropertyInstance<Object>) state.propertyFor(propertyDescriptor.accessor()))
+                        .setPropertyInfo(propertyDescriptor));
 
-        model.checkConstraints( state );
+        model.checkConstraints(state);
 
-        CompositeInstance compositeInstance = model.newInstance( uses, state );
+        CompositeInstance compositeInstance = model.newInstance(uses, state);
         return compositeInstance.proxy();
     }
 }

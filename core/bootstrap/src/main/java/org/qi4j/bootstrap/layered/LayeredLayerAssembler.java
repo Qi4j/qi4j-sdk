@@ -19,78 +19,89 @@
  */
 package org.qi4j.bootstrap.layered;
 
-import java.lang.reflect.Constructor;
-import java.util.HashMap;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
+
+import java.lang.reflect.Constructor;
+import java.util.HashMap;
 
 import static org.qi4j.api.util.AccessibleObjects.accessible;
 
 public abstract class LayeredLayerAssembler
     implements LayerAssembler
 {
-    private HashMap<Class<? extends ModuleAssembler>, ModuleAssembler> assemblers = new HashMap<>();
+    private final HashMap<Class<? extends ModuleAssembler>, ModuleAssembler> assemblers = new HashMap<>();
 
-    protected ModuleAssembly createModule( LayerAssembly layer, Class<? extends ModuleAssembler> moduleAssemblerClass )
+    protected ModuleAssembly createModule(LayerAssembly layer, Class<? extends ModuleAssembler> moduleAssemblerClass)
     {
-        return createModule( layer, moduleAssemblerClass, null );
+        return createModule(layer, moduleAssemblerClass, (ModuleAssembly) null);
     }
 
-    protected ModuleAssembly createModule( LayerAssembly layer, Class<? extends ModuleAssembler> moduleAssemblerClass, ModuleAssembly constructorArgumentModule )
+    protected ModuleAssembly createModule(LayerAssembly layer, Class<? extends ModuleAssembler> moduleAssemblerClass, Object... metaInfos)
+    {
+        ModuleAssembly module = createModule(layer, moduleAssemblerClass, (ModuleAssembly) null);
+        for(Object metaInfo : metaInfos)
+        {
+            module.setMetaInfo(metaInfo);
+        }
+        return module;
+    }
+
+    protected ModuleAssembly createModule(LayerAssembly layer, Class<? extends ModuleAssembler> moduleAssemblerClass, ModuleAssembly constructorArgumentModule)
     {
         try
         {
-            String moduleName = createModuleName( moduleAssemblerClass );
-            ModuleAssembly moduleAssembly = layer.module( moduleName );
-            ModuleAssembler moduleAssembler = instantiateModuleAssembler( moduleAssemblerClass, constructorArgumentModule );
-            LayeredApplicationAssembler.setNameIfPresent( moduleAssemblerClass, moduleName );
-            ModuleAssembly module = layer.module( moduleName );
-            assemblers.put( moduleAssemblerClass, moduleAssembler );
-            ModuleAssembly assembly = moduleAssembler.assemble( layer, module );
-            if( assembly == null )
+            String moduleName = createModuleName(moduleAssemblerClass);
+            ModuleAssembly moduleAssembly = layer.module(moduleName);
+            ModuleAssembler moduleAssembler = instantiateModuleAssembler(moduleAssemblerClass, constructorArgumentModule);
+            LayeredApplicationAssembler.setNameIfPresent(moduleAssemblerClass, moduleName);
+            ModuleAssembly module = layer.module(moduleName);
+            assemblers.put(moduleAssemblerClass, moduleAssembler);
+            ModuleAssembly assembly = moduleAssembler.assemble(layer, module);
+            if(assembly == null)
             {
                 return module;
             }
             return assembly;
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new IllegalArgumentException( "Unable to instantiate module with " + moduleAssemblerClass.getSimpleName(), e );
+            throw new IllegalArgumentException("Unable to instantiate module with " + moduleAssemblerClass.getSimpleName(), e);
         }
     }
 
-    protected String createModuleName( Class<? extends ModuleAssembler> modulerAssemblerClass )
+    protected String createModuleName(Class<? extends ModuleAssembler> modulerAssemblerClass)
     {
         String moduleName = modulerAssemblerClass.getSimpleName();
-        if( moduleName.endsWith( "Module" ) )
+        if(moduleName.endsWith("Module"))
         {
-            moduleName = moduleName.substring( 0, moduleName.length() - 6 ) + " Module";
+            moduleName = moduleName.substring(0, moduleName.length() - 6) + " Module";
         }
         return moduleName;
     }
 
-    protected ModuleAssembler instantiateModuleAssembler( Class<? extends ModuleAssembler> modulerAssemblerClass,
-                                                          ModuleAssembly constructorArgument
-                                                        )
+    protected ModuleAssembler instantiateModuleAssembler(Class<? extends ModuleAssembler> modulerAssemblerClass,
+                                                         ModuleAssembly constructorArgument
+    )
         throws InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException, NoSuchMethodException
     {
         ModuleAssembler moduleAssembler;
         try
         {
-            Constructor<? extends ModuleAssembler> assemblyConstructor = modulerAssemblerClass.getDeclaredConstructor( ModuleAssembly.class );
-            moduleAssembler = accessible( assemblyConstructor ).newInstance( constructorArgument );
+            Constructor<? extends ModuleAssembler> assemblyConstructor = modulerAssemblerClass.getDeclaredConstructor(ModuleAssembly.class);
+            moduleAssembler = accessible(assemblyConstructor).newInstance(constructorArgument);
         }
-        catch( NoSuchMethodException e )
+        catch(NoSuchMethodException e)
         {
             Constructor<? extends ModuleAssembler> assemblyConstructor = modulerAssemblerClass.getDeclaredConstructor();
-            moduleAssembler = accessible( assemblyConstructor ).newInstance();
+            moduleAssembler = accessible(assemblyConstructor).newInstance();
         }
         return moduleAssembler;
     }
 
-    @SuppressWarnings( "unchecked" )
-    protected <T extends ModuleAssembler> T assemblerOf( Class<T> moduleAssemblerType )
+    @SuppressWarnings("unchecked")
+    protected <T extends ModuleAssembler> T assemblerOf(Class<T> moduleAssemblerType)
     {
-        return (T) assemblers.get( moduleAssemblerType );
+        return (T) assemblers.get(moduleAssemblerType);
     }
 }

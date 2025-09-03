@@ -19,6 +19,8 @@
  */
 package org.qi4j.api.composite;
 
+import org.qi4j.api.structure.ModuleDescriptor;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -27,17 +29,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.qi4j.api.structure.ModuleDescriptor;
-import org.qi4j.api.structure.ModuleDescriptor;
 
 /**
  * This exception is thrown if a Composite is invalid.
  */
 public class InvalidCompositeException extends RuntimeException
 {
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
     private static boolean aggregateProblems = true;
-    private static ThreadLocal<ArrayList<InvalidCompositeException>> report = ThreadLocal.withInitial( ArrayList::new );
+    private static ThreadLocal<ArrayList<InvalidCompositeException>> report = ThreadLocal.withInitial(ArrayList::new);
     private ModuleDescriptor module;
     private Class<?> primaryType;
     private Class<?> fragmentClass;
@@ -45,24 +45,24 @@ public class InvalidCompositeException extends RuntimeException
     private Member member;
     private List<Class<?>> types;
 
-    public static void handleInvalidCompositeType( String message, ModuleDescriptor module, Class<?> primaryType,
-                                                   Class<?> fragmentClass, Type valueType, Member member,
-                                                   List<Class<?>> types )
+    public static void handleInvalidCompositeType(String message, ModuleDescriptor module, Class<?> primaryType,
+                                                  Class<?> fragmentClass, Type valueType, Member member,
+                                                  List<Class<?>> types)
     {
-        InvalidCompositeException exception = new InvalidCompositeException( message, module, primaryType,
-                                                                             fragmentClass, valueType, member, types );
-        if( aggregateProblems )
+        InvalidCompositeException exception = new InvalidCompositeException(message, module, primaryType,
+            fragmentClass, valueType, member, types);
+        if(aggregateProblems)
         {
-            report.get().add( exception );
+            report.get().add(exception);
             return;
         }
         throw exception;
     }
 
-    private InvalidCompositeException( String message, ModuleDescriptor module, Class<?> primaryType,
-                                       Class<?> fragmentClass, Type valueType, Member member, List<Class<?>> types )
+    private InvalidCompositeException(String message, ModuleDescriptor module, Class<?> primaryType,
+                                      Class<?> fragmentClass, Type valueType, Member member, List<Class<?>> types)
     {
-        super( message );
+        super(message);
         this.module = module;
         this.primaryType = primaryType;
         this.fragmentClass = fragmentClass;
@@ -81,38 +81,38 @@ public class InvalidCompositeException extends RuntimeException
         String fragment = fragmentClass == null ? "" : "    fragmentClass: " + fragmentClass.getName() + NL;
         String valueType = this.valueType == null ? "" : "    valueType: " + this.valueType.getTypeName() + NL;
         String module = this.module == null ? "" : "    layer: " + this.module.layer().name() + NL + "    module: "
-                                                   + this.module.name() + NL;
+            + this.module.name() + NL;
         return message + module + primary + fragment + methodName + valueType + typeNames;
     }
 
     private String typesString()
     {
-        if( types == null || types.size() == 0 )
+        if(types == null || types.size() == 0)
         {
             return "";
         }
         return "    types: "
-               + types.stream()
-                      .map( Class::getSimpleName )
-                      .collect( Collectors.joining( ",", "[", "]" ) )
-               + NL;
+            + types.stream()
+            .map(Class::getSimpleName)
+            .collect(Collectors.joining(",", "[", "]"))
+            + NL;
     }
 
     private String memberString()
     {
-        if( member == null )
+        if(member == null)
         {
             return "";
         }
-        if( member instanceof Method )
+        if(member instanceof Method)
         {
             Method method = (Method) member;
-            String parameters = Arrays.stream( method.getParameters() )
-                                      .map( p -> p.getType().getSimpleName() + " " + p.getName() )
-                                      .collect( Collectors.joining( ", ", "(", ")" ) );
+            String parameters = Arrays.stream(method.getParameters())
+                .map(p -> p.getType().getSimpleName() + " " + p.getName())
+                .collect(Collectors.joining(", ", "(", ")"));
             return "    method: " + method.getReturnType().getSimpleName() + " " + method.getName() + parameters + NL;
         }
-        if( member instanceof Field )
+        if(member instanceof Field)
         {
             Field field = (Field) member;
             return "    field: " + field.getType().getSimpleName() + " " + field.getName() + NL;
@@ -122,14 +122,14 @@ public class InvalidCompositeException extends RuntimeException
 
     public static String modelReport()
     {
-        if( report.get().size() > 0 )
+        if(report.get().size() > 0)
         {
             String reportText = NL + "Composition Problems Report:" + NL
-                                + report.get().stream()
-                                        .map( Throwable::getMessage )
-                                        .map( m -> m + NL + "--" + NL )
-                                        .collect( Collectors.joining() );
-            report.set( new ArrayList<>() );
+                + report.get().stream()
+                .map(Throwable::getMessage)
+                .map(m -> m + NL + "--" + NL)
+                .collect(Collectors.joining());
+            report.set(new ArrayList<>());
             return reportText;
         }
         aggregateProblems = false;

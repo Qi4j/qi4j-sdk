@@ -26,6 +26,7 @@ import org.qi4j.api.mixin.Mixins;
 public interface View2
 {
     String bar();
+
     public class Mixin
         implements View2
     {

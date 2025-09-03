@@ -21,7 +21,6 @@ package org.qi4j.api.composite;
 
 import org.qi4j.api.association.AssociationStateDescriptor;
 import org.qi4j.api.type.StatefulAssociationValueType;
-import org.qi4j.api.association.AssociationStateDescriptor;
 
 /**
  * Stateful Association Composite Descriptor.

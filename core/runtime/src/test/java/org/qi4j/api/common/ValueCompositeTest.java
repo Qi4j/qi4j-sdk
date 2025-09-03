@@ -20,7 +20,7 @@
 
 package org.qi4j.api.common;
 
-import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.constraint.ConstraintViolationException;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
@@ -32,7 +32,8 @@ import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,138 +45,138 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Tests for ValueComposites
  */
 public class ValueCompositeTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.values( SomeValue.class, AnotherValue.class );
-        module.entities( SomeEntity.class );
-        new EntityTestAssembler().assemble( module );
+        module.values(SomeValue.class, AnotherValue.class);
+        module.entities(SomeEntity.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
     public void testImmutabilityOfValueComposite()
     {
-        assertThrows( IllegalStateException.class, () -> {
-            ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
+        assertThrows(IllegalStateException.class, () -> {
+            ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
             SomeValue some = builder.prototype();
-            some.other().set( "test" );
+            some.other().set("test");
             some = builder.newInstance();
-            some.other().set( "test2" );
-        } );
+            some.other().set("test2");
+        });
     }
 
     @Test
     public void testCreationOfValueComposite()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
         SomeValue some = builder.prototype();
-        some.other().set( "test" );
+        some.other().set("test");
         builder.newInstance();
     }
 
     @Test
     public void testEqualityOfValueComposite()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
         SomeValue prototype = builder.prototype();
-        prototype.other().set( "test" );
+        prototype.other().set("test");
         SomeValue instance = builder.newInstance();
 
-        builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
+        builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
         prototype = builder.prototype();
-        prototype.other().set( "test" );
+        prototype.other().set("test");
         SomeValue other = builder.newInstance();
-        assertThat( "Instances should not be the same.", instance == other, is( false ) );
-        assertThat( "Equal values.", other, equalTo( instance ) );
+        assertThat("Instances should not be the same.", instance == other, is(false));
+        assertThat("Equal values.", other, equalTo(instance));
     }
 
     @Test
     public void testHashcodeOfValueComposite()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
         SomeValue prototype = builder.prototype();
-        prototype.other().set( "test" );
+        prototype.other().set("test");
         SomeValue instance = builder.newInstance();
 
-        builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
+        builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
         prototype = builder.prototype();
-        prototype.other().set( "test" );
+        prototype.other().set("test");
         SomeValue other = builder.newInstance();
-        assertThat( "Instances should not be the same.", instance == other, is( false ) );
-        assertThat( "Equal values.", other.hashCode(), equalTo( instance.hashCode() ) );
+        assertThat("Instances should not be the same.", instance == other, is(false));
+        assertThat("Equal values.", other.hashCode(), equalTo(instance.hashCode()));
     }
 
     @Test
     public void testModifyValue()
     {
-        ValueBuilder<AnotherValue> anotherBuilder = valueBuilderFactory.newValueBuilder( AnotherValue.class );
-        anotherBuilder.prototype().val1().set( "Val1" );
+        ValueBuilder<AnotherValue> anotherBuilder = valueBuilderFactory.newValueBuilder(AnotherValue.class);
+        anotherBuilder.prototype().val1().set("Val1");
         AnotherValue anotherValue = anotherBuilder.newInstance();
 
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
         SomeValue prototype = builder.prototype();
-        prototype.some().set( "foo" );
-        prototype.other().set( "test" );
-        prototype.xyzzyList().get().add( "blah" );
-        prototype.another().set( anotherValue );
+        prototype.some().set("foo");
+        prototype.other().set("test");
+        prototype.xyzzyList().get().add("blah");
+        prototype.another().set(anotherValue);
         SomeValue instance = builder.newInstance();
 
-        assertThat( "List has value blah", instance.xyzzyList().get().get( 0 ), equalTo( "blah" ) );
+        assertThat("List has value blah", instance.xyzzyList().get().get(0), equalTo("blah"));
 
         // Modify value
-        builder = valueBuilderFactory.newValueBuilderWithPrototype( instance );
-        builder.prototype().some().set( "bar" );
+        builder = valueBuilderFactory.newValueBuilderWithPrototype(instance);
+        builder.prototype().some().set("bar");
         instance = builder.newInstance();
 
-        assertThat( "Other is set to test", instance.other().get(), equalTo( "test" ) );
-        assertThat( "List has value blah", instance.xyzzyList().get().get( 0 ), equalTo( "blah" ) );
-        assertThat( "AnotherValue.val1 has value Val1", instance.another().get().val1().get(), equalTo( "Val1" ) );
+        assertThat("Other is set to test", instance.other().get(), equalTo("test"));
+        assertThat("List has value blah", instance.xyzzyList().get().get(0), equalTo("blah"));
+        assertThat("AnotherValue.val1 has value Val1", instance.another().get().val1().get(), equalTo("Val1"));
 
         // Modify value again using method 2
-        builder = valueBuilderFactory.newValueBuilderWithPrototype( instance );
-        builder.prototype().other().set( "test2" );
+        builder = valueBuilderFactory.newValueBuilderWithPrototype(instance);
+        builder.prototype().other().set("test2");
         instance = builder.newInstance();
 
-        assertThat( "Other is set to test2", instance.other().get(), equalTo( "test2" ) );
-        assertThat( "Some is set to bar", instance.some().get(), equalTo( "bar" ) );
+        assertThat("Other is set to test2", instance.other().get(), equalTo("test2"));
+        assertThat("Some is set to bar", instance.some().get(), equalTo("bar"));
     }
 
     @Test
     public void givenValueWhenModifyToIncorrectValueThenThrowConstraintException()
     {
-        assertThrows( ConstraintViolationException.class, () -> {
-            ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
+        assertThrows(ConstraintViolationException.class, () -> {
+            ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
             SomeValue prototype = builder.prototype();
-            prototype.some().set( "foo" );
+            prototype.some().set("foo");
             SomeValue instance = builder.newInstance();
 
-            builder = valueBuilderFactory.newValueBuilderWithPrototype( instance );
-            builder.prototype().some().set( null );
-        } );
+            builder = valueBuilderFactory.newValueBuilderWithPrototype(instance);
+            builder.prototype().some().set(null);
+        });
     }
 
     @Test
     public void givenValueWithListOfValueWhenPrototypeThenListedValuesAreEditable()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
-        builder.prototype().anotherList().get().add( valueBuilderFactory.newValue( AnotherValue.class ) );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
+        builder.prototype().anotherList().get().add(valueBuilderFactory.newValue(AnotherValue.class));
         SomeValue some = builder.newInstance();
 
-        builder = valueBuilderFactory.newValueBuilderWithPrototype( some );
-        builder.prototype().anotherList().get().get( 0 ).val1().set( "Foo" );
-        builder.prototype().anotherList().get().add( valueBuilderFactory.newValue( AnotherValue.class ) );
+        builder = valueBuilderFactory.newValueBuilderWithPrototype(some);
+        builder.prototype().anotherList().get().get(0).val1().set("Foo");
+        builder.prototype().anotherList().get().add(valueBuilderFactory.newValue(AnotherValue.class));
         some = builder.newInstance();
 
-        assertThat( "Val1 has been set", some.anotherList().get().get( 0 ).val1().get(), equalTo( "Foo" ) );
+        assertThat("Val1 has been set", some.anotherList().get().get(0).val1().get(), equalTo("Foo"));
 
         try
         {
-            some.anotherList().get().get( 0 ).val1().set( "Bar" );
-            fail( "Should not be allowed to modify value" );
+            some.anotherList().get().get(0).val1().set("Bar");
+            fail("Should not be allowed to modify value");
         }
-        catch( IllegalStateException e )
+        catch(IllegalStateException e)
         {
             // Ok
         }
@@ -185,20 +186,20 @@ public class ValueCompositeTest
     public void givenEntityWhenUpdateValueThenValueIsSet()
         throws UnitOfWorkCompletionException
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
-        builder.prototype().anotherList().get().add( valueBuilderFactory.newValue( AnotherValue.class ) );
-        ValueBuilder<AnotherValue> valueBuilder = valueBuilderFactory.newValueBuilder( AnotherValue.class );
-        valueBuilder.prototype().val1().set( "Foo" );
-        builder.prototype().another().set( valueBuilder.newInstance() );
-        builder.prototype().number().set( 42L );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
+        builder.prototype().anotherList().get().add(valueBuilderFactory.newValue(AnotherValue.class));
+        ValueBuilder<AnotherValue> valueBuilder = valueBuilderFactory.newValueBuilder(AnotherValue.class);
+        valueBuilder.prototype().val1().set("Foo");
+        builder.prototype().another().set(valueBuilder.newInstance());
+        builder.prototype().number().set(42L);
         SomeValue some = builder.newInstance();
 
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
-        EntityBuilder<SomeEntity> entityBuilder = unitOfWork.newEntityBuilder( SomeEntity.class );
-        entityBuilder.instance().someValue().set( some );
+        EntityBuilder<SomeEntity> entityBuilder = unitOfWork.newEntityBuilder(SomeEntity.class);
+        entityBuilder.instance().someValue().set(some);
         SomeEntity entity = entityBuilder.newInstance();
 
-        assertThat( "Value has been set", entity.someValue().get().another().get().val1().get(), equalTo( "Foo" ) );
+        assertThat("Value has been set", entity.someValue().get().another().get().val1().get(), equalTo("Foo"));
 
         unitOfWork.complete();
     }

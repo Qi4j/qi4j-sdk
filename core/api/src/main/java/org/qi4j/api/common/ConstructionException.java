@@ -41,18 +41,18 @@ public class ConstructionException
     {
     }
 
-    public ConstructionException( String message )
+    public ConstructionException(String message)
     {
-        super( message );
+        super(message);
     }
 
-    public ConstructionException( String message, Throwable cause )
+    public ConstructionException(String message, Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 
-    public ConstructionException( Throwable cause )
+    public ConstructionException(Throwable cause)
     {
-        super( cause );
+        super(cause);
     }
 }

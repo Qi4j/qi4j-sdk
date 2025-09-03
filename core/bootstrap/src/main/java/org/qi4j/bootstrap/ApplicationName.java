@@ -28,14 +28,14 @@ public final class ApplicationName
 {
     private String name;
 
-    public ApplicationName( String name )
+    public ApplicationName(String name)
     {
         this.name = name;
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.layer().application().setName( name );
+        module.layer().application().setName(name);
     }
 }

@@ -19,13 +19,14 @@
  */
 package org.qi4j.spi.entitystore.helpers;
 
+import org.qi4j.api.entity.EntityDescriptor;
+import org.qi4j.api.entity.EntityReference;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.time.Instant;
 import java.util.stream.Stream;
-import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.entity.EntityReference;
 
 /**
  * MapEntityStore.
@@ -36,14 +37,17 @@ public interface MapEntityStore
      * @param entityReference The reference to the entity that we want to get.
      * @return Entity state Reader
      */
-    Reader get( EntityReference entityReference ) throws Exception;
+    Reader get(EntityReference entityReference)
+        throws Exception;
 
     /**
      * @return All entities state Readers, must be closed
      */
-    Stream<Reader> entityStates() throws Exception;
+    Stream<Reader> entityStates()
+        throws Exception;
 
-    void applyChanges( MapChanges changes ) throws Exception;
+    void applyChanges(MapChanges changes)
+        throws Exception;
 
     /**
      * Changes to be applied on a MapEntityStore.
@@ -56,7 +60,8 @@ public interface MapEntityStore
          * @param changer Map changer
          * @throws IOException on error
          */
-        void visitMap( MapChanger changer ) throws Exception;
+        void visitMap(MapChanger changer)
+            throws Exception;
     }
 
     /**
@@ -64,18 +69,19 @@ public interface MapEntityStore
      */
     interface MapChanger
     {
-        Writer newEntity( EntityReference ref, EntityDescriptor entityDescriptor )
+        Writer newEntity(EntityReference ref, EntityDescriptor entityDescriptor)
             throws Exception;
 
-        Writer updateEntity( MapChange mapChange ) throws Exception;
+        Writer updateEntity(MapChange mapChange)
+            throws Exception;
 
-        void removeEntity( EntityReference ref, EntityDescriptor entityDescriptor )
+        void removeEntity(EntityReference ref, EntityDescriptor entityDescriptor)
             throws Exception;
     }
 
     /**
      * MapEntityStore change meta info.
-     *
+     * <p>
      * Implementations backed by a shared store can make use of this for e.g. optimistic locking.
      */
     class MapChange
@@ -86,9 +92,9 @@ public interface MapEntityStore
         private final String newVersion;
         private final Instant lastModified;
 
-        public MapChange( EntityReference reference, EntityDescriptor descriptor,
-                          String previousVersion, String newVersion,
-                          Instant lastModified )
+        public MapChange(EntityReference reference, EntityDescriptor descriptor,
+                         String previousVersion, String newVersion,
+                         Instant lastModified)
         {
             this.reference = reference;
             this.descriptor = descriptor;

@@ -24,25 +24,18 @@ import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.bootstrap.layered.ModuleAssembler;
-import org.qi4j.test.model.Account;
-import org.qi4j.test.model.Domain;
-import org.qi4j.test.model.File;
-import org.qi4j.test.model.Host;
-import org.qi4j.test.model.Port;
-import org.qi4j.test.model.Protocol;
-import org.qi4j.test.model.QueryParam;
-import org.qi4j.test.model.URL;
+import org.qi4j.test.model.*;
 
 class AccountModule
     implements ModuleAssembler
 {
 
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
     {
-        module.entities( Account.class, Domain.class ).visibleIn( Visibility.layer );
-        module.values( File.class, Host.class, Port.class, Protocol.class, QueryParam.class, URL.class )
-            .visibleIn( Visibility.layer );
+        module.entities(Account.class, Domain.class).visibleIn(Visibility.layer);
+        module.values(File.class, Host.class, Port.class, Protocol.class, QueryParam.class, URL.class)
+            .visibleIn(Visibility.layer);
         return module;
     }
 }

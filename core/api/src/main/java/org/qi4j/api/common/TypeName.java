@@ -19,9 +19,10 @@
  */
 package org.qi4j.api.common;
 
+import org.qi4j.api.util.Classes;
+
 import java.lang.reflect.Type;
 import java.util.Objects;
-import org.qi4j.api.util.Classes;
 
 /**
  * Represents a Type name.
@@ -31,40 +32,40 @@ public final class TypeName
 {
     private final String name;
 
-    public static TypeName nameOf( Class type )
+    public static TypeName nameOf(Class type)
     {
-        Objects.requireNonNull( type, "type" );
-        return new TypeName( type.getName() );
+        Objects.requireNonNull(type, "type");
+        return new TypeName(type.getName());
     }
 
-    public static TypeName nameOf( Type type )
+    public static TypeName nameOf(Type type)
     {
-        return nameOf( Classes.RAW_CLASS.apply( type ) );
+        return nameOf(Classes.RAW_CLASS.apply(type));
     }
 
-    public static TypeName nameOf( String typeName )
+    public static TypeName nameOf(String typeName)
     {
-        return new TypeName( typeName );
+        return new TypeName(typeName);
     }
 
-    private TypeName( String name )
+    private TypeName(String name)
     {
-        Objects.requireNonNull( name, "name" );
-        if( name.isEmpty() )
+        Objects.requireNonNull(name, "name");
+        if(name.isEmpty())
         {
-            throw new IllegalArgumentException( "name was empty" );
+            throw new IllegalArgumentException("name was empty");
         }
         this.name = name;
     }
 
     public String normalized()
     {
-        return Classes.normalizeClassToURI( name );
+        return Classes.normalizeClassToURI(name);
     }
 
     public String toURI()
     {
-        return Classes.toURI( name );
+        return Classes.toURI(name);
     }
 
     public String name()
@@ -78,26 +79,26 @@ public final class TypeName
         return name;
     }
 
-    public boolean isClass( final Class<?> type )
+    public boolean isClass(final Class<?> type)
     {
-        return type.getName().equals( name );
+        return type.getName().equals(name);
     }
 
     @Override
-    public boolean equals( final Object o )
+    public boolean equals(final Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
 
         final TypeName other = (TypeName) o;
 
-        return name.equals( other.name );
+        return name.equals(other.name);
     }
 
     @Override
@@ -107,9 +108,9 @@ public final class TypeName
     }
 
     @Override
-    public int compareTo( final TypeName typeName )
+    public int compareTo(final TypeName typeName)
     {
-        return this.name.compareTo( typeName.name );
+        return this.name.compareTo(typeName.name);
     }
 }
 

@@ -19,11 +19,11 @@
  */
 package org.qi4j.api.type;
 
+import org.qi4j.api.util.Classes;
+
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Objects;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.util.Classes;
 
 /**
  * Map ValueType.
@@ -32,43 +32,43 @@ import org.qi4j.api.util.Classes;
 public final class MapType
     extends ValueType
 {
-    public static boolean isMap( Type type )
+    public static boolean isMap(Type type)
     {
-        Class<?> cl = Classes.RAW_CLASS.apply( type );
-        return Map.class.isAssignableFrom( cl );
+        Class<?> cl = Classes.RAW_CLASS.apply(type);
+        return Map.class.isAssignableFrom(cl);
     }
 
-    public static MapType of( Class<?> mapType, ValueType keyType, ValueType valueType )
+    public static MapType of(Class<?> mapType, ValueType keyType, ValueType valueType)
     {
-        return new MapType( mapType, keyType, valueType );
+        return new MapType(mapType, keyType, valueType);
     }
 
-    public static MapType of( Class<?> mapType, Class<?> keyType, Class<?> valueType )
+    public static MapType of(Class<?> mapType, Class<?> keyType, Class<?> valueType)
     {
-        return of( mapType, of( keyType ), of( valueType ) );
+        return of(mapType, of(keyType), of(valueType));
     }
 
-    public static MapType of( ValueType keyType, ValueType valueType )
+    public static MapType of(ValueType keyType, ValueType valueType)
     {
-        return new MapType( Map.class, keyType, valueType );
+        return new MapType(Map.class, keyType, valueType);
     }
 
-    public static MapType of( Class<?> keyType, Class<?> valueType )
+    public static MapType of(Class<?> keyType, Class<?> valueType)
     {
-        return of( of( keyType ), of( valueType ) );
+        return of(of(keyType), of(valueType));
     }
 
     private ValueType keyType;
     private ValueType valueType;
 
-    public MapType( Class<?> type, ValueType keyType, ValueType valueType )
+    public MapType(Class<?> type, ValueType keyType, ValueType valueType)
     {
-        super( type );
+        super(type);
         this.keyType = keyType;
         this.valueType = valueType;
-        if( !isMap( type ) )
+        if(!isMap(type))
         {
-            throw new IllegalArgumentException( type + " is not a Map." );
+            throw new IllegalArgumentException(type + " is not a Map.");
         }
     }
 
@@ -83,20 +83,29 @@ public final class MapType
     }
 
     @Override
-    public boolean equals( final Object o )
+    public boolean equals(final Object o)
     {
-        if( this == o ) { return true; }
-        if( o == null || getClass() != o.getClass() ) { return false; }
-        if( !super.equals( o ) ) { return false; }
+        if(this == o)
+        {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
         MapType mapType = (MapType) o;
-        return Objects.equals( keyType, mapType.keyType ) &&
-               Objects.equals( valueType, mapType.valueType );
+        return Objects.equals(keyType, mapType.keyType) &&
+            Objects.equals(valueType, mapType.valueType);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( super.hashCode(), keyType, valueType );
+        return Objects.hash(super.hashCode(), keyType, valueType);
     }
 
     @Override

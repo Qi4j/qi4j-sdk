@@ -30,10 +30,10 @@ public class DefaultIdentityGeneratorAssembler
     public static final String IDENTITY = "default-identity-generator";
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.services( IdentityGenerator.class )
-              .withMixins( UuidGeneratorMixin.class )
-              .identifiedBy( IDENTITY );
+        module.services(IdentityGenerator.class)
+            .withMixins(UuidGeneratorMixin.class)
+            .identifiedBy(IDENTITY);
     }
 }

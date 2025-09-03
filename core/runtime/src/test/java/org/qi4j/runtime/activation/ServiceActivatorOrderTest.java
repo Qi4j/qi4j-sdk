@@ -19,7 +19,8 @@
  */
 package org.qi4j.runtime.activation;
 
-import java.util.Arrays;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.activation.Activators;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.service.ServiceComposite;
@@ -31,11 +32,8 @@ import org.qi4j.runtime.activation.ActivatorOrderTestSupport.ActivationStepsReco
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.ActivationStepsRecorderInstance;
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.Expected;
 import org.qi4j.runtime.activation.ActivatorOrderTestSupport.OrderTestActivator;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.qi4j.bootstrap.AssemblyException;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.bootstrap.SingletonAssembler;
+
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -59,13 +57,13 @@ public class ServiceActivatorOrderTest
     //
     public static interface FooBar
     {
-        
+
         String foo();
-        
+
     }
 
     public static abstract class FooBarInstance
-            implements FooBar
+        implements FooBar
     {
 
         @Override
@@ -76,46 +74,46 @@ public class ServiceActivatorOrderTest
 
     }
 
-    @Mixins( FooBarInstance.class )
+    @Mixins(FooBarInstance.class)
     public static interface FooBarService
-            extends FooBar, ServiceComposite
+        extends FooBar, ServiceComposite
     {
     }
 
-    @Mixins( FooBarInstance.class )
-    @Activators( { GammaActivator.class, DeltaActivator.class } )
+    @Mixins(FooBarInstance.class)
+    @Activators({GammaActivator.class, DeltaActivator.class})
     public static interface FooBarServiceWithActivators
-            extends FooBar, ServiceComposite
+        extends FooBar, ServiceComposite
     {
     }
 
     //
     // BazarService ------------------------------------------------------
     //
-    @Activators( GammaActivator.class )
+    @Activators(GammaActivator.class)
     public static interface Bazar
-            extends Things, Stuff
+        extends Things, Stuff
     {
     }
-    
-    @Activators( DeltaActivator.class )
+
+    @Activators(DeltaActivator.class)
     public static interface Things
     {
-        
+
         String things();
-        
+
     }
-    
-    @Activators( EpsilonActivator.class )
+
+    @Activators(EpsilonActivator.class)
     public static interface Stuff
     {
-        
+
         String stuff();
-        
+
     }
-    
+
     public static class ThingsInstance
-            implements Things
+        implements Things
     {
 
         @Override
@@ -123,11 +121,11 @@ public class ServiceActivatorOrderTest
         {
             return "things";
         }
-        
+
     }
-    
+
     public static class StuffInstance
-            implements Stuff
+        implements Stuff
     {
 
         @Override
@@ -135,81 +133,81 @@ public class ServiceActivatorOrderTest
         {
             return "stuff";
         }
-        
+
     }
-    
-    @Mixins( { ThingsInstance.class, StuffInstance.class } )
-    @Activators( BetaActivator.class )
+
+    @Mixins({ThingsInstance.class, StuffInstance.class})
+    @Activators(BetaActivator.class)
     public static interface BazarService
-            extends Bazar, ServiceComposite
+        extends Bazar, ServiceComposite
     {
     }
-    
+
     //
     // Activators in order: Alpha, Beta, Gamma, Delta, Epsilon, Zeta ------
     //
     public static class AlphaActivator
-            extends OrderTestActivator<ServiceReference<?>>
+        extends OrderTestActivator<ServiceReference<?>>
     {
 
         public AlphaActivator()
         {
-            super( "Alpha", RECORDER );
+            super("Alpha", RECORDER);
         }
 
     }
 
     public static class BetaActivator
-            extends OrderTestActivator<ServiceReference<?>>
+        extends OrderTestActivator<ServiceReference<?>>
     {
 
         public BetaActivator()
         {
-            super( "Beta", RECORDER );
+            super("Beta", RECORDER);
         }
 
     }
 
     public static class GammaActivator
-            extends OrderTestActivator<ServiceReference<?>>
+        extends OrderTestActivator<ServiceReference<?>>
     {
 
         public GammaActivator()
         {
-            super( "Gamma", RECORDER );
+            super("Gamma", RECORDER);
         }
 
     }
 
     public static class DeltaActivator
-            extends OrderTestActivator<ServiceReference<?>>
+        extends OrderTestActivator<ServiceReference<?>>
     {
 
         public DeltaActivator()
         {
-            super( "Delta", RECORDER );
+            super("Delta", RECORDER);
         }
 
     }
 
     public static class EpsilonActivator
-            extends OrderTestActivator<ServiceReference<?>>
+        extends OrderTestActivator<ServiceReference<?>>
     {
 
         public EpsilonActivator()
         {
-            super( "Epsilon", RECORDER );
+            super("Epsilon", RECORDER);
         }
 
     }
 
     public static class ZetaActivator
-            extends OrderTestActivator<ServiceReference<?>>
+        extends OrderTestActivator<ServiceReference<?>>
     {
 
         public ZetaActivator()
         {
-            super( "Zeta", RECORDER );
+            super("Zeta", RECORDER);
         }
 
     }
@@ -219,154 +217,154 @@ public class ServiceActivatorOrderTest
     //
     @Test
     public void testTwoActivatorsOrderOnSimpleService()
-            throws Exception
+        throws Exception
     {
         new SingletonAssembler()
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
-                    throws AssemblyException
+            public void assemble(ModuleAssembly module)
+                throws AssemblyException
             {
-                module.services( FooBarService.class ).
-                        withActivators( AlphaActivator.class, BetaActivator.class ).
-                        instantiateOnStartup();
+                module.services(FooBarService.class).
+                    withActivators(AlphaActivator.class, BetaActivator.class).
+                    instantiateOnStartup();
             }
 
         }.application().passivate();
 
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
+        String actual = Arrays.toString(RECORDER.steps().toArray());
         // System.out.println( "\n" + Expected.ALPHA_BETA_SINGLE + "\n" + actual + "\n" );
-        assertThat( actual, equalTo( Expected.ALPHA_BETA_SINGLE ) );
+        assertThat(actual, equalTo(Expected.ALPHA_BETA_SINGLE));
     }
 
     @Test
     public void testAnnotationActivatorsOrderOnSimpleService()
-            throws Exception
+        throws Exception
     {
         new SingletonAssembler()
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
-                    throws AssemblyException
+            public void assemble(ModuleAssembly module)
+                throws AssemblyException
             {
-                module.services( FooBarServiceWithActivators.class ).
-                        instantiateOnStartup();
+                module.services(FooBarServiceWithActivators.class).
+                    instantiateOnStartup();
             }
 
         }.application().passivate();
 
-        String expected = Arrays.toString( new String[]{
-                    "Gamma.beforeActivation",   // Annotation
-                    "Delta.beforeActivation",   // Annotation
-                    // -> Activation
-                    "Gamma.afterActivation",
-                    "Delta.afterActivation",
-                    // -> Active
-                    "Delta.beforePassivation",
-                    "Gamma.beforePassivation",
-                    // -> Passivation
-                    "Delta.afterPassivation",
-                    "Gamma.afterPassivation"
-                } );
+        String expected = Arrays.toString(new String[]{
+            "Gamma.beforeActivation",   // Annotation
+            "Delta.beforeActivation",   // Annotation
+            // -> Activation
+            "Gamma.afterActivation",
+            "Delta.afterActivation",
+            // -> Active
+            "Delta.beforePassivation",
+            "Gamma.beforePassivation",
+            // -> Passivation
+            "Delta.afterPassivation",
+            "Gamma.afterPassivation"
+        });
 
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
+        String actual = Arrays.toString(RECORDER.steps().toArray());
         // System.out.println( "\n" + expected + "\n" + actual + "\n" );
-        assertThat( actual, equalTo( expected ) );
+        assertThat(actual, equalTo(expected));
     }
 
     @Test
     public void testMixedAnnotationAndAssemblyActivatorsOrderOnSimpleService()
-            throws Exception
+        throws Exception
     {
         new SingletonAssembler()
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
-                    throws AssemblyException
+            public void assemble(ModuleAssembly module)
+                throws AssemblyException
             {
-                module.services( FooBarServiceWithActivators.class ).
-                        withActivators( AlphaActivator.class, BetaActivator.class ).
-                        instantiateOnStartup();
+                module.services(FooBarServiceWithActivators.class).
+                    withActivators(AlphaActivator.class, BetaActivator.class).
+                    instantiateOnStartup();
             }
 
         }.application().passivate();
 
-        String expected = Arrays.toString( new String[]{
-                    "Alpha.beforeActivation",   // Assembly
-                    "Beta.beforeActivation",    // Assembly
-                    "Gamma.beforeActivation",   // Annotation
-                    "Delta.beforeActivation",   // Annotation
-                    // -> Activation
-                    "Alpha.afterActivation",
-                    "Beta.afterActivation",
-                    "Gamma.afterActivation",
-                    "Delta.afterActivation",
-                    // -> Active
-                    "Delta.beforePassivation",
-                    "Gamma.beforePassivation",
-                    "Beta.beforePassivation",
-                    "Alpha.beforePassivation",
-                    // -> Passivation
-                    "Delta.afterPassivation",
-                    "Gamma.afterPassivation",
-                    "Beta.afterPassivation",
-                    "Alpha.afterPassivation"
-                } );
+        String expected = Arrays.toString(new String[]{
+            "Alpha.beforeActivation",   // Assembly
+            "Beta.beforeActivation",    // Assembly
+            "Gamma.beforeActivation",   // Annotation
+            "Delta.beforeActivation",   // Annotation
+            // -> Activation
+            "Alpha.afterActivation",
+            "Beta.afterActivation",
+            "Gamma.afterActivation",
+            "Delta.afterActivation",
+            // -> Active
+            "Delta.beforePassivation",
+            "Gamma.beforePassivation",
+            "Beta.beforePassivation",
+            "Alpha.beforePassivation",
+            // -> Passivation
+            "Delta.afterPassivation",
+            "Gamma.afterPassivation",
+            "Beta.afterPassivation",
+            "Alpha.afterPassivation"
+        });
 
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
+        String actual = Arrays.toString(RECORDER.steps().toArray());
         // System.out.println( "\n" + expected + "\n" + actual + "\n" );
-        assertThat( actual, equalTo( expected ) );
+        assertThat(actual, equalTo(expected));
     }
-    
+
     @Test
     public void testMixedAnnotationAndAssemblyActivatorsOrderOnComplexService()
-            throws Exception
+        throws Exception
     {
         new SingletonAssembler()
         {
 
             @Override
-            public void assemble( ModuleAssembly module )
-                    throws AssemblyException
+            public void assemble(ModuleAssembly module)
+                throws AssemblyException
             {
-                module.services( BazarService.class ).
-                        withActivators( AlphaActivator.class ).
-                        instantiateOnStartup();
+                module.services(BazarService.class).
+                    withActivators(AlphaActivator.class).
+                    instantiateOnStartup();
             }
 
         }.application().passivate();
-        
-        String expected = Arrays.toString( new String[]{
-                    "Alpha.beforeActivation",   // Assembly
-                    "Beta.beforeActivation",    // Service type annotation
-                    "Gamma.beforeActivation",   // Base type annotation
-                    "Delta.beforeActivation",   // First composite type annotation
-                    "Epsilon.beforeActivation", // Second composite type annotation
-                    // -> Activation
-                    "Alpha.afterActivation",
-                    "Beta.afterActivation",
-                    "Gamma.afterActivation",
-                    "Delta.afterActivation",
-                    "Epsilon.afterActivation",
-                    // -> Active
-                    "Epsilon.beforePassivation",
-                    "Delta.beforePassivation",
-                    "Gamma.beforePassivation",
-                    "Beta.beforePassivation",
-                    "Alpha.beforePassivation",
-                    // -> Passivation
-                    "Epsilon.afterPassivation",
-                    "Delta.afterPassivation",
-                    "Gamma.afterPassivation",
-                    "Beta.afterPassivation",
-                    "Alpha.afterPassivation"
-        } );
-        String actual = Arrays.toString( RECORDER.steps().toArray() );
+
+        String expected = Arrays.toString(new String[]{
+            "Alpha.beforeActivation",   // Assembly
+            "Beta.beforeActivation",    // Service type annotation
+            "Gamma.beforeActivation",   // Base type annotation
+            "Delta.beforeActivation",   // First composite type annotation
+            "Epsilon.beforeActivation", // Second composite type annotation
+            // -> Activation
+            "Alpha.afterActivation",
+            "Beta.afterActivation",
+            "Gamma.afterActivation",
+            "Delta.afterActivation",
+            "Epsilon.afterActivation",
+            // -> Active
+            "Epsilon.beforePassivation",
+            "Delta.beforePassivation",
+            "Gamma.beforePassivation",
+            "Beta.beforePassivation",
+            "Alpha.beforePassivation",
+            // -> Passivation
+            "Epsilon.afterPassivation",
+            "Delta.afterPassivation",
+            "Gamma.afterPassivation",
+            "Beta.afterPassivation",
+            "Alpha.afterPassivation"
+        });
+        String actual = Arrays.toString(RECORDER.steps().toArray());
         // System.out.println( "\n" + expected + "\n" + actual + "\n" );
-        assertThat( actual, equalTo( expected ) );
+        assertThat(actual, equalTo(expected));
     }
 
 }

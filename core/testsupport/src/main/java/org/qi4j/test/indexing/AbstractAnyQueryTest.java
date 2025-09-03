@@ -19,26 +19,14 @@
  */
 package org.qi4j.test.indexing;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.qi4j.test.model.Account;
-import org.qi4j.test.model.Address;
-import org.qi4j.test.model.Cat;
-import org.qi4j.test.model.City;
-import org.qi4j.test.model.Domain;
-import org.qi4j.test.model.Female;
-import org.qi4j.test.model.File;
-import org.qi4j.test.model.Host;
-import org.qi4j.test.model.Male;
-import org.qi4j.test.model.Port;
-import org.qi4j.test.model.Protocol;
-import org.qi4j.test.model.QueryParam;
-import org.qi4j.test.model.URL;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.qi4j.test.model.*;
 
 /**
  * Abstract satisfiedBy with tests for any queries against Index/Query engines.
@@ -48,32 +36,32 @@ public class AbstractAnyQueryTest extends AbstractQi4jTest
     protected UnitOfWork unitOfWork;
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        assembleEntities( module, Visibility.module );
-        assembleValues( module, Visibility.module );
-        new EntityTestAssembler().assemble( module );
+        assembleEntities(module, Visibility.module);
+        assembleValues(module, Visibility.module);
+        new EntityTestAssembler().assemble(module);
     }
 
-    protected void assembleEntities( ModuleAssembly module, Visibility visibility )
+    protected void assembleEntities(ModuleAssembly module, Visibility visibility)
     {
-        module.entities( Male.class,
-                         Female.class,
-                         City.class,
-                         Domain.class,
-                         Account.class,
-                         Cat.class ). visibleIn( visibility );
+        module.entities(Male.class,
+            Female.class,
+            City.class,
+            Domain.class,
+            Account.class,
+            Cat.class).visibleIn(visibility);
     }
 
-    protected void assembleValues( ModuleAssembly module, Visibility visibility )
+    protected void assembleValues(ModuleAssembly module, Visibility visibility)
     {
-        module.values( URL.class,
-                       Address.class,
-                       Protocol.class,
-                       Host.class,
-                       Port.class,
-                       File.class,
-                       QueryParam.class ).visibleIn( visibility );
+        module.values(URL.class,
+            Address.class,
+            Protocol.class,
+            Host.class,
+            Port.class,
+            File.class,
+            QueryParam.class).visibleIn(visibility);
     }
 
     @Override
@@ -82,7 +70,7 @@ public class AbstractAnyQueryTest extends AbstractQi4jTest
         throws Exception
     {
         super.setUp();
-        TestData.populate( module.instance() );
+        TestData.populate(module.instance());
 
         this.unitOfWork = this.module.instance().unitOfWorkFactory().newUnitOfWork();
     }
@@ -92,7 +80,7 @@ public class AbstractAnyQueryTest extends AbstractQi4jTest
     @AfterEach
     public void tearDown()
     {
-        if( this.unitOfWork != null )
+        if(this.unitOfWork != null)
         {
             this.unitOfWork.discard();
             this.unitOfWork = null;

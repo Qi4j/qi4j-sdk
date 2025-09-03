@@ -29,18 +29,18 @@ public class AssemblyException extends RuntimeException
     {
     }
 
-    public AssemblyException( String string )
+    public AssemblyException(String string)
     {
-        super( string );
+        super(string);
     }
 
-    public AssemblyException( String string, Throwable throwable )
+    public AssemblyException(String string, Throwable throwable)
     {
-        super( string, throwable );
+        super(string, throwable);
     }
 
-    public AssemblyException( Throwable throwable )
+    public AssemblyException(Throwable throwable)
     {
-        super( throwable );
+        super(throwable);
     }
 }

@@ -19,14 +19,15 @@
  */
 package org.qi4j.runtime.property;
 
+import org.qi4j.api.common.QualifiedName;
+import org.qi4j.api.util.HierarchicalVisitor;
+import org.qi4j.api.util.VisitableHierarchy;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Member;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.qi4j.api.common.QualifiedName;
-import org.qi4j.api.util.HierarchicalVisitor;
-import org.qi4j.api.util.VisitableHierarchy;
 
 /**
  * Base class for properties model
@@ -41,28 +42,28 @@ public class PropertiesModel
     {
     }
 
-    public void addProperty( PropertyModel property )
+    public void addProperty(PropertyModel property)
     {
-        mapAccessiblePropertyModel.put( property.accessor(), property );
-        mapNamePropertyModel.put( property.qualifiedName(), property );
+        mapAccessiblePropertyModel.put(property.accessor(), property);
+        mapNamePropertyModel.put(property.qualifiedName(), property);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            for( PropertyModel propertyModel : mapAccessiblePropertyModel.values() )
+            for(PropertyModel propertyModel : mapAccessiblePropertyModel.values())
             {
-                if( !propertyModel.accept( visitor ) )
+                if(!propertyModel.accept(visitor))
                 {
                     break;
                 }
             }
         }
 
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
     public Stream<PropertyModel> properties()
@@ -70,42 +71,42 @@ public class PropertiesModel
         return mapAccessiblePropertyModel.values().stream();
     }
 
-    public PropertyModel getProperty( AccessibleObject accessor )
+    public PropertyModel getProperty(AccessibleObject accessor)
     {
-        PropertyModel propertyModel = mapAccessiblePropertyModel.get( accessor );
-        if( propertyModel == null )
+        PropertyModel propertyModel = mapAccessiblePropertyModel.get(accessor);
+        if(propertyModel == null)
         {
-            throw new IllegalArgumentException( "No property found with name: " + ( (Member) accessor ).getName() );
+            throw new IllegalArgumentException("No property found with name: " + ((Member) accessor).getName());
         }
         return propertyModel;
     }
 
-    public PropertyModel getPropertyByName( String name )
+    public PropertyModel getPropertyByName(String name)
         throws IllegalArgumentException
     {
-        for( PropertyModel propertyModel : mapAccessiblePropertyModel.values() )
+        for(PropertyModel propertyModel : mapAccessiblePropertyModel.values())
         {
-            if( propertyModel.qualifiedName().name().equals( name ) )
+            if(propertyModel.qualifiedName().name().equals(name))
             {
                 return propertyModel;
             }
         }
-        throw new IllegalArgumentException( "No property found with name: " + name );
+        throw new IllegalArgumentException("No property found with name: " + name);
     }
 
-    public PropertyModel getPropertyByQualifiedName( QualifiedName name )
+    public PropertyModel getPropertyByQualifiedName(QualifiedName name)
         throws IllegalArgumentException
     {
-        PropertyModel propertyModel = mapNamePropertyModel.get( name );
-        if( propertyModel != null )
+        PropertyModel propertyModel = mapNamePropertyModel.get(name);
+        if(propertyModel != null)
         {
             return propertyModel;
         }
-        throw new IllegalArgumentException( "No property found with qualified name: " + name );
+        throw new IllegalArgumentException("No property found with qualified name: " + name);
     }
 
-    public boolean hasProperty( QualifiedName name )
+    public boolean hasProperty(QualifiedName name)
     {
-        return mapNamePropertyModel.containsKey( name );
+        return mapNamePropertyModel.containsKey(name);
     }
 }

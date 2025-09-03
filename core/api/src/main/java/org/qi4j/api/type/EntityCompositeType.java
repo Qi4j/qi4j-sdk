@@ -19,48 +19,55 @@
  */
 package org.qi4j.api.type;
 
+import org.qi4j.api.entity.EntityComposite;
+import org.qi4j.api.entity.EntityDescriptor;
+import org.qi4j.api.util.Classes;
+
 import java.lang.reflect.Type;
 import java.util.Objects;
-import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.util.Classes;
-import org.qi4j.api.entity.EntityComposite;
-import org.qi4j.api.entity.EntityDescriptor;
-import org.qi4j.api.util.Classes;
 
 /**
  * EntityComposite ValueType.
  */
 public class EntityCompositeType extends StatefulAssociationValueType<EntityDescriptor>
 {
-    public static EntityCompositeType of( EntityDescriptor model )
+    public static EntityCompositeType of(EntityDescriptor model)
     {
-        return new EntityCompositeType( model );
+        return new EntityCompositeType(model);
     }
 
-    public static boolean isEntityComposite( Type type )
+    public static boolean isEntityComposite(Type type)
     {
-        return EntityComposite.class.isAssignableFrom( Classes.RAW_CLASS.apply( type ) );
+        return EntityComposite.class.isAssignableFrom(Classes.RAW_CLASS.apply(type));
     }
 
-    public EntityCompositeType( EntityDescriptor model )
+    public EntityCompositeType(EntityDescriptor model)
     {
-        super( model );
+        super(model);
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o ) { return true; }
-        if( o == null || getClass() != o.getClass() ) { return false; }
-        if( !super.equals( o ) ) { return false; }
+        if(this == o)
+        {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+        if(!super.equals(o))
+        {
+            return false;
+        }
         EntityCompositeType that = (EntityCompositeType) o;
-        return Objects.equals( model, that.model );
+        return Objects.equals(model, that.model);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash( super.hashCode(), model );
+        return Objects.hash(super.hashCode(), model);
     }
 }

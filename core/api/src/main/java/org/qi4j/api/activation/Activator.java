@@ -25,7 +25,6 @@ import org.qi4j.api.service.ServiceActivation;
  * Assemble Activators to hook Services Activation.
  *
  * @param <ActivateeType> Type of the activatee.
- *
  * @see ActivatorAdapter
  * @see ServiceActivation
  */
@@ -36,39 +35,35 @@ public interface Activator<ActivateeType>
      * Called before activatee activation.
      *
      * @param activating The instance that is about to be activated.
-     *
      * @throws Exception Allowed to throw Exception which will be wrapped in an ActivationException
      */
-    void beforeActivation( ActivateeType activating )
+    void beforeActivation(ActivateeType activating)
         throws Exception;
 
     /**
      * Called after activatee activation.
      *
      * @param activated The instance that has just been activated.
-     *
      * @throws Exception Allowed to throw Exception which will be wrapped in an ActivationException
      */
-    void afterActivation( ActivateeType activated )
+    void afterActivation(ActivateeType activated)
         throws Exception;
 
     /**
      * Called before activatee passivation.
      *
      * @param passivating The instance that is about to be passivated.
-     *
      * @throws Exception Allowed to throw Exception which will be wrapped in an PassivationException
      */
-    void beforePassivation( ActivateeType passivating )
+    void beforePassivation(ActivateeType passivating)
         throws Exception;
 
     /**
      * Called after activatee passivation.
      *
      * @param passivated The instance that has just been passivated.
-     *
      * @throws Exception Allowed to throw Exception which will be wrapped in an PassivationException
      */
-    void afterPassivation( ActivateeType passivated )
+    void afterPassivation(ActivateeType passivated)
         throws Exception;
 }

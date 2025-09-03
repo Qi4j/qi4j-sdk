@@ -19,13 +19,14 @@
  */
 package org.qi4j.test.util;
 
-import java.awt.GraphicsEnvironment;
+import org.opentest4j.TestAbortedException;
+
+import java.awt.*;
 import java.io.IOException;
 import java.net.NetworkInterface;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Enumeration;
-import org.opentest4j.TestAbortedException;
 
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -37,11 +38,12 @@ public class Assume
 {
     /**
      * If called on a JDK which version is different than the given one, the test will halt and be ignored.
+     *
      * @param version the java version, 6, 7, 8, 9, 10
      */
-    public static void assumeJavaVersion( int version )
+    public static void assumeJavaVersion(int version)
     {
-        assumeTrue( System.getProperty( "java.version" ).startsWith( "1." + version ) );
+        assumeTrue(System.getProperty("java.version").startsWith("1." + version));
     }
 
     /**
@@ -49,7 +51,7 @@ public class Assume
      */
     public static void assumeNoIbmJdk()
     {
-        assumeFalse( System.getProperty( "java.vendor" ).contains( "IBM" ) );
+        assumeFalse(System.getProperty("java.vendor").contains("IBM"));
     }
 
     /**
@@ -59,15 +61,15 @@ public class Assume
     {
         try
         {
-            assumeFalse( GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance() );
-            String display = System.getenv( "DISPLAY" );
-            assumeTrue( display != null );
-            assumeTrue( display.length() > 0 );
+            assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance());
+            String display = System.getenv("DISPLAY");
+            assumeTrue(display != null);
+            assumeTrue(display.length() > 0);
         }
-        catch( UnsatisfiedLinkError e )
+        catch(UnsatisfiedLinkError e)
         {
             // assuming that this is caused due to missing video subsystem, or similar
-            throw new TestAbortedException( "Grahics system is missing?", e );
+            throw new TestAbortedException("Grahics system is missing?", e);
         }
     }
 
@@ -79,12 +81,12 @@ public class Assume
         try
         {
             Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-            assumeTrue( ifaces != null );
-            assumeTrue( ifaces.hasMoreElements() );
+            assumeTrue(ifaces != null);
+            assumeTrue(ifaces.hasMoreElements());
         }
-        catch( SocketException ex )
+        catch(SocketException ex)
         {
-            throw new TestAbortedException( ex.getMessage(), ex );
+            throw new TestAbortedException(ex.getMessage(), ex);
         }
     }
 
@@ -93,7 +95,7 @@ public class Assume
      */
     public static void assumeConnectivity()
     {
-        assumeConnectivity( "qi4j.org", 80 );
+        assumeConnectivity("qi4j.org", 80);
     }
 
     /**
@@ -102,27 +104,28 @@ public class Assume
      * @param host Host
      * @param port Port
      */
-    public static void assumeConnectivity( String host, int port )
+    public static void assumeConnectivity(String host, int port)
     {
-        try( Socket socket = new Socket( host, port ) )
+        try(Socket socket = new Socket(host, port))
         {
             // Connected
         }
-        catch( IOException ex )
+        catch(IOException ex)
         {
-            throw new TestAbortedException( ex.getMessage(), ex );
+            throw new TestAbortedException(ex.getMessage(), ex);
         }
     }
 
     /**
      * If called on a runtime without the given System Property set, the test will halt and be ignored.
+     *
      * @param key the name of the system property
      * @return The System Propery value if not null
      */
-    public static String assumeSystemPropertyNotNull( String key )
+    public static String assumeSystemPropertyNotNull(String key)
     {
-        String property = System.getProperty( key );
-        assumeTrue( property != null );
+        String property = System.getProperty(key);
+        assumeTrue(property != null);
         return property;
     }
 }

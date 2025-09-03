@@ -20,7 +20,7 @@
 
 package org.qi4j.runtime.injection;
 
-import java.util.ArrayList;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.injection.scope.Uses;
@@ -28,7 +28,8 @@ import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
 
 /**
  * Test of generic list injection
@@ -36,27 +37,27 @@ import org.junit.jupiter.api.Test;
 public class UsesGenericListTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestCase.class );
+        module.transients(TestCase.class);
     }
 
     @Test
     public void givenMixinUsesGenericListWhenUseListThenInjectWorks()
     {
-        TransientBuilder<TestCase> builder = transientBuilderFactory.newTransientBuilder( TestCase.class );
+        TransientBuilder<TestCase> builder = transientBuilderFactory.newTransientBuilder(TestCase.class);
 
         ArrayList<String> list = new ArrayList<String>();
-        list.add( "Hello" );
-        list.add( "Bye" );
-        builder.use( list );
+        list.add("Hello");
+        list.add("Bye");
+        builder.use(list);
 
         TestCase TestCase = builder.newInstance();
         TestCase.sayHello();
     }
 
-    @Mixins( TestMixin.class )
+    @Mixins(TestMixin.class)
     public interface TestCase
         extends TransientComposite
     {
@@ -71,7 +72,7 @@ public class UsesGenericListTest
 
         public void sayHello()
         {
-            System.out.println( messages );
+            System.out.println(messages);
         }
     }
 }

@@ -19,38 +19,39 @@
  */
 package org.qi4j.api.association;
 
-import java.util.stream.Stream;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.composite.StateDescriptor;
+
+import java.util.stream.Stream;
 
 /**
  * Associations State Descriptor.
  */
 public interface AssociationStateDescriptor extends StateDescriptor
 {
-    AssociationDescriptor getAssociationByName( String name )
+    AssociationDescriptor getAssociationByName(String name)
         throws IllegalArgumentException;
 
-    AssociationDescriptor getAssociationByQualifiedName( QualifiedName name )
+    AssociationDescriptor getAssociationByQualifiedName(QualifiedName name)
         throws IllegalArgumentException;
 
-    boolean hasAssociation( QualifiedName name );
+    boolean hasAssociation(QualifiedName name);
 
-    AssociationDescriptor getManyAssociationByName( String name )
+    AssociationDescriptor getManyAssociationByName(String name)
         throws IllegalArgumentException;
 
-    AssociationDescriptor getManyAssociationByQualifiedName( QualifiedName name )
+    AssociationDescriptor getManyAssociationByQualifiedName(QualifiedName name)
         throws IllegalArgumentException;
 
-    boolean hasManyAssociation( QualifiedName name );
+    boolean hasManyAssociation(QualifiedName name);
 
-    AssociationDescriptor getNamedAssociationByName( String name )
+    AssociationDescriptor getNamedAssociationByName(String name)
         throws IllegalArgumentException;
 
-    AssociationDescriptor getNamedAssociationByQualifiedName( QualifiedName name )
+    AssociationDescriptor getNamedAssociationByQualifiedName(QualifiedName name)
         throws IllegalArgumentException;
 
-    boolean hasNamedAssociation( QualifiedName name );
+    boolean hasNamedAssociation(QualifiedName name);
 
     Stream<? extends AssociationDescriptor> associations();
 

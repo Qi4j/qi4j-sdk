@@ -20,8 +20,7 @@
 
 package org.qi4j.api.common;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.constraint.Constraint;
@@ -34,7 +33,9 @@ import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Test for ability to set constraints on Properties
@@ -42,11 +43,11 @@ import org.junit.jupiter.api.Test;
 public class PropertyTypeTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( PersonEntity.class );
-        module.transients( PersonComposite.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(PersonEntity.class);
+        module.transients(PersonComposite.class);
     }
 
     @Test
@@ -56,14 +57,14 @@ public class PropertyTypeTest
         UnitOfWork unitOfWork = unitOfWorkFactory.newUnitOfWork();
         try
         {
-            EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder( PersonEntity.class );
+            EntityBuilder<PersonEntity> builder = unitOfWork.newEntityBuilder(PersonEntity.class);
             PersonEntity personEntity = builder.instance();
-            personEntity.givenName().set( "Rickard" );
-            personEntity.familyName().set( "Öberg" );
+            personEntity.givenName().set("Rickard");
+            personEntity.familyName().set("Öberg");
             personEntity = builder.newInstance();
 
-            personEntity.givenName().set( "Niclas" );
-            personEntity.familyName().set( "Hedhman" );
+            personEntity.givenName().set("Niclas");
+            personEntity.familyName().set("Hedhman");
 
             unitOfWork.complete();
         }
@@ -77,25 +78,25 @@ public class PropertyTypeTest
     public void givenCompositeWithPropertyConstraintsWhenInstantiatedThenPropertiesWork()
         throws Exception
     {
-        TransientBuilder<PersonComposite> builder = transientBuilderFactory.newTransientBuilder( PersonComposite.class );
+        TransientBuilder<PersonComposite> builder = transientBuilderFactory.newTransientBuilder(PersonComposite.class);
         PersonComposite personComposite = builder.prototype();
-        personComposite.givenName().set( "Rickard" );
-        personComposite.familyName().set( "Öberg" );
+        personComposite.givenName().set("Rickard");
+        personComposite.familyName().set("Öberg");
         personComposite = builder.newInstance();
 
-        personComposite.givenName().set( "Niclas" );
-        personComposite.familyName().set( "Hedhman" );
+        personComposite.givenName().set("Niclas");
+        personComposite.familyName().set("Hedhman");
     }
 
     @ConstraintDeclaration
-    @Retention( RetentionPolicy.RUNTIME )
-    @MaxLength( 50 )
+    @Retention(RetentionPolicy.RUNTIME)
+    @MaxLength(50)
     public @interface Name
     {
     }
 
     @ConstraintDeclaration
-    @Retention( RetentionPolicy.RUNTIME )
+    @Retention(RetentionPolicy.RUNTIME)
     @NotEmpty
     @Name
     public @interface GivenName
@@ -123,8 +124,8 @@ public class PropertyTypeTest
     }
 
     @ConstraintDeclaration
-    @Retention( RetentionPolicy.RUNTIME )
-    @Constraints( MaxLengthConstraint.class )
+    @Retention(RetentionPolicy.RUNTIME)
+    @Constraints(MaxLengthConstraint.class)
     public @interface MaxLength
     {
         int value();
@@ -133,9 +134,9 @@ public class PropertyTypeTest
     public static class MaxLengthConstraint
         implements Constraint<MaxLength, String>
     {
-        public boolean isValid( MaxLength annotation, String argument )
+        public boolean isValid(MaxLength annotation, String argument)
         {
-            if( argument != null )
+            if(argument != null)
             {
                 return argument.length() <= annotation.value();
             }
@@ -145,8 +146,8 @@ public class PropertyTypeTest
     }
 
     @ConstraintDeclaration
-    @Retention( RetentionPolicy.RUNTIME )
-    @Constraints( { NotEmptyStringConstraint.class } )
+    @Retention(RetentionPolicy.RUNTIME)
+    @Constraints({NotEmptyStringConstraint.class})
     public @interface NotEmpty
     {
     }
@@ -155,7 +156,7 @@ public class PropertyTypeTest
         implements Constraint<NotEmpty, String>
     {
 
-        public boolean isValid( NotEmpty annotation, String value )
+        public boolean isValid(NotEmpty annotation, String value)
         {
             return value.trim().length() > 0;
         }

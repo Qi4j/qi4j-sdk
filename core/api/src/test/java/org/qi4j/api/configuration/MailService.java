@@ -24,19 +24,17 @@ import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.library.constraints.annotation.Email;
 import org.qi4j.library.constraints.annotation.MinLength;
-import org.qi4j.library.constraints.annotation.Email;
-import org.qi4j.library.constraints.annotation.MinLength;
 
 // Documentation Support
-@Mixins( MailService.MailServiceMixin.class )
+@Mixins(MailService.MailServiceMixin.class)
 public interface MailService
 {
-    void sendMail(@Email String to, @MinLength( 8 ) String subject, String body );
-    
+    void sendMail(@Email String to, @MinLength(8) String subject, String body);
+
     // START SNIPPET: write
-    void changeExternalMailService( String hostName, int port );
+    void changeExternalMailService(String hostName, int port);
     // END SNIPPET: write
-    
+
     public class MailServiceMixin
         implements MailService
     {
@@ -45,7 +43,7 @@ public interface MailService
         private Configuration<MailServiceConfiguration> config;
 
         @Override
-        public void sendMail( @Email String to, @MinLength( 8 ) String subject, String body )
+        public void sendMail(@Email String to, @MinLength(8) String subject, String body)
         {
             config.refresh();
             MailServiceConfiguration conf = config.get();
@@ -59,11 +57,11 @@ public interface MailService
 
         // START SNIPPET: write        
         @Override
-        public void changeExternalMailService( String hostName, int port )
+        public void changeExternalMailService(String hostName, int port)
         {
             MailServiceConfiguration conf = config.get();
-            conf.hostName().set( hostName );
-            conf.port().set( port );
+            conf.hostName().set(hostName);
+            conf.port().set(port);
             config.save();
         }
         // START SNIPPET: write        

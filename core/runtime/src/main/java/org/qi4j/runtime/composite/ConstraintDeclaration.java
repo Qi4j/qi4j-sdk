@@ -20,11 +20,12 @@
 
 package org.qi4j.runtime.composite;
 
+import org.qi4j.api.constraint.Constraint;
+import org.qi4j.api.util.Classes;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import org.qi4j.api.constraint.Constraint;
-import org.qi4j.api.util.Classes;
 
 /**
  * JAVADOC
@@ -32,18 +33,18 @@ import org.qi4j.api.util.Classes;
 public final class ConstraintDeclaration
 {
     private final Class<? extends Constraint<?, ?>> constraintClass;
-    @SuppressWarnings( "raw" )
+    @SuppressWarnings("raw")
     private final Class constraintAnnotationType;
     private final Type constraintValueType;
 
-    @SuppressWarnings( "unchecked" )
-    public ConstraintDeclaration( Class<? extends Constraint<?, ?>> constraintClass )
+    @SuppressWarnings("unchecked")
+    public ConstraintDeclaration(Class<? extends Constraint<?, ?>> constraintClass)
     {
         this.constraintClass = constraintClass;
 
-        constraintAnnotationType = (Class<? extends Annotation>) ( (ParameterizedType) constraintClass.getGenericInterfaces()[ 0 ] )
-            .getActualTypeArguments()[ 0 ];
-        constraintValueType = ( (ParameterizedType) constraintClass.getGenericInterfaces()[ 0 ] ).getActualTypeArguments()[ 1 ];
+        constraintAnnotationType = (Class<? extends Annotation>) ((ParameterizedType) constraintClass.getGenericInterfaces()[0])
+            .getActualTypeArguments()[0];
+        constraintValueType = ((ParameterizedType) constraintClass.getGenericInterfaces()[0]).getActualTypeArguments()[1];
     }
 
     public Class<? extends Constraint<?, ?>> constraintClass()
@@ -51,21 +52,21 @@ public final class ConstraintDeclaration
         return constraintClass;
     }
 
-    @SuppressWarnings( {"raw", "unchecked"} )
-    public boolean appliesTo( Class annotationType, Type valueType )
+    @SuppressWarnings({"raw", "unchecked"})
+    public boolean appliesTo(Class annotationType, Type valueType)
     {
-        if( constraintValueType instanceof Class )
+        if(constraintValueType instanceof Class)
         {
             Class constraintValueClass = (Class) constraintValueType;
-            Class valueClass = Classes.RAW_CLASS.apply( valueType );
-            return constraintAnnotationType.equals( annotationType ) && constraintValueClass.isAssignableFrom( valueClass );
+            Class valueClass = Classes.RAW_CLASS.apply(valueType);
+            return constraintAnnotationType.equals(annotationType) && constraintValueClass.isAssignableFrom(valueClass);
         }
-        else if( constraintValueType instanceof ParameterizedType )
+        else if(constraintValueType instanceof ParameterizedType)
         {
             // TODO Handle nested generics
-            Class constraintValueClass = Classes.RAW_CLASS.apply( constraintValueType );
-            Class valueClass = Classes.RAW_CLASS.apply( valueType );
-            return constraintAnnotationType.equals( annotationType ) && constraintValueClass.isAssignableFrom( valueClass );
+            Class constraintValueClass = Classes.RAW_CLASS.apply(constraintValueType);
+            Class valueClass = Classes.RAW_CLASS.apply(valueType);
+            return constraintAnnotationType.equals(annotationType) && constraintValueClass.isAssignableFrom(valueClass);
         }
         else
         {

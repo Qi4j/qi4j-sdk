@@ -20,12 +20,13 @@
 
 package org.qi4j.runtime.structure;
 
-import java.util.List;
-import java.util.stream.Stream;
 import org.qi4j.api.structure.LayerDescriptor;
 import org.qi4j.api.structure.UsedLayersDescriptor;
 import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -35,7 +36,7 @@ public final class UsedLayersModel
 {
     private final List<LayerModel> usedLayers;
 
-    public UsedLayersModel( List<LayerModel> usedLayers )
+    public UsedLayersModel(List<LayerModel> usedLayers)
     {
         this.usedLayers = usedLayers;
     }
@@ -47,26 +48,26 @@ public final class UsedLayersModel
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            for( LayerModel usedLayer : usedLayers )
+            for(LayerModel usedLayer : usedLayers)
             {
-                if( !usedLayer.accept( visitor ) )
+                if(!usedLayer.accept(visitor))
                 {
                     break;
                 }
             }
         }
 
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
-    public UsedLayersInstance newInstance( List<LayerDescriptor> usedLayerInstances )
+    public UsedLayersInstance newInstance(List<LayerDescriptor> usedLayerInstances)
     {
-        return new UsedLayersInstance( usedLayerInstances );
+        return new UsedLayersInstance(usedLayerInstances);
     }
 
     @Override

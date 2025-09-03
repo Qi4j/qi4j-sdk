@@ -20,6 +20,11 @@
 
 package org.qi4j.runtime.query;
 
+import org.qi4j.api.composite.Composite;
+import org.qi4j.api.property.Property;
+import org.qi4j.api.query.grammar.OrderBy;
+import org.qi4j.spi.query.QuerySource;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -27,10 +32,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.property.Property;
-import org.qi4j.api.query.grammar.OrderBy;
-import org.qi4j.spi.query.QuerySource;
 
 import static java.util.stream.Collectors.toList;
 import static org.qi4j.api.util.Classes.instanceOf;
@@ -48,119 +49,119 @@ public class IterableQuerySource
      *
      * @param iterable iterable
      */
-    @SuppressWarnings( "raw" )
-    IterableQuerySource( final Iterable iterable )
+    @SuppressWarnings("raw")
+    IterableQuerySource(final Iterable iterable)
     {
         this.iterable = iterable;
     }
 
     @Override
-    public <T> T find( Class<T> resultType,
-                       Predicate<Composite> whereClause,
-                       List<OrderBy> orderBySegments,
-                       Integer firstResult,
-                       Integer maxResults,
-                       Map<String, Object> variables
+    public <T> T find(Class<T> resultType,
+                      Predicate<Composite> whereClause,
+                      List<OrderBy> orderBySegments,
+                      Integer firstResult,
+                      Integer maxResults,
+                      Map<String, Object> variables
     )
     {
-        return stream( resultType, whereClause, orderBySegments, firstResult, maxResults, variables )
-            .findFirst().orElse( null );
+        return stream(resultType, whereClause, orderBySegments, firstResult, maxResults, variables)
+            .findFirst().orElse(null);
     }
 
     @Override
-    public <T> long count( Class<T> resultType,
-                           Predicate<Composite> whereClause,
-                           List<OrderBy> orderBySegments,
-                           Integer firstResult,
-                           Integer maxResults,
-                           Map<String, Object> variables
+    public <T> long count(Class<T> resultType,
+                          Predicate<Composite> whereClause,
+                          List<OrderBy> orderBySegments,
+                          Integer firstResult,
+                          Integer maxResults,
+                          Map<String, Object> variables
     )
     {
-        return list( resultType, whereClause, orderBySegments, firstResult, maxResults, variables ).size();
+        return list(resultType, whereClause, orderBySegments, firstResult, maxResults, variables).size();
     }
 
     @Override
-    public <T> Stream<T> stream( Class<T> resultType,
-                                     Predicate<Composite> whereClause,
-                                     List<OrderBy> orderBySegments,
-                                     Integer firstResult,
-                                     Integer maxResults,
-                                     Map<String, Object> variables
+    public <T> Stream<T> stream(Class<T> resultType,
+                                Predicate<Composite> whereClause,
+                                List<OrderBy> orderBySegments,
+                                Integer firstResult,
+                                Integer maxResults,
+                                Map<String, Object> variables
     )
     {
-        return list( resultType, whereClause, orderBySegments, firstResult, maxResults, variables ).stream();
+        return list(resultType, whereClause, orderBySegments, firstResult, maxResults, variables).stream();
     }
 
-    @SuppressWarnings( {"raw", "unchecked"} )
-    private <T> List<T> list( Class<T> resultType,
-                              Predicate<Composite> whereClause,
-                              List<OrderBy> orderBySegments,
-                              Integer firstResult,
-                              Integer maxResults,
-                              Map<String, Object> variables
+    @SuppressWarnings({"raw", "unchecked"})
+    private <T> List<T> list(Class<T> resultType,
+                             Predicate<Composite> whereClause,
+                             List<OrderBy> orderBySegments,
+                             Integer firstResult,
+                             Integer maxResults,
+                             Map<String, Object> variables
     )
     {
         // Ensure it's a list first
-        List<T> list = filter( resultType, whereClause );
+        List<T> list = filter(resultType, whereClause);
 
         // Order list
-        if( orderBySegments != null )
+        if(orderBySegments != null)
         {
             // Sort it
-            list.sort( new OrderByComparator( orderBySegments ) );
+            list.sort(new OrderByComparator(orderBySegments));
         }
 
         // Cut results
-        if( firstResult != null )
+        if(firstResult != null)
         {
-            if( firstResult > list.size() )
+            if(firstResult > list.size())
             {
                 return Collections.emptyList();
             }
 
             int toIdx;
-            if( maxResults != null )
+            if(maxResults != null)
             {
-                toIdx = Math.min( firstResult + maxResults, list.size() );
+                toIdx = Math.min(firstResult + maxResults, list.size());
             }
             else
             {
                 toIdx = list.size();
             }
 
-            list = list.subList( firstResult, toIdx );
+            list = list.subList(firstResult, toIdx);
         }
         else
         {
             int toIdx;
-            if( maxResults != null )
+            if(maxResults != null)
             {
-                toIdx = Math.min( maxResults, list.size() );
+                toIdx = Math.min(maxResults, list.size());
             }
             else
             {
                 toIdx = list.size();
             }
 
-            list = list.subList( 0, toIdx );
+            list = list.subList(0, toIdx);
         }
 
         return list;
     }
 
-    @SuppressWarnings( {"raw", "unchecked"} )
-    private <T> List<T> filter( Class<T> resultType, Predicate whereClause )
+    @SuppressWarnings({"raw", "unchecked"})
+    private <T> List<T> filter(Class<T> resultType, Predicate whereClause)
     {
-        Stream stream = StreamSupport.stream( iterable.spliterator(), false );
-        if( whereClause == null )
+        Stream stream = StreamSupport.stream(iterable.spliterator(), false);
+        if(whereClause == null)
         {
-            return List.class.cast( stream.filter( resultType::isInstance )
-                                          .collect( toList() ) );
+            return List.class.cast(stream.filter(resultType::isInstance)
+                .collect(toList()));
         }
         else
         {
-            return List.class.cast( stream.filter( instanceOf( resultType ).and( whereClause ) )
-                                          .collect( toList() ) );
+            return List.class.cast(stream.filter(instanceOf(resultType).and(whereClause))
+                .collect(toList()));
         }
     }
 
@@ -176,28 +177,28 @@ public class IterableQuerySource
 
         private final Iterable<OrderBy> orderBySegments;
 
-        private OrderByComparator( Iterable<OrderBy> orderBySegments )
+        private OrderByComparator(Iterable<OrderBy> orderBySegments)
         {
             this.orderBySegments = orderBySegments;
         }
 
         @Override
-        @SuppressWarnings( {"raw", "unchecked"} )
-        public int compare( T o1, T o2 )
+        @SuppressWarnings({"raw", "unchecked"})
+        public int compare(T o1, T o2)
         {
-            for( OrderBy orderBySegment : orderBySegments )
+            for(OrderBy orderBySegment : orderBySegments)
             {
                 try
                 {
-                    final Property prop1 = orderBySegment.property().apply( o1 );
-                    final Property prop2 = orderBySegment.property().apply( o2 );
-                    if( prop1 == null || prop2 == null )
+                    final Property prop1 = orderBySegment.property().apply(o1);
+                    final Property prop2 = orderBySegment.property().apply(o2);
+                    if(prop1 == null || prop2 == null)
                     {
-                        if( prop1 == null && prop2 == null )
+                        if(prop1 == null && prop2 == null)
                         {
                             return 0;
                         }
-                        else if( prop1 != null )
+                        else if(prop1 != null)
                         {
                             return 1;
                         }
@@ -205,24 +206,24 @@ public class IterableQuerySource
                     }
                     final Object value1 = prop1.get();
                     final Object value2 = prop2.get();
-                    if( value1 == null || value2 == null )
+                    if(value1 == null || value2 == null)
                     {
-                        if( value1 == null && value2 == null )
+                        if(value1 == null && value2 == null)
                         {
                             return 0;
                         }
-                        else if( value1 != null )
+                        else if(value1 != null)
                         {
                             return 1;
                         }
                         return -1;
                     }
-                    if( value1 instanceof Comparable )
+                    if(value1 instanceof Comparable)
                     {
-                        int result = ( (Comparable) value1 ).compareTo( value2 );
-                        if( result != 0 )
+                        int result = ((Comparable) value1).compareTo(value2);
+                        if(result != 0)
                         {
-                            if( orderBySegment.order() == OrderBy.Order.ASCENDING )
+                            if(orderBySegment.order() == OrderBy.Order.ASCENDING)
                             {
                                 return result;
                             }
@@ -233,7 +234,7 @@ public class IterableQuerySource
                         }
                     }
                 }
-                catch( Exception e )
+                catch(Exception e)
                 {
                     return 0;
                 }

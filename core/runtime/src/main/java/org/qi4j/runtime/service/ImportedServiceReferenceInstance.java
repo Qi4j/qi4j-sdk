@@ -19,7 +19,6 @@
  */
 package org.qi4j.runtime.service;
 
-import java.util.stream.Stream;
 import org.qi4j.api.activation.Activation;
 import org.qi4j.api.activation.ActivationEventListener;
 import org.qi4j.api.activation.ActivationException;
@@ -31,7 +30,8 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.service.ServiceUnavailableException;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.runtime.activation.ActivationDelegate;
-import org.qi4j.runtime.activation.ActivationDelegate;
+
+import java.util.stream.Stream;
 
 /**
  * Implementation of ServiceReference. This manages the reference to the imported service.
@@ -50,11 +50,11 @@ public final class ImportedServiceReferenceInstance<T>
     private T instance;
     private final ModuleDescriptor module;
     private final ImportedServiceModel serviceModel;
-    private final ActivationDelegate activation = new ActivationDelegate( this );
+    private final ActivationDelegate activation = new ActivationDelegate(this);
     private boolean active = false;
     private ImportedServiceInstance<T> serviceInstanceBeingActivated;
 
-    public ImportedServiceReferenceInstance( ImportedServiceModel serviceModel, ModuleDescriptor module )
+    public ImportedServiceReferenceInstance(ImportedServiceModel serviceModel, ModuleDescriptor module)
     {
         this.module = module;
         this.serviceModel = serviceModel;
@@ -73,9 +73,9 @@ public final class ImportedServiceReferenceInstance<T>
     }
 
     @Override
-    public <M> M metaInfo( Class<M> infoType )
+    public <M> M metaInfo(Class<M> infoType)
     {
-        return serviceModel.metaInfo( infoType );
+        return serviceModel.metaInfo(infoType);
     }
 
     @Override
@@ -93,7 +93,7 @@ public final class ImportedServiceReferenceInstance<T>
     public void activate()
         throws ActivationException
     {
-        if( serviceModel.isImportOnStartup() )
+        if(serviceModel.isImportOnStartup())
         {
             getInstance();
         }
@@ -103,11 +103,11 @@ public final class ImportedServiceReferenceInstance<T>
     public void passivate()
         throws PassivationException
     {
-        if( serviceInstance != null )
+        if(serviceInstance != null)
         {
             try
             {
-                activation.passivate( () -> active = false );
+                activation.passivate(() -> active = false);
             }
             finally
             {
@@ -131,7 +131,7 @@ public final class ImportedServiceReferenceInstance<T>
             getInstance();
             return serviceInstance.isAvailable();
         }
-        catch( ServiceImporterException ex )
+        catch(ServiceImporterException ex)
         {
             return false;
         }
@@ -152,13 +152,13 @@ public final class ImportedServiceReferenceInstance<T>
         throws ServiceImporterException
     {
         // DCL that works with Java 1.5 volatile semantics
-        if( serviceInstance == null )
+        if(serviceInstance == null)
         {
-            synchronized( this )
+            synchronized(this)
             {
-                if( serviceInstance == null )
+                if(serviceInstance == null)
                 {
-                    if( serviceInstanceBeingActivated != null )
+                    if(serviceInstanceBeingActivated != null)
                     {
                         // needed because activation may request its own service.
                         // There is possible complication with this, as activation may use another service, which in turn
@@ -167,17 +167,17 @@ public final class ImportedServiceReferenceInstance<T>
                         // constructors to objects, which may then use an uninitilized object.
                         return serviceInstanceBeingActivated.instance();
                     }
-                    serviceInstanceBeingActivated = serviceModel.importInstance( module );
+                    serviceInstanceBeingActivated = serviceModel.importInstance(module);
                     try
                     {
                         activation.activate(
-                            serviceModel.newActivatorsInstance( module ),
+                            serviceModel.newActivatorsInstance(module),
                             serviceInstanceBeingActivated, () -> active = true
                         );
                     }
-                    catch( Exception e )
+                    catch(Exception e)
                     {
-                        throw new ServiceUnavailableException( "Could not activate service " + serviceModel.identity(), e );
+                        throw new ServiceUnavailableException("Could not activate service " + serviceModel.identity(), e);
                     }
                     serviceInstance = serviceInstanceBeingActivated;
                     instance = serviceInstanceBeingActivated.instance();
@@ -196,15 +196,15 @@ public final class ImportedServiceReferenceInstance<T>
     }
 
     @Override
-    public void registerActivationEventListener( ActivationEventListener listener )
+    public void registerActivationEventListener(ActivationEventListener listener)
     {
-        activation.registerActivationEventListener( listener );
+        activation.registerActivationEventListener(listener);
     }
 
     @Override
-    public void deregisterActivationEventListener( ActivationEventListener listener )
+    public void deregisterActivationEventListener(ActivationEventListener listener)
     {
-        activation.deregisterActivationEventListener( listener );
+        activation.deregisterActivationEventListener(listener);
     }
 
     @Override
@@ -214,17 +214,17 @@ public final class ImportedServiceReferenceInstance<T>
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals(Object obj)
     {
-        if( obj == null )
+        if(obj == null)
         {
             return false;
         }
-        if( getClass() != obj.getClass() )
+        if(getClass() != obj.getClass())
         {
             return false;
         }
         final ServiceReference other = (ServiceReference) obj;
-        return identity().equals( other.identity() );
+        return identity().equals(other.identity());
     }
 }

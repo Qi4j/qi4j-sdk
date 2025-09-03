@@ -19,11 +19,12 @@
  */
 package org.qi4j.test.model;
 
-import java.util.Collection;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.entity.Queryable;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.value.ValueComposite;
+
+import java.util.Collection;
 
 /**
  * JAVADOC Add JavaDoc.
@@ -33,7 +34,7 @@ public interface URL extends ValueComposite
     Property<Protocol> protocol();
 
     @Optional
-    @Queryable( false )
+    @Queryable(false)
     Property<Host> host();
 
     @Optional

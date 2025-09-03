@@ -19,7 +19,7 @@ package org.qi4j.api.serialization;
 
 /**
  * Converter for (de)serialization.
- *
+ * <p>
  * Convert instances of {@code T} to String and the other way around.
  *
  * @param <T> the converted type
@@ -37,7 +37,7 @@ public interface Converter<T>
      * @param object the {@code T} to convert to String, never null
      * @return the String representation of the given object
      */
-    String toString( T object );
+    String toString(T object);
 
     /**
      * Revert.
@@ -45,5 +45,5 @@ public interface Converter<T>
      * @param string the String to convert back to {@code T}
      * @return the {@code T}
      */
-    T fromString( String string );
+    T fromString(String string);
 }

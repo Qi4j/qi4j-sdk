@@ -20,15 +20,16 @@
 
 package org.qi4j.runtime.sideeffects;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.sideeffect.GenericSideEffect;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -37,24 +38,24 @@ import static org.hamcrest.core.IsEqual.equalTo;
  * Test of declaring sideeffect in assembly
  */
 public class ModuleSideEffectTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
     public static boolean ok = false;
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( FooComposite.class ).withSideEffects( TraceSideEffect.class );
+        module.transients(FooComposite.class).withSideEffects(TraceSideEffect.class);
     }
 
     @Test
     public void testModuleSideEffect()
     {
-        transientBuilderFactory.newTransient( Foo.class ).test( "Foo", 42 );
-        assertThat( "SideEffect has been called", ok, equalTo( true ) );
+        transientBuilderFactory.newTransient(Foo.class).test("Foo", 42);
+        assertThat("SideEffect has been called", ok, equalTo(true));
     }
 
-    @Mixins( FooMixin.class )
+    @Mixins(FooMixin.class)
     public interface FooComposite
         extends TransientComposite, Foo
     {
@@ -62,13 +63,13 @@ public class ModuleSideEffectTest
 
     public interface Foo
     {
-        String test( String foo, int bar );
+        String test(String foo, int bar);
     }
 
     public static class FooMixin
         implements Foo
     {
-        public String test( String foo, int bar )
+        public String test(String foo, int bar)
         {
             return foo + " " + bar;
         }
@@ -77,13 +78,13 @@ public class ModuleSideEffectTest
     public static class TraceSideEffect
         extends GenericSideEffect
     {
-        public Object invoke( Object proxy, Method method, Object[] args )
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
             ok = true;
-            Object result = this.result.invoke( proxy, method, args );
-            String str = method.getName() + Arrays.asList( args );
-            System.out.println( str );
+            Object result = this.result.invoke(proxy, method, args);
+            String str = method.getName() + Arrays.asList(args);
+            System.out.println(str);
             return result;
         }
     }

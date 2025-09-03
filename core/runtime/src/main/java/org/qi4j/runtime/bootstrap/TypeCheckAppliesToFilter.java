@@ -20,8 +20,9 @@
 
 package org.qi4j.runtime.bootstrap;
 
-import java.lang.reflect.Method;
 import org.qi4j.api.common.AppliesToFilter;
+
+import java.lang.reflect.Method;
 
 /**
  * JAVADOC
@@ -29,19 +30,19 @@ import org.qi4j.api.common.AppliesToFilter;
 final class TypeCheckAppliesToFilter
     implements AppliesToFilter
 {
-    @SuppressWarnings( "raw" )
+    @SuppressWarnings("raw")
     private final Class type;
 
-    @SuppressWarnings( "raw" )
-    TypeCheckAppliesToFilter( Class type )
+    @SuppressWarnings("raw")
+    TypeCheckAppliesToFilter(Class type)
     {
         this.type = type;
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public boolean appliesTo( Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass )
+    @SuppressWarnings("unchecked")
+    public boolean appliesTo(Method method, Class<?> mixin, Class<?> compositeType, Class<?> fragmentClass)
     {
-        return type.isAssignableFrom( compositeType );
+        return type.isAssignableFrom(compositeType);
     }
 }

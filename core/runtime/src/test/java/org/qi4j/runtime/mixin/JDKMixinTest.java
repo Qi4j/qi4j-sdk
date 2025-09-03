@@ -19,16 +19,11 @@
  */
 package org.qi4j.runtime.mixin;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.concern.GenericConcern;
@@ -39,8 +34,14 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -50,22 +51,22 @@ import static org.hamcrest.core.IsEqual.equalTo;
  */
 public class JDKMixinTest extends AbstractQi4jTest
 {
-    @Concerns( JDKMixinConcern.class )
+    @Concerns(JDKMixinConcern.class)
     public interface JSONSerializableMap extends Map<String, String>
     {
         JsonObject toJSON();
     }
 
-    @SuppressWarnings( "serial" )
+    @SuppressWarnings("serial")
     public static class ExtendsJDKMixin extends HashMap<String, String>
         implements JSONSerializableMap
     {
         @Override
         public JsonObject toJSON()
         {
-            System.out.println( ">>>> Call ExtendsJDKMixin.toJSON()" );
+            System.out.println(">>>> Call ExtendsJDKMixin.toJSON()");
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            entrySet().forEach( entry -> builder.add( entry.getKey(), entry.getValue() ) );
+            entrySet().forEach(entry -> builder.add(entry.getKey(), entry.getValue()));
             return builder.build();
         }
     }
@@ -79,9 +80,9 @@ public class JDKMixinTest extends AbstractQi4jTest
         @Override
         public JsonObject toJSON()
         {
-            System.out.println( ">>>> Call ComposeWithJDKMixin.toJSON()" );
+            System.out.println(">>>> Call ComposeWithJDKMixin.toJSON()");
             JsonObjectBuilder builder = Json.createObjectBuilder();
-            map.entrySet().forEach( entry -> builder.add( entry.getKey(), entry.getValue() ) );
+            map.entrySet().forEach(entry -> builder.add(entry.getKey(), entry.getValue()));
             return builder.build();
         }
     }
@@ -89,21 +90,21 @@ public class JDKMixinTest extends AbstractQi4jTest
     public static class JDKMixinConcern extends GenericConcern
     {
         @Override
-        public Object invoke( Object proxy, Method method, Object[] args )
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
-            System.out.println( ">>>> Call to JDKMixinConcern." + method.getName() );
-            CONCERN_RECORDS.add( method.getName() );
-            return next.invoke( proxy, method, args );
+            System.out.println(">>>> Call to JDKMixinConcern." + method.getName());
+            CONCERN_RECORDS.add(method.getName());
+            return next.invoke(proxy, method, args);
         }
     }
 
-    private static final Identity EXTENDS_IDENTITY = StringIdentity.identityOf( ExtendsJDKMixin.class.getName() );
-    private static final Identity COMPOSE_IDENTITY = StringIdentity.identityOf( ComposeWithJDKMixin.class.getName() );
+    private static final Identity EXTENDS_IDENTITY = StringIdentity.identityOf(ExtendsJDKMixin.class.getName());
+    private static final Identity COMPOSE_IDENTITY = StringIdentity.identityOf(ComposeWithJDKMixin.class.getName());
     private static final Predicate<ServiceReference<?>> EXTENDS_IDENTITY_SPEC = new ServiceIdentitySpec(
-        EXTENDS_IDENTITY );
+        EXTENDS_IDENTITY);
     private static final Predicate<ServiceReference<?>> COMPOSE_IDENTITY_SPEC = new ServiceIdentitySpec(
-        COMPOSE_IDENTITY );
+        COMPOSE_IDENTITY);
     private static final List<String> CONCERN_RECORDS = new ArrayList<String>();
 
     @BeforeEach
@@ -113,59 +114,59 @@ public class JDKMixinTest extends AbstractQi4jTest
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( JSONSerializableMap.class )
-              .identifiedBy( EXTENDS_IDENTITY.toString() )
-              .withMixins( ExtendsJDKMixin.class )
-              .instantiateOnStartup();
+        module.services(JSONSerializableMap.class)
+            .identifiedBy(EXTENDS_IDENTITY.toString())
+            .withMixins(ExtendsJDKMixin.class)
+            .instantiateOnStartup();
 
-        module.layer().module( "compose" ).services( JSONSerializableMap.class )
-              .visibleIn( Visibility.layer )
-              .identifiedBy( COMPOSE_IDENTITY.toString() )
-              .withMixins( HashMap.class, ComposeWithJDKMixin.class )
-              .instantiateOnStartup();
+        module.layer().module("compose").services(JSONSerializableMap.class)
+            .visibleIn(Visibility.layer)
+            .identifiedBy(COMPOSE_IDENTITY.toString())
+            .withMixins(HashMap.class, ComposeWithJDKMixin.class)
+            .instantiateOnStartup();
     }
 
     @Test
     public void testMixinExtendsJDK()
     {
-        List<ServiceReference<JSONSerializableMap>> services = serviceFinder.findServices( JSONSerializableMap.class )
-                                                                            .filter( EXTENDS_IDENTITY_SPEC )
-                                                                            .collect( Collectors.toList() );
+        List<ServiceReference<JSONSerializableMap>> services = serviceFinder.findServices(JSONSerializableMap.class)
+            .filter(EXTENDS_IDENTITY_SPEC)
+            .collect(Collectors.toList());
 
-        assertThat( services.size(), equalTo( 1 ) );
-        assertThat( services.get( 0 ).identity(), equalTo( EXTENDS_IDENTITY ) );
+        assertThat(services.size(), equalTo(1));
+        assertThat(services.get(0).identity(), equalTo(EXTENDS_IDENTITY));
 
-        JSONSerializableMap extending = services.get( 0 ).get();
-        extending.put( "foo", "bar" ); // Concern trigger #1 (put)
+        JSONSerializableMap extending = services.get(0).get();
+        extending.put("foo", "bar"); // Concern trigger #1 (put)
         JsonObject json = extending.toJSON(); // Concern trigger #2 and #3 (toJSON, entrySet)
 
-        assertThat( json.size(), equalTo( 1 ) );
-        assertThat( json.getString( "foo" ), equalTo( "bar" ) );
+        assertThat(json.size(), equalTo(1));
+        assertThat(json.getString("foo"), equalTo("bar"));
 
-        assertThat( CONCERN_RECORDS.size(), equalTo( 3 ) );
+        assertThat(CONCERN_RECORDS.size(), equalTo(3));
     }
 
     @Test
     public void testComposeJDKMixin()
     {
-        List<ServiceReference<JSONSerializableMap>> services = serviceFinder.findServices( JSONSerializableMap.class )
-                                                                            .filter( COMPOSE_IDENTITY_SPEC )
-                                                                            .collect( Collectors.toList() );
+        List<ServiceReference<JSONSerializableMap>> services = serviceFinder.findServices(JSONSerializableMap.class)
+            .filter(COMPOSE_IDENTITY_SPEC)
+            .collect(Collectors.toList());
 
-        assertThat( services.size(), equalTo( 1 ) );
-        assertThat( services.get( 0 ).identity(), equalTo( COMPOSE_IDENTITY ) );
+        assertThat(services.size(), equalTo(1));
+        assertThat(services.get(0).identity(), equalTo(COMPOSE_IDENTITY));
 
-        JSONSerializableMap composing = services.get( 0 ).get();
-        composing.put( "foo", "bar" ); // Concern trigger #1 (put)
+        JSONSerializableMap composing = services.get(0).get();
+        composing.put("foo", "bar"); // Concern trigger #1 (put)
         JsonObject json = composing.toJSON(); // Concern trigger #2 and #3 (toJSON, entrySet)
 
-        assertThat( json.size(), equalTo( 1 ) );
-        assertThat( json.getString( "foo" ), equalTo( "bar" ) );
+        assertThat(json.size(), equalTo(1));
+        assertThat(json.getString("foo"), equalTo("bar"));
 
-        assertThat( CONCERN_RECORDS.size(), equalTo( 3 ) );
+        assertThat(CONCERN_RECORDS.size(), equalTo(3));
     }
 
     private static class ServiceIdentitySpec
@@ -173,15 +174,15 @@ public class JDKMixinTest extends AbstractQi4jTest
     {
         private final Identity identity;
 
-        ServiceIdentitySpec( Identity identity )
+        ServiceIdentitySpec(Identity identity)
         {
             this.identity = identity;
         }
 
         @Override
-        public boolean test( ServiceReference<?> item )
+        public boolean test(ServiceReference<?> item)
         {
-            return item.identity().equals( identity );
+            return item.identity().equals(identity);
         }
     }
 }

@@ -19,9 +19,6 @@
  */
 package org.qi4j.runtime.value;
 
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.common.ConstructionException;
@@ -30,16 +27,13 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.property.PropertyDescriptor;
 import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.api.value.ValueDescriptor;
-import org.qi4j.runtime.composite.FunctionStateResolver;
-import org.qi4j.runtime.composite.MixinModel;
-import org.qi4j.runtime.composite.MixinsModel;
-import org.qi4j.runtime.composite.StateResolver;
-import org.qi4j.runtime.composite.UsesInstance;
-import org.qi4j.runtime.injection.InjectionContext;
-import org.qi4j.runtime.structure.ModuleInstance;
 import org.qi4j.runtime.composite.*;
 import org.qi4j.runtime.injection.InjectionContext;
 import org.qi4j.runtime.structure.ModuleInstance;
+
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static org.qi4j.api.composite.CompositeInstance.compositeInstanceOf;
 
@@ -52,22 +46,22 @@ public class ValueBuilderWithPrototype<T>
     private ValueInstance prototypeInstance;
     private final ValueModel valueModel;
 
-    public ValueBuilderWithPrototype( ValueDescriptor compositeModelModule,
-                                      ModuleInstance currentModule,
-                                      T prototype
-                                    )
+    public ValueBuilderWithPrototype(ValueDescriptor compositeModelModule,
+                                     ModuleInstance currentModule,
+                                     T prototype
+    )
     {
         valueModel = (ValueModel) compositeModelModule;
         MixinsModel mixinsModel = valueModel.mixinsModel();
         Object[] mixins = mixinsModel.newMixinHolder();
-        final ValueStateInstance prototypeState = ( (ValueInstance) compositeInstanceOf( (Composite) prototype ) ).state();
+        final ValueStateInstance prototypeState = ((ValueInstance) compositeInstanceOf((Composite) prototype)).state();
         StateResolver resolver = new FunctionStateResolver(
-            new PropertyDescriptorFunction( prototypeState ),
-            new AssociationDescriptorEntityReferenceFunction( prototypeState ),
-            new AssociationDescriptorIterableFunction( prototypeState ),
-            new AssociationDescriptorMapFunction( prototypeState )
+            new PropertyDescriptorFunction(prototypeState),
+            new AssociationDescriptorEntityReferenceFunction(prototypeState),
+            new AssociationDescriptorIterableFunction(prototypeState),
+            new AssociationDescriptorMapFunction(prototypeState)
         );
-        ValueStateInstance state = new ValueStateInstance( compositeModelModule, currentModule, resolver );
+        ValueStateInstance state = new ValueStateInstance(compositeModelModule, currentModule, resolver);
         ValueInstance valueInstance = new ValueInstance(
             valueModel,
             mixins,
@@ -75,10 +69,10 @@ public class ValueBuilderWithPrototype<T>
         );
 
         int i = 0;
-        InjectionContext injectionContext = new InjectionContext( valueInstance, UsesInstance.EMPTY_USES, state );
-        for( MixinModel mixinModel : mixinsModel.mixinModels() )
+        InjectionContext injectionContext = new InjectionContext(valueInstance, UsesInstance.EMPTY_USES, state);
+        for(MixinModel mixinModel : mixinsModel.mixinModels())
         {
-            mixins[ i++ ] = mixinModel.newInstance( injectionContext );
+            mixins[i++] = mixinModel.newInstance(injectionContext);
         }
 
         valueInstance.prepareToBuild();
@@ -93,7 +87,7 @@ public class ValueBuilderWithPrototype<T>
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public Class<T> primaryType()
     {
         return (Class<T>) valueModel.primaryType();
@@ -107,10 +101,10 @@ public class ValueBuilderWithPrototype<T>
     }
 
     @Override
-    public <K> K prototypeFor( Class<K> mixinType )
+    public <K> K prototypeFor(Class<K> mixinType)
     {
         verifyUnderConstruction();
-        return prototypeInstance.newProxy( mixinType );
+        return prototypeInstance.newProxy(mixinType);
     }
 
     @Override
@@ -123,7 +117,7 @@ public class ValueBuilderWithPrototype<T>
         prototypeInstance.prepareBuilderState();
 
         // Check that it is valid
-        valueModel.checkConstraints( prototypeInstance.state() );
+        valueModel.checkConstraints(prototypeInstance.state());
 
         try
         {
@@ -138,9 +132,9 @@ public class ValueBuilderWithPrototype<T>
 
     private void verifyUnderConstruction()
     {
-        if( prototypeInstance == null )
+        if(prototypeInstance == null)
         {
-            throw new IllegalStateException( "ValueBuilder instances cannot be reused" );
+            throw new IllegalStateException("ValueBuilder instances cannot be reused");
         }
     }
 
@@ -149,15 +143,15 @@ public class ValueBuilderWithPrototype<T>
     {
         private final ValueStateInstance prototypeState;
 
-        PropertyDescriptorFunction( ValueStateInstance prototypeState )
+        PropertyDescriptorFunction(ValueStateInstance prototypeState)
         {
             this.prototypeState = prototypeState;
         }
 
         @Override
-        public Object apply( PropertyDescriptor descriptor )
+        public Object apply(PropertyDescriptor descriptor)
         {
-            return prototypeState.propertyFor( descriptor.accessor() ).get();
+            return prototypeState.propertyFor(descriptor.accessor()).get();
         }
     }
 
@@ -166,15 +160,15 @@ public class ValueBuilderWithPrototype<T>
     {
         private final ValueStateInstance prototypeState;
 
-        AssociationDescriptorEntityReferenceFunction( ValueStateInstance prototypeState )
+        AssociationDescriptorEntityReferenceFunction(ValueStateInstance prototypeState)
         {
             this.prototypeState = prototypeState;
         }
 
         @Override
-        public EntityReference apply( AssociationDescriptor descriptor )
+        public EntityReference apply(AssociationDescriptor descriptor)
         {
-            return prototypeState.associationFor( descriptor.accessor() ).reference();
+            return prototypeState.associationFor(descriptor.accessor()).reference();
         }
     }
 
@@ -183,15 +177,15 @@ public class ValueBuilderWithPrototype<T>
     {
         private final ValueStateInstance prototypeState;
 
-        AssociationDescriptorIterableFunction( ValueStateInstance prototypeState )
+        AssociationDescriptorIterableFunction(ValueStateInstance prototypeState)
         {
             this.prototypeState = prototypeState;
         }
 
         @Override
-        public Stream<EntityReference> apply( AssociationDescriptor descriptor )
+        public Stream<EntityReference> apply(AssociationDescriptor descriptor)
         {
-            return prototypeState.manyAssociationFor( descriptor.accessor() ).references();
+            return prototypeState.manyAssociationFor(descriptor.accessor()).references();
         }
     }
 
@@ -200,15 +194,15 @@ public class ValueBuilderWithPrototype<T>
     {
         private final ValueStateInstance prototypeState;
 
-        AssociationDescriptorMapFunction( ValueStateInstance prototypeState )
+        AssociationDescriptorMapFunction(ValueStateInstance prototypeState)
         {
             this.prototypeState = prototypeState;
         }
 
         @Override
-        public Stream<Map.Entry<String, EntityReference>> apply( AssociationDescriptor descriptor )
+        public Stream<Map.Entry<String, EntityReference>> apply(AssociationDescriptor descriptor)
         {
-            return prototypeState.namedAssociationFor( descriptor.accessor() ).references();
+            return prototypeState.namedAssociationFor(descriptor.accessor()).references();
         }
     }
 }

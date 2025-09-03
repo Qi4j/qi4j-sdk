@@ -20,14 +20,15 @@
 
 package org.qi4j.spi.entitystore;
 
-import java.time.Instant;
-import java.util.HashMap;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.spi.entity.EntityState;
+
+import java.time.Instant;
+import java.util.HashMap;
 
 /**
  * Default EntityStore UnitOfWork.
@@ -42,11 +43,11 @@ public final class DefaultEntityStoreUnitOfWork
     private Usecase usecase;
     private Instant currentTime;
 
-    public DefaultEntityStoreUnitOfWork( ModuleDescriptor module,
-                                         EntityStoreSPI entityStoreSPI,
-                                         Identity identity,
-                                         Usecase usecase,
-                                         Instant currentTime
+    public DefaultEntityStoreUnitOfWork(ModuleDescriptor module,
+                                        EntityStoreSPI entityStoreSPI,
+                                        Identity identity,
+                                        Usecase usecase,
+                                        Instant currentTime
     )
     {
         this.module = module;
@@ -81,50 +82,50 @@ public final class DefaultEntityStoreUnitOfWork
 // EntityStore
 
     @Override
-    public EntityState newEntityState( EntityReference anIdentity, EntityDescriptor descriptor )
+    public EntityState newEntityState(EntityReference anIdentity, EntityDescriptor descriptor)
         throws EntityStoreException
     {
-        EntityState entityState = states.get( anIdentity );
-        if( entityState != null )
+        EntityState entityState = states.get(anIdentity);
+        if(entityState != null)
         {
-            throw new EntityAlreadyExistsException( anIdentity );
+            throw new EntityAlreadyExistsException(anIdentity);
         }
-        EntityState state = entityStoreSPI.newEntityState( this, anIdentity, descriptor );
-        states.put( anIdentity, state );
+        EntityState state = entityStoreSPI.newEntityState(this, anIdentity, descriptor);
+        states.put(anIdentity, state);
         return state;
     }
 
     @Override
-    public EntityState entityStateOf( ModuleDescriptor module, EntityReference anIdentity )
+    public EntityState entityStateOf(ModuleDescriptor module, EntityReference anIdentity)
         throws EntityNotFoundException
     {
-        EntityState entityState = states.get( anIdentity );
-        if( entityState != null )
+        EntityState entityState = states.get(anIdentity);
+        if(entityState != null)
         {
             return entityState;
         }
-        entityState = entityStoreSPI.entityStateOf( this, module, anIdentity );
-        states.put( anIdentity, entityState );
+        entityState = entityStoreSPI.entityStateOf(this, module, anIdentity);
+        states.put(anIdentity, entityState);
         return entityState;
     }
 
     @Override
-    public String versionOf( EntityReference anIdentity )
+    public String versionOf(EntityReference anIdentity)
         throws EntityNotFoundException
     {
-        EntityState entityState = states.get( anIdentity );
-        if( entityState != null )
+        EntityState entityState = states.get(anIdentity);
+        if(entityState != null)
         {
             return entityState.version();
         }
-        return entityStoreSPI.versionOf( this, anIdentity );
+        return entityStoreSPI.versionOf(this, anIdentity);
     }
 
     @Override
     public StateCommitter applyChanges()
         throws EntityStoreException
     {
-        return entityStoreSPI.applyChanges( this, states.values() );
+        return entityStoreSPI.applyChanges(this, states.values());
     }
 
     @Override

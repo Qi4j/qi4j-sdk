@@ -38,17 +38,17 @@ public interface PhoneNumber extends HasIdentity
         private final ValueBuilder<PhoneNumber> valueBuilder;
         private final PhoneNumber prototype;
 
-        public Builder( @Structure ValueBuilderFactory vbf )
+        public Builder(@Structure ValueBuilderFactory vbf)
         {
-            valueBuilder = vbf.newValueBuilder( PhoneNumber.class );
+            valueBuilder = vbf.newValueBuilder(PhoneNumber.class);
             prototype = valueBuilder.prototype();
         }
 
-        PhoneNumber create( int countryCode, int areaCode, String number )
+        PhoneNumber create(int countryCode, int areaCode, String number)
         {
-            prototype.countryCode().set( countryCode );
-            prototype.areaCode().set( areaCode );
-            prototype.number().set( number );
+            prototype.countryCode().set(countryCode);
+            prototype.areaCode().set(areaCode);
+            prototype.number().set(number);
             return valueBuilder.newInstance();
         }
     }

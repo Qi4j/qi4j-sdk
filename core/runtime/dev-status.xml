@@ -22,15 +22,15 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://qi4j.org/schemas/2008/dev-status/1
         https://raw.githubusercontent.com/Qi4j/qi4j-sdk/develop/schemas/2008-dev-status.xsd">
-  <status>
-    <codebase>stable</codebase>
-    <!--none,early,beta,stable,mature-->
-    <documentation>brief</documentation>
-    <!-- none, brief, good, complete -->
-    <unittests>good</unittests>
-    <!-- none, some, good, complete -->
-  </status>
-  <licenses>
-    <license>ALv2</license>
-  </licenses>
+    <status>
+        <codebase>stable</codebase>
+        <!--none,early,beta,stable,mature-->
+        <documentation>brief</documentation>
+        <!-- none, brief, good, complete -->
+        <unittests>good</unittests>
+        <!-- none, some, good, complete -->
+    </status>
+    <licenses>
+        <license>ALv2</license>
+    </licenses>
 </module>

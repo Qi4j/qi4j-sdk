@@ -31,5 +31,5 @@ import java.util.stream.Stream;
 public final class Constructors
 {
     public static final Function<Type, Stream<Constructor<?>>> CONSTRUCTORS_OF =
-        Classes.forClassHierarchy( type -> Arrays.stream( type.getDeclaredConstructors() ) );
+        Classes.forClassHierarchy(type -> Arrays.stream(type.getDeclaredConstructors()));
 }

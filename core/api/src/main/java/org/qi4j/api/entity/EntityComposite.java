@@ -25,17 +25,12 @@ import org.qi4j.api.association.NamedAssociationMixin;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.identity.HasIdentity;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.association.AssociationMixin;
-import org.qi4j.api.association.ManyAssociationMixin;
-import org.qi4j.api.association.NamedAssociationMixin;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.identity.HasIdentity;
 
 /**
  * EntityComposites are Composites that has mutable state persisted in EntityStores and equality defined from its
  * reference.
  */
-@Mixins( { AssociationMixin.class, ManyAssociationMixin.class, NamedAssociationMixin.class } )
+@Mixins({AssociationMixin.class, ManyAssociationMixin.class, NamedAssociationMixin.class})
 public interface EntityComposite extends HasIdentity, Composite
 {
 }

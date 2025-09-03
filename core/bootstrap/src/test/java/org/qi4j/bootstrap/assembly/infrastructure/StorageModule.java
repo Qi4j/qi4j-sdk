@@ -30,13 +30,13 @@ public class StorageModule
     public static final String NAME = "Storage Module";
     private final ModuleAssembly configModule;
 
-    public StorageModule( ModuleAssembly configModule )
+    public StorageModule(ModuleAssembly configModule)
     {
         this.configModule = configModule;
     }
 
     @Override
-    public ModuleAssembly assemble( LayerAssembly layer, ModuleAssembly module )
+    public ModuleAssembly assemble(LayerAssembly layer, ModuleAssembly module)
         throws AssemblyException
     {
         return module;

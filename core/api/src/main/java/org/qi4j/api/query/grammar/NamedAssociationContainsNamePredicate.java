@@ -21,8 +21,6 @@ package org.qi4j.api.query.grammar;
 
 import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.composite.Composite;
-import org.qi4j.api.association.NamedAssociation;
-import org.qi4j.api.composite.Composite;
 
 /**
  * NamedAssociation Contains Specification.
@@ -33,7 +31,7 @@ public class NamedAssociationContainsNamePredicate<T>
     private final NamedAssociationFunction<T> namedAssociationFunction;
     private final String name;
 
-    public NamedAssociationContainsNamePredicate( NamedAssociationFunction<T> namedAssociationFunction, String name )
+    public NamedAssociationContainsNamePredicate(NamedAssociationFunction<T> namedAssociationFunction, String name)
     {
         this.namedAssociationFunction = namedAssociationFunction;
         this.name = name;
@@ -50,14 +48,14 @@ public class NamedAssociationContainsNamePredicate<T>
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
-        NamedAssociation<T> collection = namedAssociationFunction.apply( item );
-        if( collection == null )
+        NamedAssociation<T> collection = namedAssociationFunction.apply(item);
+        if(collection == null)
         {
             return false;
         }
-        return collection.containsName( name );
+        return collection.containsName(name);
     }
 
     @Override

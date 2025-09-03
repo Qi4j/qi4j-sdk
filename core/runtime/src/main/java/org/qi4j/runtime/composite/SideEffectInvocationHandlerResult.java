@@ -35,7 +35,7 @@ public final class SideEffectInvocationHandlerResult
     {
     }
 
-    public void setResult( Object result, Throwable throwable )
+    public void setResult(Object result, Throwable throwable)
     {
         this.result = result;
         this.throwable = throwable;
@@ -44,10 +44,10 @@ public final class SideEffectInvocationHandlerResult
     // InvocationHandler implementation ------------------------------
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
-        if( throwable != null )
+        if(throwable != null)
         {
             throw throwable;
         }

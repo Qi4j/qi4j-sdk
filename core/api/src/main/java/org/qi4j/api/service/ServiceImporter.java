@@ -29,20 +29,17 @@ public interface ServiceImporter<T>
      * Imports an instance of the service type described in the service descriptor.
      *
      * @param serviceDescriptor The service descriptor.
-     *
      * @return The imported service instance.
-     *
      * @throws ServiceImporterException if import failed.
      */
-    T importService( ImportedServiceDescriptor serviceDescriptor )
+    T importService(ImportedServiceDescriptor serviceDescriptor)
         throws ServiceImporterException;
 
     /**
      * Ask if the service is available or not.
      *
      * @param instance the instance to be checked
-     *
      * @return true if the service is available, false if not
      */
-    boolean isAvailable( T instance );
+    boolean isAvailable(T instance);
 }

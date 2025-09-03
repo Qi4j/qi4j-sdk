@@ -40,26 +40,26 @@ public interface RuntimeFactory
             ClassLoader loader = getClass().getClassLoader();
             try
             {
-                Class<? extends Qi4jRuntime> runtimeClass = loadRuntimeClass( loader );
+                Class<? extends Qi4jRuntime> runtimeClass = loadRuntimeClass(loader);
                 return runtimeClass.getConstructor().newInstance();
             }
-            catch( ClassNotFoundException e )
+            catch(ClassNotFoundException e)
             {
-                System.err.println( "Qi4j Runtime jar is not present in the classpath." );
+                System.err.println("Qi4j Runtime jar is not present in the classpath.");
             }
-            catch( InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e )
+            catch(InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e)
             {
-                System.err.println( "Invalid Qi4j Runtime class. If you are providing your own Qi4j Runtime, please " +
-                                    "contact qi4j-dev@googlegroups.com mailing list for assistance." );
+                System.err.println("Invalid Qi4j Runtime class. If you are providing your own Qi4j Runtime, please " +
+                    "contact qi4j-dev@googlegroups.com mailing list for assistance.");
             }
             return null;
         }
 
-        @SuppressWarnings( { "unchecked" } )
-        private Class<? extends Qi4jRuntime> loadRuntimeClass( ClassLoader loader )
+        @SuppressWarnings({"unchecked"})
+        private Class<? extends Qi4jRuntime> loadRuntimeClass(ClassLoader loader)
             throws ClassNotFoundException
         {
-            return (Class<? extends Qi4jRuntime>) loader.loadClass( "org.qi4j.runtime.Qi4jRuntimeImpl" );
+            return (Class<? extends Qi4jRuntime>) loader.loadClass("org.qi4j.runtime.Qi4jRuntimeImpl");
         }
     }
 }

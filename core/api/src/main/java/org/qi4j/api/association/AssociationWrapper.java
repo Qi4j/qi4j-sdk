@@ -31,7 +31,7 @@ public class AssociationWrapper
 {
     protected Association<Object> next;
 
-    public AssociationWrapper( Association<Object> next )
+    public AssociationWrapper(Association<Object> next)
     {
         this.next = next;
     }
@@ -48,10 +48,10 @@ public class AssociationWrapper
     }
 
     @Override
-    public void set( Object associated )
+    public void set(Object associated)
         throws IllegalArgumentException
     {
-        next.set( associated );
+        next.set(associated);
     }
 
     @Override
@@ -68,9 +68,9 @@ public class AssociationWrapper
 
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public boolean equals( Object obj )
+    public boolean equals(Object obj)
     {
-        return next.equals( obj );
+        return next.equals(obj);
     }
 
     @Override

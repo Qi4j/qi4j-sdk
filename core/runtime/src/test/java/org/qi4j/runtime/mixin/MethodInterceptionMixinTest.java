@@ -20,9 +20,7 @@
 
 package org.qi4j.runtime.mixin;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.concern.ConcernOf;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.api.injection.scope.This;
@@ -32,7 +30,10 @@ import org.qi4j.api.service.ServiceReference;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -40,23 +41,23 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class MethodInterceptionMixinTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( SomeService.class );
+        module.services(SomeService.class);
     }
 
     @Test
     public void whenMixinCallsPublicMethodExpectInvocationStackToBeCalled()
     {
-        ServiceReference<SomeService> service = serviceFinder.findService( SomeService.class );
+        ServiceReference<SomeService> service = serviceFinder.findService(SomeService.class);
         Collection<String> result1 = service.get().result();
-        assertThat( "Concern should have been called.", result1.size(), equalTo( 1 ) );
-        assertThat( "Concern should have been called.", result1.iterator().next(), equalTo( "Concern1" ) );
+        assertThat("Concern should have been called.", result1.size(), equalTo(1));
+        assertThat("Concern should have been called.", result1.iterator().next(), equalTo("Concern1"));
     }
 
-    @Concerns( { SomeConcern1.class } )
-    @Mixins( { SomeMixin.class } )
+    @Concerns({SomeConcern1.class})
+    @Mixins({SomeMixin.class})
     public interface SomeService
         extends Some, ServiceComposite
     {
@@ -95,7 +96,7 @@ public class MethodInterceptionMixinTest
         public Collection<String> doSome()
         {
             Collection<String> some = next.doSome();
-            some.add( "Concern1" );
+            some.add("Concern1");
             return some;
         }
     }

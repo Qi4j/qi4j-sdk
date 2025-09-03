@@ -19,9 +19,7 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
@@ -29,7 +27,10 @@ import org.qi4j.api.structure.Module;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,42 +39,42 @@ public class FunctionalListTest extends AbstractQi4jTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( List.class ).withTypes( FList.class ).withMixins( ArrayList.class );
+        module.transients(List.class).withTypes(FList.class).withMixins(ArrayList.class);
     }
 
     @Test
     public void givenArrayListWithMapOpCapabilityWhenMappingIntegerToStringExpectCorrectResult()
     {
-        List<Integer> integers = transientBuilderFactory.newTransient( List.class );
-        integers.add( 5 );
-        integers.add( 15 );
-        integers.add( 45 );
-        integers.add( 85 );
+        List<Integer> integers = transientBuilderFactory.newTransient(List.class);
+        integers.add(5);
+        integers.add(15);
+        integers.add(45);
+        integers.add(85);
         FList<Integer> list = (FList<Integer>) integers;
 
-        List<String> strings = list.translate( new Function<Integer, String>()
+        List<String> strings = list.translate(new Function<Integer, String>()
         {
             @Override
-            public String apply( Integer x )
+            public String apply(Integer x)
             {
                 return x.toString();
             }
-        } );
+        });
 
         String[] expected = new String[]
-        {
-            "5", "15", "45", "85"
-        };
-        assertThat( strings, hasItems( expected ) );
+            {
+                "5", "15", "45", "85"
+            };
+        assertThat(strings, hasItems(expected));
     }
 
-    @Mixins( FListMixin.class )
+    @Mixins(FListMixin.class)
     public interface FList<FROM>
     {
-        <TO> List<TO> translate( Function<FROM, TO> function );
+        <TO> List<TO> translate(Function<FROM, TO> function);
     }
 
     public static class FListMixin<FROM>
@@ -86,12 +87,12 @@ public class FunctionalListTest extends AbstractQi4jTest
         private Module module;
 
         @Override
-        public <TO> List<TO> translate( Function<FROM, TO> function )
+        public <TO> List<TO> translate(Function<FROM, TO> function)
         {
-            List<TO> result = module.newTransient( List.class );
-            for( FROM data : list )
+            List<TO> result = module.newTransient(List.class);
+            for(FROM data : list)
             {
-                result.add( function.apply( data ) );
+                result.add(function.apply(data));
             }
             return result;
         }

@@ -20,10 +20,11 @@
 
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.AccessibleObject;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.runtime.composite.ValueConstraintsInstance;
+
+import java.lang.reflect.AccessibleObject;
 
 /**
  * Model for an Association.
@@ -34,12 +35,12 @@ public final class AssociationModel extends AbstractAssociationModel<Association
     implements AssociationDescriptor, AssociationInfo
 {
 
-    public AssociationModel( AccessibleObject accessor,
-                             ValueConstraintsInstance valueConstraintsInstance,
-                             ValueConstraintsInstance associationConstraintsInstance,
-                             MetaInfo metaInfo
+    public AssociationModel(AccessibleObject accessor,
+                            ValueConstraintsInstance valueConstraintsInstance,
+                            ValueConstraintsInstance associationConstraintsInstance,
+                            MetaInfo metaInfo
     )
     {
-        super( accessor, valueConstraintsInstance, associationConstraintsInstance, metaInfo );
+        super(accessor, valueConstraintsInstance, associationConstraintsInstance, metaInfo);
     }
 }

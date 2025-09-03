@@ -20,6 +20,7 @@
 
 package org.qi4j.regression.qi59;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.unitofwork.UnitOfWork;
@@ -28,7 +29,6 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.library.constraints.annotation.NotEmpty;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -36,13 +36,13 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Test for QI-59
  */
 public class IssueTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.entities( TestCase.class );
-        new EntityTestAssembler().assemble( module );
+        module.entities(TestCase.class);
+        new EntityTestAssembler().assemble(module);
     }
 
     @Test
@@ -52,14 +52,14 @@ public class IssueTest
 
         try
         {
-            TestCase testCase = uow.newEntity( TestCase.class );
+            TestCase testCase = uow.newEntity(TestCase.class);
 
-            testCase.someProperty().set( null );
+            testCase.someProperty().set(null);
 
             uow.complete();
-            fail( "Should not be allowed to set invalid property value" );
+            fail("Should not be allowed to set invalid property value");
         }
-        catch( Exception e )
+        catch(Exception e)
         {
             uow.discard();
         }
@@ -72,14 +72,14 @@ public class IssueTest
 
         try
         {
-            TestCase testCase = uow.newEntity( TestCase.class );
+            TestCase testCase = uow.newEntity(TestCase.class);
 
-            testCase.otherProperty().set( "" );
+            testCase.otherProperty().set("");
 
             uow.complete();
-            fail( "Should not be allowed to set invalid property value" );
+            fail("Should not be allowed to set invalid property value");
         }
-        catch( Exception e )
+        catch(Exception e)
         {
             uow.discard();
         }

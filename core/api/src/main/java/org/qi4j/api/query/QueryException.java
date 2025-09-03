@@ -28,13 +28,13 @@ public abstract class QueryException extends RuntimeException
     {
     }
 
-    public QueryException( final String message )
+    public QueryException(final String message)
     {
-        super( message );
+        super(message);
     }
 
-    public QueryException( final String message, final Throwable cause )
+    public QueryException(final String message, final Throwable cause)
     {
-        super( message, cause );
+        super(message, cause);
     }
 }

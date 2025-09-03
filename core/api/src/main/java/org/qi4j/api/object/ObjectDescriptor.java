@@ -20,7 +20,6 @@
 
 package org.qi4j.api.object;
 
-import org.qi4j.api.composite.ModelDescriptor;
 import org.qi4j.api.util.VisitableModelDescriptor;
 
 /**

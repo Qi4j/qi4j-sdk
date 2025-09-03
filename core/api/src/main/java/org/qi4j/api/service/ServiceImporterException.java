@@ -31,18 +31,18 @@ public class ServiceImporterException
     {
     }
 
-    public ServiceImporterException( String string )
+    public ServiceImporterException(String string)
     {
-        super( string );
+        super(string);
     }
 
-    public ServiceImporterException( String string, Throwable throwable )
+    public ServiceImporterException(String string, Throwable throwable)
     {
-        super( string, throwable );
+        super(string, throwable);
     }
 
-    public ServiceImporterException( Throwable throwable )
+    public ServiceImporterException(Throwable throwable)
     {
-        super( throwable );
+        super(throwable);
     }
 }

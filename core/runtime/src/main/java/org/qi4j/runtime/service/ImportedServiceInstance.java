@@ -34,7 +34,7 @@ public final class ImportedServiceInstance<T>
     private final T instance;
     private final ServiceImporter<T> importer;
 
-    public ImportedServiceInstance( T instance, ServiceImporter<T> importer )
+    public ImportedServiceInstance(T instance, ServiceImporter<T> importer)
     {
         this.importer = importer;
         this.instance = instance;
@@ -52,7 +52,7 @@ public final class ImportedServiceInstance<T>
 
     public boolean isAvailable()
     {
-        return importer.isAvailable( instance );
+        return importer.isAvailable(instance);
     }
 
     @Override

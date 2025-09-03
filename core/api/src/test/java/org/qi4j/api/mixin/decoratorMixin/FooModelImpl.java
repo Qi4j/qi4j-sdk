@@ -24,7 +24,7 @@ public class FooModelImpl
 {
     private String bar;
 
-    public FooModelImpl( String bar )
+    public FooModelImpl(String bar)
     {
         this.bar = bar;
     }
@@ -35,7 +35,7 @@ public class FooModelImpl
         return bar;
     }
 
-    public void setBar( String bar )
+    public void setBar(String bar)
     {
         this.bar = bar;
     }

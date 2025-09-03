@@ -20,14 +20,15 @@
 
 package org.qi4j.runtime.mixin;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -39,48 +40,48 @@ public class MixinPrecedenceTest
     extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestComposite1.class,
-                           TestComposite2.class,
-                           TestComposite3.class );
+        module.transients(TestComposite1.class,
+            TestComposite2.class,
+            TestComposite3.class);
     }
 
     @Test
     public void whenMultipleTypedMixinsPrecedence()
     {
-        TestComposite1 instance = transientBuilderFactory.newTransient( TestComposite1.class );
-        assertThat( "Mixin precedence", instance.AMethod(), equalTo( "A1" ) );
+        TestComposite1 instance = transientBuilderFactory.newTransient(TestComposite1.class);
+        assertThat("Mixin precedence", instance.AMethod(), equalTo("A1"));
     }
 
     @Test
     public void whenGenericAndTypedMixinPrecedence()
     {
-        TestComposite2 instance = transientBuilderFactory.newTransient( TestComposite2.class );
-        assertThat( "Typed mixin is chosen over generic mixin", instance.AMethod(), equalTo( "A1" ) );
+        TestComposite2 instance = transientBuilderFactory.newTransient(TestComposite2.class);
+        assertThat("Typed mixin is chosen over generic mixin", instance.AMethod(), equalTo("A1"));
     }
 
     @Test
     public void whenMultipleGenericMixinsPrecedence()
     {
-        TestComposite3 instance = transientBuilderFactory.newTransient( TestComposite3.class );
-        assertThat( instance.AMethod(), equalTo( "GM1" ) );
+        TestComposite3 instance = transientBuilderFactory.newTransient(TestComposite3.class);
+        assertThat(instance.AMethod(), equalTo("GM1"));
     }
 
-    @Mixins( { AMixin1.class, AMixin2.class } )
+    @Mixins({AMixin1.class, AMixin2.class})
     public static interface TestComposite1
         extends A, TransientComposite
     {
     }
 
-    @Mixins( { GenericMixin1.class, AMixin1.class } )
+    @Mixins({GenericMixin1.class, AMixin1.class})
     public static interface TestComposite2
         extends A, TransientComposite
     {
     }
 
-    @Mixins( { GenericMixin1.class, GenericMixin2.class } )
+    @Mixins({GenericMixin1.class, GenericMixin2.class})
     public static interface TestComposite3
         extends A, TransientComposite
     {
@@ -114,7 +115,7 @@ public class MixinPrecedenceTest
     public static class GenericMixin1
         implements InvocationHandler
     {
-        public Object invoke( Object object, Method method, Object[] objects )
+        public Object invoke(Object object, Method method, Object[] objects)
             throws Throwable
         {
             return "GM1";
@@ -124,7 +125,7 @@ public class MixinPrecedenceTest
     public static class GenericMixin2
         implements InvocationHandler
     {
-        public Object invoke( Object object, Method method, Object[] objects )
+        public Object invoke(Object object, Method method, Object[] objects)
             throws Throwable
         {
             return "GM2";

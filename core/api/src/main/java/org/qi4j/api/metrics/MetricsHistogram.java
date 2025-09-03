@@ -27,5 +27,5 @@ package org.qi4j.api.metrics;
  */
 public interface MetricsHistogram extends Metric
 {
-    void update( long newValue );
+    void update(long newValue);
 }

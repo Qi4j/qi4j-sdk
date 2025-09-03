@@ -17,36 +17,40 @@
  */
 package org.qi4j.spi.serialization;
 
+import org.qi4j.api.common.Optional;
+import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.structure.ModuleDescriptor;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.UncheckedIOException;
-import org.qi4j.api.common.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 // START SNIPPET: text
+
 /**
  * Base Text Serializer.
- *
+ * <p>
  * Implementations work on Strings, this base serializer encode these strings in UTF-8 to produce bytes.
- *
+ * <p>
  * See {@link AbstractTextDeserializer}.
  */
 public abstract class AbstractTextSerializer extends AbstractSerializer
 // END SNIPPET: text
 {
-    public void serialize( Options options, OutputStream output, @Optional Object object )
+    public void serialize(ModuleDescriptor module, Serialization.Options options, OutputStream output, @Optional Object object)
     {
         try
         {
             StringWriter writer = new StringWriter();
-            serialize( options, writer, object );
-            output.write( writer.toString().getBytes( UTF_8 ) );
+            serialize(module, options, writer, object);
+            output.write(writer.toString().getBytes(UTF_8));
         }
-        catch( IOException ex )
+        catch(IOException ex)
         {
-            throw new UncheckedIOException( ex );
+            throw new UncheckedIOException(ex);
         }
     }
 }

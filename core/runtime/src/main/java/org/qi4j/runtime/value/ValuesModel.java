@@ -22,7 +22,6 @@ package org.qi4j.runtime.value;
 
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.composite.CompositesModel;
-import org.qi4j.runtime.composite.CompositesModel;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ import java.util.List;
 public final class ValuesModel extends CompositesModel<ValueModel>
     implements VisitableHierarchy<Object, Object>
 {
-    public ValuesModel( List<ValueModel> valueModels )
+    public ValuesModel(List<ValueModel> valueModels)
     {
         super(valueModels);
     }

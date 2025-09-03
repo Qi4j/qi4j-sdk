@@ -20,14 +20,15 @@
 
 package org.qi4j.runtime.composite;
 
+import org.qi4j.api.composite.CompositeInstance;
+import org.qi4j.api.constraint.ConstraintViolationException;
+import org.qi4j.api.constraint.ValueConstraintViolation;
+import org.qi4j.api.identity.HasIdentity;
+import org.qi4j.api.identity.Identity;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import org.qi4j.api.composite.CompositeInstance;
-import org.qi4j.api.constraint.ValueConstraintViolation;
-import org.qi4j.api.constraint.ConstraintViolationException;
-import org.qi4j.api.identity.HasIdentity;
-import org.qi4j.api.identity.Identity;
 
 /**
  * JAVADOC
@@ -36,52 +37,52 @@ public final class ConstraintsInstance
 {
     private final List<ValueConstraintsInstance> valueConstraintsInstances;
 
-    public ConstraintsInstance( List<ValueConstraintsInstance> parameterConstraints )
+    public ConstraintsInstance(List<ValueConstraintsInstance> parameterConstraints)
     {
         valueConstraintsInstances = parameterConstraints;
     }
 
-    @SuppressWarnings( "unchecked" )
-    public void checkValid( Object instance, Method method, Object[] params )
+    @SuppressWarnings("unchecked")
+    public void checkValid(Object instance, Method method, Object[] params)
         throws ConstraintViolationException
     {
-        if( valueConstraintsInstances.isEmpty() )
+        if(valueConstraintsInstances.isEmpty())
         {
             return; // No constraints to check
         }
 
         // Check constraints
         List<ValueConstraintViolation> violations = null;
-        for( int i = 0; i < params.length; i++ )
+        for(int i = 0; i < params.length; i++)
         {
-            Object param = params[ i ];
-            List<ValueConstraintViolation> paramViolations = valueConstraintsInstances.get( i ).checkConstraints( param );
-            if( !paramViolations.isEmpty() )
+            Object param = params[i];
+            List<ValueConstraintViolation> paramViolations = valueConstraintsInstances.get(i).checkConstraints(param);
+            if(!paramViolations.isEmpty())
             {
-                if( violations == null )
+                if(violations == null)
                 {
                     violations = new ArrayList<>();
                 }
-                violations.addAll( paramViolations );
+                violations.addAll(paramViolations);
             }
         }
 
         // Check if any constraint failed
-        if( violations != null )
+        if(violations != null)
         {
-            for( ValueConstraintViolation violation : violations )
+            for(ValueConstraintViolation violation : violations)
             {
-                violation.setMixinType( method.getDeclaringClass() );
-                violation.setMethodName( method.getName() );
+                violation.setMixinType(method.getDeclaringClass());
+                violation.setMethodName(method.getName());
             }
-            ConstraintViolationException exception = new ConstraintViolationException( violations );
-            Identity identity = instance instanceof HasIdentity ? ( (HasIdentity) instance ).identity().get() : null;
-            exception.setIdentity( identity );
-            if( instance instanceof CompositeInstance )
+            ConstraintViolationException exception = new ConstraintViolationException(violations);
+            Identity identity = instance instanceof HasIdentity ? ((HasIdentity) instance).identity().get() : null;
+            exception.setIdentity(identity);
+            if(instance instanceof CompositeInstance)
             {
-                instance = ( (CompositeInstance) instance ).proxy();
+                instance = ((CompositeInstance) instance).proxy();
             }
-            exception.setInstanceString( instance.toString() );
+            exception.setInstanceString(instance.toString());
             throw exception;
         }
     }

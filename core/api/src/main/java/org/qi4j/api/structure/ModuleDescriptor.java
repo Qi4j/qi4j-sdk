@@ -20,13 +20,15 @@
 
 package org.qi4j.api.structure;
 
-import java.util.stream.Stream;
+import org.qi4j.api.activation.ActivatorDescriptor;
 import org.qi4j.api.composite.TransientDescriptor;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.object.ObjectDescriptor;
 import org.qi4j.api.service.ImportedServiceDescriptor;
 import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.api.value.ValueDescriptor;
+
+import java.util.stream.Stream;
 
 /**
  * Module Descriptor.
@@ -44,31 +46,27 @@ public interface ModuleDescriptor
 
     /**
      * @param typeName name of a transient composite type
-     *
      * @return the descriptor for a transient composite or null if the class could not be found or the transient composite is not visible
      */
-    TransientDescriptor transientDescriptor( String typeName );
+    TransientDescriptor transientDescriptor(String typeName);
 
     /**
      * @param typeName name of an entity composite type
-     *
      * @return the descriptor for an entity composite or null if the class could not be found or the entity composite is not visible
      */
-    EntityDescriptor entityDescriptor( String typeName );
+    EntityDescriptor entityDescriptor(String typeName);
 
     /**
      * @param typeName name of an object type
-     *
      * @return the descriptor for an object or null if the class could not be found or the object is not visible
      */
-    ObjectDescriptor objectDescriptor( String typeName );
+    ObjectDescriptor objectDescriptor(String typeName);
 
     /**
      * @param typeName name of a value composite type
-     *
      * @return the descriptor for a value composite or null if the class could not be found or the value composite is not visible
      */
-    ValueDescriptor valueDescriptor( String typeName );
+    ValueDescriptor valueDescriptor(String typeName);
 
     Stream<? extends TransientDescriptor> findVisibleTransientTypes();
 
@@ -93,4 +91,6 @@ public interface ModuleDescriptor
     Module instance();
 
     TypeLookup typeLookup();
+
+    Stream<? extends ActivatorDescriptor> activators();
 }

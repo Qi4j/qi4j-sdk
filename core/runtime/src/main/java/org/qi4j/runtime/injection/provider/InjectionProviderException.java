@@ -26,13 +26,13 @@ package org.qi4j.runtime.injection.provider;
 public class InjectionProviderException
     extends RuntimeException
 {
-    public InjectionProviderException( String string )
+    public InjectionProviderException(String string)
     {
-        super( string );
+        super(string);
     }
 
-    public InjectionProviderException( String string, Throwable throwable )
+    public InjectionProviderException(String string, Throwable throwable)
     {
-        super( string, throwable );
+        super(string, throwable);
     }
 }

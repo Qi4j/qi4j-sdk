@@ -19,13 +19,13 @@
  */
 package org.qi4j.runtime.instantiation;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -35,10 +35,10 @@ public class ValueInstantiationTests
     extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.values( MyValue.class );
+        module.values(MyValue.class);
     }
 
     @Test
@@ -48,10 +48,10 @@ public class ValueInstantiationTests
         // valueBuilderFactory.newValueBuilder()
         try
         {
-            valueBuilderFactory.newValueBuilder( null );
-            fail( "NullPointerException was expected." );
+            valueBuilderFactory.newValueBuilder(null);
+            fail("NullPointerException was expected.");
         }
-        catch( NullPointerException e )
+        catch(NullPointerException e)
         {
             // expected
         }
@@ -59,10 +59,10 @@ public class ValueInstantiationTests
         // valueBuilderFactory.newValue();
         try
         {
-            valueBuilderFactory.newValue( null );
-            fail( "NullPointerException was expected." );
+            valueBuilderFactory.newValue(null);
+            fail("NullPointerException was expected.");
         }
-        catch( NullPointerException e )
+        catch(NullPointerException e)
         {
             // expected
         }
@@ -70,11 +70,11 @@ public class ValueInstantiationTests
         //module.newValueFromSerializedState();
         try
         {
-            valueBuilderFactory.newValueFromSerializedState( null, "abc:123" );
-            ValueBuilder<My> builder = valueBuilderFactory.newValueBuilder( null );
-            fail( "NullPointerException was expected." );
+            valueBuilderFactory.newValueFromSerializedState(null, "abc:123");
+            ValueBuilder<My> builder = valueBuilderFactory.newValueBuilder(null);
+            fail("NullPointerException was expected.");
         }
-        catch( NullPointerException e )
+        catch(NullPointerException e)
         {
             // expected
         }
@@ -84,12 +84,12 @@ public class ValueInstantiationTests
     public void whenCreatingServiceCompositeGivenAServiceCompositeThenSucceed()
         throws Exception
     {
-        ValueBuilder<My> builder = valueBuilderFactory.newValueBuilder( My.class );
+        ValueBuilder<My> builder = valueBuilderFactory.newValueBuilder(My.class);
         My my = builder.newInstance();
-        assertThat( my.doSomething(), equalTo( "Niclas" ) );
+        assertThat(my.doSomething(), equalTo("Niclas"));
     }
 
-    @Mixins( MyMixin.class )
+    @Mixins(MyMixin.class)
     public interface MyValue
         extends ValueComposite, My
     {

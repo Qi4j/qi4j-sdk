@@ -19,13 +19,6 @@
  */
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Objects;
 import org.qi4j.api.association.AbstractAssociation;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.GenericAssociationInfo;
@@ -42,7 +35,9 @@ import org.qi4j.bootstrap.BindingException;
 import org.qi4j.runtime.composite.ValueConstraintsInstance;
 import org.qi4j.runtime.model.Binder;
 import org.qi4j.runtime.model.Resolution;
-import org.qi4j.bootstrap.BindingException;
+
+import java.lang.reflect.*;
+import java.util.Objects;
 
 public class AbstractAssociationModel<AT>
     implements AbstractAssociation, AssociationDescriptor, AssociationInfo, Binder, Visitable<AT>
@@ -58,30 +53,30 @@ public class AbstractAssociationModel<AT>
     private Type type;
     private AssociationInfo builderInfo;
 
-    public AbstractAssociationModel( AccessibleObject accessor,
-                                     ValueConstraintsInstance valueConstraintsInstance,
-                                     ValueConstraintsInstance associationConstraintsInstance,
-                                     MetaInfo metaInfo )
+    public AbstractAssociationModel(AccessibleObject accessor,
+                                    ValueConstraintsInstance valueConstraintsInstance,
+                                    ValueConstraintsInstance associationConstraintsInstance,
+                                    MetaInfo metaInfo)
     {
-        Objects.requireNonNull( accessor );
-        Objects.requireNonNull( metaInfo );
+        Objects.requireNonNull(accessor);
+        Objects.requireNonNull(metaInfo);
         this.metaInfo = metaInfo;
         this.constraints = valueConstraintsInstance;
         this.associationConstraints = associationConstraintsInstance;
         this.accessor = accessor;
-        this.type = GenericAssociationInfo.associationTypeOf( accessor );
-        this.qualifiedName = QualifiedName.fromAccessor( accessor );
-        this.immutable = metaInfo.get( Immutable.class ) != null;
-        this.aggregated = metaInfo.get( Aggregated.class ) != null;
+        this.type = GenericAssociationInfo.associationTypeOf(accessor);
+        this.qualifiedName = QualifiedName.fromAccessor(accessor);
+        this.immutable = metaInfo.get(Immutable.class) != null;
+        this.aggregated = metaInfo.get(Aggregated.class) != null;
 
-        Queryable queryable = accessor.getAnnotation( Queryable.class );
+        Queryable queryable = accessor.getAnnotation(Queryable.class);
         this.queryable = queryable == null || queryable.value();
     }
 
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return metaInfo.get( infoType );
+        return metaInfo.get(infoType);
     }
 
     @Override
@@ -121,16 +116,16 @@ public class AbstractAssociationModel<AT>
     }
 
     @Override
-    public void checkConstraints( Object value )
+    public void checkConstraints(Object value)
         throws ConstraintViolationException
     {
-        constraints.checkConstraints( value, accessor );
+        constraints.checkConstraints(value, accessor);
     }
 
-    public void checkAssociationConstraints( AbstractAssociation association )
+    public void checkAssociationConstraints(AbstractAssociation association)
         throws ConstraintViolationException
     {
-        associationConstraints.checkConstraints( association, accessor );
+        associationConstraints.checkConstraints(association, accessor);
     }
 
     public AssociationInfo builderInfo()
@@ -139,7 +134,7 @@ public class AbstractAssociationModel<AT>
     }
 
     @Override
-    public void bind( Resolution resolution )
+    public void bind(Resolution resolution)
         throws BindingException
     {
         builderInfo = new AssociationInfo()
@@ -163,41 +158,41 @@ public class AbstractAssociationModel<AT>
             }
 
             @Override
-            public void checkConstraints( Object value )
+            public void checkConstraints(Object value)
                 throws ConstraintViolationException
             {
-                AbstractAssociationModel.this.checkConstraints( value );
+                AbstractAssociationModel.this.checkConstraints(value);
             }
         };
 
-        if( type instanceof TypeVariable )
+        if(type instanceof TypeVariable)
         {
-            Class mainType = resolution.model().types().findFirst().orElse( null );
-            type = Classes.resolveTypeVariable( (TypeVariable) type, ( (Member) accessor ).getDeclaringClass(), mainType );
+            Class mainType = resolution.model().types().findFirst().orElse(null);
+            type = Classes.resolveTypeVariable((TypeVariable) type, ((Member) accessor).getDeclaringClass(), mainType);
         }
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <ThrowableType extends Throwable> boolean accept( Visitor<? super AT, ThrowableType> visitor )
+    @SuppressWarnings("unchecked")
+    public <ThrowableType extends Throwable> boolean accept(Visitor<? super AT, ThrowableType> visitor)
         throws ThrowableType
     {
-        return visitor.visit( (AT) this );
+        return visitor.visit((AT) this);
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
         AbstractAssociationModel that = (AbstractAssociationModel) o;
-        return accessor.equals( that.accessor );
+        return accessor.equals(that.accessor);
     }
 
     @Override
@@ -209,13 +204,13 @@ public class AbstractAssociationModel<AT>
     @Override
     public String toString()
     {
-        if( accessor instanceof Field )
+        if(accessor instanceof Field)
         {
-            return ( (Field) accessor ).toGenericString();
+            return ((Field) accessor).toGenericString();
         }
         else
         {
-            return ( (Method) accessor ).toGenericString();
+            return ((Method) accessor).toGenericString();
         }
     }
 }

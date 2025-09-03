@@ -20,6 +20,7 @@
 
 package org.qi4j.regression.qi230;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.concern.ConcernOf;
@@ -33,7 +34,6 @@ import org.qi4j.api.service.ServiceComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -44,30 +44,30 @@ import static org.hamcrest.core.IsEqual.equalTo;
 public class Qi230IssueTest
     extends AbstractQi4jTest
 {
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.services( Some.class ).withMixins( NoopMixin.class ).withConcerns( OtherConcern.class );
+        module.services(Some.class).withMixins(NoopMixin.class).withConcerns(OtherConcern.class);
 //        module.services( Some.class );
-        module.services( Result.class );
+        module.services(Result.class);
     }
 
     @Test
     public void whenDerefencingInsideConcernThisExpectItToWork()
         throws Exception
     {
-        Result result = serviceFinder.findService( Result.class ).get();
-        Some some = serviceFinder.findService( Some.class ).get();
-        assertThat( some.method(), equalTo( "method()" ) );
-        assertThat( result.some().identity(), equalTo( some.identity() ) );
-        assertThat( result.some().identity().get(), equalTo( some.identity().get() ) );
+        Result result = serviceFinder.findService(Result.class).get();
+        Some some = serviceFinder.findService(Some.class).get();
+        assertThat(some.method(), equalTo("method()"));
+        assertThat(result.some().identity(), equalTo(some.identity()));
+        assertThat(result.some().identity().get(), equalTo(some.identity().get()));
     }
 
-    @Mixins( ResultMixin.class )
+    @Mixins(ResultMixin.class)
     public interface Result
         extends ServiceComposite
     {
-        void execute( Some value );
+        void execute(Some value);
 
         Some some();
     }
@@ -78,7 +78,7 @@ public class Qi230IssueTest
 
         private Some value;
 
-        public void execute( Some value )
+        public void execute(Some value)
         {
             this.value = value;
         }
@@ -89,14 +89,14 @@ public class Qi230IssueTest
         }
     }
 
-    @Concerns( OtherConcern.class )
-    @Mixins( NoopMixin.class )
+    @Concerns(OtherConcern.class)
+    @Mixins(NoopMixin.class)
     public interface Other
     {
         void other();
     }
 
-    @Mixins( SomeMixin.class )
+    @Mixins(SomeMixin.class)
     public interface Some
         extends ServiceComposite
 //        extends ServiceComposite, Other
@@ -132,8 +132,8 @@ public class Qi230IssueTest
 
         public void other()
         {
-            Composite value = api.dereference( me );
-            result.execute( (Some) value );
+            Composite value = api.dereference(me);
+            result.execute((Some) value);
             next.other();
         }
     }

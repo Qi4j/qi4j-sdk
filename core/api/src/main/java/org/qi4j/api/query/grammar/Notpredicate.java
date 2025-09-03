@@ -19,9 +19,9 @@
  */
 package org.qi4j.api.query.grammar;
 
+import org.qi4j.api.composite.Composite;
+
 import java.util.function.Predicate;
-import org.qi4j.api.composite.Composite;
-import org.qi4j.api.composite.Composite;
 
 /**
  * NOT Specification.
@@ -30,7 +30,7 @@ public class Notpredicate implements Predicate<Composite>
 {
     private Predicate<Composite> operand;
 
-    public Notpredicate( Predicate<Composite> operand )
+    public Notpredicate(Predicate<Composite> operand)
     {
         this.operand = operand;
     }
@@ -41,9 +41,9 @@ public class Notpredicate implements Predicate<Composite>
     }
 
     @Override
-    public boolean test( Composite item )
+    public boolean test(Composite item)
     {
-        return operand.negate().test( item );
+        return operand.negate().test(item);
     }
 
     @Override

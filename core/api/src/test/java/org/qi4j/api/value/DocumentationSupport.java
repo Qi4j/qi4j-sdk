@@ -19,6 +19,16 @@
  */
 package org.qi4j.api.value;
 
+import org.junit.jupiter.api.Test;
+import org.qi4j.api.injection.scope.Service;
+import org.qi4j.api.property.Property;
+import org.qi4j.api.serialization.Deserializer;
+import org.qi4j.api.serialization.Serialization.Options;
+import org.qi4j.api.serialization.Serializer;
+import org.qi4j.bootstrap.ModuleAssembly;
+import org.qi4j.serialization.jakartajson.assembly.JakartaJsonSerializationAssembler;
+import org.qi4j.test.AbstractQi4jTest;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -26,14 +36,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
-import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.property.Property;
-import org.qi4j.api.serialization.Deserializer;
-import org.qi4j.api.serialization.Serializer;
-import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.serialization.jakartajson.assembly.JakartaJsonSerializationAssembler;
-import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -55,16 +57,16 @@ public class DocumentationSupport extends AbstractQi4jTest
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.values( SomeValue.class ); // (2)
+        module.values(SomeValue.class); // (2)
         // END SNIPPET: default
         // END SNIPPET: service
         // START SNIPPET: default
         module.defaultServices(); // (3)
         // END SNIPPET: default
         // START SNIPPET: service
-        new JakartaJsonSerializationAssembler().assemble( module ); // (3)
+        new JakartaJsonSerializationAssembler().assemble(module); // (3)
         // END SNIPPET: service
         // START SNIPPET: default
         // START SNIPPET: service
@@ -78,11 +80,11 @@ public class DocumentationSupport extends AbstractQi4jTest
     {
         SomeValue someValue = someNewValueInstance(); // (4)
         String json = someValue.toString(); // (5)
-        SomeValue someNewValue = valueBuilderFactory.newValueFromSerializedState( SomeValue.class, json ); // (6)
+        SomeValue someNewValue = valueBuilderFactory.newValueFromSerializedState(SomeValue.class, json); // (6)
         // END SNIPPET: default
 
-        assertThat( json, equalTo( "{\"foo\":\"bar\"}" ) );
-        assertThat( someNewValue, equalTo( someValue ) );
+        assertThat(json, equalTo("{\"foo\":\"bar\"}"));
+        assertThat(someNewValue, equalTo(someValue));
 
         // START SNIPPET: default
     }
@@ -100,12 +102,12 @@ public class DocumentationSupport extends AbstractQi4jTest
     public void assembledDefaultServiceSerialization()
     {
         SomeValue someValue = someNewValueInstance(); // (5)
-        String json = serializer.serialize( someValue ); // (6)
-        SomeValue someNewValue = deserializer.deserialize( module, SomeValue.class, json ); // (7)
+        String json = serializer.serialize(module, Options.DEFAULT, someValue); // (6)
+        SomeValue someNewValue = deserializer.deserialize(module, Options.DEFAULT, SomeValue.class, json); // (7)
         // END SNIPPET: service
 
-        assertThat( json, equalTo( "{\"foo\":\"bar\"}" ) );
-        assertThat( someNewValue, equalTo( someValue ) );
+        assertThat(json, equalTo("{\"foo\":\"bar\"}"));
+        assertThat(someNewValue, equalTo(someValue));
 
         // START SNIPPET: service
     }
@@ -124,9 +126,9 @@ public class DocumentationSupport extends AbstractQi4jTest
     {
         // END SNIPPET: io
 
-        List<AcmeValue> dataSource = Arrays.asList( AcmeValue.values() );
+        List<AcmeValue> dataSource = Arrays.asList(AcmeValue.values());
         StringWriter stringOutput = new StringWriter();
-        PrintWriter output = new PrintWriter( stringOutput );
+        PrintWriter output = new PrintWriter(stringOutput);
 
 
         // START SNIPPET: io
@@ -135,31 +137,31 @@ public class DocumentationSupport extends AbstractQi4jTest
         Stream<AcmeValue> queryResult = dataSource.stream();
 
         // (2)
-        Function<AcmeValue, String> serialize = serializer.serializeFunction();
+        Function<AcmeValue, String> serialize = serializer.serializeFunction(module, Options.DEFAULT);
 
         // (3)
         // Eg. pipe data to another process or to a file
-        queryResult.map( serialize ).forEach( output::println );
+        queryResult.map(serialize).forEach(output::println);
         // END SNIPPET: io
 
         output.flush();
         String string = stringOutput.toString();
-        List<String> input = Arrays.asList( string.split( System.lineSeparator() ) );
+        List<String> input = Arrays.asList(string.split(System.lineSeparator()));
 
         // START SNIPPET: io
         // (4)
         Stream<String> lines = input.stream();
 
         // (5)
-        Function<String, AcmeValue> deserialize = deserializer.deserializeFunction( module, AcmeValue.class );
+        Function<String, AcmeValue> deserialize = deserializer.deserializeFunction(module, Options.DEFAULT, AcmeValue.class);
 
         // Deserialization of a collection of AcmeValue from a String.
         // One serialized AcmeValue per line.
         // (6)
-        List<AcmeValue> values = lines.map( deserialize ).collect( toList() );
+        List<AcmeValue> values = lines.map(deserialize).collect(toList());
         // END SNIPPET: io
 
-        assertThat( dataSource, equalTo( values ) );
+        assertThat(dataSource, equalTo(values));
 
         // START SNIPPET: io
     }
@@ -167,8 +169,8 @@ public class DocumentationSupport extends AbstractQi4jTest
 
     private SomeValue someNewValueInstance()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
-        builder.prototype().foo().set( "bar" );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
+        builder.prototype().foo().set("bar");
         return builder.newInstance();
     }
 }

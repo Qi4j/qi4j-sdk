@@ -30,19 +30,19 @@ public class ApplicationAssemblerAdapter
 {
     private final Assembler[][][] assemblers;
 
-    protected ApplicationAssemblerAdapter( Assembler assembler )
+    protected ApplicationAssemblerAdapter(Assembler assembler)
     {
-        this.assemblers = new Assembler[][][]{ { { assembler } } };
+        this.assemblers = new Assembler[][][]{{{assembler}}};
     }
 
-    protected ApplicationAssemblerAdapter( Assembler[][][] assemblers )
+    protected ApplicationAssemblerAdapter(Assembler[][][] assemblers)
     {
         this.assemblers = assemblers;
     }
 
     @Override
-    public ApplicationAssembly assemble( ApplicationAssemblyFactory applicationFactory )
+    public ApplicationAssembly assemble(ApplicationAssemblyFactory applicationFactory)
     {
-        return applicationFactory.newApplicationAssembly( assemblers );
+        return applicationFactory.newApplicationAssembly(assemblers);
     }
 }

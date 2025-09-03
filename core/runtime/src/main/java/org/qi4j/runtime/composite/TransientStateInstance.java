@@ -19,11 +19,12 @@
  */
 package org.qi4j.runtime.composite;
 
+import org.qi4j.api.property.Property;
+import org.qi4j.api.property.StateHolder;
+
 import java.lang.reflect.AccessibleObject;
 import java.util.Map;
 import java.util.stream.Stream;
-import org.qi4j.api.property.Property;
-import org.qi4j.api.property.StateHolder;
 
 /**
  * TODO
@@ -33,22 +34,22 @@ public final class TransientStateInstance
 {
     private final Map<AccessibleObject, Property<?>> properties;
 
-    public TransientStateInstance( Map<AccessibleObject, Property<?>> properties
+    public TransientStateInstance(Map<AccessibleObject, Property<?>> properties
     )
     {
         this.properties = properties;
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T> Property<T> propertyFor( AccessibleObject accessor )
+    @SuppressWarnings("unchecked")
+    public <T> Property<T> propertyFor(AccessibleObject accessor)
         throws IllegalArgumentException
     {
-        Property<T> property = (Property<T>) properties.get( accessor );
+        Property<T> property = (Property<T>) properties.get(accessor);
 
-        if( property == null )
+        if(property == null)
         {
-            throw new IllegalArgumentException( "No such property:" + accessor );
+            throw new IllegalArgumentException("No such property:" + accessor);
         }
 
         return property;

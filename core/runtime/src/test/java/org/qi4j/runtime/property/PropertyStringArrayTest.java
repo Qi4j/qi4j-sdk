@@ -20,13 +20,13 @@
 
 package org.qi4j.runtime.property;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.TransientBuilder;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.property.Property;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -35,13 +35,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * Tests for string arrays as properties (QI-132)
  */
 public class PropertyStringArrayTest
-        extends AbstractQi4jTest
+    extends AbstractQi4jTest
 {
 
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( TestComposite.class );
+        module.transients(TestComposite.class);
     }
 
     @Test
@@ -49,16 +49,16 @@ public class PropertyStringArrayTest
     {
         TestComposite instance;
         {
-            TransientBuilder<TestComposite> builder = transientBuilderFactory.newTransientBuilder( TestComposite.class );
-            builder.prototype().array().set( new String[]{ "Foo", "Bar" } );
+            TransientBuilder<TestComposite> builder = transientBuilderFactory.newTransientBuilder(TestComposite.class);
+            builder.prototype().array().set(new String[]{"Foo", "Bar"});
             instance = builder.newInstance();
         }
 
-        assertThat( "property has correct value", instance.array().get()[ 0 ], equalTo( "Foo" ) );
+        assertThat("property has correct value", instance.array().get()[0], equalTo("Foo"));
 
-        instance.array().set( new String[]{ "Hello", "World" } );
+        instance.array().set(new String[]{"Hello", "World"});
 
-        assertThat( "property has correct value", instance.array().get()[ 0 ], equalTo( "Hello" ) );
+        assertThat("property has correct value", instance.array().get()[0], equalTo("Hello"));
     }
 
     public interface TestComposite

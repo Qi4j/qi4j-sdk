@@ -20,7 +20,6 @@
 package org.qi4j.api.metrics;
 
 import org.qi4j.api.structure.Module;
-import org.qi4j.api.structure.Module;
 
 import java.lang.reflect.Method;
 import java.util.StringJoiner;
@@ -36,12 +35,12 @@ public class MetricNames
      * @param fragments Name fragments
      * @return Metric name
      */
-    public static String nameFor( String... fragments )
+    public static String nameFor(String... fragments)
     {
-        StringJoiner joiner = new StringJoiner( "." );
-        for( String fragment : fragments )
+        StringJoiner joiner = new StringJoiner(".");
+        for(String fragment : fragments)
         {
-            joiner.add( fragment );
+            joiner.add(fragment);
         }
         return joiner.toString();
     }
@@ -49,20 +48,20 @@ public class MetricNames
     /**
      * Build a Metric name for the given Module, Type and optional fragments.
      *
-     * @param module Module
-     * @param type Type
+     * @param module    Module
+     * @param type      Type
      * @param fragments Name fragments
      * @return Metric name
      */
-    public static String nameFor(Module module, Class<?> type, String... fragments )
+    public static String nameFor(Module module, Class<?> type, String... fragments)
     {
-        StringJoiner joiner = new StringJoiner( "." )
-                .add( module.layer().name() )
-                .add( module.name() )
-                .add( className( type ) );
-        for( String fragment : fragments )
+        StringJoiner joiner = new StringJoiner(".")
+            .add(module.layer().name())
+            .add(module.name())
+            .add(className(type));
+        for(String fragment : fragments)
         {
-            joiner.add( fragment );
+            joiner.add(fragment);
         }
         return joiner.toString();
     }
@@ -70,27 +69,27 @@ public class MetricNames
     /**
      * Build a Metric name for the given Module, Method and optional fragments.
      *
-     * @param module Module
-     * @param method Method
+     * @param module    Module
+     * @param method    Method
      * @param fragments Name fragments
      * @return Metric name
      */
-    public static String nameFor( Module module, Method method, String... fragments )
+    public static String nameFor(Module module, Method method, String... fragments)
     {
-        StringJoiner joiner = new StringJoiner( "." )
-                .add( module.layer().name() )
-                .add( module.name() )
-                .add( className( method.getDeclaringClass() ) )
-                .add( method.getName() );
-        for( String fragment : fragments )
+        StringJoiner joiner = new StringJoiner(".")
+            .add(module.layer().name())
+            .add(module.name())
+            .add(className(method.getDeclaringClass()))
+            .add(method.getName());
+        for(String fragment : fragments)
         {
-            joiner.add( fragment );
+            joiner.add(fragment);
         }
         return joiner.toString();
     }
 
-    private static String className( Class<?> clazz )
+    private static String className(Class<?> clazz)
     {
-        return clazz.getName().substring( clazz.getName().lastIndexOf( '.' ) + 1 ).replace( '$', '.' );
+        return clazz.getName().substring(clazz.getName().lastIndexOf('.') + 1).replace('$', '.');
     }
 }

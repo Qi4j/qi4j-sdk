@@ -17,62 +17,23 @@
  */
 package org.qi4j.spi.serialization;
 
-import java.util.function.Function;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import jakarta.json.JsonValue;
 import org.qi4j.api.common.Optional;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.serialization.Serializer;
+import org.qi4j.api.structure.ModuleDescriptor;
+
+import java.util.function.Function;
 
 /**
  * {@literal jakarta.json} serializer.
  */
 public interface JsonSerializer extends Serializer
 {
-    <T> Function<T, JsonValue> toJsonFunction( Options options );
+    <T> Function<T, JsonValue> toJsonFunction(ModuleDescriptor module, Options options);
 
-    default <T> Function<T, JsonValue> toJsonFunction()
+    default JsonValue toJson(ModuleDescriptor module, Options options, @Optional Object object)
     {
-        return object -> toJsonFunction( Options.DEFAULT ).apply( object );
-    }
-
-    default JsonValue toJson( Options options, @Optional Object object )
-    {
-        return toJsonFunction( options ).apply( object );
-    }
-
-    default JsonValue toJson( @Optional Object object )
-    {
-        return toJsonFunction( Options.DEFAULT ).apply( object );
-    }
-
-    default <T> Stream<JsonValue> toJsonEach( Options options, Stream<T> objects )
-    {
-        return objects.map( toJsonFunction( options ) );
-    }
-
-    default <T> Stream<JsonValue> toJsonEach( Options options, Iterable<T> objects )
-    {
-        return toJsonEach( options, StreamSupport.stream( objects.spliterator(), false ) );
-    }
-
-    default <T> Stream<JsonValue> toJsonEach( Options options, Object... objects )
-    {
-        return toJsonEach( options, Stream.of( objects ) );
-    }
-
-    default <T> Stream<JsonValue> toJsonEach( Stream<T> objects )
-    {
-        return objects.map( toJsonFunction( Options.DEFAULT ) );
-    }
-
-    default <T> Stream<JsonValue> toJsonEach( Iterable<T> objects )
-    {
-        return toJsonEach( Options.DEFAULT, StreamSupport.stream( objects.spliterator(), false ) );
-    }
-
-    default <T> Stream<JsonValue> toJsonEach( Object... objects )
-    {
-        return toJsonEach( Options.DEFAULT, Stream.of( objects ) );
+        return toJsonFunction(module, options).apply(object);
     }
 }

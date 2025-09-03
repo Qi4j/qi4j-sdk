@@ -25,15 +25,15 @@ package org.qi4j.api.query.grammar;
 public class EqPredicate<T>
     extends ComparisonPredicate<T>
 {
-    public EqPredicate( PropertyFunction<T> property, T value )
+    public EqPredicate(PropertyFunction<T> property, T value)
     {
-        super( property, value );
+        super(property, value);
     }
 
     @Override
-    protected boolean compare( T value )
+    protected boolean compare(T value)
     {
-        return value.equals( this.value );
+        return value.equals(this.value);
     }
 
     @Override

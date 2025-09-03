@@ -19,7 +19,6 @@
  */
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.AccessibleObject;
 import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.util.Classes;
@@ -28,6 +27,8 @@ import org.qi4j.runtime.unitofwork.BuilderEntityState;
 import org.qi4j.runtime.unitofwork.ModuleUnitOfWork;
 import org.qi4j.spi.entity.EntityState;
 
+import java.lang.reflect.AccessibleObject;
+
 /**
  * Model for a NamedAssociation.
  * <p>
@@ -35,20 +36,20 @@ import org.qi4j.spi.entity.EntityState;
  */
 public final class NamedAssociationModel extends AbstractAssociationModel<NamedAssociationModel>
 {
-    public NamedAssociationModel( AccessibleObject accessor,
-                                  ValueConstraintsInstance valueConstraintsInstance,
-                                  ValueConstraintsInstance associationConstraintsInstance,
-                                  MetaInfo metaInfo
-                                )
+    public NamedAssociationModel(AccessibleObject accessor,
+                                 ValueConstraintsInstance valueConstraintsInstance,
+                                 ValueConstraintsInstance associationConstraintsInstance,
+                                 MetaInfo metaInfo
+    )
     {
-        super( accessor, valueConstraintsInstance, associationConstraintsInstance, metaInfo );
+        super(accessor, valueConstraintsInstance, associationConstraintsInstance, metaInfo);
     }
 
-    public <T> NamedAssociation<T> newInstance( final ModuleUnitOfWork uow, EntityState state )
+    public <T> NamedAssociation<T> newInstance(final ModuleUnitOfWork uow, EntityState state)
     {
         return new NamedAssociationInstance<>(
             state instanceof BuilderEntityState ? builderInfo() : this,
-            ( entityReference, type ) -> uow.get( Classes.RAW_CLASS.apply( type ), entityReference.identity() ),
-            state.namedAssociationValueOf( qualifiedName() ) );
+            (entityReference, type) -> uow.get(Classes.RAW_CLASS.apply(type), entityReference.identity()),
+            state.namedAssociationValueOf(qualifiedName()));
     }
 }

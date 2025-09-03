@@ -19,11 +19,6 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.Composite;
@@ -35,6 +30,12 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Note that keySet(), values() and entrySet() would ALSO require overloading, but this has been left out for
  * clarity reasons.
  */
-@Disabled( "Depends on a design decision, whether Concerns are invoked during BUILD of the instance, and if so, we probably need a way to differentiate between normal call and call during BUILD." )
+@Disabled("Depends on a design decision, whether Concerns are invoked during BUILD of the instance, and if so, we probably need a way to differentiate between normal call and call during BUILD.")
 public class MapOverrideTest
     extends AbstractQi4jTest
 {
@@ -61,7 +62,7 @@ public class MapOverrideTest
     }
 
     @Test
-    @SuppressWarnings( { "rawtypes", "unchecked" } )
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void givenReadOnlyAnnotatedHashMapWhenCallingSizeExpectSuccess()
     {
         ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
@@ -72,7 +73,7 @@ public class MapOverrideTest
     }
 
     @Test
-    @SuppressWarnings( { "rawtypes", "unchecked" } )
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void givenReadOnlyAnnotatedHashMapWhenCallingIsEmptyExpectSuccess()
     {
         ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
@@ -83,7 +84,7 @@ public class MapOverrideTest
     }
 
     @Test
-    @SuppressWarnings( { "rawtypes", "unchecked" } )
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void givenReadOnlyAnnotatedHashMapWhenCallingContainsKeyExpectSuccess()
     {
         ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
@@ -94,7 +95,7 @@ public class MapOverrideTest
     }
 
     @Test
-    @SuppressWarnings( { "rawtypes", "unchecked" } )
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void givenReadOnlyAnnotatedHashMapWhenCallingContainsValueExpectSuccess()
     {
         ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
@@ -105,7 +106,7 @@ public class MapOverrideTest
     }
 
     @Test
-    @SuppressWarnings( { "rawtypes", "unchecked" } )
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void givenReadOnlyAnnotatedHashMapWhenCallingGetExpectSuccess()
     {
         ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
@@ -116,7 +117,7 @@ public class MapOverrideTest
     }
 
     @Test
-    @SuppressWarnings( { "rawtypes", "unchecked" } )
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void givenReadOnlyAnnotatedHashMapWhenCallingKeySetExpectSuccess()
     {
         ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
@@ -133,7 +134,7 @@ public class MapOverrideTest
     }
 
     @Test
-    @SuppressWarnings( { "rawtypes", "unchecked" } )
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void givenReadOnlyAnnotatedHashMapWhenCallingValuesExpectSuccess()
     {
         ValueBuilder<Map> builder = valueBuilderFactory.newValueBuilder(Map.class);
@@ -177,7 +178,7 @@ public class MapOverrideTest
         });
     }
 
-    @SuppressWarnings( { "rawtypes" } )
+    @SuppressWarnings({"rawtypes"})
     public static abstract class ReadOnlyMapConcern extends ConcernOf<Map>
         implements Map
     {
@@ -200,7 +201,7 @@ public class MapOverrideTest
         }
 
         @Override
-        @SuppressWarnings( "NullableProblems" )
+        @SuppressWarnings("NullableProblems")
         public void putAll(Map m)
         {
             throw new ReadOnlyException(me, method);

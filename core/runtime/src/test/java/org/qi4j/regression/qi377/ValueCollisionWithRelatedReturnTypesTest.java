@@ -19,6 +19,7 @@
  */
 package org.qi4j.regression.qi377;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.Optional;
@@ -30,87 +31,86 @@ import org.qi4j.api.value.ValueBuilder;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 public class ValueCollisionWithRelatedReturnTypesTest
     extends AbstractQi4jTest
 {
 
-    public static final Identity NICLAS = StringIdentity.identityOf( "niclas" );
+    public static final Identity NICLAS = StringIdentity.identityOf("niclas");
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.values( Employee.class, Company.class );
+        module.values(Employee.class, Company.class);
     }
 
     @Test
     public void shouldBeAbleToSetNameToTheCompany()
     {
-        ValueBuilder<Company> builder = valueBuilderFactory.newValueBuilder( Company.class );
-        builder.prototype().name().set( "Acme" );
+        ValueBuilder<Company> builder = valueBuilderFactory.newValueBuilder(Company.class);
+        builder.prototype().name().set("Acme");
         Company startUp = builder.newInstance();
     }
 
     @Test
     public void shouldBeAbleToSetLeadToTheCompany()
     {
-        Company startUp = valueBuilderFactory.newValue( Company.class );
-        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder( Employee.class );
+        Company startUp = valueBuilderFactory.newValue(Company.class);
+        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder(Employee.class);
         builder.prototype().identity().set(NICLAS);
         Employee niclas = builder.newInstance();
-        startUp.lead().set( niclas );
+        startUp.lead().set(niclas);
     }
 
     @Test
     public void shouldBeAbleToSetLeadToTheSalesTeam()
     {
-        SalesTeam startUp = valueBuilderFactory.newValue( SalesTeam.class );
-        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder( Employee.class );
+        SalesTeam startUp = valueBuilderFactory.newValue(SalesTeam.class);
+        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder(Employee.class);
         builder.prototype().identity().set(NICLAS);
         Employee niclas = builder.newInstance();
-        startUp.lead().set( niclas );
+        startUp.lead().set(niclas);
     }
 
     @Test
     public void shouldBeAbleToSetLeadToTheResearchTeam()
     {
-        ResearchTeam startUp = valueBuilderFactory.newValue( ResearchTeam.class );
-        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder( Employee.class );
+        ResearchTeam startUp = valueBuilderFactory.newValue(ResearchTeam.class);
+        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder(Employee.class);
         builder.prototype().identity().set(NICLAS);
         Employee niclas = builder.newInstance();
-        startUp.lead().set( niclas );
+        startUp.lead().set(niclas);
     }
 
     @Test
     public void shouldBeAbleToAddEmployeesToTheCompany()
     {
-        Company startUp = valueBuilderFactory.newValue( Company.class );
-        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder( Employee.class );
+        Company startUp = valueBuilderFactory.newValue(Company.class);
+        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder(Employee.class);
         builder.prototype().identity().set(NICLAS);
         Employee niclas = builder.newInstance();
-        startUp.employees().add( niclas );
+        startUp.employees().add(niclas);
     }
 
     @Test
     public void shouldBeAbleToAddEmployeesToTheSalesTeam()
     {
-        SalesTeam startUp = valueBuilderFactory.newValue( SalesTeam.class );
-        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder( Employee.class );
+        SalesTeam startUp = valueBuilderFactory.newValue(SalesTeam.class);
+        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder(Employee.class);
         builder.prototype().identity().set(NICLAS);
         Employee niclas = builder.newInstance();
-        startUp.employees().add( niclas );
+        startUp.employees().add(niclas);
     }
 
     @Test
     public void shouldBeAbleToAddEmployeesToTheResearchTeam()
     {
-        ResearchTeam startUp = valueBuilderFactory.newValue( ResearchTeam.class );
-        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder( Employee.class );
-        builder.prototype().identity().set( NICLAS );
+        ResearchTeam startUp = valueBuilderFactory.newValue(ResearchTeam.class);
+        ValueBuilder<Employee> builder = valueBuilderFactory.newValueBuilder(Employee.class);
+        builder.prototype().identity().set(NICLAS);
         Employee niclas = builder.newInstance();
-        startUp.employees().add( niclas );
+        startUp.employees().add(niclas);
     }
 
     public interface Employee

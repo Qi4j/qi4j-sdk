@@ -19,12 +19,12 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.qi4j.bootstrap.BindingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.qi4j.bootstrap.BindingException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -43,7 +43,7 @@ public class UsageGraphTest
     public void verifyRandomDoesNotAffect()
         throws Exception
     {
-        for( int i = 0; i < 100; i++ )
+        for(int i = 0; i < 100; i++)
         {
             whenGraphIsOpenEndedGivenNotAllowCyclicDependenciesThenNoError();
             whenGraphIsCyclicGivenAllowCyclicDependencyThenNoError();
@@ -61,115 +61,115 @@ public class UsageGraphTest
         Thing thing5 = new Thing();
         Thing thing6 = new Thing();
         Thing thing7 = new Thing();
-        thing1.uses.add( thing3 );
-        thing2.uses.add( thing3 );
-        thing3.uses.add( thing4 );
-        thing4.uses.add( thing5 );
-        thing1.uses.add( thing6 );
-        thing7.uses.add( thing1 );
-        thing7.uses.add( thing2 );
-        thing7.uses.add( thing4 );
+        thing1.uses.add(thing3);
+        thing2.uses.add(thing3);
+        thing3.uses.add(thing4);
+        thing4.uses.add(thing5);
+        thing1.uses.add(thing6);
+        thing7.uses.add(thing1);
+        thing7.uses.add(thing2);
+        thing7.uses.add(thing4);
         List<Thing> data = new ArrayList<Thing>();
-        data.add( thing7 );
-        data.add( thing4 );
-        data.add( thing3 );
-        data.add( thing1 );
-        data.add( thing6 );
-        data.add( thing5 );
-        data.add( thing2 );
-        randomize( data );
-        UsageGraph<Thing> deps = new UsageGraph<Thing>( data, new Userator(), false );
-        assertThat( deps.transitiveUse( thing1, thing1 ), is( false ) );
-        assertThat( deps.transitiveUse( thing1, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing1, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing6 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing2, thing1 ), is( false ) );
-        assertThat( deps.transitiveUse( thing2, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing2, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing2, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing2, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing2, thing6 ), is( false ) );
-        assertThat( deps.transitiveUse( thing2, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing3, thing1 ), is( false ) );
-        assertThat( deps.transitiveUse( thing3, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing3, thing3 ), is( false ) );
-        assertThat( deps.transitiveUse( thing3, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing3, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing3, thing6 ), is( false ) );
-        assertThat( deps.transitiveUse( thing3, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing4, thing1 ), is( false ) );
-        assertThat( deps.transitiveUse( thing4, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing4, thing3 ), is( false ) );
-        assertThat( deps.transitiveUse( thing4, thing4 ), is( false ) );
-        assertThat( deps.transitiveUse( thing4, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing4, thing6 ), is( false ) );
-        assertThat( deps.transitiveUse( thing4, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing1 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing3 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing4 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing5 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing6 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing1 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing3 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing4 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing5 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing6 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing7, thing1 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing2 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing6 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing7 ), is( false ) );
+        data.add(thing7);
+        data.add(thing4);
+        data.add(thing3);
+        data.add(thing1);
+        data.add(thing6);
+        data.add(thing5);
+        data.add(thing2);
+        randomize(data);
+        UsageGraph<Thing> deps = new UsageGraph<Thing>(data, new Userator(), false);
+        assertThat(deps.transitiveUse(thing1, thing1), is(false));
+        assertThat(deps.transitiveUse(thing1, thing2), is(false));
+        assertThat(deps.transitiveUse(thing1, thing3), is(true));
+        assertThat(deps.transitiveUse(thing1, thing4), is(true));
+        assertThat(deps.transitiveUse(thing1, thing5), is(true));
+        assertThat(deps.transitiveUse(thing1, thing6), is(true));
+        assertThat(deps.transitiveUse(thing1, thing7), is(false));
+        assertThat(deps.transitiveUse(thing2, thing1), is(false));
+        assertThat(deps.transitiveUse(thing2, thing2), is(false));
+        assertThat(deps.transitiveUse(thing2, thing3), is(true));
+        assertThat(deps.transitiveUse(thing2, thing4), is(true));
+        assertThat(deps.transitiveUse(thing2, thing5), is(true));
+        assertThat(deps.transitiveUse(thing2, thing6), is(false));
+        assertThat(deps.transitiveUse(thing2, thing7), is(false));
+        assertThat(deps.transitiveUse(thing3, thing1), is(false));
+        assertThat(deps.transitiveUse(thing3, thing2), is(false));
+        assertThat(deps.transitiveUse(thing3, thing3), is(false));
+        assertThat(deps.transitiveUse(thing3, thing4), is(true));
+        assertThat(deps.transitiveUse(thing3, thing5), is(true));
+        assertThat(deps.transitiveUse(thing3, thing6), is(false));
+        assertThat(deps.transitiveUse(thing3, thing7), is(false));
+        assertThat(deps.transitiveUse(thing4, thing1), is(false));
+        assertThat(deps.transitiveUse(thing4, thing2), is(false));
+        assertThat(deps.transitiveUse(thing4, thing3), is(false));
+        assertThat(deps.transitiveUse(thing4, thing4), is(false));
+        assertThat(deps.transitiveUse(thing4, thing5), is(true));
+        assertThat(deps.transitiveUse(thing4, thing6), is(false));
+        assertThat(deps.transitiveUse(thing4, thing7), is(false));
+        assertThat(deps.transitiveUse(thing5, thing1), is(false));
+        assertThat(deps.transitiveUse(thing5, thing2), is(false));
+        assertThat(deps.transitiveUse(thing5, thing3), is(false));
+        assertThat(deps.transitiveUse(thing5, thing4), is(false));
+        assertThat(deps.transitiveUse(thing5, thing5), is(false));
+        assertThat(deps.transitiveUse(thing5, thing6), is(false));
+        assertThat(deps.transitiveUse(thing5, thing7), is(false));
+        assertThat(deps.transitiveUse(thing6, thing1), is(false));
+        assertThat(deps.transitiveUse(thing6, thing2), is(false));
+        assertThat(deps.transitiveUse(thing6, thing3), is(false));
+        assertThat(deps.transitiveUse(thing6, thing4), is(false));
+        assertThat(deps.transitiveUse(thing6, thing5), is(false));
+        assertThat(deps.transitiveUse(thing6, thing6), is(false));
+        assertThat(deps.transitiveUse(thing6, thing7), is(false));
+        assertThat(deps.transitiveUse(thing7, thing1), is(true));
+        assertThat(deps.transitiveUse(thing7, thing2), is(true));
+        assertThat(deps.transitiveUse(thing7, thing3), is(true));
+        assertThat(deps.transitiveUse(thing7, thing4), is(true));
+        assertThat(deps.transitiveUse(thing7, thing5), is(true));
+        assertThat(deps.transitiveUse(thing7, thing6), is(true));
+        assertThat(deps.transitiveUse(thing7, thing7), is(false));
         List<Thing> resolved = deps.resolveOrder();
-        System.out.println( resolved );
-        assertThat( resolved.indexOf( thing1 ) > resolved.indexOf( thing6 ), is( true ) );
-        assertThat( resolved.indexOf( thing2 ) > resolved.indexOf( thing3 ), is( true ) );
-        assertThat( resolved.indexOf( thing2 ) > resolved.indexOf( thing4 ), is( true ) );
-        assertThat( resolved.indexOf( thing2 ) > resolved.indexOf( thing5 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing1 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing2 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing4 ), is( true ) );
-        assertThat( resolved.indexOf( thing1 ) > resolved.indexOf( thing3 ), is( true ) );
-        assertThat( resolved.indexOf( thing1 ) > resolved.indexOf( thing4 ), is( true ) );
-        assertThat( resolved.indexOf( thing1 ) > resolved.indexOf( thing5 ), is( true ) );
-        assertThat( resolved.indexOf( thing3 ) > resolved.indexOf( thing4 ), is( true ) );
-        assertThat( resolved.indexOf( thing3 ) > resolved.indexOf( thing5 ), is( true ) );
-        assertThat( resolved.indexOf( thing4 ) > resolved.indexOf( thing5 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing4 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing5 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing6 ), is( true ) );
+        System.out.println(resolved);
+        assertThat(resolved.indexOf(thing1) > resolved.indexOf(thing6), is(true));
+        assertThat(resolved.indexOf(thing2) > resolved.indexOf(thing3), is(true));
+        assertThat(resolved.indexOf(thing2) > resolved.indexOf(thing4), is(true));
+        assertThat(resolved.indexOf(thing2) > resolved.indexOf(thing5), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing1), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing2), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing4), is(true));
+        assertThat(resolved.indexOf(thing1) > resolved.indexOf(thing3), is(true));
+        assertThat(resolved.indexOf(thing1) > resolved.indexOf(thing4), is(true));
+        assertThat(resolved.indexOf(thing1) > resolved.indexOf(thing5), is(true));
+        assertThat(resolved.indexOf(thing3) > resolved.indexOf(thing4), is(true));
+        assertThat(resolved.indexOf(thing3) > resolved.indexOf(thing5), is(true));
+        assertThat(resolved.indexOf(thing4) > resolved.indexOf(thing5), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing4), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing5), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing6), is(true));
     }
 
-    private void randomize( List<Thing> data )
+    private void randomize(List<Thing> data)
     {
-        int n = (int) ( Math.random() * 100 );
-        for( int i = 0; i < n; i++ )
+        int n = (int) (Math.random() * 100);
+        for(int i = 0; i < n; i++)
         {
             int pos1 = 0;
             int pos2 = 0;
-            while( pos1 == pos2 )
+            while(pos1 == pos2)
             {
-                pos1 = (int) ( Math.floor( Math.random() * data.size() ) );
-                pos2 = (int) ( Math.floor( Math.random() * data.size() ) );
+                pos1 = (int) (Math.floor(Math.random() * data.size()));
+                pos2 = (int) (Math.floor(Math.random() * data.size()));
             }
-            if( pos1 < pos2 )
+            if(pos1 < pos2)
             {
                 int temp = pos2;
                 pos2 = pos1;
                 pos1 = temp;
             }
-            Thing thing1 = data.remove( pos1 );
-            Thing thing2 = data.remove( pos2 );
-            data.add( pos2, thing1 );
-            data.add( pos1, thing2 );
+            Thing thing1 = data.remove(pos1);
+            Thing thing2 = data.remove(pos2);
+            data.add(pos2, thing1);
+            data.add(pos1, thing2);
         }
     }
 
@@ -184,31 +184,31 @@ public class UsageGraphTest
         Thing thing5 = new Thing();
         Thing thing6 = new Thing();
         Thing thing7 = new Thing();
-        thing1.uses.add( thing3 );
-        thing2.uses.add( thing3 );
-        thing3.uses.add( thing4 );
-        thing4.uses.add( thing5 );
-        thing5.uses.add( thing1 );      // <-- Cyclic
-        thing1.uses.add( thing6 );
-        thing7.uses.add( thing1 );
-        thing7.uses.add( thing2 );
-        thing7.uses.add( thing4 );
+        thing1.uses.add(thing3);
+        thing2.uses.add(thing3);
+        thing3.uses.add(thing4);
+        thing4.uses.add(thing5);
+        thing5.uses.add(thing1);      // <-- Cyclic
+        thing1.uses.add(thing6);
+        thing7.uses.add(thing1);
+        thing7.uses.add(thing2);
+        thing7.uses.add(thing4);
         List<Thing> data = new ArrayList<Thing>();
-        data.add( thing7 );
-        data.add( thing4 );
-        data.add( thing1 );
-        data.add( thing3 );
-        data.add( thing6 );
-        data.add( thing5 );
-        data.add( thing2 );
-        randomize( data );
-        UsageGraph<Thing> deps = new UsageGraph<Thing>( data, new Userator(), false );
+        data.add(thing7);
+        data.add(thing4);
+        data.add(thing1);
+        data.add(thing3);
+        data.add(thing6);
+        data.add(thing5);
+        data.add(thing2);
+        randomize(data);
+        UsageGraph<Thing> deps = new UsageGraph<Thing>(data, new Userator(), false);
         try
         {
             List<Thing> resolved = deps.resolveOrder();
-            fail( "Cyclic Dependency Not Detected." );
+            fail("Cyclic Dependency Not Detected.");
         }
-        catch( BindingException e )
+        catch(BindingException e)
         {
             // Expected!
         }
@@ -225,31 +225,31 @@ public class UsageGraphTest
         Thing thing5 = new Thing();
         Thing thing6 = new Thing();
         Thing thing7 = new Thing();
-        thing1.uses.add( thing3 );
-        thing2.uses.add( thing3 );
-        thing3.uses.add( thing4 );
-        thing4.uses.add( thing5 );
-        thing5.uses.add( thing1 );      // <-- Cyclic
-        thing1.uses.add( thing6 );
-        thing7.uses.add( thing1 );
-        thing7.uses.add( thing2 );
-        thing7.uses.add( thing4 );
+        thing1.uses.add(thing3);
+        thing2.uses.add(thing3);
+        thing3.uses.add(thing4);
+        thing4.uses.add(thing5);
+        thing5.uses.add(thing1);      // <-- Cyclic
+        thing1.uses.add(thing6);
+        thing7.uses.add(thing1);
+        thing7.uses.add(thing2);
+        thing7.uses.add(thing4);
         List<Thing> data = new ArrayList<Thing>();
-        data.add( thing7 );
-        data.add( thing4 );
-        data.add( thing1 );
-        data.add( thing3 );
-        data.add( thing6 );
-        data.add( thing5 );
-        data.add( thing2 );
-        randomize( data );
-        UsageGraph<Thing> deps = new UsageGraph<Thing>( data, new Userator(), false );
+        data.add(thing7);
+        data.add(thing4);
+        data.add(thing1);
+        data.add(thing3);
+        data.add(thing6);
+        data.add(thing5);
+        data.add(thing2);
+        randomize(data);
+        UsageGraph<Thing> deps = new UsageGraph<Thing>(data, new Userator(), false);
         try
         {
-            assertThat( deps.transitiveUse( thing1, thing3 ), is( true ) );
-            fail( "Cyclic Dependency Not Detected." );
+            assertThat(deps.transitiveUse(thing1, thing3), is(true));
+            fail("Cyclic Dependency Not Detected.");
         }
-        catch( BindingException e )
+        catch(BindingException e)
         {
             // Expected!
         }
@@ -266,84 +266,84 @@ public class UsageGraphTest
         Thing thing5 = new Thing();
         Thing thing6 = new Thing();
         Thing thing7 = new Thing();
-        thing1.uses.add( thing3 );
-        thing2.uses.add( thing3 );
-        thing3.uses.add( thing4 );
-        thing4.uses.add( thing5 );
-        thing1.uses.add( thing6 );
-        thing5.uses.add( thing1 );      // <-- Cyclic
-        thing7.uses.add( thing1 );
-        thing7.uses.add( thing2 );
-        thing7.uses.add( thing4 );
+        thing1.uses.add(thing3);
+        thing2.uses.add(thing3);
+        thing3.uses.add(thing4);
+        thing4.uses.add(thing5);
+        thing1.uses.add(thing6);
+        thing5.uses.add(thing1);      // <-- Cyclic
+        thing7.uses.add(thing1);
+        thing7.uses.add(thing2);
+        thing7.uses.add(thing4);
         List<Thing> data = new ArrayList<Thing>();
-        data.add( thing7 );
-        data.add( thing4 );
-        data.add( thing1 );
-        data.add( thing3 );
-        data.add( thing6 );
-        data.add( thing5 );
-        data.add( thing2 );
-        randomize( data );
-        UsageGraph<Thing> deps = new UsageGraph<Thing>( data, new Userator(), true );
-        assertThat( deps.transitiveUse( thing1, thing1 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing1, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing6 ), is( true ) );
-        assertThat( deps.transitiveUse( thing1, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing2, thing1 ), is( true ) );
-        assertThat( deps.transitiveUse( thing2, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing2, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing2, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing2, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing2, thing6 ), is( true ) );
-        assertThat( deps.transitiveUse( thing2, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing3, thing1 ), is( true ) );
-        assertThat( deps.transitiveUse( thing3, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing3, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing3, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing3, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing3, thing6 ), is( true ) );
-        assertThat( deps.transitiveUse( thing3, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing4, thing1 ), is( true ) );
-        assertThat( deps.transitiveUse( thing4, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing4, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing4, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing4, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing4, thing6 ), is( true ) );
-        assertThat( deps.transitiveUse( thing4, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing1 ), is( true ) );
-        assertThat( deps.transitiveUse( thing5, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing5, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing5, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing5, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing5, thing6 ), is( true ) );
-        assertThat( deps.transitiveUse( thing5, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing1 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing2 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing3 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing4 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing5 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing6 ), is( false ) );
-        assertThat( deps.transitiveUse( thing6, thing7 ), is( false ) );
-        assertThat( deps.transitiveUse( thing7, thing1 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing2 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing3 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing4 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing5 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing6 ), is( true ) );
-        assertThat( deps.transitiveUse( thing7, thing7 ), is( false ) );
+        data.add(thing7);
+        data.add(thing4);
+        data.add(thing1);
+        data.add(thing3);
+        data.add(thing6);
+        data.add(thing5);
+        data.add(thing2);
+        randomize(data);
+        UsageGraph<Thing> deps = new UsageGraph<Thing>(data, new Userator(), true);
+        assertThat(deps.transitiveUse(thing1, thing1), is(true));
+        assertThat(deps.transitiveUse(thing1, thing2), is(false));
+        assertThat(deps.transitiveUse(thing1, thing3), is(true));
+        assertThat(deps.transitiveUse(thing1, thing4), is(true));
+        assertThat(deps.transitiveUse(thing1, thing5), is(true));
+        assertThat(deps.transitiveUse(thing1, thing6), is(true));
+        assertThat(deps.transitiveUse(thing1, thing7), is(false));
+        assertThat(deps.transitiveUse(thing2, thing1), is(true));
+        assertThat(deps.transitiveUse(thing2, thing2), is(false));
+        assertThat(deps.transitiveUse(thing2, thing3), is(true));
+        assertThat(deps.transitiveUse(thing2, thing4), is(true));
+        assertThat(deps.transitiveUse(thing2, thing5), is(true));
+        assertThat(deps.transitiveUse(thing2, thing6), is(true));
+        assertThat(deps.transitiveUse(thing2, thing7), is(false));
+        assertThat(deps.transitiveUse(thing3, thing1), is(true));
+        assertThat(deps.transitiveUse(thing3, thing2), is(false));
+        assertThat(deps.transitiveUse(thing3, thing3), is(true));
+        assertThat(deps.transitiveUse(thing3, thing4), is(true));
+        assertThat(deps.transitiveUse(thing3, thing5), is(true));
+        assertThat(deps.transitiveUse(thing3, thing6), is(true));
+        assertThat(deps.transitiveUse(thing3, thing7), is(false));
+        assertThat(deps.transitiveUse(thing4, thing1), is(true));
+        assertThat(deps.transitiveUse(thing4, thing2), is(false));
+        assertThat(deps.transitiveUse(thing4, thing3), is(true));
+        assertThat(deps.transitiveUse(thing4, thing4), is(true));
+        assertThat(deps.transitiveUse(thing4, thing5), is(true));
+        assertThat(deps.transitiveUse(thing4, thing6), is(true));
+        assertThat(deps.transitiveUse(thing4, thing7), is(false));
+        assertThat(deps.transitiveUse(thing5, thing1), is(true));
+        assertThat(deps.transitiveUse(thing5, thing2), is(false));
+        assertThat(deps.transitiveUse(thing5, thing3), is(true));
+        assertThat(deps.transitiveUse(thing5, thing4), is(true));
+        assertThat(deps.transitiveUse(thing5, thing5), is(true));
+        assertThat(deps.transitiveUse(thing5, thing6), is(true));
+        assertThat(deps.transitiveUse(thing5, thing7), is(false));
+        assertThat(deps.transitiveUse(thing6, thing1), is(false));
+        assertThat(deps.transitiveUse(thing6, thing2), is(false));
+        assertThat(deps.transitiveUse(thing6, thing3), is(false));
+        assertThat(deps.transitiveUse(thing6, thing4), is(false));
+        assertThat(deps.transitiveUse(thing6, thing5), is(false));
+        assertThat(deps.transitiveUse(thing6, thing6), is(false));
+        assertThat(deps.transitiveUse(thing6, thing7), is(false));
+        assertThat(deps.transitiveUse(thing7, thing1), is(true));
+        assertThat(deps.transitiveUse(thing7, thing2), is(true));
+        assertThat(deps.transitiveUse(thing7, thing3), is(true));
+        assertThat(deps.transitiveUse(thing7, thing4), is(true));
+        assertThat(deps.transitiveUse(thing7, thing5), is(true));
+        assertThat(deps.transitiveUse(thing7, thing6), is(true));
+        assertThat(deps.transitiveUse(thing7, thing7), is(false));
         List<Thing> resolved = deps.resolveOrder();
-        System.out.println( resolved );
-        assertThat( resolved.indexOf( thing1 ) > resolved.indexOf( thing6 ), is( true ) );
-        assertThat( resolved.indexOf( thing2 ) > resolved.indexOf( thing3 ), is( true ) );
-        assertThat( resolved.indexOf( thing2 ) > resolved.indexOf( thing4 ), is( true ) );
-        assertThat( resolved.indexOf( thing2 ) > resolved.indexOf( thing5 ), is( true ) );
-        assertThat( resolved.indexOf( thing2 ) > resolved.indexOf( thing1 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing1 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing2 ), is( true ) );
-        assertThat( resolved.indexOf( thing7 ) > resolved.indexOf( thing4 ), is( true ) );
+        System.out.println(resolved);
+        assertThat(resolved.indexOf(thing1) > resolved.indexOf(thing6), is(true));
+        assertThat(resolved.indexOf(thing2) > resolved.indexOf(thing3), is(true));
+        assertThat(resolved.indexOf(thing2) > resolved.indexOf(thing4), is(true));
+        assertThat(resolved.indexOf(thing2) > resolved.indexOf(thing5), is(true));
+        assertThat(resolved.indexOf(thing2) > resolved.indexOf(thing1), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing1), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing2), is(true));
+        assertThat(resolved.indexOf(thing7) > resolved.indexOf(thing4), is(true));
 
         // The cyclic nodes can not be determine which one is before the other
     }
@@ -352,7 +352,7 @@ public class UsageGraphTest
         implements UsageGraph.Use<Thing>
     {
 
-        public List<Thing> uses( Thing source )
+        public List<Thing> uses(Thing source)
         {
             return source.uses;
         }

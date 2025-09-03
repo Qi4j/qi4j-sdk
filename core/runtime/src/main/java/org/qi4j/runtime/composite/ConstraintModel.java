@@ -20,9 +20,10 @@
 
 package org.qi4j.runtime.composite;
 
-import java.lang.annotation.Annotation;
 import org.qi4j.api.common.ConstructionException;
 import org.qi4j.api.constraint.Constraint;
+
+import java.lang.annotation.Annotation;
 
 /**
  * JAVADOC
@@ -32,24 +33,24 @@ public final class ConstraintModel
 {
     private final Class<? extends Constraint<?, ?>> constraintClass;
 
-    public ConstraintModel( Annotation annotation, Class<? extends Constraint<?, ?>> constraintClass )
+    public ConstraintModel(Annotation annotation, Class<? extends Constraint<?, ?>> constraintClass)
     {
-        super( annotation );
+        super(annotation);
         this.constraintClass = constraintClass;
     }
 
     @Override
-    @SuppressWarnings( { "unchecked", "rawtypes" } )
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public ConstraintInstance<?, ?> newInstance()
     {
         try
         {
             Constraint<?, ?> constraint = constraintClass.getConstructor().newInstance();
-            return new ConstraintInstance( constraint, annotation );
+            return new ConstraintInstance(constraint, annotation);
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new ConstructionException( "Could not instantiate constraint implementation", e );
+            throw new ConstructionException("Could not instantiate constraint implementation", e);
         }
     }
 }

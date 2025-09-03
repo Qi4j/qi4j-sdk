@@ -35,10 +35,10 @@ public final class SideEffectsInstance
     private final ProxyReferenceInvocationHandler proxyHandler;
     private InvocationHandler invoker;
 
-    public SideEffectsInstance( List<InvocationHandler> sideEffects,
-                                SideEffectInvocationHandlerResult resultInvocationHandler,
-                                ProxyReferenceInvocationHandler proxyHandler,
-                                InvocationHandler invoker
+    public SideEffectsInstance(List<InvocationHandler> sideEffects,
+                               SideEffectInvocationHandlerResult resultInvocationHandler,
+                               ProxyReferenceInvocationHandler proxyHandler,
+                               InvocationHandler invoker
     )
     {
         this.sideEffects = sideEffects;
@@ -48,44 +48,44 @@ public final class SideEffectsInstance
     }
 
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
         try
         {
-            Object result = invoker.invoke( proxy, method, args );
-            invokeSideEffects( proxy, method, args, result, null );
+            Object result = invoker.invoke(proxy, method, args);
+            invokeSideEffects(proxy, method, args, result, null);
             return result;
         }
-        catch( Throwable throwable )
+        catch(Throwable throwable)
         {
-            invokeSideEffects( proxy, method, args, null, throwable );
+            invokeSideEffects(proxy, method, args, null, throwable);
             throw throwable;
         }
     }
 
-    private void invokeSideEffects( Object proxy,
-                                    Method method,
-                                    Object[] params,
-                                    Object result,
-                                    Throwable originalThrowable
+    private void invokeSideEffects(Object proxy,
+                                   Method method,
+                                   Object[] params,
+                                   Object result,
+                                   Throwable originalThrowable
     )
         throws Throwable
     {
-        proxyHandler.setProxy( proxy );
-        resultInvocationHandler.setResult( result, originalThrowable );
+        proxyHandler.setProxy(proxy);
+        resultInvocationHandler.setResult(result, originalThrowable);
 
         try
         {
-            for( InvocationHandler sideEffect : sideEffects )
+            for(InvocationHandler sideEffect : sideEffects)
             {
                 try
                 {
-                    sideEffect.invoke( proxy, method, params );
+                    sideEffect.invoke(proxy, method, params);
                 }
-                catch( Throwable throwable )
+                catch(Throwable throwable)
                 {
-                    if( throwable != originalThrowable )
+                    if(throwable != originalThrowable)
                     {
                         throwable.printStackTrace();
                     }
@@ -95,7 +95,7 @@ public final class SideEffectsInstance
         finally
         {
             proxyHandler.clearProxy();
-            resultInvocationHandler.setResult( null, null );
+            resultInvocationHandler.setResult(null, null);
         }
     }
 }

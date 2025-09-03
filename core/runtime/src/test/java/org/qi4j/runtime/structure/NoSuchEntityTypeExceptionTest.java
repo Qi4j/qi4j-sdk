@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.structure;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.composite.NoSuchTransientTypeException;
 import org.qi4j.api.unitofwork.NoSuchEntityTypeException;
 import org.qi4j.api.unitofwork.UnitOfWork;
@@ -30,7 +31,6 @@ import org.qi4j.test.entity.model.AbstractQi4jMultiLayeredTestWithModel;
 import org.qi4j.test.entity.model.monetary.CheckBookSlip;
 import org.qi4j.test.entity.model.people.Person;
 import org.qi4j.test.entity.model.people.Rent;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
@@ -43,14 +43,14 @@ public class NoSuchEntityTypeExceptionTest extends AbstractQi4jMultiLayeredTestW
     {
         try
         {
-            ValueBuilder<Rent> builder = valueBuilderFactory.newValueBuilder( Rent.class );
-            fail( NoSuchValueTypeException.class.getSimpleName() + " should have been thrown." );
+            ValueBuilder<Rent> builder = valueBuilderFactory.newValueBuilder(Rent.class);
+            fail(NoSuchValueTypeException.class.getSimpleName() + " should have been thrown.");
         }
-        catch( NoSuchValueTypeException e )
+        catch(NoSuchValueTypeException e)
         {
-            String expectedString = "\tInvisible ValueComposite types are:" + System.getProperty( "line.separator" )
-                                    + "\t\t[ org.qi4j.test.entity.model.people.Rent] in [People Module] with visibility module";
-            assertThat( e.getMessage(), containsString( expectedString ) );
+            String expectedString = "\tInvisible ValueComposite types are:" + System.getProperty("line.separator")
+                + "\t\t[ org.qi4j.test.entity.model.people.Rent] in [People Module] with visibility module";
+            assertThat(e.getMessage(), containsString(expectedString));
         }
     }
 
@@ -59,36 +59,36 @@ public class NoSuchEntityTypeExceptionTest extends AbstractQi4jMultiLayeredTestW
     {
         try
         {
-            CheckBookSlip slip = transientBuilderFactory.newTransient( CheckBookSlip.class );
-            fail( NoSuchTransientTypeException.class.getSimpleName() + " should have been thrown." );
+            CheckBookSlip slip = transientBuilderFactory.newTransient(CheckBookSlip.class);
+            fail(NoSuchTransientTypeException.class.getSimpleName() + " should have been thrown.");
         }
-        catch( NoSuchTransientTypeException e )
+        catch(NoSuchTransientTypeException e)
         {
-            String expectedString = "\tInvisible TransientComposite types are:" + System.getProperty( "line.separator" )
-                                    + "\t\t[ org.qi4j.test.entity.model.monetary.CheckBookSlip] in [Monetary Module] with visibility module";
-            assertThat( e.getMessage(), containsString( expectedString ) );
+            String expectedString = "\tInvisible TransientComposite types are:" + System.getProperty("line.separator")
+                + "\t\t[ org.qi4j.test.entity.model.monetary.CheckBookSlip] in [Monetary Module] with visibility module";
+            assertThat(e.getMessage(), containsString(expectedString));
         }
     }
 
     @Test
     public void givenNoVisibilityWhenCreatingEntityExpectClearException()
     {
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            Person p = uow.newEntity( Person.class );
-            fail( NoSuchEntityTypeException.class.getSimpleName() + " should have been thrown." );
+            Person p = uow.newEntity(Person.class);
+            fail(NoSuchEntityTypeException.class.getSimpleName() + " should have been thrown.");
         }
-        catch( NoSuchEntityTypeException e )
+        catch(NoSuchEntityTypeException e)
         {
-            String expectedString = "\tInvisible EntityComposite types are:" + System.getProperty( "line.separator" )
-                                    + "\t\t[ org.qi4j.test.entity.model.people.Person] in [People Module] with visibility layer";
-            assertThat( e.getMessage(), containsString( expectedString ) );
+            String expectedString = "\tInvisible EntityComposite types are:" + System.getProperty("line.separator")
+                + "\t\t[ org.qi4j.test.entity.model.people.Person] in [People Module] with visibility layer";
+            assertThat(e.getMessage(), containsString(expectedString));
         }
     }
 
-    protected void defineStorageModule( ModuleAssembly module )
+    protected void defineStorageModule(ModuleAssembly module)
     {
         module.defaultServices();
-        module.services( MemoryEntityStoreService.class ).instantiateOnStartup();
+        module.services(MemoryEntityStoreService.class).instantiateOnStartup();
     }
 }

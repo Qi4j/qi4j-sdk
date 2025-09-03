@@ -19,10 +19,7 @@
  */
 package org.qi4j.runtime.property;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.UseDefaults;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.value.ValueBuilder;
@@ -30,7 +27,11 @@ import org.qi4j.api.value.ValueComposite;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ValueNestedBuilderTest
     extends AbstractQi4jTest
@@ -70,10 +71,10 @@ public class ValueNestedBuilderTest
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.values( InnerValue.class, InnerDefaultedValue.class, OuterValue.class, OuterDefaultedValue.class );
+        module.values(InnerValue.class, InnerDefaultedValue.class, OuterValue.class, OuterDefaultedValue.class);
 
         module.defaultServices();
     }
@@ -81,10 +82,10 @@ public class ValueNestedBuilderTest
     @Test
     public void testInner()
     {
-        ValueBuilder<InnerValue> innerBuilder = valueBuilderFactory.newValueBuilder( InnerValue.class );
+        ValueBuilder<InnerValue> innerBuilder = valueBuilderFactory.newValueBuilder(InnerValue.class);
         InnerValue inner = innerBuilder.prototype();
-        inner.listProp().set( new ArrayList<String>() );
-        inner.mapProp().set( new HashMap<String, String>() );
+        inner.listProp().set(new ArrayList<String>());
+        inner.mapProp().set(new HashMap<String, String>());
         inner = innerBuilder.newInstance();
         // If we reach this point, value creation went well
     }
@@ -92,25 +93,25 @@ public class ValueNestedBuilderTest
     @Test
     public void testOuter()
     {
-        ValueBuilder<InnerValue> innerBuilder = valueBuilderFactory.newValueBuilder( InnerValue.class );
+        ValueBuilder<InnerValue> innerBuilder = valueBuilderFactory.newValueBuilder(InnerValue.class);
         InnerValue inner = innerBuilder.prototype();
-        inner.listProp().set( new ArrayList<String>() );
-        inner.mapProp().set( new HashMap<String, String>() );
+        inner.listProp().set(new ArrayList<String>());
+        inner.mapProp().set(new HashMap<String, String>());
         inner = innerBuilder.newInstance();
-        ValueBuilder<OuterValue> outerBuilder = valueBuilderFactory.newValueBuilder( OuterValue.class );
+        ValueBuilder<OuterValue> outerBuilder = valueBuilderFactory.newValueBuilder(OuterValue.class);
         OuterValue outer = outerBuilder.prototype();
         List<InnerValue> inners = new ArrayList<InnerValue>();
-        inners.add( inner );
-        outer.innerListProp().set( inners );
+        inners.add(inner);
+        outer.innerListProp().set(inners);
         outer = outerBuilder.newInstance();
-        System.out.println( outer.toString() );
+        System.out.println(outer.toString());
         // If we reach this point, value creation went well
     }
 
     @Test
     public void testDefaultedInner()
     {
-        ValueBuilder<InnerDefaultedValue> innerBuilder = valueBuilderFactory.newValueBuilder( InnerDefaultedValue.class );
+        ValueBuilder<InnerDefaultedValue> innerBuilder = valueBuilderFactory.newValueBuilder(InnerDefaultedValue.class);
         InnerDefaultedValue inner = innerBuilder.newInstance();
         // If we reach this point, value creation went well
     }
@@ -118,15 +119,15 @@ public class ValueNestedBuilderTest
     @Test
     public void testDefaultedOuter()
     {
-        ValueBuilder<InnerDefaultedValue> innerBuilder = valueBuilderFactory.newValueBuilder( InnerDefaultedValue.class );
+        ValueBuilder<InnerDefaultedValue> innerBuilder = valueBuilderFactory.newValueBuilder(InnerDefaultedValue.class);
         InnerDefaultedValue inner = innerBuilder.newInstance();
-        ValueBuilder<OuterDefaultedValue> outerBuilder = valueBuilderFactory.newValueBuilder( OuterDefaultedValue.class );
+        ValueBuilder<OuterDefaultedValue> outerBuilder = valueBuilderFactory.newValueBuilder(OuterDefaultedValue.class);
         OuterDefaultedValue outer = outerBuilder.prototype();
         List<InnerDefaultedValue> inners = new ArrayList<InnerDefaultedValue>();
-        inners.add( inner );
-        outer.innerListPropDefault().set( inners );
+        inners.add(inner);
+        outer.innerListPropDefault().set(inners);
         outer = outerBuilder.newInstance();
-        System.out.println( outer.toString() );
+        System.out.println(outer.toString());
         // If we reach this point, value creation went well
     }
 }

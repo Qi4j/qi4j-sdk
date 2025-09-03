@@ -20,51 +20,31 @@
 
 package org.qi4j.runtime.unitofwork;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
-import org.qi4j.api.metrics.MetricNames;
-import org.qi4j.api.metrics.MetricsCounter;
-import org.qi4j.api.metrics.MetricsCounterFactory;
-import org.qi4j.api.metrics.MetricsProvider;
-import org.qi4j.api.metrics.MetricsTimer;
-import org.qi4j.api.metrics.MetricsTimerFactory;
+import org.qi4j.api.metrics.*;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.HasTypes;
-import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
-import org.qi4j.api.unitofwork.NoSuchEntityException;
-import org.qi4j.api.unitofwork.NoSuchEntityTypeException;
-import org.qi4j.api.unitofwork.UnitOfWork;
-import org.qi4j.api.unitofwork.UnitOfWorkCallback;
-import org.qi4j.api.unitofwork.UnitOfWorkCompletionException;
-import org.qi4j.api.unitofwork.UnitOfWorkException;
-import org.qi4j.api.unitofwork.UnitOfWorkOptions;
+import org.qi4j.api.unitofwork.*;
 import org.qi4j.api.usecase.Usecase;
 import org.qi4j.runtime.entity.EntityInstance;
 import org.qi4j.runtime.entity.EntityModel;
 import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
-import org.qi4j.spi.entitystore.ConcurrentEntityStateModificationException;
-import org.qi4j.spi.entitystore.EntityNotFoundException;
-import org.qi4j.spi.entitystore.EntityStore;
-import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
-import org.qi4j.spi.entitystore.StateCommitter;
+import org.qi4j.spi.entitystore.*;
 import org.qi4j.spi.module.ModuleSpi;
+
+import java.time.Instant;
+import java.util.*;
 
 import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.COMPLETED;
 import static org.qi4j.api.unitofwork.UnitOfWorkCallback.UnitOfWorkStatus.DISCARDED;
 
 public final class UnitOfWorkInstance
 {
-    private static final ThreadLocal<Stack<UnitOfWorkInstance>> CURRENT = ThreadLocal.withInitial( Stack::new );
+    private static final ThreadLocal<Stack<UnitOfWorkInstance>> CURRENT = ThreadLocal.withInitial(Stack::new);
 
     public static Stack<UnitOfWorkInstance> getCurrent()
     {
@@ -87,7 +67,7 @@ public final class UnitOfWorkInstance
     private MetaInfo metaInfo;
     private List<UnitOfWorkCallback> callbacks;
 
-    public UnitOfWorkInstance(ModuleSpi module, Usecase usecase, Instant currentTime, MetricsProvider metrics )
+    public UnitOfWorkInstance(ModuleSpi module, Usecase usecase, Instant currentTime, MetricsProvider metrics)
     {
         this.module = module;
         this.usecase = usecase;
@@ -95,7 +75,7 @@ public final class UnitOfWorkInstance
         this.metrics = metrics;
 
         this.open = true;
-        getCurrent().push( this );
+        getCurrent().push(this);
         this.paused = false;
         startCapture();
     }
@@ -105,23 +85,23 @@ public final class UnitOfWorkInstance
         return currentTime;
     }
 
-    public EntityStoreUnitOfWork getEntityStoreUnitOfWork( EntityStore store )
+    public EntityStoreUnitOfWork getEntityStoreUnitOfWork(EntityStore store)
     {
-        return storeUnitOfWork.computeIfAbsent( store,
-                                                s -> s.newUnitOfWork( module.descriptor(), usecase, currentTime ) );
+        return storeUnitOfWork.computeIfAbsent(store,
+            s -> s.newUnitOfWork(module.descriptor(), usecase, currentTime));
     }
 
-    public <T> T get( EntityReference reference,
-                      UnitOfWork uow,
-                      Iterable<? extends EntityDescriptor> potentialModels,
-                      Class<T> mixinType
+    public <T> T get(EntityReference reference,
+                     UnitOfWork uow,
+                     Iterable<? extends EntityDescriptor> potentialModels,
+                     Class<T> mixinType
     )
         throws NoSuchEntityTypeException, NoSuchEntityException
     {
         checkOpen();
 
-        EntityInstance entityInstance = instanceCache.get( reference );
-        if( entityInstance == null )
+        EntityInstance entityInstance = instanceCache.get(reference);
+        if(entityInstance == null)
         {   // Not yet in cache
 
             // Check if this is a root UoW, or if no parent UoW knows about this entity
@@ -129,15 +109,15 @@ public final class UnitOfWorkInstance
             EntityModel model = null;
             ModuleDescriptor module = null;
             // Figure out what EntityStore to use
-            for( EntityDescriptor potentialModel : potentialModels )
+            for(EntityDescriptor potentialModel : potentialModels)
             {
                 EntityStore store = ((ModuleSpi) potentialModel.module().instance()).entityStore();
-                EntityStoreUnitOfWork storeUow = getEntityStoreUnitOfWork( store );
+                EntityStoreUnitOfWork storeUow = getEntityStoreUnitOfWork(store);
                 try
                 {
-                    entityState = storeUow.entityStateOf( potentialModel.module(), reference );
+                    entityState = storeUow.entityStateOf(potentialModel.module(), reference);
                 }
-                catch( EntityNotFoundException e )
+                catch(EntityNotFoundException e)
                 {
                     continue;
                 }
@@ -148,28 +128,28 @@ public final class UnitOfWorkInstance
             }
 
             // Check if model was found
-            if( model == null )
+            if(model == null)
             {
                 // Check if state was found
-                if( entityState == null )
+                if(entityState == null)
                 {
-                    throw new NoSuchEntityException( reference, mixinType, usecase );
+                    throw new NoSuchEntityException(reference, mixinType, usecase);
                 }
                 else
                 {
-                    throw new NoSuchEntityTypeException( mixinType.getName(), module );
+                    throw new NoSuchEntityTypeException(mixinType.getName(), module);
                 }
             }
             // Create instance
-            entityInstance = new EntityInstance( uow, model, entityState );
-            instanceCache.put( reference, entityInstance );
+            entityInstance = new EntityInstance(uow, model, entityState);
+            instanceCache.put(reference, entityInstance);
         }
         else
         {
             // Check if it has been removed
-            if( entityInstance.status() == EntityStatus.REMOVED )
+            if(entityInstance.status() == EntityStatus.REMOVED)
             {
-                throw new NoSuchEntityException( reference, mixinType, usecase );
+                throw new NoSuchEntityException(reference, mixinType, usecase);
             }
         }
 
@@ -183,7 +163,7 @@ public final class UnitOfWorkInstance
 
     public MetaInfo metaInfo()
     {
-        if( metaInfo == null )
+        if(metaInfo == null)
         {
             metaInfo = new MetaInfo();
         }
@@ -193,56 +173,56 @@ public final class UnitOfWorkInstance
 
     public void pause()
     {
-        if( !paused )
+        if(!paused)
         {
             paused = true;
             getCurrent().pop();
 
-            UnitOfWorkOptions unitOfWorkOptions = metaInfo().get( UnitOfWorkOptions.class );
-            if( unitOfWorkOptions == null )
+            UnitOfWorkOptions unitOfWorkOptions = metaInfo().get(UnitOfWorkOptions.class);
+            if(unitOfWorkOptions == null)
             {
-                unitOfWorkOptions = usecase().metaInfo( UnitOfWorkOptions.class );
+                unitOfWorkOptions = usecase().metaInfo(UnitOfWorkOptions.class);
             }
 
-            if( unitOfWorkOptions != null )
+            if(unitOfWorkOptions != null)
             {
-                if( unitOfWorkOptions.isPruneOnPause() )
+                if(unitOfWorkOptions.isPruneOnPause())
                 {
                     List<EntityReference> prunedInstances = null;
-                    for( EntityInstance entityInstance : instanceCache.values() )
+                    for(EntityInstance entityInstance : instanceCache.values())
                     {
-                        if( entityInstance.status() == EntityStatus.LOADED )
+                        if(entityInstance.status() == EntityStatus.LOADED)
                         {
-                            if( prunedInstances == null )
+                            if(prunedInstances == null)
                             {
                                 prunedInstances = new ArrayList<>();
                             }
-                            prunedInstances.add( entityInstance.reference() );
+                            prunedInstances.add(entityInstance.reference());
                         }
                     }
-                    if( prunedInstances != null )
+                    if(prunedInstances != null)
                     {
-                        prunedInstances.forEach( instanceCache::remove );
+                        prunedInstances.forEach(instanceCache::remove);
                     }
                 }
             }
         }
         else
         {
-            throw new UnitOfWorkException( "Unit of work is not active" );
+            throw new UnitOfWorkException("Unit of work is not active");
         }
     }
 
     public void resume()
     {
-        if( paused )
+        if(paused)
         {
             paused = false;
-            getCurrent().push( this );
+            getCurrent().push(this);
         }
         else
         {
-            throw new UnitOfWorkException( "Unit of work has not been paused" );
+            throw new UnitOfWorkException("Unit of work has not been paused");
         }
     }
 
@@ -252,39 +232,39 @@ public final class UnitOfWorkInstance
         checkOpen();
 
         // Copy list so that it cannot be modified during completion
-        List<UnitOfWorkCallback> currentCallbacks = callbacks == null ? null : new ArrayList<>( callbacks );
+        List<UnitOfWorkCallback> currentCallbacks = callbacks == null ? null : new ArrayList<>(callbacks);
 
         // Commit state to EntityStores
         List<StateCommitter> committers = applyChanges();
 
         // Check callbacks
-        notifyBeforeCompletion( currentCallbacks );
+        notifyBeforeCompletion(currentCallbacks);
 
         // Commit all changes
-        committers.forEach( StateCommitter::commit );
+        committers.forEach(StateCommitter::commit);
 
         close();
 
         // Call callbacks
-        notifyAfterCompletion( currentCallbacks, COMPLETED );
+        notifyAfterCompletion(currentCallbacks, COMPLETED);
 
         callbacks = currentCallbacks;
     }
 
     public void discard()
     {
-        if( !isOpen() )
+        if(!isOpen())
         {
             return;
         }
         close();
 
         // Copy list so that it cannot be modified during completion
-        List<UnitOfWorkCallback> currentCallbacks = callbacks == null ? null : new ArrayList<>( callbacks );
+        List<UnitOfWorkCallback> currentCallbacks = callbacks == null ? null : new ArrayList<>(callbacks);
 
         // Call callbacks
-        notifyAfterCompletion( currentCallbacks, DISCARDED );
-        storeUnitOfWork.values().forEach( EntityStoreUnitOfWork::discard );
+        notifyAfterCompletion(currentCallbacks, DISCARDED);
+        storeUnitOfWork.values().forEach(EntityStoreUnitOfWork::discard);
         callbacks = currentCallbacks;
     }
 
@@ -292,7 +272,7 @@ public final class UnitOfWorkInstance
     {
         checkOpen();
 
-        if( !isPaused() )
+        if(!isPaused())
         {
             getCurrent().pop();
         }
@@ -305,114 +285,114 @@ public final class UnitOfWorkInstance
         return open;
     }
 
-    public void addUnitOfWorkCallback( UnitOfWorkCallback callback )
+    public void addUnitOfWorkCallback(UnitOfWorkCallback callback)
     {
-        if( callbacks == null )
+        if(callbacks == null)
         {
             callbacks = new ArrayList<>();
         }
 
-        callbacks.add( callback );
+        callbacks.add(callback);
     }
 
-    public void removeUnitOfWorkCallback( UnitOfWorkCallback callback )
+    public void removeUnitOfWorkCallback(UnitOfWorkCallback callback)
     {
-        if( callbacks != null )
+        if(callbacks != null)
         {
-            callbacks.remove( callback );
+            callbacks.remove(callback);
         }
     }
 
-    public void addEntity( EntityInstance instance )
+    public void addEntity(EntityInstance instance)
     {
-        instanceCache.put( instance.reference(), instance );
+        instanceCache.put(instance.reference(), instance);
     }
 
     private List<StateCommitter> applyChanges()
         throws UnitOfWorkCompletionException
     {
         List<StateCommitter> committers = new ArrayList<>();
-        for( EntityStoreUnitOfWork entityStoreUnitOfWork : storeUnitOfWork.values() )
+        for(EntityStoreUnitOfWork entityStoreUnitOfWork : storeUnitOfWork.values())
         {
             try
             {
                 StateCommitter committer = entityStoreUnitOfWork.applyChanges();
-                committers.add( committer );
+                committers.add(committer);
             }
-            catch( Exception e )
+            catch(Exception e)
             {
                 // Cancel all previously prepared stores
-                committers.forEach( StateCommitter::cancel );
+                committers.forEach(StateCommitter::cancel);
 
-                if( e instanceof ConcurrentEntityStateModificationException )
+                if(e instanceof ConcurrentEntityStateModificationException)
                 {
                     // If we cancelled due to concurrent modification, then create the proper exception for it!
                     ConcurrentEntityStateModificationException mee = (ConcurrentEntityStateModificationException) e;
                     Collection<EntityReference> modifiedEntityIdentities = mee.modifiedEntities();
                     Map<EntityComposite, HasTypes> modifiedEntities = new HashMap<>();
-                    for( EntityReference modifiedEntityIdentity : modifiedEntityIdentities )
+                    for(EntityReference modifiedEntityIdentity : modifiedEntityIdentities)
                     {
                         instanceCache.values().stream()
-                            .filter( instance -> instance.reference().equals( modifiedEntityIdentity ) )
-                            .forEach( instance -> modifiedEntities.put( instance.<EntityComposite>proxy(), instance ) );
+                            .filter(instance -> instance.reference().equals(modifiedEntityIdentity))
+                            .forEach(instance -> modifiedEntities.put(instance.<EntityComposite>proxy(), instance));
                     }
-                    throw new ConcurrentEntityModificationException( modifiedEntities, usecase );
+                    throw new ConcurrentEntityModificationException(modifiedEntities, usecase);
                 }
                 else
                 {
-                    throw new UnitOfWorkCompletionException( e );
+                    throw new UnitOfWorkCompletionException(e);
                 }
             }
         }
         return committers;
     }
 
-    private void notifyBeforeCompletion( List<UnitOfWorkCallback> callbacks )
+    private void notifyBeforeCompletion(List<UnitOfWorkCallback> callbacks)
         throws UnitOfWorkCompletionException
     {
         // Notify explicitly registered callbacks
-        if( callbacks != null )
+        if(callbacks != null)
         {
-            callbacks.forEach( UnitOfWorkCallback::beforeCompletion );
+            callbacks.forEach(UnitOfWorkCallback::beforeCompletion);
         }
 
         // Notify entities
         try
         {
-            for( EntityInstance instance : instanceCache.values() )
+            for(EntityInstance instance : instanceCache.values())
             {
                 boolean isCallback = instance.proxy() instanceof UnitOfWorkCallback;
-                boolean isNotRemoved = !instance.status().equals( EntityStatus.REMOVED );
-                if( isCallback && isNotRemoved )
+                boolean isNotRemoved = !instance.status().equals(EntityStatus.REMOVED);
+                if(isCallback && isNotRemoved)
                 {
-                    UnitOfWorkCallback callback = UnitOfWorkCallback.class.cast( instance.proxy() );
+                    UnitOfWorkCallback callback = UnitOfWorkCallback.class.cast(instance.proxy());
                     callback.beforeCompletion();
                 }
             }
         }
-        catch( UnitOfWorkCompletionException e )
+        catch(UnitOfWorkCompletionException e)
         {
             throw e;
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new UnitOfWorkCompletionException( e );
+            throw new UnitOfWorkCompletionException(e);
         }
     }
 
-    private void notifyAfterCompletion( List<UnitOfWorkCallback> callbacks,
-                                        final UnitOfWorkCallback.UnitOfWorkStatus status
+    private void notifyAfterCompletion(List<UnitOfWorkCallback> callbacks,
+                                       final UnitOfWorkCallback.UnitOfWorkStatus status
     )
     {
-        if( callbacks != null )
+        if(callbacks != null)
         {
-            for( UnitOfWorkCallback callback : callbacks )
+            for(UnitOfWorkCallback callback : callbacks)
             {
                 try
                 {
-                    callback.afterCompletion( status );
+                    callback.afterCompletion(status);
                 }
-                catch( Exception e )
+                catch(Exception e)
                 {
                     // Ignore
                 }
@@ -422,18 +402,18 @@ public final class UnitOfWorkInstance
         // Notify entities
         try
         {
-            for( EntityInstance instance : instanceCache.values() )
+            for(EntityInstance instance : instanceCache.values())
             {
                 boolean isCallback = instance.proxy() instanceof UnitOfWorkCallback;
-                boolean isNotRemoved = !instance.status().equals( EntityStatus.REMOVED );
-                if( isCallback && isNotRemoved )
+                boolean isNotRemoved = !instance.status().equals(EntityStatus.REMOVED);
+                if(isCallback && isNotRemoved)
                 {
-                    UnitOfWorkCallback callback = UnitOfWorkCallback.class.cast( instance.proxy() );
-                    callback.afterCompletion( status );
+                    UnitOfWorkCallback callback = UnitOfWorkCallback.class.cast(instance.proxy());
+                    callback.afterCompletion(status);
                 }
             }
         }
-        catch( Exception e )
+        catch(Exception e)
         {
             // Ignore
         }
@@ -441,9 +421,9 @@ public final class UnitOfWorkInstance
 
     public void checkOpen()
     {
-        if( !isOpen() )
+        if(!isOpen())
         {
-            throw new UnitOfWorkException( "Unit of work has been closed" );
+            throw new UnitOfWorkException("Unit of work has been closed");
         }
     }
 
@@ -458,9 +438,9 @@ public final class UnitOfWorkInstance
         return "UnitOfWork " + hashCode() + "(" + usecase + "): entities:" + instanceCache.size();
     }
 
-    public void remove( EntityReference entityReference )
+    public void remove(EntityReference entityReference)
     {
-        instanceCache.remove( entityReference );
+        instanceCache.remove(entityReference);
     }
 
     private void startCapture()
@@ -478,20 +458,20 @@ public final class UnitOfWorkInstance
 
     private MetricsCounter getMetricsCounter()
     {
-        if( metricsCounter == null )
+        if(metricsCounter == null)
         {
-            MetricsCounterFactory metricsFactory = metrics.createFactory( MetricsCounterFactory.class );
-            metricsCounter = metricsFactory.createCounter( MetricNames.nameFor( module, UnitOfWork.class, "counter" ) );
+            MetricsCounterFactory metricsFactory = metrics.createFactory(MetricsCounterFactory.class);
+            metricsCounter = metricsFactory.createCounter(MetricNames.nameFor(module, UnitOfWork.class, "counter"));
         }
         return metricsCounter;
     }
 
     private MetricsTimer getMetricsTimer()
     {
-        if( metricsTimer == null )
+        if(metricsTimer == null)
         {
-            MetricsTimerFactory metricsFactory = metrics.createFactory( MetricsTimerFactory.class );
-            metricsTimer = metricsFactory.createTimer( MetricNames.nameFor( module, UnitOfWork.class, "timer" ) );
+            MetricsTimerFactory metricsFactory = metrics.createFactory(MetricsTimerFactory.class);
+            metricsTimer = metricsFactory.createTimer(MetricNames.nameFor(module, UnitOfWork.class, "timer"));
         }
         return metricsTimer;
     }

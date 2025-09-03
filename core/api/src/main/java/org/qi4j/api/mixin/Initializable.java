@@ -32,5 +32,6 @@ public interface Initializable
      *
      * @throws Exception if something went wrong
      */
-    void initialize() throws Exception;
+    void initialize()
+        throws Exception;
 }

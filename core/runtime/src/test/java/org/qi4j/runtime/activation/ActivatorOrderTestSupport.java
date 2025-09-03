@@ -19,12 +19,12 @@
  */
 package org.qi4j.runtime.activation;
 
+import org.qi4j.api.activation.Activator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import org.qi4j.api.activation.Activator;
 
 public class ActivatorOrderTestSupport
 {
@@ -35,19 +35,19 @@ public class ActivatorOrderTestSupport
     public static interface Expected
     {
 
-        String ALPHA_BETA_SINGLE = Arrays.toString( new String[]{
-                    "Alpha.beforeActivation",
-                    "Beta.beforeActivation",
-                    // -> Activation
-                    "Alpha.afterActivation",
-                    "Beta.afterActivation",
-                    // -> Active
-                    "Beta.beforePassivation",
-                    "Alpha.beforePassivation",
-                    // -> Passivation
-                    "Beta.afterPassivation",
-                    "Alpha.afterPassivation"
-                } );
+        String ALPHA_BETA_SINGLE = Arrays.toString(new String[]{
+            "Alpha.beforeActivation",
+            "Beta.beforeActivation",
+            // -> Activation
+            "Alpha.afterActivation",
+            "Beta.afterActivation",
+            // -> Active
+            "Beta.beforePassivation",
+            "Alpha.beforePassivation",
+            // -> Passivation
+            "Beta.afterPassivation",
+            "Alpha.afterPassivation"
+        });
 
     }
 
@@ -61,7 +61,7 @@ public class ActivatorOrderTestSupport
 
         public final String step;
 
-        public ActivationStep( String activator, String step )
+        public ActivationStep(String activator, String step)
         {
             this.activator = activator;
             this.step = step;
@@ -80,14 +80,14 @@ public class ActivatorOrderTestSupport
 
         void reset();
 
-        void record( ActivationStep step );
+        void record(ActivationStep step);
 
         List<ActivationStep> steps();
 
     }
 
     public static class ActivationStepsRecorderInstance
-            implements ActivationStepsRecorder
+        implements ActivationStepsRecorder
     {
 
         private List<ActivationStep> steps = new ArrayList<ActivationStep>();
@@ -99,15 +99,15 @@ public class ActivatorOrderTestSupport
         }
 
         @Override
-        public void record( ActivationStep step )
+        public void record(ActivationStep step)
         {
-            steps.add( step );
+            steps.add(step);
         }
 
         @Override
         public List<ActivationStep> steps()
         {
-            return Collections.unmodifiableList( steps );
+            return Collections.unmodifiableList(steps);
         }
 
     }
@@ -116,45 +116,45 @@ public class ActivatorOrderTestSupport
     // Activator that call the ActivationStepsRecorder --------------------
     //
     public static abstract class OrderTestActivator<T>
-            implements Activator<T>
+        implements Activator<T>
     {
 
         private final String activator;
 
         private final ActivationStepsRecorder recorder;
 
-        public OrderTestActivator( String activator, ActivationStepsRecorder recorder )
+        public OrderTestActivator(String activator, ActivationStepsRecorder recorder)
         {
             this.activator = activator;
             this.recorder = recorder;
         }
 
         @Override
-        public final void beforeActivation( T activating )
-                throws Exception
+        public final void beforeActivation(T activating)
+            throws Exception
         {
-            recorder.record( new ActivationStep( activator, "beforeActivation" ) );
+            recorder.record(new ActivationStep(activator, "beforeActivation"));
         }
 
         @Override
-        public final void afterActivation( T activated )
-                throws Exception
+        public final void afterActivation(T activated)
+            throws Exception
         {
-            recorder.record( new ActivationStep( activator, "afterActivation" ) );
+            recorder.record(new ActivationStep(activator, "afterActivation"));
         }
 
         @Override
-        public final void beforePassivation( T passivating )
-                throws Exception
+        public final void beforePassivation(T passivating)
+            throws Exception
         {
-            recorder.record( new ActivationStep( activator, "beforePassivation" ) );
+            recorder.record(new ActivationStep(activator, "beforePassivation"));
         }
 
         @Override
-        public final void afterPassivation( T passivated )
-                throws Exception
+        public final void afterPassivation(T passivated)
+            throws Exception
         {
-            recorder.record( new ActivationStep( activator, "afterPassivation" ) );
+            recorder.record(new ActivationStep(activator, "afterPassivation"));
         }
 
     }

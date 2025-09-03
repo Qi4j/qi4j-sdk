@@ -35,50 +35,50 @@ public abstract class UnitOfWorkTemplate<RESULT, ThrowableType extends Throwable
     {
     }
 
-    protected UnitOfWorkTemplate( int retries, boolean complete )
+    protected UnitOfWorkTemplate(int retries, boolean complete)
     {
         this.retries = retries;
         this.complete = complete;
     }
 
-    protected UnitOfWorkTemplate( Usecase usecase, int retries, boolean complete )
+    protected UnitOfWorkTemplate(Usecase usecase, int retries, boolean complete)
     {
         this.usecase = usecase;
         this.retries = retries;
         this.complete = complete;
     }
 
-    protected abstract RESULT withUnitOfWork( UnitOfWork uow )
+    protected abstract RESULT withUnitOfWork(UnitOfWork uow)
         throws ThrowableType;
 
-    @SuppressWarnings( "unchecked" )
-    public RESULT withModule( Module module )
+    @SuppressWarnings("unchecked")
+    public RESULT withModule(Module module)
         throws ThrowableType, UnitOfWorkCompletionException
     {
         int loop = 0;
         ThrowableType ex = null;
         do
         {
-            UnitOfWork uow = module.unitOfWorkFactory().newUnitOfWork( usecase );
+            UnitOfWork uow = module.unitOfWorkFactory().newUnitOfWork(usecase);
 
             try
             {
-                RESULT result = withUnitOfWork( uow );
-                if( complete )
+                RESULT result = withUnitOfWork(uow);
+                if(complete)
                 {
                     try
                     {
                         uow.complete();
                         return result;
                     }
-                    catch( ConcurrentEntityModificationException e )
+                    catch(ConcurrentEntityModificationException e)
                     {
                         // Retry?
                         ex = (ThrowableType) e;
                     }
                 }
             }
-            catch( Throwable e )
+            catch(Throwable e)
             {
                 ex = (ThrowableType) e;
             }
@@ -87,7 +87,7 @@ public abstract class UnitOfWorkTemplate<RESULT, ThrowableType extends Throwable
                 uow.discard();
             }
         }
-        while( loop++ < retries );
+        while(loop++ < retries);
 
         throw ex;
     }

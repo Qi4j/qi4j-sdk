@@ -40,47 +40,47 @@ public final class NoopMixin
     private static final Double DOUBLE_DEFAULT = 0.0;
 
     @Override
-    public Object invoke( Object object, Method method, Object[] args )
+    public Object invoke(Object object, Method method, Object[] args)
         throws Throwable
     {
         Class<?> retType = method.getReturnType();
-        if( !retType.isPrimitive() )
+        if(!retType.isPrimitive())
         {
             return null;
         }
-        if( Void.TYPE == retType )
+        if(Void.TYPE == retType)
         {
             return null;
         }
-        if( Boolean.TYPE == retType )
+        if(Boolean.TYPE == retType)
         {
             return BOOLEAN_DEFAULT;
         }
-        if( Short.TYPE == retType )
+        if(Short.TYPE == retType)
         {
             return SHORT_DEFAULT;
         }
-        if( Character.TYPE == retType )
+        if(Character.TYPE == retType)
         {
             return CHARACTER_DEFAULT;
         }
-        if( Integer.TYPE == retType )
+        if(Integer.TYPE == retType)
         {
             return INTEGER_DEFAULT;
         }
-        if( Byte.TYPE == retType )
+        if(Byte.TYPE == retType)
         {
             return BYTE_DEFAULT;
         }
-        if( Long.TYPE == retType )
+        if(Long.TYPE == retType)
         {
             return LONG_DEFAULT;
         }
-        if( Float.TYPE == retType )
+        if(Float.TYPE == retType)
         {
             return FLOAT_DEFAULT;
         }
-        if( Double.TYPE == retType )
+        if(Double.TYPE == retType)
         {
             return DOUBLE_DEFAULT;
         }

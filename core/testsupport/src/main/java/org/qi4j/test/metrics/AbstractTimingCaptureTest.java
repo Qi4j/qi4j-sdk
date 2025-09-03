@@ -19,6 +19,7 @@
  */
 package org.qi4j.test.metrics;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.composite.TransientComposite;
 import org.qi4j.api.metrics.TimingCapture;
@@ -30,7 +31,6 @@ import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.Assemblers;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -39,15 +39,15 @@ public abstract class AbstractTimingCaptureTest extends AbstractQi4jTest
 {
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws Exception
     {
         module.defaultServices();
-        module.layer().application().setName( "SomeApplication" );
-        module.transients( Country1.class );
-        module.transients( Country2.class ).withConcerns( TimingCaptureAllConcern.class );
-        module.transients( Country3.class ).withConcerns( TimingCaptureConcern.class );
-        metricsAssembler().assemble( module );
+        module.layer().application().setName("SomeApplication");
+        module.transients(Country1.class);
+        module.transients(Country2.class).withConcerns(TimingCaptureAllConcern.class);
+        module.transients(Country3.class).withConcerns(TimingCaptureConcern.class);
+        metricsAssembler().assemble(module);
     }
 
     protected abstract Assemblers.Visible<? extends Assembler> metricsAssembler();
@@ -57,35 +57,35 @@ public abstract class AbstractTimingCaptureTest extends AbstractQi4jTest
     @Test
     public void givenNonInstrumentedCompositeExpectNoTimers()
     {
-        Country underTest = transientBuilderFactory.newTransient( Country1.class );
-        updateName( underTest, 10 );
-        assertThat( metricValuesProvider().timerCount( "Layer 1.Module 1.AbstractTimingCaptureTest.Country.name" ), is( 0L ) );
-        assertThat( metricValuesProvider().timerCount( "Layer 1.Module 1.AbstractTimingCaptureTest.Country.updateName" ), is( 0L ) );
+        Country underTest = transientBuilderFactory.newTransient(Country1.class);
+        updateName(underTest, 10);
+        assertThat(metricValuesProvider().timerCount("Layer 1.Module 1.AbstractTimingCaptureTest.Country.name"), is(0L));
+        assertThat(metricValuesProvider().timerCount("Layer 1.Module 1.AbstractTimingCaptureTest.Country.updateName"), is(0L));
     }
 
     @Test
     public void givenInstrumentedWithAllCompositeWhenCallingUpdateNameExpectTimers()
     {
-        Country underTest = transientBuilderFactory.newTransient( Country2.class );
-        updateName( underTest, 10 );
-        assertThat( metricValuesProvider().timerCount( "Layer 1.Module 1.AbstractTimingCaptureTest.Country.name" ), is( 10L ) );
-        assertThat( metricValuesProvider().timerCount( "Layer 1.Module 1.AbstractTimingCaptureTest.Country.updateName" ), is( 10L ) );
+        Country underTest = transientBuilderFactory.newTransient(Country2.class);
+        updateName(underTest, 10);
+        assertThat(metricValuesProvider().timerCount("Layer 1.Module 1.AbstractTimingCaptureTest.Country.name"), is(10L));
+        assertThat(metricValuesProvider().timerCount("Layer 1.Module 1.AbstractTimingCaptureTest.Country.updateName"), is(10L));
     }
 
     @Test
     public void givenOneMethodAnnotatedWhenCallingUpdateNameExpectTimerForThatMethodOnly()
     {
-        Country underTest = transientBuilderFactory.newTransient( Country3.class );
-        updateName( underTest, 10 );
-        assertThat( metricValuesProvider().timerCount( "Layer 1.Module 1.AbstractTimingCaptureTest.Country.name" ), is( 0L ) );
-        assertThat( metricValuesProvider().timerCount( "Country3.updateName" ), is( 10L ) );
+        Country underTest = transientBuilderFactory.newTransient(Country3.class);
+        updateName(underTest, 10);
+        assertThat(metricValuesProvider().timerCount("Layer 1.Module 1.AbstractTimingCaptureTest.Country.name"), is(0L));
+        assertThat(metricValuesProvider().timerCount("Country3.updateName"), is(10L));
     }
 
-    private void updateName( Country underTest, int times )
+    private void updateName(Country underTest, int times)
     {
-        for( int i = 0; i < times; i++ )
+        for(int i = 0; i < times; i++)
         {
-            underTest.updateName( "Name" + i );
+            underTest.updateName("Name" + i);
         }
     }
 
@@ -95,10 +95,10 @@ public abstract class AbstractTimingCaptureTest extends AbstractQi4jTest
         @Optional
         Property<String> name();
 
-        void updateName( String newName );
+        void updateName(String newName);
     }
 
-    @Mixins( Country1Mixin.class )
+    @Mixins(Country1Mixin.class)
     public interface Country1 extends Country
     {
     }
@@ -107,13 +107,13 @@ public abstract class AbstractTimingCaptureTest extends AbstractQi4jTest
         implements Country1
     {
         @Override
-        public void updateName( String newName )
+        public void updateName(String newName)
         {
-            name().set( newName );
+            name().set(newName);
         }
     }
 
-    @Mixins( Country2Mixin.class )
+    @Mixins(Country2Mixin.class)
     public interface Country2 extends Country
     {
     }
@@ -122,27 +122,27 @@ public abstract class AbstractTimingCaptureTest extends AbstractQi4jTest
         implements Country2
     {
         @Override
-        public void updateName( String newName )
+        public void updateName(String newName)
         {
-            name().set( newName );
+            name().set(newName);
         }
     }
 
-    @Mixins( Country3Mixin.class )
+    @Mixins(Country3Mixin.class)
     public interface Country3 extends Country
     {
-        @TimingCapture( "Country3.updateName" )
+        @TimingCapture("Country3.updateName")
         @Override
-        void updateName( String newName );
+        void updateName(String newName);
     }
 
     public static abstract class Country3Mixin
         implements Country3
     {
         @Override
-        public void updateName( String newName )
+        public void updateName(String newName)
         {
-            name().set( newName );
+            name().set(newName);
         }
     }
     // END SNIPPET: complex-capture

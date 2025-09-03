@@ -30,30 +30,30 @@ import static org.qi4j.api.util.Classes.typeOf;
  */
 public final class GenericAssociationInfo
 {
-    public static Type associationTypeOf( AccessibleObject accessor )
+    public static Type associationTypeOf(AccessibleObject accessor)
     {
-        return toAssociationType( typeOf( accessor ) );
+        return toAssociationType(typeOf(accessor));
     }
 
-    public static Type toAssociationType( Type methodReturnType )
+    public static Type toAssociationType(Type methodReturnType)
     {
-        if( methodReturnType instanceof ParameterizedType )
+        if(methodReturnType instanceof ParameterizedType)
         {
             ParameterizedType parameterizedType = (ParameterizedType) methodReturnType;
-            if( AbstractAssociation.class.isAssignableFrom( (Class<?>) parameterizedType.getRawType() ) )
+            if(AbstractAssociation.class.isAssignableFrom((Class<?>) parameterizedType.getRawType()))
             {
-                return parameterizedType.getActualTypeArguments()[ 0 ];
+                return parameterizedType.getActualTypeArguments()[0];
             }
         }
-        if (!(methodReturnType instanceof Class))
+        if(!(methodReturnType instanceof Class))
         {
-            throw new IllegalArgumentException( "Unable to make an association with " + methodReturnType );
+            throw new IllegalArgumentException("Unable to make an association with " + methodReturnType);
         }
         Type[] interfaces = ((Class<?>) methodReturnType).getGenericInterfaces();
-        for (Type anInterface : interfaces)
+        for(Type anInterface : interfaces)
         {
             Type associationType = toAssociationType(anInterface);
-            if (associationType != null)
+            if(associationType != null)
             {
                 return associationType;
             }

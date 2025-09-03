@@ -26,9 +26,9 @@ import org.qi4j.bootstrap.layered.LayeredLayerAssembler;
 class PersistenceLayer extends LayeredLayerAssembler
 {
     @Override
-    public LayerAssembly assemble( LayerAssembly layer )
+    public LayerAssembly assemble(LayerAssembly layer)
     {
-        createModule( layer, PersistenceModule.class );
+        createModule(layer, PersistenceModule.class);
         return layer;
     }
 }

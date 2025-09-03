@@ -30,20 +30,20 @@ public final class GenericFragmentInvocationHandler
     extends FragmentInvocationHandler
 {
     @Override
-    public Object invoke( Object proxy, Method method, Object[] args )
+    public Object invoke(Object proxy, Method method, Object[] args)
         throws Throwable
     {
         try
         {
-            return ( (InvocationHandler) fragment ).invoke( proxy, method, args );
+            return ((InvocationHandler) fragment).invoke(proxy, method, args);
         }
-        catch( InvocationTargetException throwable )
+        catch(InvocationTargetException throwable)
         {
-            throw cleanStackTrace( throwable.getTargetException(), proxy, method );
+            throw cleanStackTrace(throwable.getTargetException(), proxy, method);
         }
-        catch( Throwable throwable )
+        catch(Throwable throwable)
         {
-            throw cleanStackTrace( throwable, proxy, method );
+            throw cleanStackTrace(throwable, proxy, method);
         }
     }
 }

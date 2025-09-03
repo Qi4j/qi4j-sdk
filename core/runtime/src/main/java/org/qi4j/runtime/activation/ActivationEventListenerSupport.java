@@ -19,11 +19,12 @@
  */
 package org.qi4j.runtime.activation;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.qi4j.api.activation.ActivationEvent;
 import org.qi4j.api.activation.ActivationEventListener;
 import org.qi4j.api.activation.ActivationEventListenerRegistration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Internal helper for managing registrations and firing events
@@ -34,36 +35,36 @@ import org.qi4j.api.activation.ActivationEventListenerRegistration;
     protected List<ActivationEventListener> listeners = new ArrayList<>();
 
     @Override
-    public void registerActivationEventListener( ActivationEventListener listener )
+    public void registerActivationEventListener(ActivationEventListener listener)
     {
         List<ActivationEventListener> newListeners = new ArrayList<>();
-        newListeners.addAll( listeners );
-        newListeners.add( listener );
+        newListeners.addAll(listeners);
+        newListeners.add(listener);
         listeners = newListeners;
     }
 
     @Override
-    public void deregisterActivationEventListener( ActivationEventListener listener )
+    public void deregisterActivationEventListener(ActivationEventListener listener)
     {
         List<ActivationEventListener> newListeners = new ArrayList<>();
-        newListeners.addAll( listeners );
-        newListeners.remove( listener );
+        newListeners.addAll(listeners);
+        newListeners.remove(listener);
         listeners = newListeners;
     }
 
-    /* package */ void fireEvent( ActivationEvent event )
+    /* package */ void fireEvent(ActivationEvent event)
         throws Exception
     {
-        for( ActivationEventListener listener : listeners )
+        for(ActivationEventListener listener : listeners)
         {
-            listener.onEvent( event );
+            listener.onEvent(event);
         }
     }
 
     @Override
-    public void onEvent( ActivationEvent event )
+    public void onEvent(ActivationEvent event)
         throws Exception
     {
-        fireEvent( event );
+        fireEvent(event);
     }
 }

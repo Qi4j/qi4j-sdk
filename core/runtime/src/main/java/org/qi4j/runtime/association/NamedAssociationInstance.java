@@ -19,17 +19,6 @@
  */
 package org.qi4j.runtime.association;
 
-import java.lang.reflect.Type;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.association.NamedAssociation;
 import org.qi4j.api.association.NamedAssociationWrapper;
@@ -37,17 +26,25 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.identity.HasIdentity;
 import org.qi4j.spi.entity.NamedAssociationState;
 
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
 public class NamedAssociationInstance<T> extends AbstractAssociationInstance<T>
     implements NamedAssociation<T>
 {
     private final NamedAssociationState namedAssociationState;
 
-    public NamedAssociationInstance( AssociationInfo associationInfo,
-                                     BiFunction<EntityReference, Type, Object> associationFunction,
-                                     NamedAssociationState namedAssociationState
-                                   )
+    public NamedAssociationInstance(AssociationInfo associationInfo,
+                                    BiFunction<EntityReference, Type, Object> associationFunction,
+                                    NamedAssociationState namedAssociationState
+    )
     {
-        super( associationInfo, associationFunction );
+        super(associationInfo, associationFunction);
         this.namedAssociationState = namedAssociationState;
     }
 
@@ -64,33 +61,33 @@ public class NamedAssociationInstance<T> extends AbstractAssociationInstance<T>
     }
 
     @Override
-    public boolean containsName( String name )
+    public boolean containsName(String name)
     {
-        return namedAssociationState.containsName( name );
+        return namedAssociationState.containsName(name);
     }
 
     @Override
-    public boolean put( String name, T entity )
+    public boolean put(String name, T entity)
     {
-        Objects.requireNonNull( entity, "entity" );
+        Objects.requireNonNull(entity, "entity");
         checkImmutable();
         try
         {
-            checkType( entity );
+            checkType(entity);
         }
-        catch( IllegalArgumentException e )
+        catch(IllegalArgumentException e)
         {
-            throw new IllegalArgumentException( "Named association [" + name +"] must have Identity: " + entity );
+            throw new IllegalArgumentException("Named association [" + name + "] must have Identity: " + entity);
         }
-        associationInfo.checkConstraints( entity );
-        return namedAssociationState.put( name, EntityReference.create( ( (HasIdentity) entity ).identity().get() ) );
+        associationInfo.checkConstraints(entity);
+        return namedAssociationState.put(name, EntityReference.create(((HasIdentity) entity).identity().get()));
     }
 
     @Override
-    public boolean remove( String name )
+    public boolean remove(String name)
     {
         checkImmutable();
-        return namedAssociationState.remove( name );
+        return namedAssociationState.remove(name);
     }
 
     @Override
@@ -101,24 +98,24 @@ public class NamedAssociationInstance<T> extends AbstractAssociationInstance<T>
     }
 
     @Override
-    public T get( String name )
+    public T get(String name)
     {
-        return getEntity( namedAssociationState.get( name ) );
+        return getEntity(namedAssociationState.get(name));
     }
 
     @Override
-    public String nameOf( T entity )
+    public String nameOf(T entity)
     {
-        return namedAssociationState.nameOf( getEntityReference( entity ) );
+        return namedAssociationState.nameOf(getEntityReference(entity));
     }
 
     @Override
     public Map<String, T> toMap()
     {
         Map<String, T> map = new HashMap<>();
-        for( String name : namedAssociationState )
+        for(String name : namedAssociationState)
         {
-            map.put( name, getEntity( namedAssociationState.get( name ) ) );
+            map.put(name, getEntity(namedAssociationState.get(name)));
         }
         return map;
     }
@@ -130,57 +127,57 @@ public class NamedAssociationInstance<T> extends AbstractAssociationInstance<T>
     }
 
     @Override
-    public EntityReference referenceOf( String name )
+    public EntityReference referenceOf(String name)
     {
-        return namedAssociationState.get( name );
+        return namedAssociationState.get(name);
     }
 
     public Iterable<Map.Entry<String, EntityReference>> getEntityReferences()
     {
         return Collections.unmodifiableMap(
-            StreamSupport.stream( namedAssociationState.spliterator(), false )
-                         .collect( Collectors.toMap( Function.identity(), namedAssociationState::get ) )
-                                          ).entrySet();
+            StreamSupport.stream(namedAssociationState.spliterator(), false)
+                .collect(Collectors.toMap(Function.identity(), namedAssociationState::get))
+        ).entrySet();
     }
 
     @Override
-    public boolean equals( Object o )
+    public boolean equals(Object o)
     {
-        if( this == o )
+        if(this == o)
         {
             return true;
         }
-        if( o == null || getClass() != o.getClass() )
+        if(o == null || getClass() != o.getClass())
         {
             return false;
         }
         NamedAssociation<?> that = (NamedAssociation) o;
         // Unwrap if needed
-        while( that instanceof NamedAssociationWrapper )
+        while(that instanceof NamedAssociationWrapper)
         {
-            that = ( (NamedAssociationWrapper) that ).next();
+            that = ((NamedAssociationWrapper) that).next();
         }
         // Descriptor equality
         NamedAssociationInstance<?> thatInstance = (NamedAssociationInstance) that;
         AssociationDescriptor thatDescriptor = (AssociationDescriptor) thatInstance.associationInfo();
-        if( !associationInfo.equals( thatDescriptor ) )
+        if(!associationInfo.equals(thatDescriptor))
         {
             return false;
         }
         // State equality
-        if( namedAssociationState.count() != thatInstance.namedAssociationState.count() )
+        if(namedAssociationState.count() != thatInstance.namedAssociationState.count())
         {
             return false;
         }
-        for( String name : namedAssociationState )
+        for(String name : namedAssociationState)
         {
-            if( !thatInstance.namedAssociationState.containsName( name ) )
+            if(!thatInstance.namedAssociationState.containsName(name))
             {
                 return false;
             }
-            EntityReference thisReference = namedAssociationState.get( name );
-            EntityReference thatReference = thatInstance.namedAssociationState.get( name );
-            if( !thisReference.equals( thatReference ) )
+            EntityReference thisReference = namedAssociationState.get(name);
+            EntityReference thatReference = thatInstance.namedAssociationState.get(name);
+            if(!thisReference.equals(thatReference))
             {
                 return false;
             }
@@ -192,10 +189,10 @@ public class NamedAssociationInstance<T> extends AbstractAssociationInstance<T>
     public int hashCode()
     {
         int hash = associationInfo.hashCode() * 31; // Descriptor
-        for( String name : namedAssociationState )
+        for(String name : namedAssociationState)
         {
             hash += name.hashCode();
-            hash += namedAssociationState.get( name ).hashCode() * 7; // State
+            hash += namedAssociationState.get(name).hashCode() * 7; // State
         }
         return hash;
     }

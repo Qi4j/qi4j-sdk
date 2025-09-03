@@ -19,8 +19,6 @@
  */
 package org.qi4j.runtime.activation;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.Activator;
 import org.qi4j.api.structure.ModuleDescriptor;
@@ -28,6 +26,9 @@ import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.composite.UsesInstance;
 import org.qi4j.runtime.injection.InjectionContext;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Activators Model.
@@ -41,30 +42,30 @@ public class ActivatorsModel<ActivateeType>
     private final List<ActivatorModel<ActivateeType>> activatorModels = new ArrayList<>();
     private final Iterable<Class<? extends Activator<ActivateeType>>> activatorsClasses;
 
-    public ActivatorsModel( Iterable<Class<? extends Activator<ActivateeType>>> activatorsClasses )
+    public ActivatorsModel(Iterable<Class<? extends Activator<ActivateeType>>> activatorsClasses)
     {
         this.activatorsClasses = activatorsClasses;
-        for( Class<? extends Activator<ActivateeType>> activatorClass : activatorsClasses )
+        for(Class<? extends Activator<ActivateeType>> activatorClass : activatorsClasses)
         {
-            activatorModels.add( new ActivatorModel<>( activatorClass ) );
+            activatorModels.add(new ActivatorModel<>(activatorClass));
         }
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            for( ActivatorModel<ActivateeType> activatorModel : activatorModels )
+            for(ActivatorModel<ActivateeType> activatorModel : activatorModels)
             {
-                if( !activatorModel.accept( visitor ) )
+                if(!activatorModel.accept(visitor))
                 {
                     break;
                 }
             }
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
     public Iterable<ActivatorModel<ActivateeType>> models()
@@ -76,21 +77,21 @@ public class ActivatorsModel<ActivateeType>
         throws ActivationException
     {
         List<Activator<ActivateeType>> activators = new ArrayList<>();
-        for( ActivatorModel<ActivateeType> activatorModel : activatorModels )
+        for(ActivatorModel<ActivateeType> activatorModel : activatorModels)
         {
-            activators.add( activatorModel.newInstance() );
+            activators.add(activatorModel.newInstance());
         }
         return activators;
     }
 
-    public Iterable<Activator<ActivateeType>> newInstances( ModuleDescriptor module )
+    public Iterable<Activator<ActivateeType>> newInstances(ModuleDescriptor module)
         throws ActivationException
     {
         List<Activator<ActivateeType>> activators = new ArrayList<>();
-        for( ActivatorModel<ActivateeType> activatorModel : activatorModels )
+        for(ActivatorModel<ActivateeType> activatorModel : activatorModels)
         {
-            InjectionContext injectionContext = new InjectionContext( module, UsesInstance.EMPTY_USES );
-            activators.add( activatorModel.newInstance( injectionContext ) );
+            InjectionContext injectionContext = new InjectionContext(module, UsesInstance.EMPTY_USES);
+            activators.add(activatorModel.newInstance(injectionContext));
         }
         return activators;
     }

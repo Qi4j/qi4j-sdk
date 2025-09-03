@@ -19,8 +19,7 @@
  */
 package org.qi4j.runtime.entity;
 
-import java.util.Collections;
-import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.association.Association;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.association.NamedAssociation;
@@ -36,7 +35,9 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
+import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -48,11 +49,11 @@ public class EntityBuilderWithStateTest
     extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( SomeEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(SomeEntity.class);
     }
 
     @Test
@@ -60,54 +61,54 @@ public class EntityBuilderWithStateTest
         throws UnitOfWorkCompletionException
     {
         final Identity associatedIdentity;
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
-            EntityBuilder<SomeEntity> builder = uow.newEntityBuilder( SomeEntity.class );
-            builder.instance().prop().set( "Associated" );
+            EntityBuilder<SomeEntity> builder = uow.newEntityBuilder(SomeEntity.class);
+            builder.instance().prop().set("Associated");
             SomeEntity entity = builder.newInstance();
             associatedIdentity = entity.identity().get();
             uow.complete();
         }
-        try( UnitOfWork uow = unitOfWorkFactory.newUnitOfWork() )
+        try(UnitOfWork uow = unitOfWorkFactory.newUnitOfWork())
         {
             SomeEntity entity = uow.newEntityBuilderWithState(
                 SomeEntity.class,
                 descriptor -> {
-                    if( "prop".equals( descriptor.qualifiedName().name() ) )
+                    if("prop".equals(descriptor.qualifiedName().name()))
                     {
                         return "Foo";
                     }
                     return null;
                 },
                 descriptor -> {
-                    if( "ass".equals( descriptor.qualifiedName().name() ) )
+                    if("ass".equals(descriptor.qualifiedName().name()))
                     {
-                        return EntityReference.create( associatedIdentity );
+                        return EntityReference.create(associatedIdentity);
                     }
                     return null;
                 },
                 descriptor -> {
-                    if( "manyAss".equals( descriptor.qualifiedName().name() ) )
+                    if("manyAss".equals(descriptor.qualifiedName().name()))
                     {
-                        return Stream.of( EntityReference.create( associatedIdentity ) );
+                        return Stream.of(EntityReference.create(associatedIdentity));
                     }
                     return null;
                 },
                 descriptor -> {
-                    if( "namedAss".equals( descriptor.qualifiedName().name() ) )
+                    if("namedAss".equals(descriptor.qualifiedName().name()))
                     {
                         return Collections.singletonMap(
                             "foo",
-                            EntityReference.create( associatedIdentity )
+                            EntityReference.create(associatedIdentity)
                         ).entrySet().stream();
                     }
                     return null;
                 }
             ).newInstance();
-            assertThat( entity.prop().get(), equalTo( "Foo" ) );
-            assertThat( entity.ass().get().identity().get(), equalTo( associatedIdentity ) );
-            assertThat( entity.manyAss().get( 0 ).identity().get(), equalTo( associatedIdentity ) );
-            assertThat( entity.namedAss().get( "foo" ).identity().get(), equalTo( associatedIdentity ) );
+            assertThat(entity.prop().get(), equalTo("Foo"));
+            assertThat(entity.ass().get().identity().get(), equalTo(associatedIdentity));
+            assertThat(entity.manyAss().get(0).identity().get(), equalTo(associatedIdentity));
+            assertThat(entity.namedAss().get("foo").identity().get(), equalTo(associatedIdentity));
             uow.complete();
         }
     }

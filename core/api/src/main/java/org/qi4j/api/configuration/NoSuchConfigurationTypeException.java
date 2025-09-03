@@ -26,11 +26,11 @@ public class NoSuchConfigurationTypeException extends RuntimeException
 {
     private final Class<?> configType;
 
-    public NoSuchConfigurationTypeException( Class<?> configType,
-                                             ModuleDescriptor module
-                                           )
+    public NoSuchConfigurationTypeException(Class<?> configType,
+                                            ModuleDescriptor module
+    )
     {
-        super( "No configuration type " + configType.getName() + " has been registered, or is not visible from " + module.name() );
+        super("No configuration type " + configType.getName() + " has been registered, or is not visible from " + module.name());
         this.configType = configType;
     }
 }

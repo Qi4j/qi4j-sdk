@@ -17,28 +17,22 @@
  */
 package org.qi4j.spi.serialization;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.Period;
-import java.time.ZonedDateTime;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.identity.StringIdentity;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.serialization.Converter;
 import org.qi4j.api.serialization.Converters;
-import org.qi4j.api.type.ValueType;
 import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.type.ValueType;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.*;
 
 /**
  * Built-in serialization converters.
- *
+ * <p>
  * Mixin for {@link Serialization} implementations that provides built-in
  * {@link Converter}s for the following types:
  *
@@ -56,43 +50,43 @@ import org.qi4j.api.serialization.Serialization;
  *     <li>{@link Duration}</li>
  *     <li>{@link Period}</li>
  * </ul>
- *
+ * <p>
  * Note that this does not include {@link String} nor primitive values and their boxed counterparts.
  * {@literal Serialization} implementations must handle those.
  */
-@Mixins( BuiltInConverters.Mixin.class )
+@Mixins(BuiltInConverters.Mixin.class)
 public interface BuiltInConverters
 {
-    void registerBuiltInConverters( Converters converters );
+    void registerBuiltInConverters(Converters converters);
 
     class Mixin implements BuiltInConverters
     {
         @Override
-        public void registerBuiltInConverters( Converters converters )
+        public void registerBuiltInConverters(Converters converters)
         {
             // Qi4j types
-            converters.registerConverter( ValueType.IDENTITY, new IdentityConverter() );
-            converters.registerConverter( ValueType.ENTITY_REFERENCE, new EntityReferenceConverter() );
+            converters.registerConverter(ValueType.IDENTITY, new IdentityConverter());
+            converters.registerConverter(ValueType.ENTITY_REFERENCE, new EntityReferenceConverter());
 
             // Big numbers types
-            converters.registerConverter( ValueType.BIG_DECIMAL, new BigDecimalConverter() );
-            converters.registerConverter( ValueType.BIG_INTEGER, new BigIntegerConverter() );
+            converters.registerConverter(ValueType.BIG_DECIMAL, new BigDecimalConverter());
+            converters.registerConverter(ValueType.BIG_INTEGER, new BigIntegerConverter());
 
             // Date types
-            converters.registerConverter( ValueType.INSTANT, new InstantConverter() );
-            converters.registerConverter( ValueType.ZONED_DATE_TIME, new ZonedDateTimeConverter() );
-            converters.registerConverter( ValueType.OFFSET_DATE_TIME, new OffsetDateTimeConverter() );
-            converters.registerConverter( ValueType.LOCAL_DATE_TIME, new LocalDateTimeConverter() );
-            converters.registerConverter( ValueType.LOCAL_DATE, new LocalDateConverter() );
-            converters.registerConverter( ValueType.LOCAL_TIME, new LocalTimeConverter() );
-            converters.registerConverter( ValueType.DURATION, new DurationConverter() );
-            converters.registerConverter( ValueType.PERIOD, new PeriodConverter() );
+            converters.registerConverter(ValueType.INSTANT, new InstantConverter());
+            converters.registerConverter(ValueType.ZONED_DATE_TIME, new ZonedDateTimeConverter());
+            converters.registerConverter(ValueType.OFFSET_DATE_TIME, new OffsetDateTimeConverter());
+            converters.registerConverter(ValueType.LOCAL_DATE_TIME, new LocalDateTimeConverter());
+            converters.registerConverter(ValueType.LOCAL_DATE, new LocalDateConverter());
+            converters.registerConverter(ValueType.LOCAL_TIME, new LocalTimeConverter());
+            converters.registerConverter(ValueType.DURATION, new DurationConverter());
+            converters.registerConverter(ValueType.PERIOD, new PeriodConverter());
         }
 
         private static abstract class ToStringConverter<T> implements Converter<T>
         {
             @Override
-            public String toString( T object )
+            public String toString(T object)
             {
                 return object.toString();
             }
@@ -107,9 +101,9 @@ public interface BuiltInConverters
             }
 
             @Override
-            public Identity fromString( String string )
+            public Identity fromString(String string)
             {
-                return StringIdentity.identityOf( string );
+                return StringIdentity.identityOf(string);
             }
         }
 
@@ -122,9 +116,9 @@ public interface BuiltInConverters
             }
 
             @Override
-            public EntityReference fromString( String string )
+            public EntityReference fromString(String string)
             {
-                return EntityReference.parseEntityReference( string );
+                return EntityReference.parseEntityReference(string);
             }
         }
 
@@ -137,9 +131,9 @@ public interface BuiltInConverters
             }
 
             @Override
-            public BigDecimal fromString( String string )
+            public BigDecimal fromString(String string)
             {
-                return new BigDecimal( string );
+                return new BigDecimal(string);
             }
         }
 
@@ -152,105 +146,129 @@ public interface BuiltInConverters
             }
 
             @Override
-            public BigInteger fromString( String string )
+            public BigInteger fromString(String string)
             {
-                return new BigInteger( string );
+                return new BigInteger(string);
             }
         }
 
         private static class PeriodConverter extends ToStringConverter<Period>
         {
             @Override
-            public Class<Period> type() { return Period.class; }
+            public Class<Period> type()
+            {
+                return Period.class;
+            }
 
             @Override
-            public Period fromString( String string )
+            public Period fromString(String string)
             {
-                return Period.parse( string );
+                return Period.parse(string);
             }
         }
 
         private static class DurationConverter extends ToStringConverter<Duration>
         {
             @Override
-            public Class<Duration> type() { return Duration.class; }
+            public Class<Duration> type()
+            {
+                return Duration.class;
+            }
 
             @Override
-            public Duration fromString( String string )
+            public Duration fromString(String string)
             {
-                return Duration.parse( string );
+                return Duration.parse(string);
             }
         }
 
         private static class LocalTimeConverter extends ToStringConverter<LocalTime>
         {
             @Override
-            public Class<LocalTime> type() { return LocalTime.class; }
+            public Class<LocalTime> type()
+            {
+                return LocalTime.class;
+            }
 
             @Override
-            public LocalTime fromString( String string )
+            public LocalTime fromString(String string)
             {
-                return LocalTime.parse( string );
+                return LocalTime.parse(string);
             }
         }
 
         private static class LocalDateConverter extends ToStringConverter<LocalDate>
         {
             @Override
-            public Class<LocalDate> type() { return LocalDate.class; }
+            public Class<LocalDate> type()
+            {
+                return LocalDate.class;
+            }
 
             @Override
-            public LocalDate fromString( String string )
+            public LocalDate fromString(String string)
             {
-                return LocalDate.parse( string );
+                return LocalDate.parse(string);
             }
         }
 
         private static class LocalDateTimeConverter extends ToStringConverter<LocalDateTime>
         {
             @Override
-            public Class<LocalDateTime> type() { return LocalDateTime.class; }
+            public Class<LocalDateTime> type()
+            {
+                return LocalDateTime.class;
+            }
 
             @Override
-            public LocalDateTime fromString( String string )
+            public LocalDateTime fromString(String string)
             {
-                return LocalDateTime.parse( string );
+                return LocalDateTime.parse(string);
             }
         }
 
         private static class OffsetDateTimeConverter extends ToStringConverter<OffsetDateTime>
         {
             @Override
-            public Class<OffsetDateTime> type() { return OffsetDateTime.class; }
+            public Class<OffsetDateTime> type()
+            {
+                return OffsetDateTime.class;
+            }
 
             @Override
-            public OffsetDateTime fromString( String string )
+            public OffsetDateTime fromString(String string)
             {
-                return OffsetDateTime.parse( string );
+                return OffsetDateTime.parse(string);
             }
         }
 
         private static class ZonedDateTimeConverter extends ToStringConverter<ZonedDateTime>
         {
             @Override
-            public Class<ZonedDateTime> type() { return ZonedDateTime.class; }
+            public Class<ZonedDateTime> type()
+            {
+                return ZonedDateTime.class;
+            }
 
             @Override
-            public ZonedDateTime fromString( String string )
+            public ZonedDateTime fromString(String string)
             {
-                return ZonedDateTime.parse( string );
+                return ZonedDateTime.parse(string);
             }
         }
 
         private static class InstantConverter extends ToStringConverter<Instant>
         {
             @Override
-            public Class<Instant> type() { return Instant.class; }
+            public Class<Instant> type()
+            {
+                return Instant.class;
+            }
 
             @Override
-            public Instant fromString( String string )
+            public Instant fromString(String string)
             {
-                return Instant.parse( string );
+                return Instant.parse(string);
             }
         }
     }

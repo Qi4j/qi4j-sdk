@@ -28,10 +28,10 @@ public class DefaultMetricsProviderAssembler
     public static final String IDENTITY = "default-metrics-provider";
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
-        module.services( MetricsProvider.class )
-              .withMixins( MetricsProviderAdapter.class )
-              .identifiedBy( IDENTITY );
+        module.services(MetricsProvider.class)
+            .withMixins(MetricsProviderAdapter.class)
+            .identifiedBy(IDENTITY);
     }
 }

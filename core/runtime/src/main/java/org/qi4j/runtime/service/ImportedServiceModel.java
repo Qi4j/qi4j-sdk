@@ -19,9 +19,6 @@
  */
 package org.qi4j.runtime.service;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.util.stream.Stream;
 import org.qi4j.api.common.MetaInfo;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.api.identity.Identity;
@@ -30,11 +27,12 @@ import org.qi4j.api.service.ServiceImporter;
 import org.qi4j.api.service.ServiceImporterException;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.util.HierarchicalVisitor;
-import org.qi4j.api.util.VisitableHierarchy;
 import org.qi4j.runtime.activation.ActivatorsInstance;
 import org.qi4j.runtime.activation.ActivatorsModel;
-import org.qi4j.runtime.activation.ActivatorsInstance;
-import org.qi4j.runtime.activation.ActivatorsModel;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.util.stream.Stream;
 
 /**
  * JAVADOC
@@ -45,7 +43,7 @@ public final class ImportedServiceModel
     private final ModuleDescriptor module;
     private final Class<?> type;
     private final Visibility visibility;
-    @SuppressWarnings( "raw" )
+    @SuppressWarnings("raw")
     private final Class<? extends ServiceImporter> serviceImporter;
     private final Identity identity;
     private final boolean importOnStartup;
@@ -53,16 +51,16 @@ public final class ImportedServiceModel
     private final ActivatorsModel<?> activatorsModel;
     private final String moduleName;
 
-    @SuppressWarnings( "raw" )
-    public ImportedServiceModel( ModuleDescriptor module,
-                                 Class serviceType,
-                                 Visibility visibility,
-                                 Class<? extends ServiceImporter> serviceImporter,
-                                 Identity identity,
-                                 boolean importOnStartup,
-                                 MetaInfo metaInfo,
-                                 ActivatorsModel<?> activatorsModel,
-                                 String moduleName
+    @SuppressWarnings("raw")
+    public ImportedServiceModel(ModuleDescriptor module,
+                                Class serviceType,
+                                Visibility visibility,
+                                Class<? extends ServiceImporter> serviceImporter,
+                                Identity identity,
+                                boolean importOnStartup,
+                                MetaInfo metaInfo,
+                                ActivatorsModel<?> activatorsModel,
+                                String moduleName
     )
     {
         this.module = module;
@@ -82,10 +80,10 @@ public final class ImportedServiceModel
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings("unchecked")
     public Stream<Class<?>> types()
     {
-        return Stream.of( type );
+        return Stream.of(type);
     }
 
     @Override
@@ -101,13 +99,13 @@ public final class ImportedServiceModel
     }
 
     @Override
-    public <T> T metaInfo( Class<T> infoType )
+    public <T> T metaInfo(Class<T> infoType)
     {
-        return metaInfo.get( infoType );
+        return metaInfo.get(infoType);
     }
 
     @Override
-    @SuppressWarnings( "raw" )
+    @SuppressWarnings("raw")
     public Class<? extends ServiceImporter> serviceImporter()
     {
         return serviceImporter;
@@ -130,64 +128,64 @@ public final class ImportedServiceModel
         return moduleName;
     }
 
-    @SuppressWarnings( { "raw", "unchecked" } )
-    public ActivatorsInstance<?> newActivatorsInstance(ModuleDescriptor module )
+    @SuppressWarnings({"raw", "unchecked"})
+    public ActivatorsInstance<?> newActivatorsInstance(ModuleDescriptor module)
         throws Exception
     {
-        return new ActivatorsInstance( activatorsModel.newInstances( module ) );
+        return new ActivatorsInstance(activatorsModel.newInstances(module));
     }
 
     @Override
-    public boolean isAssignableTo( Class<?> type )
+    public boolean isAssignableTo(Class<?> type)
     {
-        return this.type.isAssignableFrom( type );
+        return this.type.isAssignableFrom(type);
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super Object, ? super Object, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            activatorsModel.accept( visitor );
+            activatorsModel.accept(visitor);
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
-    @SuppressWarnings( { "raw", "unchecked" } )
-    public <T> ImportedServiceInstance<T> importInstance( ModuleDescriptor module )
+    @SuppressWarnings({"raw", "unchecked"})
+    public <T> ImportedServiceInstance<T> importInstance(ModuleDescriptor module)
     {
         try
         {
-            ServiceImporter importer = module.instance().newObject( serviceImporter );
-            T instance = (T) importer.importService( this );
-            return new ImportedServiceInstance<>( instance, importer );
+            ServiceImporter importer = module.instance().newObject(serviceImporter);
+            T instance = (T) importer.importService(this);
+            return new ImportedServiceInstance<>(instance, importer);
         }
-        catch( ServiceImporterException e )
+        catch(ServiceImporterException e)
         {
             throw e;
         }
-        catch( Exception e )
+        catch(Exception e)
         {
-            throw new ServiceImporterException( "Could not import service " + identity, e );
+            throw new ServiceImporterException("Could not import service " + identity, e);
         }
     }
 
-    @SuppressWarnings( "raw" )
-    public Object newProxy( InvocationHandler serviceInvocationHandler )
+    @SuppressWarnings("raw")
+    public Object newProxy(InvocationHandler serviceInvocationHandler)
     {
-        if( type.isInterface() )
+        if(type.isInterface())
         {
-            return Proxy.newProxyInstance( type.getClassLoader(),
-                                           new Class[]{ type },
-                                           serviceInvocationHandler );
+            return Proxy.newProxyInstance(type.getClassLoader(),
+                new Class[]{type},
+                serviceInvocationHandler);
         }
         else
         {
             Class[] interfaces = type.getInterfaces();
-            return Proxy.newProxyInstance( type.getClassLoader(),
-                                           interfaces,
-                                           serviceInvocationHandler );
+            return Proxy.newProxyInstance(type.getClassLoader(),
+                interfaces,
+                serviceInvocationHandler);
         }
     }
 

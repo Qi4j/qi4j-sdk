@@ -19,12 +19,12 @@
  */
 package org.qi4j.api.unitofwork.concern;
 
+import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
-import org.qi4j.api.unitofwork.ConcurrentEntityModificationException;
 
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -34,8 +34,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * {@link ConcurrentEntityModificationException}
  * occurs.
  */
-@Retention( RUNTIME )
-@Target( METHOD )
+@Retention(RUNTIME)
+@Target(METHOD)
 @Inherited
 @Documented
 public @interface UnitOfWorkRetry
@@ -61,7 +61,7 @@ public @interface UnitOfWorkRetry
     /**
      * Number of milliseconds to be added for each additional retry, beyond the second one.
      * The default value is 10.
-     *
+     * <p>
      * The delay is defined as;
      *
      * <pre><code>

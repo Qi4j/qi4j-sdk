@@ -25,16 +25,16 @@ package org.qi4j.api.query.grammar;
 public class GtPredicate<T>
     extends ComparisonPredicate<T>
 {
-    public GtPredicate( PropertyFunction<T> property, T value )
+    public GtPredicate(PropertyFunction<T> property, T value)
     {
-        super( property, value );
+        super(property, value);
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    protected boolean compare( T value )
+    @SuppressWarnings("unchecked")
+    protected boolean compare(T value)
     {
-        return ( (Comparable) value ).compareTo( this.value ) > 0;
+        return ((Comparable) value).compareTo(this.value) > 0;
     }
 
     @Override

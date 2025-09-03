@@ -17,10 +17,6 @@
  */
 package org.qi4j.api.serialization;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.structure.MetaInfoHolder;
 import org.qi4j.api.type.HasTypes;
@@ -28,12 +24,17 @@ import org.qi4j.api.type.HasTypesCollectors;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.api.util.Annotations;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import static org.qi4j.api.type.HasTypesCollectors.closestType;
 
 /**
  * Serialization Converters.
  */
-@Mixins( Converters.Mixin.class )
+@Mixins(Converters.Mixin.class)
 public interface Converters
 {
     /**
@@ -42,44 +43,44 @@ public interface Converters
      * @param valueType the value type
      * @param converter the converter
      */
-    void registerConverter( ValueType valueType, Converter<?> converter );
+    void registerConverter(ValueType valueType, Converter<?> converter);
 
     /**
      * Find a matching converter amongst registered ones.
-     *
+     * <p>
      * See {@link HasTypesCollectors#closestType(HasTypes)}.
      *
      * @param valueType the value type
-     * @param <T> the converted type
+     * @param <T>       the converted type
      * @return the closest matching registered converter, or {@literal null} if none
      */
-    <T> Converter<T> converterFor( ValueType valueType );
+    <T> Converter<T> converterFor(ValueType valueType);
 
     /**
      * Find a matching converter amongst registered ones.
-     *
+     * <p>
      * See {@link HasTypesCollectors#closestType(HasTypes)}.
      *
      * @param type the value type
-     * @param <T> the converted type
+     * @param <T>  the converted type
      * @return the closest matching registered converter, or {@literal null} if none
      */
-    default <T> Converter<T> converterFor( Class<? extends T> type )
+    default <T> Converter<T> converterFor(Class<? extends T> type)
     {
-        return converterFor( ValueType.of( type ) );
+        return converterFor(ValueType.of(type));
     }
 
     /**
      * Find converter registered as meta-info.
-     *
+     * <p>
      * Meta-info converters are registered either using {@link ConvertedBy} annotation or at assembly time.
      * The latter takes precedence over the former.
      *
      * @param metaInfoHolder the meta-info holder, e.g. a property descriptor
-     * @param <T> the converted type
+     * @param <T>            the converted type
      * @return the registered converted, or {@literal null} if none
      */
-    <T> Converter<T> converterFor( MetaInfoHolder metaInfoHolder );
+    <T> Converter<T> converterFor(MetaInfoHolder metaInfoHolder);
 
     /**
      * Serialization Converters default Mixin.
@@ -91,88 +92,88 @@ public interface Converters
         private final Map<Class<? extends Converter>, Converter<?>> convertersInstancesCache = new HashMap<>();
 
         @Override
-        public void registerConverter( ValueType valueType, Converter<?> converter )
+        public void registerConverter(ValueType valueType, Converter<?> converter)
         {
-            converters.put( valueType, converter );
-            resolvedConvertersCache.put( valueType, converter );
+            converters.put(valueType, converter);
+            resolvedConvertersCache.put(valueType, converter);
         }
 
         @Override
-        public <T> Converter<T> converterFor( ValueType valueType )
+        public <T> Converter<T> converterFor(ValueType valueType)
         {
-            if( resolvedConvertersCache.containsKey( valueType ) )
+            if(resolvedConvertersCache.containsKey(valueType))
             {
-                return castConverter( resolvedConvertersCache.get( valueType ) );
+                return castConverter(resolvedConvertersCache.get(valueType));
             }
-            Converter<T> converter = lookupConverter( valueType );
-            resolvedConvertersCache.put( valueType, converter );
+            Converter<T> converter = lookupConverter(valueType);
+            resolvedConvertersCache.put(valueType, converter);
             return converter;
         }
 
-        @SuppressWarnings( "unchecked" )
-        private <T> Converter<T> lookupConverter( ValueType valueType )
+        @SuppressWarnings("unchecked")
+        private <T> Converter<T> lookupConverter(ValueType valueType)
         {
-            Converter<T> converter = lookupConvertedByConverter( valueType );
-            if( converter == null )
+            Converter<T> converter = lookupConvertedByConverter(valueType);
+            if(converter == null)
             {
-                converter = castConverter( converters.keySet().stream()
-                                                     .collect( closestType( valueType ) )
-                                                     .map( converters::get )
-                                                     .orElse( null ) );
+                converter = castConverter(converters.keySet().stream()
+                    .collect(closestType(valueType))
+                    .map(converters::get)
+                    .orElse(null));
             }
-            if( converter == null && valueType.primaryType().isEnum() )
+            if(converter == null && valueType.primaryType().isEnum())
             {
-                converter = new EnumConverter( valueType.primaryType() );
+                converter = new EnumConverter(valueType.primaryType());
             }
             return converter;
         }
 
         @Override
-        public <T> Converter<T> converterFor( MetaInfoHolder metaInfoHolder )
+        public <T> Converter<T> converterFor(MetaInfoHolder metaInfoHolder)
         {
-            Converter converter = metaInfoHolder.metaInfo( Converter.class );
-            if( converter != null )
+            Converter converter = metaInfoHolder.metaInfo(Converter.class);
+            if(converter != null)
             {
-                return castConverter( converter );
+                return castConverter(converter);
             }
-            ConvertedBy convertedBy = metaInfoHolder.metaInfo( ConvertedBy.class );
-            if( convertedBy != null )
+            ConvertedBy convertedBy = metaInfoHolder.metaInfo(ConvertedBy.class);
+            if(convertedBy != null)
             {
-                return converterInstanceOf( convertedBy.value() );
+                return converterInstanceOf(convertedBy.value());
             }
             return null;
         }
 
-        private <T> Converter<T> lookupConvertedByConverter( ValueType valueType )
+        private <T> Converter<T> lookupConvertedByConverter(ValueType valueType)
         {
-            ConvertedBy convertedBy = Annotations.annotationOn( valueType.primaryType(), ConvertedBy.class );
-            if( convertedBy != null )
+            ConvertedBy convertedBy = Annotations.annotationOn(valueType.primaryType(), ConvertedBy.class);
+            if(convertedBy != null)
             {
-                return converterInstanceOf( convertedBy.value() );
+                return converterInstanceOf(convertedBy.value());
             }
             return null;
         }
 
-        private <T> Converter<T> converterInstanceOf( Class<? extends Converter> converterClass )
+        private <T> Converter<T> converterInstanceOf(Class<? extends Converter> converterClass)
         {
-            if( convertersInstancesCache.containsKey( converterClass ) )
+            if(convertersInstancesCache.containsKey(converterClass))
             {
-                return castConverter( convertersInstancesCache.get( converterClass ) );
+                return castConverter(convertersInstancesCache.get(converterClass));
             }
             try
             {
-                Converter<T> converter = castConverter( converterClass.getConstructor().newInstance() );
-                convertersInstancesCache.put( converterClass, converter );
+                Converter<T> converter = castConverter(converterClass.getConstructor().newInstance());
+                convertersInstancesCache.put(converterClass, converter);
                 return converter;
             }
-            catch( InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ex )
+            catch(InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ex)
             {
-                throw new SerializationException( "Unable to instantiate Converter: " + converterClass.getName(), ex );
+                throw new SerializationException("Unable to instantiate Converter: " + converterClass.getName(), ex);
             }
         }
 
-        @SuppressWarnings( "unchecked" )
-        private <T> Converter<T> castConverter( Converter<?> converter )
+        @SuppressWarnings("unchecked")
+        private <T> Converter<T> castConverter(Converter<?> converter)
         {
             return (Converter<T>) converter;
         }
@@ -182,14 +183,14 @@ public interface Converters
             private final Class<E> enumType;
             private final Map<String, E> values;
 
-            private EnumConverter( final Class<E> enumType )
+            private EnumConverter(final Class<E> enumType)
             {
                 this.enumType = enumType;
                 E[] enumValues = enumType.getEnumConstants();
-                this.values = new HashMap<>( enumValues.length );
-                for( E enumValue : enumValues )
+                this.values = new HashMap<>(enumValues.length);
+                for(E enumValue : enumValues)
                 {
-                    values.put( enumValue.name(), enumValue );
+                    values.put(enumValue.name(), enumValue);
                 }
             }
 
@@ -200,15 +201,15 @@ public interface Converters
             }
 
             @Override
-            public String toString( E object )
+            public String toString(E object)
             {
                 return object.name();
             }
 
             @Override
-            public E fromString( String string )
+            public E fromString(String string)
             {
-                return values.get( string );
+                return values.get(string);
             }
         }
     }

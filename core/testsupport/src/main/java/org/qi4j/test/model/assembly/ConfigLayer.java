@@ -26,9 +26,9 @@ import org.qi4j.bootstrap.layered.LayeredLayerAssembler;
 class ConfigLayer extends LayeredLayerAssembler
 {
     @Override
-    public LayerAssembly assemble( LayerAssembly layer )
+    public LayerAssembly assemble(LayerAssembly layer)
     {
-        createModule( layer, ConfigModule.class );
+        createModule(layer, ConfigModule.class);
         return layer;
     }
 }

@@ -20,13 +20,6 @@
 
 package org.qi4j.runtime.injection;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 import org.qi4j.api.composite.DependencyDescriptor;
 import org.qi4j.api.composite.InjectedFieldDescriptor;
 import org.qi4j.api.util.AccessibleObjects;
@@ -37,8 +30,14 @@ import org.qi4j.bootstrap.BindingException;
 import org.qi4j.bootstrap.InjectionException;
 import org.qi4j.runtime.composite.TransientInstance;
 import org.qi4j.runtime.model.Resolution;
-import org.qi4j.bootstrap.BindingException;
-import org.qi4j.bootstrap.InjectionException;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.util.Collection;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
@@ -49,21 +48,21 @@ import static java.util.Collections.singleton;
 public final class InjectedFieldModel
     implements InjectedFieldDescriptor, Dependencies, VisitableHierarchy<InjectedFieldModel, DependencyModel>
 {
-    private static final String NL = System.getProperty( "line.separator" );
+    private static final String NL = System.getProperty("line.separator");
 
     private DependencyModel dependencyModel;
     private Field injectedField;
 
-    public InjectedFieldModel( Field injectedField, DependencyModel dependencyModel )
+    public InjectedFieldModel(Field injectedField, DependencyModel dependencyModel)
     {
-        this.injectedField = AccessibleObjects.accessible( injectedField );
+        this.injectedField = AccessibleObjects.accessible(injectedField);
         this.dependencyModel = dependencyModel;
     }
 
     @Override
     public Stream<DependencyModel> dependencies()
     {
-        return Stream.of( dependencyModel );
+        return Stream.of(dependencyModel);
     }
 
     @Override
@@ -78,38 +77,38 @@ public final class InjectedFieldModel
         return dependencyModel;
     }
 
-    public void bind( Resolution resolution )
+    public void bind(Resolution resolution)
         throws BindingException
     {
-        dependencyModel.bind( resolution.forField( injectedField ) );
+        dependencyModel.bind(resolution.forField(injectedField));
     }
 
-    public void inject( InjectionContext context, Object instance )
+    public void inject(InjectionContext context, Object instance)
     {
-        Object value = dependencyModel.inject( context );
+        Object value = dependencyModel.inject(context);
         try
         {
-            injectedField.set( instance, value );
+            injectedField.set(instance, value);
         }
-        catch( IllegalAccessException e )
+        catch(IllegalAccessException e)
         {
-            throw new InjectionException( e );
+            throw new InjectionException(e);
         }
-        catch( IllegalArgumentException e )
+        catch(IllegalArgumentException e)
         {
             String valueClassName;
-            if( value == null )
+            if(value == null)
             {
                 valueClassName = "<null>";
             }
-            else if( Proxy.isProxyClass( value.getClass() ) )
+            else if(Proxy.isProxyClass(value.getClass()))
             {
-                InvocationHandler invocationHandler = Proxy.getInvocationHandler( value );
-                if( invocationHandler instanceof TransientInstance )
+                InvocationHandler invocationHandler = Proxy.getInvocationHandler(value);
+                if(invocationHandler instanceof TransientInstance)
                 {
                     TransientInstance handler = (TransientInstance) invocationHandler;
-                    valueClassName = Classes.toString( handler.descriptor().types() )
-                                     + " in [" + handler.module().name() + "] of [" + handler.layer().name() + "]";
+                    valueClassName = Classes.toString(handler.descriptor().types())
+                        + " in [" + handler.module().name() + "] of [" + handler.layer().name() + "]";
                 }
                 else
                 {
@@ -121,39 +120,39 @@ public final class InjectedFieldModel
                 valueClassName = value.getClass().getName();
             }
             StringBuilder annotBuilder = new StringBuilder();
-            for( Annotation annot : injectedField.getAnnotations() )
+            for(Annotation annot : injectedField.getAnnotations())
             {
                 String s = annot.toString();
-                annotBuilder.append( "@" ).append( s.substring( s.lastIndexOf( '.' ) + 1, s.length() - 2 ) );
-                annotBuilder.append( " " );
+                annotBuilder.append("@").append(s.substring(s.lastIndexOf('.') + 1, s.length() - 2));
+                annotBuilder.append(" ");
             }
             String annots = annotBuilder.toString();
             String message = "Can not inject the field" + NL + "    "
-                             + injectedField.getDeclaringClass()
-                             + NL + "    {" + NL + "        " + annots + NL + "        "
-                             + injectedField.getType().getSimpleName() + " " + injectedField.getName()
-                             + NL + "    }" + NL + "with value " + NL + "    " + value + NL + "of type" + NL + "    "
-                             + valueClassName;
-            throw new InjectionException( message, e );
+                + injectedField.getDeclaringClass()
+                + NL + "    {" + NL + "        " + annots + NL + "        "
+                + injectedField.getType().getSimpleName() + " " + injectedField.getName()
+                + NL + "    }" + NL + "with value " + NL + "    " + value + NL + "of type" + NL + "    "
+                + valueClassName;
+            throw new InjectionException(message, e);
         }
     }
 
     @Override
-    public <ThrowableType extends Throwable> boolean accept( HierarchicalVisitor<? super InjectedFieldModel, ? super DependencyModel, ThrowableType> visitor )
+    public <ThrowableType extends Throwable> boolean accept(HierarchicalVisitor<? super InjectedFieldModel, ? super DependencyModel, ThrowableType> visitor)
         throws ThrowableType
     {
-        if( visitor.visitEnter( this ) )
+        if(visitor.visitEnter(this))
         {
-            visitor.visit( dependencyModel );
+            visitor.visit(dependencyModel);
         }
-        return visitor.visitLeave( this );
+        return visitor.visitLeave(this);
     }
 
-    public Collection<DependencyModel> filter( Predicate<DependencyModel> specification )
+    public Collection<DependencyModel> filter(Predicate<DependencyModel> specification)
     {
-        if( specification.test( dependencyModel ) )
+        if(specification.test(dependencyModel))
         {
-            return singleton( dependencyModel );
+            return singleton(dependencyModel);
         }
         else
         {

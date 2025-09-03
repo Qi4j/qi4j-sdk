@@ -19,6 +19,7 @@
  */
 package org.qi4j.runtime.entity;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.entity.EntityBuilder;
 import org.qi4j.api.entity.EntityComposite;
 import org.qi4j.api.entity.Lifecycle;
@@ -31,7 +32,6 @@ import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
-import org.junit.jupiter.api.Test;
 
 /**
  * Test case for http://team.ops4j.org/browse/QI-274
@@ -40,9 +40,9 @@ public class EntityCreationTest
     extends AbstractQi4jTest
 {
 
-    @Mixins( SomeEntityMixin.class )
+    @Mixins(SomeEntityMixin.class)
     public interface SomeEntity
-            extends EntityComposite, Lifecycle
+        extends EntityComposite, Lifecycle
     {
 
         @Immutable
@@ -51,7 +51,7 @@ public class EntityCreationTest
     }
 
     public static class SomeEntityMixin
-            implements Lifecycle
+        implements Lifecycle
     {
 
         @This
@@ -60,7 +60,7 @@ public class EntityCreationTest
         @Override
         public void create()
         {
-            this._me.someProperty().set( "SomeValue" );
+            this._me.someProperty().set("SomeValue");
         }
 
         @Override
@@ -71,18 +71,18 @@ public class EntityCreationTest
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
-            throws AssemblyException
+    public void assemble(ModuleAssembly module)
+        throws AssemblyException
     {
-        new EntityTestAssembler().assemble( module );
-        module.entities( SomeEntity.class );
+        new EntityTestAssembler().assemble(module);
+        module.entities(SomeEntity.class);
     }
 
     @Test
     public void doTestUseUowNewEntity()
     {
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
-        SomeEntity entity = uow.newEntity( SomeEntity.class );
+        SomeEntity entity = uow.newEntity(SomeEntity.class);
         uow.discard();
     }
 
@@ -90,7 +90,7 @@ public class EntityCreationTest
     public void doTestUseEntityBuilder()
     {
         UnitOfWork uow = unitOfWorkFactory.newUnitOfWork();
-        EntityBuilder<SomeEntity> builder = uow.newEntityBuilder( SomeEntity.class );
+        EntityBuilder<SomeEntity> builder = uow.newEntityBuilder(SomeEntity.class);
         SomeEntity entity = builder.newInstance();
         uow.discard();
     }

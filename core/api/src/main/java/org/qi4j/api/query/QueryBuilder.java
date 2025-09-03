@@ -19,17 +19,17 @@
  */
 package org.qi4j.api.query;
 
-import java.util.function.Predicate;
-import org.qi4j.api.composite.Composite;
 import org.qi4j.api.composite.Composite;
 import org.qi4j.api.unitofwork.UnitOfWork;
+
+import java.util.function.Predicate;
 
 /**
  * QueryBuilders are used to create {@link Query} instances.
  * Iteratively add where() clauses to the query, and then use
  * {@link UnitOfWork#newQuery(QueryBuilder)}  to instantiate the Query.
  * QueryBuilders are immutable, so when adding new where-clauses you get new instances. This
- *
+ * <p>
  * DDD tip: Query objects are not executed immediately, so they
  * should be constructed in the domain model and handed over to
  * the UI, which can then further constrain it before actual
@@ -44,17 +44,15 @@ public interface QueryBuilder<T>
      * to create the expression.
      *
      * @param specification the where clause
-     *
      * @return a new builder with the added where-clause
      */
-    QueryBuilder<T> where( Predicate<Composite> specification );
+    QueryBuilder<T> where(Predicate<Composite> specification);
 
     /**
      * Create a new query with the declared where-clauses that will be evaluated against the iterable entries.
      *
      * @param iterable collection of objects (composites?)
-     *
      * @return a new Query instance
      */
-    Query<T> newQuery( Iterable<T> iterable );
+    Query<T> newQuery(Iterable<T> iterable);
 }

@@ -19,14 +19,15 @@
  */
 package org.qi4j.runtime.composite;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.concern.ConcernOf;
 import org.qi4j.api.concern.Concerns;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -42,10 +43,10 @@ public class TransientAsClassTest
     {
 
         @Override
-        public Object invoke( Object proxy, Method method, Object[] args )
+        public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable
         {
-            return next.invoke( proxy, method, args ) + " bar";
+            return next.invoke(proxy, method, args) + " bar";
         }
     }
 
@@ -59,16 +60,16 @@ public class TransientAsClassTest
     }
 
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
         throws AssemblyException
     {
-        module.transients( UnderTest.class );
+        module.transients(UnderTest.class);
     }
 
     @Test
     public void test()
     {
-        UnderTest underTest = transientBuilderFactory.newTransient( UnderTest.class );
-        assertThat( underTest.foo(), equalTo( "foo bar" ) );
+        UnderTest underTest = transientBuilderFactory.newTransient(UnderTest.class);
+        assertThat(underTest.foo(), equalTo("foo bar"));
     }
 }

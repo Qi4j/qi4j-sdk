@@ -19,6 +19,13 @@
  */
 package org.qi4j.test.model;
 
+import org.qi4j.api.association.Association;
+import org.qi4j.api.association.ManyAssociation;
+import org.qi4j.api.association.NamedAssociation;
+import org.qi4j.api.common.Optional;
+import org.qi4j.api.entity.Queryable;
+import org.qi4j.api.property.Property;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.Instant;
@@ -26,12 +33,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Map;
-import org.qi4j.api.association.Association;
-import org.qi4j.api.association.ManyAssociation;
-import org.qi4j.api.association.NamedAssociation;
-import org.qi4j.api.common.Optional;
-import org.qi4j.api.entity.Queryable;
-import org.qi4j.api.property.Property;
 
 /**
  * JAVADOC Add JavaDoc
@@ -68,7 +69,7 @@ public interface Person
     @Optional
     Property<URL> personalWebsite();
 
-    @Queryable( false )
+    @Queryable(false)
     Property<String> password();
 
     @Optional
