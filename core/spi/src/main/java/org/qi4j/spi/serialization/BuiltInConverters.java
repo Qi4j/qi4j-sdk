@@ -73,13 +73,13 @@ public interface BuiltInConverters
             converters.registerConverter(ValueType.BIG_INTEGER, new BigIntegerConverter());
 
             // Date types
-            converters.registerConverter(ValueType.INSTANT, new InstantConverter());
             converters.registerConverter(ValueType.ZONED_DATE_TIME, new ZonedDateTimeConverter());
             converters.registerConverter(ValueType.OFFSET_DATE_TIME, new OffsetDateTimeConverter());
             converters.registerConverter(ValueType.LOCAL_DATE_TIME, new LocalDateTimeConverter());
-            converters.registerConverter(ValueType.LOCAL_DATE, new LocalDateConverter());
-            converters.registerConverter(ValueType.LOCAL_TIME, new LocalTimeConverter());
-            converters.registerConverter(ValueType.DURATION, new DurationConverter());
+//            converters.registerConverter(ValueType.INSTANT, new InstantConverter());
+//            converters.registerConverter(ValueType.LOCAL_DATE, new LocalDateConverter());
+//            converters.registerConverter(ValueType.LOCAL_TIME, new LocalTimeConverter());
+//            converters.registerConverter(ValueType.DURATION, new DurationConverter());
             converters.registerConverter(ValueType.PERIOD, new PeriodConverter());
         }
 

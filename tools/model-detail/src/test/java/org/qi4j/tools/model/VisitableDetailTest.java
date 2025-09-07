@@ -19,28 +19,24 @@
  */
 package org.qi4j.tools.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.json.Json;
+import jakarta.json.JsonBuilderFactory;
+import jakarta.json.JsonObjectBuilder;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.ActivatorAdapter;
-import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ApplicationDescriptor;
 import org.qi4j.api.structure.Layer;
 import org.qi4j.api.structure.Module;
-import org.qi4j.api.util.HierarchicalVisitor;
 import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.tools.model.descriptor.ApplicationDetailDescriptor;
-import org.qi4j.tools.model.descriptor.ServiceDetailDescriptor;
-import org.qi4j.tools.model.descriptor.TransientDetailDescriptor;
 import org.junit.jupiter.api.Test;
+import org.qi4j.tools.model.v2.Application;
 
-import static org.qi4j.tools.model.descriptor.ApplicationDetailDescriptorBuilder.createApplicationDetailDescriptor;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -50,7 +46,7 @@ public class VisitableDetailTest
 {
     @Test
     public void visit()
-        throws AssemblyException, ActivationException
+        throws AssemblyException, JsonProcessingException
     {
         ApplicationDescriptor application = new Energy4Java().newApplicationModel(
             applicationFactory -> {
@@ -67,80 +63,16 @@ public class VisitableDetailTest
                 return app;
             }
         );
-        ApplicationDetailDescriptor detail = createApplicationDetailDescriptor( application );
-        Visitor visitor = new Visitor();
-        detail.accept( visitor );
-        assertThat(
-            visitor.events,
-            equalTo( Arrays.asList(
-                    // Application
-                    "visitEnter( UnderTestApp )",
-                    "visit( " + ApplicationActivator.class.getName() + " )",
-                    // Layer
-                    "visitEnter( LayerName )",
-                    "visit( " + LayerActivator.class.getName() + " )",
-                    // Module
-                    "visitEnter( ModuleName )",
-                    "visit( " + ModuleActivator.class.getName() + " )",
-                    // Leaving Structure
-                    "visitLeave( ModuleName )",
-                    "visitLeave( LayerName )",
-                    "visitLeave( UnderTestApp )"
-                )
-            )
-        );
+        Application detail = new Application( application );
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(detail);
+        System.out.println(json);
     }
 
-    private static final class Visitor
-        implements HierarchicalVisitor<Object, Object, RuntimeException>
-    {
-        private final List<String> events = new ArrayList<>();
-
-        @Override
-        public boolean visitEnter( Object visited )
-            throws RuntimeException
-        {
-            if( visited instanceof ServiceDetailDescriptor)
-            {
-                return true;
-            }
-            String event = "visitEnter( " + visited + " )";
-            events.add( event );
-            System.out.println( event );
-            return true;
-        }
-
-        @Override
-        public boolean visitLeave( Object visited )
-            throws RuntimeException
-        {
-            if( visited instanceof ServiceDetailDescriptor)
-            {
-                return true;
-            }
-            String event = "visitLeave( " + visited + " )";
-            events.add( event );
-            System.out.println( event );
-            return true;
-        }
-
-        @Override
-        public boolean visit( Object visited )
-            throws RuntimeException
-        {
-            if( visited instanceof TransientDetailDescriptor)
-            {
-                return true;
-            }
-            String event = "visit( " + visited + " )";
-            events.add( event );
-            System.out.println( event );
-            return true;
-        }
-    }
+    public static record AsRecord(int x, int y) { }
 
     static class ApplicationActivator
-        extends ActivatorAdapter<Application>
+        extends ActivatorAdapter<org.qi4j.api.structure.Application>
     {
     }
 

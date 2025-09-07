@@ -51,9 +51,7 @@ public class PostgreSQLDBIntegrityTest
     extends AbstractQi4jTest
 {
     @Container
-    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:17-alpine")
-        .withDatabaseName("jdbc_test_db")
-        .withReuse(true);
+    public static PostgreSQLContainer postgres = SetupProgres.newContainer();
 
     public interface TestEntity
         extends EntityComposite

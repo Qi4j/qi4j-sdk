@@ -39,10 +39,8 @@ import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.property.PropertyDescriptor;
-import org.qi4j.api.serialization.Converter;
-import org.qi4j.api.serialization.Converters;
-import org.qi4j.api.serialization.Deserializer;
-import org.qi4j.api.serialization.SerializationException;
+import org.qi4j.api.serialization.*;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ArrayType;
 import org.qi4j.api.type.CollectionType;
@@ -76,7 +74,7 @@ public interface MessagePackDeserializer extends Deserializer
         private MessagePackAdapters adapters;
 
         @Override
-        public <T> T deserialize( ModuleDescriptor module, ValueType valueType, InputStream state )
+        public <T> T deserialize(ModuleDescriptor module, Options options, ValueType valueType, InputStream state )
         {
             try( MessageUnpacker unpacker = MessagePack.newDefaultUnpacker( state ) )
             {

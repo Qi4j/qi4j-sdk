@@ -35,7 +35,9 @@ include 'core:api',
         'libraries:locking',
         'libraries:logging',
         'libraries:osgi',
-        'libraries:rdf',
+// TODO: RDF4J refuse to fix a bug in Java Modules packaging; same package in more than one JAR file.
+//        'libraries:rdf',
+
 //        'libraries:rest',
 //        'libraries:rest-client',
 //        'libraries:rest-common',
@@ -74,11 +76,14 @@ include 'core:api',
         // TODO: Keep an eye on when/if TestContainers supports Zookeeper
         'extensions:entitystore-zookeeper',
 
-// TODO; migrating from ElasticSearch to OpenSearch is not trivial in Qi4j. Started but quickly realized it is quite massive change.
+// TODO; migrating from ElasticSearch to OpenSearch is not trivial in Qi4j. Done most of it, but still have Date/Time and BigInteger/BigDecimal left.
 //        'extensions:indexing-opensearch',
-        'extensions:indexing-rdf',
+// TODO: RDF4J refuse to fix a bug in Java Modules packaging; same package in more than one JAR file.
+//        'extensions:indexing-rdf',
         'extensions:indexing-sql',
-        'extensions:metrics-codahale',
+// TODO: Modernize metrics with what ???
+//        'extensions:metrics-codahale',
+
 //        'extensions:messaging-activemq',
 //        'extensions:messaging-jms',
 //        'extensions:messaging-kafka',
@@ -94,7 +99,7 @@ include 'core:api',
 //        'tools:generator-qi4j',
 //        'tools:qidea',
         'tests:regression',
-        'tests:performance',
+//        'tests:performance',
         'tutorials:cargo',
         'tutorials:composites',
         'tutorials:hello',

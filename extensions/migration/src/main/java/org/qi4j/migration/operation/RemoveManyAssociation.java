@@ -22,6 +22,7 @@ package org.qi4j.migration.operation;
 
 import java.util.Arrays;
 import jakarta.json.JsonObject;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.migration.Migrator;
 import org.qi4j.migration.assembly.EntityMigrationOperation;
 import org.qi4j.migration.assembly.MigrationContext;
@@ -33,8 +34,8 @@ import org.qi4j.spi.entitystore.helpers.StateStore;
 public class RemoveManyAssociation
     implements EntityMigrationOperation
 {
-    private String association;
-    private String[] defaultReferences;
+    private final String association;
+    private final String[] defaultReferences;
 
     public RemoveManyAssociation( String association, String... defaultReferences )
     {
@@ -43,15 +44,15 @@ public class RemoveManyAssociation
     }
 
     @Override
-    public JsonObject upgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject upgrade(ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
     {
-        return migrator.removeManyAssociation( context, state, association );
+        return migrator.removeManyAssociation(module, context, state, association );
     }
 
     @Override
-    public JsonObject downgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject downgrade( ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
     {
-        return migrator.addManyAssociation( context, state, association, defaultReferences );
+        return migrator.addManyAssociation(module, context, state, association, defaultReferences );
     }
 
     @Override

@@ -21,7 +21,7 @@ package org.qi4j.migration;
 
 import java.util.Map;
 import jakarta.json.JsonObject;
-import org.qi4j.migration.assembly.MigrationContext;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.migration.assembly.MigrationContext;
 
 /**
@@ -30,42 +30,42 @@ import org.qi4j.migration.assembly.MigrationContext;
  */
 public interface Migrator
 {
-    JsonObject addProperty(MigrationContext content, JsonObject state,
-                           String name, Object defaultValue );
+    JsonObject addProperty(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                           String name, Object defaultValue);
 
-    JsonObject removeProperty( MigrationContext content, JsonObject state,
-                               String name );
+    JsonObject removeProperty(MigrationContext content, JsonObject state,
+                              String name, ModuleDescriptor module);
 
-    JsonObject renameProperty( MigrationContext content, JsonObject state,
-                               String from, String to );
+    JsonObject renameProperty(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                              String from, String to);
 
-    JsonObject addAssociation( MigrationContext content, JsonObject state,
-                               String name, String defaultReference );
+    JsonObject addAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                              String name, String defaultReference);
 
-    JsonObject removeAssociation( MigrationContext content, JsonObject state,
-                                  String name );
+    JsonObject removeAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                                 String name );
 
-    JsonObject renameAssociation( MigrationContext content, JsonObject state,
-                                  String from, String to );
+    JsonObject renameAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                                 String from, String to );
 
-    JsonObject addManyAssociation( MigrationContext content, JsonObject state,
-                                   String name, String... defaultReferences );
+    JsonObject addManyAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                                  String name, String... defaultReferences );
 
-    JsonObject removeManyAssociation( MigrationContext content, JsonObject state,
+    JsonObject removeManyAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                                     String name );
+
+    JsonObject renameManyAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                                     String from, String to );
+
+    JsonObject addNamedAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                                   String name, Map<String, String> defaultReferences);
+
+    JsonObject removeNamedAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
                                       String name );
 
-    JsonObject renameManyAssociation( MigrationContext content, JsonObject state,
-                                      String from, String to );
+    JsonObject renameNamedAssociation(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                                      String from, String to);
 
-    JsonObject addNamedAssociation( MigrationContext content, JsonObject state,
-                                    String name, Map<String, String> defaultReferences );
-
-    JsonObject removeNamedAssociation( MigrationContext content, JsonObject state,
-                                       String name );
-
-    JsonObject renameNamedAssociation( MigrationContext content, JsonObject state,
-                                       String from, String to );
-
-    JsonObject changeEntityType( MigrationContext content, JsonObject state,
-                                 String fromType, String toType );
+    JsonObject changeEntityType(ModuleDescriptor module, MigrationContext content, JsonObject state,
+                                String fromType, String toType );
 }

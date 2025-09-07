@@ -1,77 +1,105 @@
-/*
- *  Licensed to the Apache Software Foundation (ASF) under one
- *  or more contributor license agreements.  See the NOTICE file
- *  distributed with this work for additional information
- *  regarding copyright ownership.  The ASF licenses this file
- *  to you under the Apache License, Version 2.0 (the
- *  "License"); you may not use this file except in compliance
- *  with the License.  You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- *
- *
- */
 package org.qi4j.index.opensearch.cluster;
 
-import org.opensearch.client.transport.TransportClient;
-import org.opensearch.common.settings.Settings;
-import org.opensearch.common.transport.InetSocketTransportAddress;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.util.Timeout;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Transport;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.index.opensearch.OpenSearchClusterConfiguration;
 import org.qi4j.index.opensearch.internal.AbstractOpenSearchSupport;
-import org.opensearch.transport.client.PreBuiltTransportClient;
 
-import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
-public class OpenSearchClusterSupport
-    extends AbstractOpenSearchSupport
+public class OpenSearchClusterSupport extends AbstractOpenSearchSupport
 {
+
     @This
     private Configuration<OpenSearchClusterConfiguration> configuration;
 
+    private ApacheHttpClient5Transport transport;
+
     @Override
-    protected void activateElasticSearch()
+    protected void activateOpenSearch()
         throws Exception
     {
         configuration.refresh();
         OpenSearchClusterConfiguration config = configuration.get();
 
-        String clusterName = config.clusterName().get() == null ? DEFAULT_CLUSTER_NAME : config.clusterName().get();
+        // Basic config
+        String clusterName = config.clusterName().get() == null ? DEFAULT_CLUSTER_NAME : config.clusterName().get(); // not used by REST client
         index = config.index().get() == null ? DEFAULT_INDEX_NAME : config.index().get();
         indexNonAggregatedAssociations = config.indexNonAggregatedAssociations().get();
 
-        String[] nodes = config.nodes().get() == null
-                         ? new String[] { "localhost:9300" }
-                         : config.nodes().get().split( "," );
-        boolean clusterSniff = config.clusterSniff().get();
-        boolean ignoreClusterName = config.ignoreClusterName().get();
-        String pingTimeout = config.pingTimeout().get() == null ? "5s" : config.pingTimeout().get();
-        String samplerInterval = config.samplerInterval().get() == null ? "5s" : config.samplerInterval().get();
+        // Nodes: switch to HTTP ports (default 9200)
+        String nodesCsv = config.nodes().get();
+        String[] nodes = nodesCsv == null || nodesCsv.isBlank()
+            ? new String[]{"127.0.0.1:9200"}
+            : nodesCsv.split(",");
 
-        Settings settings = Settings.builder()
-                                    .put( "cluster.name", clusterName )
-                                    .put( "client.transport.sniff", clusterSniff )
-                                    .put( "client.transport.ignore_cluster_name", ignoreClusterName )
-                                    .put( "client.transport.ping_timeout", pingTimeout )
-                                    .put( "client.transport.nodes_sampler_interval", samplerInterval )
-                                    .build();
-        TransportClient transportClient = new PreBuiltTransportClient( settings );
-        for( String node : nodes )
+//        // Parse timeouts (e.g. "5s", "500ms"). Map pingTimeout -> socket timeout; samplerInterval -> sniffer interval.
+//        String pingTimeoutStr = config.pingTimeout().get() == null ? "5s" : config.pingTimeout().get();
+//        String samplerIntervalStr = config.samplerInterval().get() == null ? "5s" : config.samplerInterval().get();
+//        int socketTimeoutMs = (int) parseDurationMillis(pingTimeoutStr);
+//        long connectTimeoutMs = 5_000; // sane default; adjust if you add a setting
+//        int connectionRequestTimeoutMs = 5_000;
+//
+//        boolean clusterSniff = Boolean.TRUE.equals(config.clusterSniff().get());
+//        boolean ignoreClusterName = Boolean.TRUE.equals(config.ignoreClusterName().get()); // Not applicable for REST; kept for compat
+
+        // Build RestClient with multiple nodes and timeouts
+        List<HttpHost> hosts = new ArrayList<>();
+        for(String node : nodes)
         {
-            String[] split = node.split( ":" );
-            String host = split[ 0 ];
-            int port = Integer.valueOf( split[ 1 ] );
-            InetSocketAddress socketAddress = new InetSocketAddress( host, port );
-            transportClient.addTransportAddress( new InetSocketTransportAddress( socketAddress ) );
+            String trimmed = node.trim();
+            if(trimmed.isEmpty())
+            {
+                continue;
+            }
+            String[] hp = trimmed.split(":");
+            String host = hp[0].trim();
+            int port = hp.length > 1 ? Integer.parseInt(hp[1].trim()) : 9200;
+            hosts.add(new HttpHost(host, port));
         }
 
-        client = transportClient;
+        HttpHost[] array = hosts.toArray(new HttpHost[0]);
+        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+        JacksonJsonpMapper mapper = new JacksonJsonpMapper(objectMapper);
+        transport = ApacheHttpClient5TransportBuilder
+            .builder(array)
+            .setMapper(mapper)
+            .setHttpClientConfigCallback(hcb ->
+                hcb.setDefaultRequestConfig(RequestConfig.custom()
+                    .setConnectTimeout(Timeout.ofSeconds(5))
+                    .setResponseTimeout(Timeout.ofSeconds(5))
+                    .setConnectionRequestTimeout(Timeout.ofSeconds(5))
+                    .build()
+                    ))
+                .build();
+        client = new OpenSearchClient(transport);
+
+        // Note: clusterName/ignoreClusterName are no-ops in REST mode. Left for config compatibility.
+    }
+
+    @Override
+    protected void passivateOpenSearch()
+        throws Exception
+    {
+        if(transport != null)
+        {
+            try
+            {
+                transport.close();
+            }
+            catch(Exception ignored)
+            {
+            }
+            transport = null;
+        }
     }
 }

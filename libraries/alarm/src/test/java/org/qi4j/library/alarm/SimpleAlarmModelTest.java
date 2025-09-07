@@ -107,7 +107,7 @@ public class SimpleAlarmModelTest
         boolean test4 = spi.modelDescription().toLowerCase().contains( "deactivation" );
         assertThat( test1 && test2 && test3 && test4, is( true ) );
 
-        Locale english = new Locale( "en" );
+        Locale english = Locale.of( "en" );
         test1 = spi.modelDescription( english ).toLowerCase().contains( "normal" );
         test2 = spi.modelDescription( english ).toLowerCase().contains( "activated" );
         test3 = spi.modelDescription( english ).toLowerCase().contains( "activation" );

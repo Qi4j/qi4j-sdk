@@ -31,6 +31,8 @@ import org.qi4j.api.entity.EntityDescriptor;
 import org.qi4j.api.entity.EntityReference;
 import org.qi4j.api.property.PropertyDescriptor;
 import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.entity.NamedAssociationState;
@@ -54,6 +56,7 @@ import org.jooq.impl.DSL;
  * Creation of the actual Mixin tables happens in {@link TypesTable}.
  * </p>
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 class MixinTable
 {
     static final String NAME_COLUMN_NAME = "_name";
@@ -64,9 +67,9 @@ class MixinTable
     private final Table<Record> mixinTable;
     private final Table<Record> mixinAssocsTable;
 
-    private Field<String> nameColumn;
-    private Field<String> referenceColumn;
-    private Field<String> indexColumn;
+    private final Field<String> nameColumn;
+    private final Field<String> referenceColumn;
+    private final Field<String> indexColumn;
 
     private final JooqDslContext dsl;
     private final Map<QualifiedName, Field<Object>> properties = new ConcurrentHashMap<>();
@@ -76,7 +79,7 @@ class MixinTable
 
     private final Class<?> mixinType;
     private final TypesTable types;
-    private Serialization serialization;
+    private final Serialization serialization;
 
     MixinTable( JooqDslContext dsl, SQLDialect dialect, TypesTable types, Class<?> mixinType,
                 EntityDescriptor descriptor, Serialization serialization )
@@ -262,8 +265,8 @@ class MixinTable
 
     private Table<Record> getAssocsTable( EntityDescriptor descriptor )
     {
-        if( descriptor.state().manyAssociations().count() > 0
-            || descriptor.state().namedAssociations().count() > 0 )
+        if( descriptor.state().manyAssociations().findAny().isPresent()
+            || descriptor.state().namedAssociations().findAny().isPresent())
         {
             Table<Record> table = dsl.tableOf( mixinTable.getName() + ASSOCS_TABLE_POSTFIX );
             int result = dsl.createTableIfNotExists( table )
@@ -286,6 +289,7 @@ class MixinTable
 
     private Object getStateValue( Field<Object> field, DefaultEntityState state, QualifiedName name )
     {
+        ModuleDescriptor module = state.entityDescriptor().module();
         PropertyDescriptor property = state.entityDescriptor().state().findPropertyModelByQualifiedName( name );
         ValueType type = property.valueType();
         Object value = state.propertyValueOf( name );
@@ -314,7 +318,7 @@ class MixinTable
         {
             return value;
         }
-        return serialization.serialize( value );
+        return serialization.serialize( module, Options.ENTITY_STORAGE, value );
     }
 
     private String referenceToString( DefaultEntityState state, QualifiedName assocName )

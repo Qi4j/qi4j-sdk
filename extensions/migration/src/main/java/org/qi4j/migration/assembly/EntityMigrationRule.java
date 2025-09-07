@@ -21,6 +21,7 @@ package org.qi4j.migration.assembly;
 
 import java.util.Arrays;
 import jakarta.json.JsonObject;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.migration.Migrator;
 import org.qi4j.spi.entitystore.helpers.JSONKeys;
 import org.qi4j.spi.entitystore.helpers.StateStore;
@@ -50,11 +51,11 @@ public class EntityMigrationRule
         return entityTypes;
     }
 
-    public JsonObject upgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject upgrade(ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
     {
         if( appliesTo( state.getString( JSONKeys.TYPE ) ) )
         {
-            return entityOperation.upgrade( context, state, stateStore, migrator );
+            return entityOperation.upgrade( module, context, state, stateStore, migrator );
         }
         else
         {
@@ -63,11 +64,11 @@ public class EntityMigrationRule
         }
     }
 
-    public JsonObject downgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject downgrade( ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
     {
         if( appliesTo( state.getString( JSONKeys.TYPE ) ) )
         {
-            return entityOperation.downgrade( context, state, stateStore, migrator );
+            return entityOperation.downgrade( module, context, state, stateStore, migrator );
         }
         else
         {

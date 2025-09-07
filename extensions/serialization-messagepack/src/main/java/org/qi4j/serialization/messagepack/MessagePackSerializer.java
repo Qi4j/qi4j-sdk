@@ -30,10 +30,8 @@ import org.qi4j.api.composite.CompositeInstance;
 import org.qi4j.api.composite.StatefulAssociationCompositeDescriptor;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.mixin.Mixins;
-import org.qi4j.api.serialization.Converter;
-import org.qi4j.api.serialization.Converters;
-import org.qi4j.api.serialization.SerializationException;
-import org.qi4j.api.serialization.Serializer;
+import org.qi4j.api.serialization.*;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ArrayType;
 import org.qi4j.api.type.EnumType;
 import org.qi4j.api.type.MapType;
@@ -62,7 +60,7 @@ public interface MessagePackSerializer extends Serializer
         private MessagePackAdapters adapters;
 
         @Override
-        public void serialize( Options options, OutputStream output, @Optional Object object )
+        public void serialize(ModuleDescriptor module, Serialization.Options options, OutputStream output, @Optional Object object)
         {
             try( MessagePacker packer = MessagePack.newDefaultPacker( output ) )
             {
@@ -76,7 +74,7 @@ public interface MessagePackSerializer extends Serializer
             }
         }
 
-        private Value doSerialize( Options options, Object object, boolean root )
+        private Value doSerialize(Serialization.Options options, Object object, boolean root )
         {
             try
             {
@@ -127,7 +125,7 @@ public interface MessagePackSerializer extends Serializer
             }
         }
 
-        private MapValue serializeStatefulAssociationValue( Options options, Object composite, boolean root )
+        private MapValue serializeStatefulAssociationValue(Serialization.Options options, Object composite, boolean root )
         {
             CompositeInstance instance = Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply( (Composite) composite );
             StatefulAssociationCompositeDescriptor descriptor =
@@ -174,7 +172,7 @@ public interface MessagePackSerializer extends Serializer
             return builder.build();
         }
 
-        private MapValue serializeMap( Options options, Map<?, ?> map )
+        private MapValue serializeMap(Serialization.Options options, Map<?, ?> map )
         {
             ValueFactory.MapBuilder builder = ValueFactory.newMapBuilder();
             map.forEach( ( key, value ) -> builder.put( doSerialize( options, key, false ),
@@ -182,7 +180,7 @@ public interface MessagePackSerializer extends Serializer
             return builder.build();
         }
 
-        private Value serializeArray( Options options, Object object )
+        private Value serializeArray(Serialization.Options options, Object object )
         {
             ArrayType valueType = ArrayType.of( object.getClass() );
             if( valueType.isArrayOfPrimitiveBytes() )
@@ -196,12 +194,12 @@ public interface MessagePackSerializer extends Serializer
             return serializeStream( options, Stream.of( (Object[]) object ) );
         }
 
-        private ArrayValue serializeIterable( Options options, Iterable<?> iterable )
+        private ArrayValue serializeIterable(Serialization.Options options, Iterable<?> iterable )
         {
             return serializeStream( options, StreamSupport.stream( iterable.spliterator(), false ) );
         }
 
-        private ArrayValue serializeStream( Options options, Stream<?> stream )
+        private ArrayValue serializeStream(Serialization.Options options, Stream<?> stream )
         {
             return ValueFactory.newArray( stream.map( element -> doSerialize( options, element, false ) )
                                                 .collect( toList() ) );

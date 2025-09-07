@@ -32,7 +32,7 @@ public class OpenSearchClusterIndexQueryAssembler
     {
         super.assemble( module );
         module.services( OpenSearchClusterIndexQueryService.class )
-              .taggedWith( "elasticsearch", "query", "indexing" )
+              .taggedWith( "opensearch", "query", "indexing" )
               .identifiedBy( identity() )
               .visibleIn( visibility() )
               .instantiateOnStartup();

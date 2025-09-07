@@ -253,7 +253,7 @@ final class JettyConfigurationHelper
             {
                 try
                 {
-                    Security.addProvider( (Provider) Class.forName( "org.bouncycastle.jce.provider.BouncyCastleProvider" ).newInstance() );
+                    Security.addProvider( (Provider) Class.forName( "org.bouncycastle.jce.provider.BouncyCastleProvider" ).getDeclaredConstructor().newInstance() );
                 }
                 catch( Exception ex )
                 {

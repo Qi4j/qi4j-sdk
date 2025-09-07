@@ -20,12 +20,16 @@ package org.qi4j.serialization.jakartajson;
 import java.time.LocalDate;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
 import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.serialization.SerializationException;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueCompositeType;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.api.value.ValueBuilder;
@@ -41,13 +45,13 @@ import static org.hamcrest.Matchers.is;
 public class CustomJsonAdapterTest extends AbstractQi4jTest
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble(ModuleAssembly module)
     {
         new JakartaJsonSerializationAssembler()
-            .withJsonSettings( new JakartaJsonSettings().withJsonAdapter( new CustomValueAdapter() )
-                                                      .withJsonAdapter( new CustomStructureAdapter() ) )
-            .assemble( module );
-        module.values( SomeValue.class );
+            .withJsonSettings(new JakartaJsonSettings().withJsonAdapter(new CustomValueAdapter())
+                .withJsonAdapter(new CustomStructureAdapter()))
+            .assemble(module);
+        module.values(SomeValue.class);
     }
 
     interface SomeValue
@@ -61,7 +65,7 @@ public class CustomJsonAdapterTest extends AbstractQi4jTest
     {
         String state;
 
-        CustomValue( String state )
+        CustomValue(String state)
         {
             this.state = state;
         }
@@ -72,7 +76,7 @@ public class CustomJsonAdapterTest extends AbstractQi4jTest
         String foo;
         LocalDate bar;
 
-        CustomStructure( String foo, LocalDate bar )
+        CustomStructure(String foo, LocalDate bar)
         {
             this.foo = foo;
             this.bar = bar;
@@ -82,24 +86,27 @@ public class CustomJsonAdapterTest extends AbstractQi4jTest
     static class CustomValueAdapter implements JakartaJsonAdapter<CustomValue>
     {
         @Override
-        public Class<CustomValue> type() { return CustomValue.class; }
-
-        @Override
-        public JsonValue serialize( JakartaJsonFactories jsonFactories,
-                                    CustomValue object, Function<Object, JsonValue> serialize )
+        public Class<CustomValue> type()
         {
-            return jsonFactories.toJsonString( type().cast( object ).state );
+            return CustomValue.class;
         }
 
         @Override
-        public CustomValue deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+        public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories,
+                                   CustomValue object, Function<Object, JsonValue> serialize)
         {
-            switch( json.getValueType() )
+            return jsonFactories.toJsonString(type().cast(object).state);
+        }
+
+        @Override
+        public CustomValue deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+        {
+            switch(json.getValueType())
             {
                 case STRING:
-                    return new CustomValue( ( (JsonString) json ).getString() );
+                    return new CustomValue(((JsonString) json).getString());
                 default:
-                    throw new SerializationException( "Don't know how to deserialize CustomValue from " + json );
+                    throw new SerializationException("Don't know how to deserialize CustomValue from " + json);
             }
         }
     }
@@ -107,29 +114,32 @@ public class CustomJsonAdapterTest extends AbstractQi4jTest
     static class CustomStructureAdapter implements JakartaJsonAdapter<CustomStructure>
     {
         @Override
-        public Class<CustomStructure> type() { return CustomStructure.class; }
-
-        @Override
-        public JsonValue serialize( JakartaJsonFactories jsonFactories,
-                                    CustomStructure object, Function<Object, JsonValue> serialize )
+        public Class<CustomStructure> type()
         {
-            return jsonFactories.builderFactory().createObjectBuilder()
-                                .add( "foo", object.foo )
-                                .add( "bar", serialize.apply( object.bar ) )
-                                .build();
+            return CustomStructure.class;
         }
 
         @Override
-        public CustomStructure deserialize( JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize )
+        public JsonValue serialize(ModuleDescriptor module, Options options, JakartaJsonFactories jsonFactories,
+                                   CustomStructure object, Function<Object, JsonValue> serialize)
         {
-            if( json.getValueType() != JsonValue.ValueType.OBJECT )
+            return jsonFactories.builderFactory().createObjectBuilder()
+                .add("foo", object.foo)
+                .add("bar", serialize.apply(object.bar))
+                .build();
+        }
+
+        @Override
+        public CustomStructure deserialize(ModuleDescriptor module, Options options, JsonValue json, BiFunction<JsonValue, ValueType, Object> deserialize)
+        {
+            if(json.getValueType() != JsonValue.ValueType.OBJECT)
             {
-                throw new SerializationException( "Don't know how to deserialize CustomStructure from " + json );
+                throw new SerializationException("Don't know how to deserialize CustomStructure from " + json);
             }
             JsonObject jsonObject = (JsonObject) json;
-            String foo = jsonObject.getString( "foo" );
-            LocalDate bar = (LocalDate) deserialize.apply( jsonObject.get( "bar" ), ValueType.of( LocalDate.class ) );
-            return new CustomStructure( foo, bar );
+            String foo = jsonObject.getString("foo");
+            LocalDate bar = (LocalDate) deserialize.apply(jsonObject.get("bar"), ValueType.of(LocalDate.class));
+            return new CustomStructure(foo, bar);
         }
     }
 
@@ -139,43 +149,43 @@ public class CustomJsonAdapterTest extends AbstractQi4jTest
     @Test
     public void customJsonAdapterForPropertyValue()
     {
-        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder( SomeValue.class );
-        builder.prototype().customValue().set( new CustomValue( "custom-value-state" ) );
-        builder.prototype().customStructure().set( new CustomStructure( "foo", LocalDate.of( 2017, 1, 1 ) ) );
+        ValueBuilder<SomeValue> builder = valueBuilderFactory.newValueBuilder(SomeValue.class);
+        builder.prototype().customValue().set(new CustomValue("custom-value-state"));
+        builder.prototype().customStructure().set(new CustomStructure("foo", LocalDate.of(2017, 1, 1)));
         SomeValue someValue = builder.newInstance();
 
-        System.out.println( someValue.toString() );
+        System.out.println(someValue.toString());
 
-        JsonValue serialized = serialization.toJson( someValue );
-        assertThat( serialized.getValueType(), is( JsonValue.ValueType.OBJECT ) );
+        JsonValue serialized = serialization.toJson(module, Options.DEFAULT, someValue);
+        assertThat(serialized.getValueType(), is(JsonValue.ValueType.OBJECT));
 
         JsonObject jsonObject = (JsonObject) serialized;
-        assertThat( jsonObject.getString( "customValue" ), equalTo( "custom-value-state" ) );
-        JsonObject structure = jsonObject.getJsonObject( "customStructure" );
-        assertThat( structure.getString( "foo" ), equalTo( "foo" ) );
-        assertThat( structure.getString( "bar" ), equalTo( "2017-01-01" ) );
+        assertThat(jsonObject.getString("customValue"), equalTo("custom-value-state"));
+        JsonObject structure = jsonObject.getJsonObject("customStructure");
+        assertThat(structure.getString("foo"), equalTo("foo"));
+        assertThat(structure.getString("bar"), equalTo("2017-01-01"));
 
-        SomeValue deserialized = serialization.fromJson( module, ValueCompositeType.of( SomeValue.class ), serialized );
+        SomeValue deserialized = serialization.fromJson(module, Options.DEFAULT, ValueCompositeType.of(SomeValue.class), serialized);
 
-        assertThat( deserialized.customValue().get().state, equalTo( "custom-value-state" ) );
-        assertThat( deserialized.customStructure().get().foo, equalTo( "foo" ) );
-        assertThat( deserialized.customStructure().get().bar, equalTo( LocalDate.of( 2017, 1, 1 ) ) );
+        assertThat(deserialized.customValue().get().state, equalTo("custom-value-state"));
+        assertThat(deserialized.customStructure().get().foo, equalTo("foo"));
+        assertThat(deserialized.customStructure().get().bar, equalTo(LocalDate.of(2017, 1, 1)));
     }
 
     @Test
     public void customJsonAdapterForDirectObject()
     {
-        CustomValue customValueObject = new CustomValue( "custom-value-state" );
-        JsonValue serialized = serialization.toJson( customValueObject );
-        assertThat( serialized.getValueType(), is( JsonValue.ValueType.STRING ) );
+        CustomValue customValueObject = new CustomValue("custom-value-state");
+        JsonValue serialized = serialization.toJson(module, Options.DEFAULT, customValueObject);
+        assertThat(serialized.getValueType(), is(JsonValue.ValueType.STRING));
         JsonString jsonString = (JsonString) serialized;
-        assertThat( jsonString.getString(), equalTo( "custom-value-state" ) );
+        assertThat(jsonString.getString(), equalTo("custom-value-state"));
 
-        CustomStructure customStructureObject = new CustomStructure( "foo", LocalDate.of( 2017, 1, 1 ) );
-        serialized = serialization.toJson( customStructureObject );
-        assertThat( serialized.getValueType(), is( JsonValue.ValueType.OBJECT ) );
+        CustomStructure customStructureObject = new CustomStructure("foo", LocalDate.of(2017, 1, 1));
+        serialized = serialization.toJson(module, Options.DEFAULT, customStructureObject);
+        assertThat(serialized.getValueType(), is(JsonValue.ValueType.OBJECT));
         JsonObject jsonObject = (JsonObject) serialized;
-        assertThat( jsonObject.getString( "foo" ), equalTo( "foo" ) );
-        assertThat( jsonObject.getString( "bar" ), equalTo( "2017-01-01" ) );
+        assertThat(jsonObject.getString("foo"), equalTo("foo"));
+        assertThat(jsonObject.getString("bar"), equalTo("2017-01-01"));
     }
 }

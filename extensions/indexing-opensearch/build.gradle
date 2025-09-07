@@ -19,24 +19,26 @@
  */
 
 plugins {
-  id "org.javamodularity.moduleplugin" version "1.8.12"
+    id "org.javamodularity.moduleplugin" version "1.8.12"
 }
 
 apply plugin: 'qi4j-extension'
 
-description = "Qi4j ElasticSearch Index/Query Extension"
-
-//jar { manifest { name = "Qi4j Extension - Index/Query - ElasticSearch" } }
+description = "Qi4j OpenSearch Index/Query Extension"
 
 dependencies {
-  api qi4j.core.bootstrap
+    api qi4j.core.bootstrap
 
-  implementation qi4j.library( 'fileconfig' )
-  implementation libraries.opensearch
-  implementation libraries.slf4j_api
+    implementation qi4j.library('fileconfig')
+    implementation libraries.jackson_mapper
+    implementation libraries.opensearch
+    implementation libraries.httpcomponents
+    implementation libraries.slf4j_api
 
-  runtimeOnly qi4j.core.runtime
+    runtimeOnly qi4j.core.runtime
 
-  testImplementation qi4j.core.testsupport
-  testRuntimeOnly libraries.logback
+    testImplementation qi4j.core.testsupport
+    testRuntimeOnly libraries.logback
+    testImplementation libraries.testcontainer_opensearch
+
 }

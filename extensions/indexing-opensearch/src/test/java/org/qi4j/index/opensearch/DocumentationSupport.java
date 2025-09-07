@@ -19,42 +19,40 @@
  */
 package org.qi4j.index.opensearch;
 
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.Assembler;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.index.opensearch.assembly.OpenSearchClientIndexQueryAssembler;
 import org.qi4j.index.opensearch.assembly.OpenSearchClusterIndexQueryAssembler;
-import org.qi4j.index.opensearch.assembly.OpenSearchFilesystemIndexQueryAssembler;
-import org.elasticsearch.client.Client;
 
 public class DocumentationSupport
     implements Assembler
 {
     @Override
-    public void assemble( ModuleAssembly module )
+    public void assemble( ModuleAssembly configModule)
         throws AssemblyException
     {
-        ModuleAssembly configModule = module;
         Visibility configVisibility = Visibility.module;
 
         // START SNIPPET: filesystem
-        new OpenSearchFilesystemIndexQueryAssembler()
+        new OpenSearchClusterIndexQueryAssembler()
             .withConfig( configModule, configVisibility )
-            .assemble( module );
+            .assemble(configModule);
         // END SNIPPET: filesystem
 
         // START SNIPPET: cluster
         new OpenSearchClusterIndexQueryAssembler()
             .withConfig( configModule, configVisibility )
-            .assemble( module );
+            .assemble(configModule);
         // END SNIPPET: cluster
 
-        Client client = null;
+        OpenSearchClient client = null;
         // START SNIPPET: client
         new OpenSearchClientIndexQueryAssembler( client )
             .withConfig( configModule, configVisibility )
-            .assemble( module );
+            .assemble(configModule);
         // END SNIPPET: client
     }
 }

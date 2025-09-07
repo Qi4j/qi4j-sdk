@@ -40,18 +40,18 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class MySQLEntityStoreTest extends AbstractEntityStoreTest
 {
     @Container
-    public static MySQLContainer mysqlContainer = (MySQLContainer) new MySQLContainer("mysql:latest")
+    public static MySQLContainer mysqlContainer = (MySQLContainer) new MySQLContainer("mysql:8")
         .withDatabaseName("jdbc_test_db")
         .withUsername("junit")
         .withUsername("27gdo87gbo278g")
         .withReuse(true);
 
-    @BeforeAll
-    static void waitForDockerToSettle()
-        throws Exception
-    {
-        Thread.sleep( 30000 );
-    }
+//    @BeforeAll
+//    static void waitForDockerToSettle()
+//        throws Exception
+//    {
+//        Thread.sleep( 30000 );
+//    }
 
     @Override
     // START SNIPPET: assembly

@@ -21,6 +21,7 @@
 package org.qi4j.migration.operation;
 
 import jakarta.json.JsonObject;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.migration.Migrator;
 import org.qi4j.migration.assembly.EntityMigrationOperation;
 import org.qi4j.migration.assembly.MigrationContext;
@@ -42,15 +43,15 @@ public class RenameAssociation
     }
 
     @Override
-    public JsonObject upgrade(MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject upgrade(ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
     {
-        return migrator.renameAssociation( context, state, from, to );
+        return migrator.renameAssociation(module, context, state, from, to );
     }
 
     @Override
-    public JsonObject downgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject downgrade( ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
     {
-        return migrator.renameAssociation( context, state, to, from );
+        return migrator.renameAssociation(module, context, state, to, from );
     }
 
     @Override

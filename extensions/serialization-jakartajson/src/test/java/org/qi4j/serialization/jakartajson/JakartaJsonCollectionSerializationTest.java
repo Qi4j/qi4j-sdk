@@ -17,16 +17,11 @@
  */
 package org.qi4j.serialization.jakartajson;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.JsonValue;
+import jakarta.json.*;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.property.Property;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.serialization.SerializationException;
 import org.qi4j.api.type.MapType;
 import org.qi4j.api.type.ValueCompositeType;
@@ -36,7 +31,10 @@ import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.serialization.jakartajson.assembly.JakartaJsonSerializationAssembler;
 import org.qi4j.spi.serialization.JsonSerialization;
 import org.qi4j.test.serialization.AbstractCollectionSerializationTest;
-import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -71,7 +69,7 @@ public class JakartaJsonCollectionSerializationTest extends AbstractCollectionSe
         map.put( "foo", "bar" );
         map.put( "baz", "bazar" );
 
-        JsonValue json = jsonSerialization.toJson( map );
+        JsonValue json = jsonSerialization.toJson( module, Options.DEFAULT, map );
         assertThat( json.getValueType(), is( JsonValue.ValueType.OBJECT ) );
 
         JsonObject jsonObject = (JsonObject) json;
@@ -79,7 +77,7 @@ public class JakartaJsonCollectionSerializationTest extends AbstractCollectionSe
         assertThat( jsonObject.getString( "baz" ), equalTo( "bazar" ) );
 
         MapType mapType = MapType.of( ValueType.STRING, ValueType.STRING );
-        Map<String, String> map2 = jsonSerialization.fromJson( module, mapType, json );
+        Map<String, String> map2 = jsonSerialization.fromJson( module, Options.DEFAULT, mapType, json );
         assertThat( map2, equalTo( map ) );
     }
 
@@ -102,7 +100,7 @@ public class JakartaJsonCollectionSerializationTest extends AbstractCollectionSe
         JsonArray jsonArray = arrayBuilder.build();
 
         MapType mapType = MapType.of( ValueType.STRING, ValueType.STRING );
-        Map<String, String> map = jsonSerialization.fromJson( module, mapType, jsonArray );
+        Map<String, String> map = jsonSerialization.fromJson( module, Options.DEFAULT, mapType, jsonArray );
 
         assertThat( map.get( "foo" ), equalTo( "bar" ) );
         assertThat( map.get( "baz" ), equalTo( "bazar" ) );
@@ -115,7 +113,7 @@ public class JakartaJsonCollectionSerializationTest extends AbstractCollectionSe
         map.put( newSomeValue( "foo" ), "bar" );
         map.put( newSomeValue( "baz" ), "bazar" );
 
-        JsonValue json = jsonSerialization.toJson( map );
+        JsonValue json = jsonSerialization.toJson( module, Options.DEFAULT, map );
         assertThat( json.getValueType(), is( JsonValue.ValueType.ARRAY ) );
 
         JsonArray jsonArray = (JsonArray) json;
@@ -128,7 +126,7 @@ public class JakartaJsonCollectionSerializationTest extends AbstractCollectionSe
 
         MapType mapType = MapType.of( ValueCompositeType.of( api.valueDescriptorFor( map.keySet().iterator().next() ) ),
                                       ValueType.STRING );
-        Map<SomeValue, String> map2 = jsonSerialization.fromJson( module, mapType, json );
+        Map<SomeValue, String> map2 = jsonSerialization.fromJson( module, Options.DEFAULT, mapType, json );
         assertThat( map2, equalTo( map ) );
     }
 
@@ -139,7 +137,7 @@ public class JakartaJsonCollectionSerializationTest extends AbstractCollectionSe
         map.put( "foo", "bar" );
         map.put( newSomeValue( "baz" ), "bazar" );
 
-        JsonValue json = jsonSerialization.toJson( map );
+        JsonValue json = jsonSerialization.toJson( module, Options.DEFAULT, map );
         assertThat( json.getValueType(), is( JsonValue.ValueType.ARRAY ) );
 
         JsonArray jsonArray = (JsonArray) json;
@@ -177,7 +175,7 @@ public class JakartaJsonCollectionSerializationTest extends AbstractCollectionSe
         MapType mapType = MapType.of( ValueType.OBJECT, ValueType.STRING );
         try
         {
-            jsonSerialization.fromJson( module, mapType, jsonArray );
+            jsonSerialization.fromJson( module, Options.DEFAULT, mapType, jsonArray );
             fail( "Should have failed deserialization" );
         }
         catch( SerializationException ex )

@@ -20,6 +20,8 @@ package org.qi4j.serialization.jakartajson;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.serialization.Deserializer;
+import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.serialization.jakartajson.assembly.JakartaJsonSerializationAssembler;
 import org.qi4j.test.AbstractQi4jTest;
@@ -49,7 +51,7 @@ public class HandCraftedJsonTest extends AbstractQi4jTest
     public void canReadSingleLineJson()
     {
         String json = "  {  \"foo\"  :  \"bar\"  }  ";
-        assertThat( deserializer.deserialize( module, SomeValue.class, json ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, json ).foo().get(),
                     equalTo( "bar" ) );
     }
 
@@ -57,7 +59,7 @@ public class HandCraftedJsonTest extends AbstractQi4jTest
     public void canReadFormattedMultiLineJson()
     {
         String json = "  \n {  \n\t\"foo\"  :  \"bar\"  \n }\n  ";
-        assertThat( deserializer.deserialize( module, SomeValue.class, json ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, json ).foo().get(),
                     equalTo( "bar" ) );
     }
 
@@ -65,7 +67,7 @@ public class HandCraftedJsonTest extends AbstractQi4jTest
     public void canReadCommentedJson()
     {
         String json = "// One comment\n {  \n\t\"foo\"  :  \"bar\"  \n/* Two comments */ }\n  ";
-        assertThat( deserializer.deserialize( module, SomeValue.class, json ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, json ).foo().get(),
                     equalTo( "bar" ) );
     }
 }

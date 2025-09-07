@@ -421,7 +421,6 @@ public class ModuleUnitOfWork
             manyAssocFunction = converter.manyAssociations(entityComposite, manyAssocFunction);
             namedAssocFunction = converter.namedAssociations(entityComposite, namedAssocFunction);
         }
-        @SuppressWarnings("unchecked")
         ValueBuilder<T> builder = module().instance().newValueBuilderWithState(
             primaryType, propertyFunction, assocationFunction, manyAssocFunction, namedAssocFunction);
         return builder.newInstance();
@@ -532,15 +531,9 @@ public class ModuleUnitOfWork
         return ((EntityInstance) compositeInstanceOf((Composite) entity)).entityState();
     }
 
-    private static class UoWQuerySource
+    private record UoWQuerySource(ModuleUnitOfWork moduleUnitOfWork)
         implements QuerySource
     {
-        private final ModuleUnitOfWork moduleUnitOfWork;
-
-        private UoWQuerySource(ModuleUnitOfWork moduleUnitOfWork)
-        {
-            this.moduleUnitOfWork = moduleUnitOfWork;
-        }
 
         @Override
         public <T> T find(Class<T> resultType,
@@ -640,15 +633,9 @@ public class ModuleUnitOfWork
         }
     }
 
-    private class ToValuePropertyMappingFunction
+    private record ToValuePropertyMappingFunction(Object entity)
         implements Function<PropertyDescriptor, Object>
     {
-        private Object entity;
-
-        ToValuePropertyMappingFunction(Object entity)
-        {
-            this.entity = entity;
-        }
 
         @Override
         public Object apply(PropertyDescriptor propertyDescriptor)
@@ -657,15 +644,9 @@ public class ModuleUnitOfWork
         }
     }
 
-    private class ToValueAssociationMappingFunction<T>
+    private record ToValueAssociationMappingFunction<T>(T entity)
         implements Function<AssociationDescriptor, EntityReference>
     {
-        private final T entity;
-
-        ToValueAssociationMappingFunction(T entity)
-        {
-            this.entity = entity;
-        }
 
         @Override
         public EntityReference apply(AssociationDescriptor associationDescriptor)
@@ -674,15 +655,9 @@ public class ModuleUnitOfWork
         }
     }
 
-    private class ToValueManyAssociationMappingFunction<T>
+    private record ToValueManyAssociationMappingFunction<T>(T entity)
         implements Function<AssociationDescriptor, Stream<EntityReference>>
     {
-        private final T entity;
-
-        ToValueManyAssociationMappingFunction(T entity)
-        {
-            this.entity = entity;
-        }
 
         @Override
         public Stream<EntityReference> apply(AssociationDescriptor associationDescriptor)
@@ -691,15 +666,9 @@ public class ModuleUnitOfWork
         }
     }
 
-    private class ToValueNameAssociationMappingFunction<T>
+    private record ToValueNameAssociationMappingFunction<T>(T entity)
         implements Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>>
     {
-        private final T entity;
-
-        ToValueNameAssociationMappingFunction(T entity)
-        {
-            this.entity = entity;
-        }
 
         @Override
         public Stream<Map.Entry<String, EntityReference>> apply(AssociationDescriptor associationDescriptor)
@@ -709,15 +678,9 @@ public class ModuleUnitOfWork
 
     }
 
-    private class ToEntityPropertyMappingFunction<T>
+    private record ToEntityPropertyMappingFunction<T>(T value)
         implements Function<PropertyDescriptor, Object>
     {
-        private final T value;
-
-        private ToEntityPropertyMappingFunction(T value)
-        {
-            this.value = value;
-        }
 
         @Override
         public Object apply(PropertyDescriptor propertyDescriptor)
@@ -728,16 +691,9 @@ public class ModuleUnitOfWork
         }
     }
 
-    private class ToEntityAssociationMappingFunction<T>
+    private record ToEntityAssociationMappingFunction<T>(T value)
         implements Function<AssociationDescriptor, EntityReference>
     {
-
-        private final T value;
-
-        private ToEntityAssociationMappingFunction(T value)
-        {
-            this.value = value;
-        }
 
         @Override
         @SuppressWarnings("unchecked")
@@ -749,16 +705,9 @@ public class ModuleUnitOfWork
         }
     }
 
-    private class ToEntityManyAssociationMappingFunction<T>
+    private record ToEntityManyAssociationMappingFunction<T>(T value)
         implements Function<AssociationDescriptor, Stream<EntityReference>>
     {
-
-        private final T value;
-
-        private ToEntityManyAssociationMappingFunction(T valueComposite)
-        {
-            this.value = valueComposite;
-        }
 
         @Override
         public Stream<EntityReference> apply(AssociationDescriptor associationDescriptor)
@@ -767,15 +716,9 @@ public class ModuleUnitOfWork
         }
     }
 
-    private class ToEntityNameAssociationMappingFunction<T>
+    private record ToEntityNameAssociationMappingFunction<T>(T value)
         implements Function<AssociationDescriptor, Stream<Map.Entry<String, EntityReference>>>
     {
-        private final T value;
-
-        private ToEntityNameAssociationMappingFunction(T valueComposite)
-        {
-            this.value = valueComposite;
-        }
 
         @Override
         public Stream<Map.Entry<String, EntityReference>> apply(AssociationDescriptor associationDescriptor)

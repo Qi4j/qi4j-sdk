@@ -39,9 +39,7 @@ public class PostgreSQLQueryTest
     extends AbstractQueryTest
 {
     @Container
-    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:17-alpine")
-        .withDatabaseName("jdbc_test_db")
-        .withReuse(true);
+    public static PostgreSQLContainer postgres = SetupProgres.newContainer();
 
     @Override
     public void assemble( ModuleAssembly mainModule )

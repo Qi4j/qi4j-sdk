@@ -165,7 +165,7 @@ public class LevelDBEntityStoreMixin
     private DBFactory newJniDBFactory()
         throws Exception
     {
-        return (DBFactory) Class.forName( "org.fusesource.leveldbjni.JniDBFactory" ).newInstance();
+        return (DBFactory) Class.forName( "org.fusesource.leveldbjni.JniDBFactory" ).getDeclaredConstructor().newInstance();
     }
 
 //    private DBFactory newJavaDBFactory()

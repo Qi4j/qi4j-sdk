@@ -20,6 +20,7 @@
 package org.qi4j.migration.operation;
 
 import jakarta.json.JsonObject;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.migration.Migrator;
 import org.qi4j.migration.assembly.EntityMigrationOperation;
 import org.qi4j.migration.assembly.MigrationContext;
@@ -31,25 +32,25 @@ import org.qi4j.spi.entitystore.helpers.StateStore;
 public class RenameEntity
     implements EntityMigrationOperation
 {
-    String fromName;
-    String toName;
+    private final String fromName;
+    private final String toName;
 
-    public RenameEntity( String fromName, String toName )
+    public RenameEntity(String fromName, String toName)
     {
         this.fromName = fromName;
         this.toName = toName;
     }
 
     @Override
-    public JsonObject upgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject upgrade(ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator)
     {
-        return migrator.changeEntityType( context, state, fromName, toName );
+        return migrator.changeEntityType(module, context, state, fromName, toName);
     }
 
     @Override
-    public JsonObject downgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject downgrade(ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator)
     {
-        return migrator.changeEntityType( context, state, fromName, fromName );
+        return migrator.changeEntityType(module, context, state, fromName, fromName);
     }
 
     @Override

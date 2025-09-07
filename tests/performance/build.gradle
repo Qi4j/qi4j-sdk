@@ -37,7 +37,7 @@ dependencies {
   implementation qi4j.extension( 'entitystore-jdbm' )
   implementation qi4j.extension( 'entitystore-sqlkv' )
   implementation qi4j.extension( 'cache-ehcache' )
-  implementation qi4j.extension( 'indexing-rdf' )
+//  implementation qi4j.extension( 'indexing-rdf' )
   implementation libraries.derby
 
   runtimeOnly qi4j.core.runtime

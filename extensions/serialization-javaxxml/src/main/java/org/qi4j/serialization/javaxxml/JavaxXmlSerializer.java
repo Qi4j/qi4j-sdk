@@ -17,17 +17,6 @@
  */
 package org.qi4j.serialization.javaxxml;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.io.Writer;
-import java.util.Base64;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import org.qi4j.api.Qi4jAPI;
 import org.qi4j.api.association.AssociationStateHolder;
 import org.qi4j.api.common.Optional;
@@ -40,8 +29,10 @@ import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.serialization.Converter;
 import org.qi4j.api.serialization.Converters;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.serialization.SerializationException;
 import org.qi4j.api.service.ServiceDescriptor;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ArrayType;
 import org.qi4j.api.type.EnumType;
 import org.qi4j.api.type.MapType;
@@ -53,6 +44,18 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.io.Writer;
+import java.util.Base64;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.qi4j.api.util.Collectors.toMap;
@@ -80,240 +83,241 @@ public class JavaxXmlSerializer extends AbstractTextSerializer
     private JavaxXmlSettings settings;
 
     @Override
-    public void initialize() throws Exception
+    public void initialize()
+        throws Exception
     {
-        settings = JavaxXmlSettings.orDefault( descriptor.metaInfo( JavaxXmlSettings.class ) );
+        settings = JavaxXmlSettings.orDefault(descriptor.metaInfo(JavaxXmlSettings.class));
     }
 
     @Override
-    public void serialize( Options options, Writer writer, @Optional Object object )
+    public void serialize(ModuleDescriptor module, Options options, Writer writer, @Optional Object object)
     {
-        Document xmlDocument = toXml( options, object );
-        if( xmlDocument == null )
+        Document xmlDocument = toXml(module, options, object);
+        if(xmlDocument == null)
         {
             return;
         }
         try
         {
             // We want plain text nodes to be serialized without surrounding elements
-            if( xmlDocument.getNodeType() == Node.TEXT_NODE )
+            if(xmlDocument.getNodeType() == Node.TEXT_NODE)
             {
-                writer.write( xmlDocument.getNodeValue() );
+                writer.write(xmlDocument.getNodeValue());
             }
             else
             {
-                xmlFactories.serializationTransformer().transform( new DOMSource( xmlDocument ),
-                                                                   new StreamResult( writer ) );
+                xmlFactories.serializationTransformer().transform(new DOMSource(xmlDocument),
+                    new StreamResult(writer));
             }
         }
-        catch( IOException ex )
+        catch(IOException ex)
         {
-            throw new UncheckedIOException( ex );
+            throw new UncheckedIOException(ex);
         }
-        catch( TransformerException ex )
+        catch(TransformerException ex)
         {
-            throw new SerializationException( "Unable to transform XML Document to String", ex );
+            throw new SerializationException("Unable to transform XML Document to String", ex);
         }
     }
 
     @Override
-    public <T> Function<T, Document> toXmlFunction( Options options )
+    public <T> Function<T, Document> toXmlFunction(ModuleDescriptor module, Options options)
     {
-        return object -> doSerializeRoot( options, object );
+        return object -> doSerializeRoot(module, options, object);
     }
 
-    private <T> Document doSerializeRoot( Options options, T object )
+    private <T> Document doSerializeRoot(ModuleDescriptor module, Options options, T object)
     {
         Document doc = xmlFactories.newDocumentForSerialization();
-        Element stateElement = doc.createElement( settings.getRootTagName() );
-        Node node = doSerialize( doc, options, object, true );
-        stateElement.appendChild( node );
-        doc.appendChild( stateElement );
+        Element stateElement = doc.createElement(settings.getRootTagName());
+        Node node = doSerialize(module, options, doc, object, true);
+        stateElement.appendChild(node);
+        doc.appendChild(stateElement);
         return doc;
     }
 
-    private <T> Node doSerialize( Document document, Options options, T object, boolean root )
+    private <T> Node doSerialize(ModuleDescriptor module, Options options, Document document, T object, boolean root)
     {
-        if( object == null )
+        if(object == null)
         {
-            return document.createElement( NULL_ELEMENT_NAME );
+            return document.createElement(NULL_ELEMENT_NAME);
         }
         Class<?> objectClass = object.getClass();
-        Converter<Object> converter = converters.converterFor( objectClass );
-        if( converter != null )
+        Converter<Object> converter = converters.converterFor(objectClass);
+        if(converter != null)
         {
-            return doSerialize( document, options, converter.toString( object ), false );
+            return doSerialize(module, options, document, converter.toString(object), false);
         }
-        JavaxXmlAdapter<?> adapter = adapters.adapterFor( objectClass );
-        if( adapter != null )
+        JavaxXmlAdapter<?> adapter = adapters.adapterFor(objectClass);
+        if(adapter != null)
         {
-            return adapter.serialize( document, object, value -> doSerialize( document, options, value, false ) );
+            return adapter.serialize(module, options, document, object, value -> doSerialize(module, options, document, value, false));
         }
-        if( EnumType.isEnum( objectClass ) )
+        if(EnumType.isEnum(objectClass))
         {
-            return document.createTextNode( object.toString() );
+            return document.createTextNode(object.toString());
         }
-        if( StatefulAssociationValueType.isStatefulAssociationValue( objectClass ) )
+        if(StatefulAssociationValueType.isStatefulAssociationValue(objectClass))
         {
-            return serializeStatefulAssociationValue( document, options, object, root );
+            return serializeStatefulAssociationValue(module, options, document, object, root);
         }
-        if( MapType.isMap( objectClass ) )
+        if(MapType.isMap(objectClass))
         {
-            return serializeMap( document, options, (Map<?, ?>) object );
+            return serializeMap(module, options, document, (Map<?, ?>) object);
         }
-        if( ArrayType.isArray( objectClass ) )
+        if(ArrayType.isArray(objectClass))
         {
-            return serializeArray( document, options, object );
+            return serializeArray(module, options, document, object);
         }
-        if( Iterable.class.isAssignableFrom( objectClass ) )
+        if(Iterable.class.isAssignableFrom(objectClass))
         {
-            return serializeIterable( document, options, (Iterable<?>) object );
+            return serializeIterable(module, options, document, (Iterable<?>) object);
         }
-        if( Stream.class.isAssignableFrom( objectClass ) )
+        if(Stream.class.isAssignableFrom(objectClass))
         {
-            return serializeStream( document, options, (Stream<?>) object );
+            return serializeStream(module, options, document, (Stream<?>) object);
         }
-        throw new SerializationException( "Don't know how to serialize " + object );
+        throw new SerializationException("Don't know how to serialize " + object);
     }
 
-    private <T> Node serializeStatefulAssociationValue( Document document, Options options, T composite, boolean root )
+    private <T> Node serializeStatefulAssociationValue(ModuleDescriptor module, Options options, Document document, T composite, boolean root)
     {
-        CompositeInstance instance = Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply( (Composite) composite );
+        CompositeInstance instance = Qi4jAPI.FUNCTION_COMPOSITE_INSTANCE_OF.apply((Composite) composite);
         StatefulAssociationCompositeDescriptor descriptor =
             (StatefulAssociationCompositeDescriptor) instance.descriptor();
         AssociationStateHolder state = (AssociationStateHolder) instance.state();
         StatefulAssociationValueType<?> valueType = descriptor.valueType();
 
-        Element valueElement = document.createElement( settings.getValueTagName() );
+        Element valueElement = document.createElement(settings.getValueTagName());
         valueType.properties().forEach(
             property ->
             {
-                Object value = state.propertyFor( property.accessor() ).get();
-                Converter<Object> converter = converters.converterFor( property );
-                if( converter != null )
+                Object value = state.propertyFor(property.accessor()).get();
+                Converter<Object> converter = converters.converterFor(property);
+                if(converter != null)
                 {
-                    value = converter.toString( value );
+                    value = converter.toString(value);
                 }
-                Element element = document.createElement( property.qualifiedName().name() );
-                element.appendChild( doSerialize( document, options, value, false ) );
-                valueElement.appendChild( element );
-            } );
+                Element element = document.createElement(property.qualifiedName().name());
+                element.appendChild(doSerialize(module, options, document, value, false));
+                valueElement.appendChild(element);
+            });
         valueType.associations().forEach(
             association ->
             {
-                EntityReference value = state.associationFor( association.accessor() ).reference();
-                Element element = document.createElement( association.qualifiedName().name() );
-                element.appendChild( doSerialize( document, options, value, false ) );
-                valueElement.appendChild( element );
+                EntityReference value = state.associationFor(association.accessor()).reference();
+                Element element = document.createElement(association.qualifiedName().name());
+                element.appendChild(doSerialize(module, options, document, value, false));
+                valueElement.appendChild(element);
             }
         );
         valueType.manyAssociations().forEach(
             association ->
             {
-                Stream<EntityReference> value = state.manyAssociationFor( association.accessor() ).references();
-                Element element = document.createElement( association.qualifiedName().name() );
-                element.appendChild( doSerialize( document, options, value, false ) );
-                valueElement.appendChild( element );
+                Stream<EntityReference> value = state.manyAssociationFor(association.accessor()).references();
+                Element element = document.createElement(association.qualifiedName().name());
+                element.appendChild(doSerialize(module, options, document, value, false));
+                valueElement.appendChild(element);
             }
         );
         valueType.namedAssociations().forEach(
             association ->
             {
-                Map<String, EntityReference> value = state.namedAssociationFor( association.accessor() ).references()
-                                                          .collect( toMap() );
-                Element element = document.createElement( association.qualifiedName().name() );
-                element.appendChild( doSerialize( document, options, value, false ) );
-                valueElement.appendChild( element );
+                Map<String, EntityReference> value = state.namedAssociationFor(association.accessor()).references()
+                    .collect(toMap());
+                Element element = document.createElement(association.qualifiedName().name());
+                element.appendChild(doSerialize(module, options, document, value, false));
+                valueElement.appendChild(element);
             }
         );
-        if( ( root && options.rootTypeInfo() ) || ( !root && options.nestedTypeInfo() ) )
+        if((root && options.rootTypeInfo()) || (!root && options.nestedTypeInfo()))
         {
-            valueElement.setAttribute( settings.getTypeInfoTagName(), valueType.primaryType().getName() );
+            valueElement.setAttribute(settings.getTypeInfoTagName(), valueType.primaryType().getName());
         }
         return valueElement;
     }
 
-    private Node serializeMap( Document document, Options options, Map<?, ?> map )
+    private Node serializeMap(ModuleDescriptor module, Options options, Document document, Map<?, ?> map)
     {
-        Element mapElement = document.createElement( settings.getMapTagName() );
-        if( map.isEmpty() )
+        Element mapElement = document.createElement(settings.getMapTagName());
+        if(map.isEmpty())
         {
             return mapElement;
         }
         Function<Map.Entry, Node> complexMapping = entry ->
         {
-            Element entryElement = document.createElement( settings.getMapEntryTagName() );
+            Element entryElement = document.createElement(settings.getMapEntryTagName());
 
-            Element keyElement = document.createElement( "key" );
-            keyElement.appendChild( doSerialize( document, options, entry.getKey(), false ) );
-            entryElement.appendChild( keyElement );
+            Element keyElement = document.createElement("key");
+            keyElement.appendChild(doSerialize(module, options, document, entry.getKey(), false));
+            entryElement.appendChild(keyElement);
 
-            Element valueElement = document.createElement( "value" );
-            valueElement.appendChild( doSerialize( document, options, entry.getValue(), false ) );
-            entryElement.appendChild( valueElement );
+            Element valueElement = document.createElement("value");
+            valueElement.appendChild(doSerialize(module, options, document, entry.getValue(), false));
+            entryElement.appendChild(valueElement);
 
             return entryElement;
         };
 
-        if( map.keySet().iterator().next() instanceof CharSequence )
+        if(map.keySet().iterator().next() instanceof CharSequence)
         {
             map.entrySet().stream()
-               .map( entry ->
-                     {
-                         try
-                         {
-                             Element element = document.createElement( entry.getKey().toString() );
-                             element.appendChild( doSerialize( document, options, entry.getValue(), false ) );
-                             return element;
-                         }
-                         catch( DOMException ex )
-                         {
-                             // The key name cannot be encoded as a tag name, fallback to complex mapping
-                             // Tag names cannot start with a digit, some characters cannot be escaped etc...
-                             return complexMapping.apply( entry );
-                         }
-                     } )
-               .forEach( mapElement::appendChild );
+                .map(entry ->
+                {
+                    try
+                    {
+                        Element element = document.createElement(entry.getKey().toString());
+                        element.appendChild(doSerialize(module, options, document, entry.getValue(), false));
+                        return element;
+                    }
+                    catch(DOMException ex)
+                    {
+                        // The key name cannot be encoded as a tag name, fallback to complex mapping
+                        // Tag names cannot start with a digit, some characters cannot be escaped etc...
+                        return complexMapping.apply(entry);
+                    }
+                })
+                .forEach(mapElement::appendChild);
         }
         else
         {
             map.entrySet().stream()
-               .map( complexMapping )
-               .forEach( mapElement::appendChild );
+                .map(complexMapping)
+                .forEach(mapElement::appendChild);
         }
         return mapElement;
     }
 
-    private <T> Node serializeArray( Document document, Options options, T object )
+    private <T> Node serializeArray(ModuleDescriptor module, Options options, Document document, T object)
     {
-        ArrayType valueType = ArrayType.of( object.getClass() );
-        if( valueType.isArrayOfPrimitiveBytes() )
+        ArrayType valueType = ArrayType.of(object.getClass());
+        if(valueType.isArrayOfPrimitiveBytes())
         {
-            byte[] base64 = Base64.getEncoder().encode( (byte[]) object );
-            return document.createCDATASection( new String( base64, UTF_8 ) );
+            byte[] base64 = Base64.getEncoder().encode((byte[]) object);
+            return document.createCDATASection(new String(base64, UTF_8));
         }
-        if( valueType.isArrayOfPrimitives() )
+        if(valueType.isArrayOfPrimitives())
         {
-            return serializeIterable( document, options, new ArrayIterable( object ) );
+            return serializeIterable(module, options, document, new ArrayIterable(object));
         }
-        return serializeStream( document, options, Stream.of( (Object[]) object ) );
+        return serializeStream(module, options, document, Stream.of((Object[]) object));
     }
 
-    private Node serializeIterable( Document document, Options options, Iterable<?> object )
+    private Node serializeIterable(ModuleDescriptor module, Options options, Document document, Iterable<?> object)
     {
-        return serializeStream( document, options, StreamSupport.stream( object.spliterator(), false ) );
+        return serializeStream(module, options, document, StreamSupport.stream(object.spliterator(), false));
     }
 
-    private Node serializeStream( Document document, Options options, Stream<?> object )
+    private Node serializeStream(ModuleDescriptor module, Options options, Document document, Stream<?> object)
     {
-        Element collectionElement = document.createElement( settings.getCollectionTagName() );
-        object.map( each -> doSerialize( document, options, each, false ) )
-              .forEach( itemValueNode ->
-                        {
-                            Element itemElement = document.createElement( settings.getCollectionElementTagName() );
-                            itemElement.appendChild( itemValueNode );
-                            collectionElement.appendChild( itemElement );
-                        } );
+        Element collectionElement = document.createElement(settings.getCollectionTagName());
+        object.map(each -> doSerialize(module, options, document, each, false))
+            .forEach(itemValueNode ->
+            {
+                Element itemElement = document.createElement(settings.getCollectionElementTagName());
+                itemElement.appendChild(itemValueNode);
+                collectionElement.appendChild(itemElement);
+            });
         return collectionElement;
     }
 }

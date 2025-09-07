@@ -33,6 +33,7 @@ import org.qi4j.api.identity.IdentityGenerator;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.api.usecase.Usecase;
@@ -172,7 +173,7 @@ public class SqlEntityStoreMixin
             return value;
         }
         // otherwise, we deal with a serialized value.
-        return serialization.deserialize( module, type, value.toString() );
+        return serialization.deserialize( module, Options.ENTITY_STORAGE, type, value.toString() );
     }
 
     private void addNamedAssociation( AssociationStateDescriptor stateDescriptor, Map<QualifiedName, Map<String, EntityReference>> namedAssocs, AssociationValue associationValue )

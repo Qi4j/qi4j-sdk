@@ -30,8 +30,9 @@ dependencies {
 
   runtimeOnly qi4j.core.runtime
 
+  implementation libraries.jackson_mapper
   testImplementation qi4j.core.testsupport
-  testImplementation qi4j.extension( 'indexing-rdf' )
+//  testImplementation qi4j.extension( 'indexing-rdf' )
 
   testRuntimeOnly libraries.logback
 }

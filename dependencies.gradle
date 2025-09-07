@@ -59,7 +59,7 @@ def freemarkerVersion = '2.3.26-incubating'
 def geodeVersion = '1.15.1'
 def groovyVersion = '4.0.12'
 def hazelcastVersion = '5.3.6'
-def httpCoreVersion = '4.4.16'
+def httpCoreVersion = '5.3.4'
 def httpClientVersion = '4.5.14'
 def jacksonVersion = '2.18.2'
 def jaxbApiVersion = '4.0.2'
@@ -81,10 +81,10 @@ def memcachedVersion = '2.4.8'
 def mongodbVersion = '5.2.1'
 def msgpackVersion = '0.8.13'
 def nettyVersion = '4.1.113.Final'
-def openSearchVersion = '2.18.0'
+def openSearchVersion = '3.1.0'
 def pulsarVersion = '3.1.0'
 def restletVersion = '2.4.3'
-def rdf4jVersion = '5.1.0'
+def rdf4jVersion = '5.1.3'
 def riakVersion = '2.1.1'
 def servletVersion = '5.0.0'
 def shiroVersion = '1.13.0'
@@ -109,18 +109,25 @@ dependencies.libraries << [
         commons_lang      : "org.apache.commons:commons-lang3:$commonsLangVersion",
         commons_pool      : "org.apache.commons:commons-pool2:$commonsPoolVersion",
         commons_validator : "commons-validator:commons-validator:$commonsValidatorVersion",
-        ehcache           : "org.ehcache:ehcache:$ehcacheVersion",
-        opensearch        : ["org.opensearch.client:opensearch-java:$openSearchVersion"],
-        freemarker        : "org.freemarker:freemarker:$freemarkerVersion",
-        geode             : "org.apache.geode:geode-core:$geodeVersion",
+        ehcache   : "org.ehcache:ehcache:$ehcacheVersion",
+        opensearch: [
+                ["org.opensearch.client:opensearch-java:$openSearchVersion"],
+                ["org.opensearch.client:opensearch-rest-client:$openSearchVersion"],
+//                ["org.opensearch.client:opensearch-rest-client-sniffer:$openSearchVersion"]
+        ],
+        freemarker: "org.freemarker:freemarker:$freemarkerVersion",
+        geode     : "org.apache.geode:geode-core:$geodeVersion",
         groovy            : "org.apache.groovy:groovy-all:$groovyVersion",
         hazelcast         : "com.hazelcast:hazelcast:$hazelcastVersion",
         httpcomponents    : [
-                "org.apache.httpcomponents:httpcore:$httpCoreVersion",
-                "org.apache.httpcomponents:httpcore-nio:$httpCoreVersion",
+                "org.apache.httpcomponents.core5:httpcore5:$httpCoreVersion"
         ],
         http_client       : "org.apache.httpcomponents:httpclient:$httpClientVersion",
-        jackson_mapper    : "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+        jackson_mapper    : [
+                "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion",
+                "com.fasterxml.jackson.datatype:jackson-datatype-jdk8:$jacksonVersion"
+                ],
         jaxb_api          : "jakarta.xml.bind:jaxb-api:$jaxbApiVersion",
         jclouds_core      : "org.apache.jclouds:jclouds-core:$jcloudsVersion",
         jclouds_blobstore : "org.apache.jclouds:jclouds-allblobstore:$jcloudsVersion",
@@ -230,7 +237,7 @@ def mockitoVersion = '3.12.4'
 def mysqlVersion = '8.0.25'
 def postgresqlVersion = '42.7.4'
 def sqliteVersion = '3.19.3'
-def testcontainersVersion = '1.20.4'
+def testcontainersVersion = '1.21.3'
 def xmlUnitVersion = '2.3.0'
 dependencies.libraries << [
         awaitility              : "org.awaitility:awaitility:$awaitilityVersion",
@@ -290,6 +297,10 @@ dependencies.libraries << [
         ],
         testcontainer_mysql     : [
                 "org.testcontainers:mysql:$testcontainersVersion",
+                "org.testcontainers:testcontainers:$testcontainersVersion",
+                "org.testcontainers:junit-jupiter:$testcontainersVersion"
+        ],
+        testcontainer_opensearch: [
                 "org.testcontainers:testcontainers:$testcontainersVersion",
                 "org.testcontainers:junit-jupiter:$testcontainersVersion"
         ],

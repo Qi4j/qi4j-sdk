@@ -19,6 +19,10 @@ package org.qi4j.serialization.javaxxml;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -43,7 +47,7 @@ public interface JavaxXmlAdapter<T>
      * @param serialize Serialization function for nested structure serialization
      * @return Serialized XML representation
      */
-    Node serialize( Document document, Object object, Function<Object, Node> serialize );
+    Node serialize( ModuleDescriptor module, Options options, Document document, Object object, Function<Object, Node> serialize );
 
     /**
      * Deserialize.
@@ -52,5 +56,5 @@ public interface JavaxXmlAdapter<T>
      * @param deserialize Deserialization function for nested structure deserialization
      * @return Deserialized object
      */
-    T deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize );
+    T deserialize(ModuleDescriptor module, Options options, Node node, BiFunction<Node, ValueType, Object> deserialize );
 }

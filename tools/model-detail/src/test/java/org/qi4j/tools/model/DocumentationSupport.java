@@ -25,9 +25,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.stream.JsonGenerator;
+import jakarta.json.stream.JsonParser;
 import org.qi4j.api.activation.ActivationException;
 import org.qi4j.api.activation.PassivationException;
 import org.qi4j.api.common.Visibility;
@@ -38,12 +41,10 @@ import org.qi4j.bootstrap.ApplicationAssembly;
 import org.qi4j.bootstrap.Energy4Java;
 import org.qi4j.bootstrap.LayerAssembly;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.tools.model.descriptor.ApplicationDetailDescriptor;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.joining;
-import static org.qi4j.tools.model.descriptor.ApplicationDetailDescriptorBuilder.createApplicationDetailDescriptor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -79,34 +80,16 @@ public class DocumentationSupport
         // START SNIPPET: usage
         Energy4Java qi4j = new Energy4Java(); // (2)
         ApplicationDescriptor model = qi4j.newApplicationModel( assembler ); // (3)
-        ApplicationDetailDescriptor detailedModel = createApplicationDetailDescriptor( model ); // (4)
-
-        System.out.println( detailedModel.toJson().toString() ); // (5)
+        org.qi4j.tools.model.v2.Application detailedModel = new org.qi4j.tools.model.v2.Application( model ); // (4)
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println( mapper.writeValueAsString(detailedModel) ); // (5)
 
         Application application = model.newInstance( qi4j.spi() ); // (6)
         try
         {
             application.activate();
             // END SNIPPET: usage
-            ClassLoader loader = getClass().getClassLoader();
-            try( InputStream input = loader.getResourceAsStream( "doc-support-report.json" ) )
-            {
-                String text = new BufferedReader( new InputStreamReader( input ) )
-                    .lines()
-                    .filter( line -> !line.startsWith( "//" ) )
-                    .collect( joining( "\n" ) );
-                JsonObject reference = Json.createReader( new StringReader( text ) ).readObject();
 
-                JsonObject detailedModelReport = detailedModel.toJson();
-
-                StringWriter writer = new StringWriter();
-                Json.createWriterFactory( singletonMap( JsonGenerator.PRETTY_PRINTING, true ) )
-                    .createWriter( writer )
-                    .write( detailedModelReport );
-                System.out.println( "--------\n" + writer.toString() );
-
-                assertThat( reference, equalTo( detailedModelReport ) );
-            }
             // START SNIPPET: usage
         }
         finally

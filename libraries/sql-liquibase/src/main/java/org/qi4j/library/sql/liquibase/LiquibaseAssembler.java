@@ -35,6 +35,7 @@ public class LiquibaseAssembler
         ServiceDeclaration service = module.services( LiquibaseService.class ).visibleIn( visibility() );
         if( applyChangelogOnStartup )
         {
+            //noinspection unchecked
             service.withActivators( LiquibaseService.ApplyChangelogActivator.class ).instantiateOnStartup();
         }
         if( hasIdentity() )

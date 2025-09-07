@@ -23,7 +23,6 @@ import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.Assemblers;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.library.sql.datasource.DataSourceConfiguration;
-import org.qi4j.library.sql.datasource.DataSourceConfiguration;
 
 public abstract class AbstractPooledDataSourceServiceAssembler<AssemblerType>
     extends Assemblers.VisibilityIdentityConfig<AssemblerType>
@@ -34,10 +33,11 @@ public abstract class AbstractPooledDataSourceServiceAssembler<AssemblerType>
     public final void assemble( ModuleAssembly module )
     {
         super.assemble( module );
-        module.values( DataSourceConfiguration.class ).visibleIn( Visibility.module );
+        // By registering the DataSourceConfiguration as configurations(), both an entity and a value is registered.
+//        module.values(DataSourceConfiguration.class).visibleIn(Visibility.module);
         if( hasConfig() )
         {
-            configModule().entities( DataSourceConfiguration.class ).visibleIn( configVisibility() );
+            configModule().configurations( DataSourceConfiguration.class ).visibleIn( configVisibility() );
         }
         onAssemble( module, identity() == null ? DEFAULT_DATASOURCE_SERVICE_IDENTITY : identity(), visibility() );
     }

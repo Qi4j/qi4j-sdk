@@ -26,6 +26,6 @@ public abstract class AbstractOpenSearchAssembler<AssemblerType>
 {
     public AbstractOpenSearchAssembler()
     {
-        identifiedBy( "es-indexing" );
+        identifiedBy( "opensearch-indexing" );
     }
 }

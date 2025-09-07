@@ -149,11 +149,11 @@ public final class ValueInstance extends TransientInstance
     public String toJsonString()
     {
         Serializer serialization = ((ModuleSpi) module().instance()).serialization();
-        if(serialization != null)
+        if(serialization == null)
         {
-            return serialization.serialize(module(), Serialization.Options.NO_TYPE_INFO, proxy());
+            return null;
         }
-        return null;
+        return serialization.serialize(module(), Serialization.Options.NO_TYPE_INFO, proxy());
     }
 
     @Override

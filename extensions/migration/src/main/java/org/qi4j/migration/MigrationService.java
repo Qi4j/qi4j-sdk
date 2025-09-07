@@ -35,9 +35,11 @@ import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Mixins;
+import org.qi4j.api.serialization.Serialization;
 import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.api.service.ServiceReference;
 import org.qi4j.api.structure.Application;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.unitofwork.UnitOfWorkFactory;
 import org.qi4j.migration.assembly.EntityMigrationRule;
 import org.qi4j.migration.assembly.MigrationBuilder;
@@ -167,14 +169,13 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject migrate( final JsonObject state, String toVersion, StateStore stateStore )
+        public JsonObject migrate(ModuleDescriptor module, final JsonObject state, String toVersion, StateStore stateStore)
             throws JsonException
         {
             // Get current version
             String fromVersion = state.getString( JSONKeys.APPLICATION_VERSION, "0.0" );
 
-            Iterable<EntityMigrationRule> matchedRules = builder.entityMigrationRules()
-                                                                .rulesBetweenVersions( fromVersion, toVersion );
+            Iterable<EntityMigrationRule> matchedRules = builder.entityMigrationRules().rulesBetweenVersions( fromVersion, toVersion );
 
             JsonObject migratedState = state;
             boolean changed = false;
@@ -185,7 +186,7 @@ public interface MigrationService
                 {
                     MigrationContext context = new MigrationContext();
 
-                    migratedState = matchedRule.upgrade( context, migratedState, stateStore, migrator );
+                    migratedState = matchedRule.upgrade( module, context, migratedState, stateStore, migrator );
 
                     if( context.isSuccess() && context.hasChanged() && LOGGER.isDebugEnabled() )
                     {
@@ -226,14 +227,14 @@ public interface MigrationService
 
         // Migrator implementation
         @Override
-        public JsonObject addProperty( MigrationContext context, JsonObject state, String name, Object defaultValue )
+        public JsonObject addProperty(ModuleDescriptor module, MigrationContext context, JsonObject state, String name, Object defaultValue)
             throws JsonException
         {
-            JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
+                        JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
             if( !valueState.containsKey( name ) )
             {
                 valueState = jsonFactories.cloneBuilder( valueState )
-                                          .add( name, serialization.toJson( defaultValue ) )
+                                          .add( name, serialization.toJson( module, Serialization.Options.ENTITY_STORAGE, defaultValue ) )
                                           .build();
                 JsonObject migratedState = jsonFactories.cloneBuilderExclude( state, JSONKeys.VALUE )
                                                         .add( JSONKeys.VALUE, valueState )
@@ -255,7 +256,7 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject removeProperty( MigrationContext context, JsonObject state, String name )
+        public JsonObject removeProperty(MigrationContext context, JsonObject state, String name, ModuleDescriptor module)
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -281,7 +282,7 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject renameProperty( MigrationContext context, JsonObject state, String from, String to )
+        public JsonObject renameProperty(ModuleDescriptor module, MigrationContext context, JsonObject state, String from, String to)
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -309,8 +310,8 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject addAssociation( MigrationContext context, JsonObject state, String name,
-                                          String defaultReference )
+        public JsonObject addAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String name,
+                                         String defaultReference)
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -337,7 +338,7 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject removeAssociation( MigrationContext context, JsonObject state, String name )
+        public JsonObject removeAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String name )
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -362,7 +363,7 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject renameAssociation( MigrationContext context, JsonObject state, String from, String to )
+        public JsonObject renameAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String from, String to )
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -390,8 +391,8 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject addManyAssociation( MigrationContext context, JsonObject state, String name,
-                                              String... defaultReferences )
+        public JsonObject addManyAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String name,
+                                             String... defaultReferences )
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -424,7 +425,7 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject removeManyAssociation( MigrationContext context, JsonObject state, String name )
+        public JsonObject removeManyAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String name )
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -449,7 +450,7 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject renameManyAssociation( MigrationContext context, JsonObject state, String from, String to )
+        public JsonObject renameManyAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String from, String to )
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -477,8 +478,8 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject addNamedAssociation( MigrationContext context, JsonObject state, String name,
-                                               Map<String, String> defaultReferences )
+        public JsonObject addNamedAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String name,
+                                              Map<String, String> defaultReferences)
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -511,7 +512,7 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject removeNamedAssociation( MigrationContext context, JsonObject state, String name )
+        public JsonObject removeNamedAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String name )
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -536,7 +537,7 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject renameNamedAssociation( MigrationContext context, JsonObject state, String from, String to )
+        public JsonObject renameNamedAssociation(ModuleDescriptor module, MigrationContext context, JsonObject state, String from, String to)
             throws JsonException
         {
             JsonObject valueState = state.getJsonObject( JSONKeys.VALUE );
@@ -564,8 +565,8 @@ public interface MigrationService
         }
 
         @Override
-        public JsonObject changeEntityType( MigrationContext context, JsonObject state,
-                                            String fromType, String toType )
+        public JsonObject changeEntityType(ModuleDescriptor module, MigrationContext context, JsonObject state,
+                                           String fromType, String toType )
             throws JsonException
         {
             String currentType = state.getString( JSONKeys.TYPE );

@@ -18,19 +18,16 @@
   ~
   ~
   -->
-<module xmlns="http://qi4j.org/schemas/2008/dev-status/1"
+<module xmlns="https://qi4j.org/schemas/2025/dev-status/1"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://qi4j.org/schemas/2008/dev-status/1
-        https://raw.githubusercontent.com/Qi4j/qi4j-sdk/develop/schemas/2008-dev-status.xsd">
-  <status>
-    <codebase>stable</codebase>
-    <!--none,early,beta,stable,mature-->
-    <documentation>good</documentation>
-    <!-- none, brief, good, complete -->
-    <unittests>good</unittests>
-    <!-- none, some, good, complete -->
-  </status>
-  <licenses>
-    <license>ALv2</license>
-  </licenses>
+        xsi:schemaLocation="https://qi4j.org/schemas/2025/dev-status/1
+        https://raw.githubusercontent.com/Qi4j/qi4j-sdk/develop/schemas/2025-dev-status.xsd">
+    <status>
+        <codebase>stable</codebase>
+        <documentation>good</documentation>
+        <unittests>good</unittests>
+    </status>
+    <licenses>
+        <license>ALv2</license>
+    </licenses>
 </module>

@@ -22,6 +22,7 @@ package org.qi4j.migration.assembly;
 
 import jakarta.json.JsonException;
 import jakarta.json.JsonObject;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.migration.Migrator;
 import org.qi4j.spi.entitystore.helpers.StateStore;
 
@@ -30,9 +31,9 @@ import org.qi4j.spi.entitystore.helpers.StateStore;
  */
 public interface EntityMigrationOperation
 {
-    JsonObject upgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    JsonObject upgrade(ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
         throws JsonException;
 
-    JsonObject downgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    JsonObject downgrade( ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
         throws JsonException;
 }

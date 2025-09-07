@@ -115,5 +115,39 @@ class ModuleReleaseSpecTest extends Specification
     'mature' | 'complete' | 'some'     | true
     'mature' | 'complete' | 'good'     | true
     'mature' | 'complete' | 'complete' | true
+
+    'deprecated' | 'none'     | 'none'     | false
+    'deprecated' | 'none'     | 'some'     | false
+    'deprecated' | 'none'     | 'good'     | false
+    'deprecated' | 'none'     | 'complete' | false
+    'deprecated' | 'brief'    | 'none'     | false
+    'deprecated' | 'brief'    | 'some'     | false
+    'deprecated' | 'brief'    | 'good'     | false
+    'deprecated' | 'brief'    | 'complete' | false
+    'deprecated' | 'good'     | 'none'     | false
+    'deprecated' | 'good'     | 'some'     | false
+    'deprecated' | 'good'     | 'good'     | false
+    'deprecated' | 'good'     | 'complete' | false
+    'deprecated' | 'complete' | 'none'     | false
+    'deprecated' | 'complete' | 'some'     | false
+    'deprecated' | 'complete' | 'good'     | false
+    'deprecated' | 'complete' | 'complete' | false
+
+    'abandoned' | 'none'     | 'none'     | false
+    'abandoned' | 'none'     | 'some'     | false
+    'abandoned' | 'none'     | 'good'     | false
+    'abandoned' | 'none'     | 'complete' | false
+    'abandoned' | 'brief'    | 'none'     | false
+    'abandoned' | 'brief'    | 'some'     | false
+    'abandoned' | 'brief'    | 'good'     | false
+    'abandoned' | 'brief'    | 'complete' | false
+    'abandoned' | 'good'     | 'none'     | false
+    'abandoned' | 'good'     | 'some'     | false
+    'abandoned' | 'good'     | 'good'     | false
+    'abandoned' | 'good'     | 'complete' | false
+    'abandoned' | 'complete' | 'none'     | false
+    'abandoned' | 'complete' | 'some'     | false
+    'abandoned' | 'complete' | 'good'     | false
+    'abandoned' | 'complete' | 'complete' | false
   }
 }

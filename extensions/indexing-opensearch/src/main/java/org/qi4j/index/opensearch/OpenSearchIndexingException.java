@@ -23,7 +23,6 @@ import org.qi4j.api.indexing.IndexingException;
 
 public class OpenSearchIndexingException extends IndexingException
 {
-
     public OpenSearchIndexingException(String message )
     {
         super( message );

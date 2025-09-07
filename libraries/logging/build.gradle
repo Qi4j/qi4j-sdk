@@ -30,7 +30,7 @@ dependencies {
   implementation qi4j.library( 'constraints' )
 
   testImplementation qi4j.core.testsupport
-  testImplementation qi4j.extension( 'indexing-rdf' )
+//  testImplementation qi4j.extension( 'indexing-rdf' )
 
   testRuntimeOnly libraries.logback
 }

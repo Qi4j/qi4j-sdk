@@ -106,7 +106,7 @@ public class ExtendedAlarmModelTest
         boolean test11 = provider.modelDescription().toLowerCase().contains( "enable" );
         assertThat( test1 && test2 && test3 && test4 && test5 && test6 && test7 && test8 && test9 && test10 && test11, is( true ) );
 
-        Locale english = new Locale( "en" );
+        Locale english = Locale.of( "en" );
         test1 = provider.modelDescription( english ).toLowerCase().contains( "normal" );
         test2 = provider.modelDescription( english ).toLowerCase().contains( "activated" );
         test3 = provider.modelDescription( english ).toLowerCase().contains( "deactivated" );

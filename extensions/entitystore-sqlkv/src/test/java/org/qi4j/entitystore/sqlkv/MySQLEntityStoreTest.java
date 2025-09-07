@@ -39,7 +39,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class MySQLEntityStoreTest extends AbstractEntityStoreTest
 {
     @Container
-    public static MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:latest")
+    public static MySQLContainer mysql = (MySQLContainer) new MySQLContainer("mysql:8")
         .withDatabaseName("jdbc_test_db")
         ;
 

@@ -26,7 +26,9 @@ import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Initializable;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.serialization.Converters;
+import org.qi4j.api.serialization.Serialization;
 import org.qi4j.api.service.ServiceDescriptor;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
 import org.qi4j.spi.serialization.BuiltInConverters;
 import org.w3c.dom.Document;
@@ -49,7 +51,7 @@ public interface JavaxXmlAdapters
 
     class Mixin implements JavaxXmlAdapters, Initializable
     {
-        private Map<ValueType, JavaxXmlAdapter<?>> adapters = new LinkedHashMap<>();
+        private final Map<ValueType, JavaxXmlAdapter<?>> adapters = new LinkedHashMap<>();
 
         @Uses
         private ServiceDescriptor descriptor;
@@ -67,7 +69,7 @@ public interface JavaxXmlAdapters
             settings.getConverters()
                     .forEach( ( type, converter ) -> converters.registerConverter( type, converter ) );
             builtInConverters.registerBuiltInConverters( converters );
-            settings.getAdapters().forEach( adapters::put );
+            adapters.putAll(settings.getAdapters());
             registerBaseJavaxXmlAdapters();
         }
 
@@ -109,7 +111,7 @@ public interface JavaxXmlAdapters
         private static abstract class ToStringTextNodeAdapter<T> implements JavaxXmlAdapter<T>
         {
             @Override
-            public Node serialize( Document document, Object object, Function<Object, Node> serialize )
+            public Node serialize(ModuleDescriptor module, Serialization.Options options, Document document, Object object, Function<Object, Node> serialize )
             {
                 return document.createTextNode( object.toString() );
             }
@@ -121,7 +123,7 @@ public interface JavaxXmlAdapters
             public Class<String> type() { return String.class; }
 
             @Override
-            public String deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public String deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 return node.getNodeValue();
             }
@@ -133,7 +135,7 @@ public interface JavaxXmlAdapters
             public Class<Character> type() { return Character.class; }
 
             @Override
-            public Character deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public Character deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 String string = node.getNodeValue();
                 return string.isEmpty() ? null : string.charAt( 0 );
@@ -146,7 +148,7 @@ public interface JavaxXmlAdapters
             public Class<Boolean> type() { return Boolean.class; }
 
             @Override
-            public Boolean deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public Boolean deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 return Boolean.valueOf( node.getNodeValue() );
             }
@@ -158,7 +160,7 @@ public interface JavaxXmlAdapters
             public Class<Integer> type() { return Integer.class; }
 
             @Override
-            public Integer deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public Integer deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 return Integer.valueOf( node.getNodeValue() );
             }
@@ -170,7 +172,7 @@ public interface JavaxXmlAdapters
             public Class<Long> type() { return Long.class; }
 
             @Override
-            public Long deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public Long deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 return Long.valueOf( node.getNodeValue() );
             }
@@ -182,7 +184,7 @@ public interface JavaxXmlAdapters
             public Class<Short> type() { return Short.class; }
 
             @Override
-            public Short deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public Short deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 return Short.valueOf( node.getNodeValue() );
             }
@@ -194,7 +196,7 @@ public interface JavaxXmlAdapters
             public Class<Byte> type() { return Byte.class; }
 
             @Override
-            public Byte deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public Byte deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 return Byte.valueOf( node.getNodeValue() );
             }
@@ -206,7 +208,7 @@ public interface JavaxXmlAdapters
             public Class<Float> type() { return Float.class; }
 
             @Override
-            public Float deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public Float deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 return Float.valueOf( node.getNodeValue() );
             }
@@ -218,7 +220,7 @@ public interface JavaxXmlAdapters
             public Class<Double> type() { return Double.class; }
 
             @Override
-            public Double deserialize( Node node, BiFunction<Node, ValueType, Object> deserialize )
+            public Double deserialize( ModuleDescriptor module, Serialization.Options options, Node node, BiFunction<Node, ValueType, Object> deserialize )
             {
                 return Double.valueOf( node.getNodeValue() );
             }

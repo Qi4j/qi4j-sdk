@@ -134,7 +134,7 @@ public class AlarmPointImplTest extends AbstractQi4jTest
         AlarmPoint underTest = createAlarm( "TestCase AlarmPoint" );
 //        assertThat( underTest.description() , equalTo( "This is a default Locale description of a testcase AlarmPoint."));
 
-        Locale swedish = new Locale( "sv" );
+        Locale swedish = Locale.of( "sv" );
         assertThat( underTest.description( swedish ), equalTo( "Detta \u00E5r en svensk beskrivning av ett testlarm." ) );
 
         Locale english = Locale.UK;

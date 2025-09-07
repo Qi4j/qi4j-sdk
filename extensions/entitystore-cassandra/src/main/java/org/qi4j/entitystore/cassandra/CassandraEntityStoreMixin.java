@@ -24,16 +24,6 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.common.QualifiedName;
@@ -46,6 +36,7 @@ import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.property.PropertyDescriptor;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.service.ServiceActivation;
 import org.qi4j.api.structure.Application;
 import org.qi4j.api.structure.ModuleDescriptor;
@@ -56,27 +47,17 @@ import org.qi4j.spi.entity.EntityState;
 import org.qi4j.spi.entity.EntityStatus;
 import org.qi4j.spi.entity.ManyAssociationState;
 import org.qi4j.spi.entity.NamedAssociationState;
-import org.qi4j.spi.entitystore.DefaultEntityStoreUnitOfWork;
-import org.qi4j.spi.entitystore.EntityNotFoundException;
-import org.qi4j.spi.entitystore.EntityStore;
-import org.qi4j.spi.entitystore.EntityStoreSPI;
-import org.qi4j.spi.entitystore.EntityStoreUnitOfWork;
-import org.qi4j.spi.entitystore.StateCommitter;
+import org.qi4j.spi.entitystore.*;
 import org.qi4j.spi.entitystore.helpers.DefaultEntityState;
 import org.qi4j.spi.serialization.JsonSerialization;
 
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static java.util.stream.StreamSupport.stream;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.APP_VERSION_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.ASSOCIATIONS_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.IDENTITY_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.LASTMODIFIED_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.MANYASSOCIATIONS_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.NAMEDASSOCIATIONS_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.PROPERTIES_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.STORE_VERSION_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.TYPE_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.USECASE_COLUMN;
-import static org.qi4j.entitystore.cassandra.CassandraCluster.VERSION_COLUMN;
+import static org.qi4j.entitystore.cassandra.CassandraCluster.*;
 import static org.qi4j.entitystore.cassandra.CassandraEntityStoreService.CURRENT_STORAGE_VERSION;
 
 /**
@@ -176,7 +157,7 @@ public class CassandraEntityStoreMixin
                         }
                         else
                         {
-                            Object deserialized = valueSerialization.deserialize( module, propertyDescriptor.valueType(), storedValue );
+                            Object deserialized = valueSerialization.deserialize( module, Options.ENTITY_STORAGE, propertyDescriptor.valueType(), storedValue );
                             properties.put( propertyDescriptor.qualifiedName(), deserialized );
                         }
                     }
@@ -357,6 +338,7 @@ public class CassandraEntityStoreMixin
 
             private void serializeProperties( EntityState entityState, Map<String, String> props )
             {
+                ModuleDescriptor module = entityState.entityDescriptor().module();
                 Stream<? extends PropertyDescriptor> properties = entityState.entityDescriptor().state().properties();
                 properties.forEach(
                     descriptor ->
@@ -364,7 +346,7 @@ public class CassandraEntityStoreMixin
                         Object value = entityState.propertyValueOf( descriptor.qualifiedName() );
                         if( value != null )
                         {
-                            String serialized = valueSerialization.serialize( value );
+                            String serialized = valueSerialization.serialize( module, Options.DEFAULT, value );
                             props.put( descriptor.qualifiedName().name(), serialized );
                         }
                     } );
@@ -398,6 +380,7 @@ public class CassandraEntityStoreMixin
 
             private void serializeNamedAssociations( EntityState entityState, Map<String, String> named )
             {
+                ModuleDescriptor module = entityState.entityDescriptor().module();
                 Stream<? extends AssociationDescriptor> associations = entityState.entityDescriptor().state().namedAssociations();
                 associations.forEach(
                     descriptor ->
@@ -408,7 +391,7 @@ public class CassandraEntityStoreMixin
                                       .collect(
                                           Collectors.toMap( Map.Entry::getKey,
                                                             entry -> entry.getValue().toString() ) );
-                        String serialized = valueSerialization.serialize( refs );
+                        String serialized = valueSerialization.serialize( module, Options.ENTITY_STORAGE, refs );
                         named.put( descriptor.qualifiedName().name(), serialized );
                     } );
             }

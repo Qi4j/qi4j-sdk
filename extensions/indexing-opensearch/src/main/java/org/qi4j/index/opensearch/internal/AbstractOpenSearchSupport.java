@@ -19,138 +19,157 @@
  */
 package org.qi4j.index.opensearch.internal;
 
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.HealthStatus;
+import org.opensearch.client.opensearch._types.Time;
+import org.opensearch.client.opensearch._types.mapping.DynamicMapping;
+import org.opensearch.client.opensearch._types.mapping.DynamicTemplate;
+import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch.cluster.HealthRequest;
+import org.opensearch.client.opensearch.cluster.HealthResponse;
+import org.opensearch.client.opensearch.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch.indices.CreateIndexResponse;
+import org.opensearch.client.opensearch.indices.ExistsRequest;
+import org.opensearch.client.opensearch.indices.RefreshRequest;
+import org.opensearch.client.transport.OpenSearchTransport;
+import org.opensearch.client.transport.endpoints.BooleanResponse;
+import org.opensearch.client.util.ObjectBuilder;
 import org.qi4j.index.opensearch.OpenSearchSupport;
-import org.opensearch.client.Client;
-import org.opensearch.common.settings.Settings;
-import org.opensearch.common.xcontent.XContentBuilder;
-import org.opensearch.common.xcontent.XContentFactory;
-import org.opensearch.common.xcontent.XContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 public abstract class AbstractOpenSearchSupport
     implements OpenSearchSupport
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger( OpenSearchSupport.class );
+    @SuppressWarnings("LoggerInitializedWithForeignClass")
+    protected static final Logger LOGGER = LoggerFactory.getLogger(OpenSearchSupport.class);
+
     protected static final String DEFAULT_CLUSTER_NAME = "qi4j_cluster";
     protected static final String DEFAULT_INDEX_NAME = "qi4j_index";
-    protected static final String ENTITIES_TYPE = "qi4j_entities";
+    protected static final String ENTITIES_TYPE = "qi4j_entities"; // kept for compatibility with callers
 
-    protected Client client;
+    protected OpenSearchClient client;
     protected String index;
     protected boolean indexNonAggregatedAssociations;
 
     @Override
-    public final void activateService()
-        throws Exception
-    {
-        activateElasticSearch();
+    public final void activateService() throws Exception {
+        activateOpenSearch();
 
-        // Wait for yellow status: the primary shard is allocated but replicas may not be yet
-        client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+        // Wait for yellow status: primary shards allocated
+        HealthRequest healthReq = new HealthRequest.Builder()
+            .waitForStatus(HealthStatus.Yellow)
+            .build();
+        HealthResponse health = client.cluster().health(healthReq);
+        LOGGER.debug("Cluster health: {}", health.status());
 
-        if( !client.admin().indices().prepareExists( index ).setIndices( index ).execute().actionGet().isExists() )
-        {
-            // Create empty index
-            LOGGER.info( "Will create '{}' index as it does not exists.", index );
-            Settings.Builder indexSettings = Settings.builder().loadFromSource(
-                XContentFactory.jsonBuilder()
-                               .startObject()
-                                   .field( "refresh_interval", -1 )
-                                   .startObject( "mapper" )
-                                       .field( "dynamic", false )
-                                   .endObject()
-                                   .startObject( "analysis" )
-                                       .startObject( "analyzer" )
-                                           .startObject( "default" )
-                                               .field( "type", "keyword" )
-                                           .endObject()
-                                           .endObject()
-                                   .endObject()
-                               .endObject()
-                               .string(),
-                XContentType.JSON);
-            XContentBuilder mapping = XContentFactory.jsonBuilder()
-                                                     .startObject()
-                                                         .startObject( entitiesType() )
-                                                             .startArray( "dynamic_templates" )
-                                                                 .startObject()
-                                                                     .startObject( entitiesType() )
-                                                                         .field( "match", "*" )
-                                                                         .field( "match_mapping_type", "string" )
-                                                                         .startObject( "mapping" )
-                                                                             .field( "type", "string" )
-                                                                             .field( "index", "not_analyzed" )
-                                                                         .endObject()
-                                                                     .endObject()
-                                                                 .endObject()
-                                                             .endArray()
-                                                         .endObject()
-                                                     .endObject();
-            client.admin().indices().prepareCreate( index )
-                  .setIndex( index )
-                  .setSettings( indexSettings )
-                  .addMapping( entitiesType(), mapping )
-                  .execute()
-                  .actionGet();
-            LOGGER.info( "Index '{}' created.", index );
+        // Ensure index exists
+        BooleanResponse exists = client.indices().exists(new ExistsRequest.Builder().index(index).build());
+        if (!exists.value()) {
+            LOGGER.info("Will create index '{}' as it does not exist.", index);
+
+            // Create index with basic settings and a dynamic template to treat strings as keyword
+            // Equivalent JSON:
+            // {
+            //   "settings": { "index": { "refresh_interval": -1 } },
+            //   "mappings": {
+            //     "dynamic": false,
+            //     "dynamic_templates": [
+            //       { "strings_as_keyword": {
+            //           "match_mapping_type": "string",
+            //           "mapping": { "type": "keyword" }
+            //       } }
+            //     ]
+            //   }
+            // }
+            CreateIndexResponse createIndexResponse = client.indices()
+                .create(CreateIndexRequest.builder()
+                    .index(index)
+                    .settings(st -> st
+                        .index(i -> i.refreshInterval(Time.of(b -> b.time("-1")))) // disable refresh during bulk
+                    )
+                    .build());
+
+            List<Map<String, DynamicTemplate>> templates = List.of(
+                Map.of(
+                    "strings_as_keyword",
+                    new DynamicTemplate.Builder()
+                        .matchMappingType("string")
+                        .mapping(new Property.Builder().keyword(k -> k).build())
+                        .build()
+                )
+            );
+
+            boolean mappingsAck = client.indices().putMapping(m -> m
+                .index(index)
+                .dynamic(DynamicMapping.True )
+                .dynamicTemplates(templates)
+            ).acknowledged();
+
+            LOGGER.info("Index '{}': acknowledged={}", index, mappingsAck);
         }
 
-        // Ensure index is fresh
-        client.admin().indices().prepareRefresh( index ).execute().actionGet();
+        // Refresh index
+        client.indices().refresh(new RefreshRequest.Builder().index(index).build());
 
-        // Wait for yellow status: the primary shard is allocated but replicas may not be yet
-        client.admin().cluster().prepareHealth().setWaitForYellowStatus().execute().actionGet();
+        // Wait for yellow again (optional but keeps parity with legacy)
+        client.cluster().health(new HealthRequest.Builder().waitForStatus(HealthStatus.Yellow).build());
 
-        LOGGER.info( "Index/Query connected to Elastic Search" );
+        LOGGER.info("Index/Query connected to OpenSearch");
     }
 
-    protected abstract void activateElasticSearch()
-        throws Exception;
+    protected abstract void activateOpenSearch() throws Exception;
 
     @Override
-    public final void passivateService()
-        throws Exception
-    {
+    public final void passivateService() throws Exception {
         passivateClient();
         index = null;
         indexNonAggregatedAssociations = false;
-        passivateElasticSearch();
+        passivateOpenSearch();
     }
 
-    protected void passivateClient()
-    {
-        client.close();
-        client = null;
+    protected void passivateClient() {
+        try {
+            if (client != null) {
+                OpenSearchTransport transport = client._transport(); // underlying transport
+                if (transport != null) {
+                    try {
+                        ((AutoCloseable) transport).close();
+                    } catch (Exception e) {
+                        LOGGER.warn("Error closing OpenSearch transport", e);
+                    }
+                }
+            }
+        } finally {
+            client = null;
+        }
     }
 
-    protected void passivateElasticSearch()
-        throws Exception
-    {
+    protected void passivateOpenSearch() throws Exception {
         // NOOP
     }
 
     @Override
-    public final Client client()
-    {
+    public final OpenSearchClient client() {
         return client;
     }
 
     @Override
-    public final String index()
-    {
+    public final String index() {
         return index;
     }
 
     @Override
-    public final String entitiesType()
-    {
+    public final String entitiesType() {
         return ENTITIES_TYPE;
     }
 
     @Override
-    public final boolean indexNonAggregatedAssociations()
-    {
+    public final boolean indexNonAggregatedAssociations() {
         return indexNonAggregatedAssociations;
     }
 }

@@ -20,6 +20,7 @@
 package org.qi4j.library.sql.dbcp;
 
 import java.sql.Connection;
+import java.time.Duration;
 import java.util.function.Consumer;
 import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -55,7 +56,7 @@ public interface DBCPDataSourceServiceImporter
             setConfig( config.password(), pool::setPassword, null );
             setConfig( config.minPoolSize(), pool::setMinIdle, null );
             setConfig( config.maxPoolSize(), pool::setMaxTotal, null );
-            setConfig( config.maxConnectionAgeSeconds(), v -> pool.setMinEvictableIdleTimeMillis( v * 1000 ), null );
+            setConfig( config.maxConnectionAgeSeconds(), v -> pool.setMinEvictableIdle(Duration.ofSeconds(v)), null);
             setConfig( config.validationQuery(), pool::setValidationQuery, null );
             setConfig( config.autoCommit(), pool::setDefaultAutoCommit, null );
             setConfig( config.isolationLevel(), pool::setDefaultTransactionIsolation, Connection.TRANSACTION_SERIALIZABLE );

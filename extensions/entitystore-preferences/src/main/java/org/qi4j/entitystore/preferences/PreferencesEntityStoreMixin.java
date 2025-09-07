@@ -20,16 +20,13 @@
 package org.qi4j.entitystore.preferences;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
+
 import org.qi4j.api.cache.CacheOptions;
 import org.qi4j.api.common.QualifiedName;
 import org.qi4j.api.entity.EntityDescriptor;
@@ -41,6 +38,7 @@ import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.property.PropertyDescriptor;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.service.ServiceActivation;
 import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.api.serialization.Serialization;
@@ -111,35 +109,35 @@ public class PreferencesEntityStoreMixin
         root = getApplicationRoot();
 
         // Reload underlying store every 60 seconds
-        reloadExecutor = new ScheduledThreadPoolExecutor( 1 );
-        reloadExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
-        reloadExecutor.scheduleAtFixedRate( () -> {
+        reloadExecutor = new ScheduledThreadPoolExecutor(1);
+        reloadExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
+        reloadExecutor.scheduleAtFixedRate(() -> {
             try
             {
                 //noinspection SynchronizeOnNonFinalField
-                synchronized( root )
+                synchronized(root)
                 {
                     root.sync();
                 }
             }
-            catch( BackingStoreException e )
+            catch(BackingStoreException e)
             {
-                throw new EntityStoreException( "Could not reload preferences", e );
+                throw new EntityStoreException("Could not reload preferences", e);
             }
-        }, 0, 60, TimeUnit.SECONDS );
+        }, 0, 60, TimeUnit.SECONDS);
     }
 
     private Preferences getApplicationRoot()
     {
-        PreferencesEntityStoreInfo storeInfo = descriptor.metaInfo( PreferencesEntityStoreInfo.class );
+        PreferencesEntityStoreInfo storeInfo = descriptor.metaInfo(PreferencesEntityStoreInfo.class);
 
         Preferences preferences;
-        if( storeInfo == null )
+        if(storeInfo == null)
         {
             // Default to use system root + application name
             preferences = Preferences.systemRoot();
             String name = application.name();
-            preferences = preferences.node( name );
+            preferences = preferences.node(name);
         }
         else
         {
@@ -149,313 +147,315 @@ public class PreferencesEntityStoreMixin
         return preferences;
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void passivateService()
         throws Exception
     {
         reloadExecutor.shutdown();
-        reloadExecutor.awaitTermination( 10, TimeUnit.SECONDS );
+        reloadExecutor.awaitTermination(10, TimeUnit.SECONDS);
     }
 
     @Override
-    public EntityStoreUnitOfWork newUnitOfWork( ModuleDescriptor module, Usecase usecase, Instant currentTime )
+    public EntityStoreUnitOfWork newUnitOfWork(ModuleDescriptor module, Usecase usecase, Instant currentTime)
     {
-        return new DefaultEntityStoreUnitOfWork( module, entityStoreSpi, newUnitOfWorkId(), usecase, currentTime );
+        return new DefaultEntityStoreUnitOfWork(module, entityStoreSpi, newUnitOfWorkId(), usecase, currentTime);
     }
 
     @Override
-    public Stream<EntityState> entityStates( final ModuleDescriptor module )
+    public Stream<EntityState> entityStates(final ModuleDescriptor module)
     {
-        UsecaseBuilder builder = UsecaseBuilder.buildUsecase( "qi4j.entitystore.preferences.visit" );
-        Usecase visitUsecase = builder.withMetaInfo( CacheOptions.NEVER ).newUsecase();
-        EntityStoreUnitOfWork uow = newUnitOfWork( module, visitUsecase, SystemTime.now() );
+        UsecaseBuilder builder = UsecaseBuilder.buildUsecase("qi4j.entitystore.preferences.visit");
+        Usecase visitUsecase = builder.withMetaInfo(CacheOptions.NEVER).newUsecase();
+        EntityStoreUnitOfWork uow = newUnitOfWork(module, visitUsecase, SystemTime.now());
 
         try
         {
-            return Stream.of( root.childrenNames() )
-                         .map( EntityReference::parseEntityReference )
-                         .map( ref -> uow.entityStateOf( module, ref ) )
-                         .onClose( uow::discard );
+            return Stream.of(root.childrenNames())
+                .map(EntityReference::parseEntityReference)
+                .map(ref -> uow.entityStateOf(module, ref))
+                .onClose(uow::discard);
         }
-        catch( BackingStoreException e )
+        catch(BackingStoreException e)
         {
-            throw new EntityStoreException( e );
+            throw new EntityStoreException(e);
         }
     }
 
     @Override
-    public EntityState newEntityState( EntityStoreUnitOfWork unitOfWork,
-                                       EntityReference reference,
-                                       EntityDescriptor entityDescriptor
+    public EntityState newEntityState(EntityStoreUnitOfWork unitOfWork,
+                                      EntityReference reference,
+                                      EntityDescriptor entityDescriptor
     )
     {
-        return new DefaultEntityState( unitOfWork.currentTime(), reference, entityDescriptor );
+        return new DefaultEntityState(unitOfWork.currentTime(), reference, entityDescriptor);
     }
 
     @Override
-    public EntityState entityStateOf( EntityStoreUnitOfWork unitOfWork,
-                                      ModuleDescriptor module,
-                                      EntityReference reference
+    public EntityState entityStateOf(EntityStoreUnitOfWork unitOfWork,
+                                     ModuleDescriptor module,
+                                     EntityReference reference
     )
     {
         try
         {
-            if( !root.nodeExists( reference.identity().toString() ) )
+            if(!root.nodeExists(reference.identity().toString()))
             {
-                throw new NoSuchEntityException( reference, UnknownType.class, unitOfWork.usecase() );
+                throw new NoSuchEntityException(reference, UnknownType.class, unitOfWork.usecase());
             }
 
-            Preferences entityPrefs = root.node( reference.identity().toString() );
+            Preferences entityPrefs = root.node(reference.identity().toString());
 
-            String type = entityPrefs.get( "type", null );
+            String type = entityPrefs.get("type", null);
             EntityStatus status = EntityStatus.LOADED;
 
-            EntityDescriptor entityDescriptor = module.entityDescriptor( type );
-            if( entityDescriptor == null )
+            EntityDescriptor entityDescriptor = module.entityDescriptor(type);
+            if(entityDescriptor == null)
             {
-                throw new NoSuchEntityTypeException( type, module );
+                throw new NoSuchEntityTypeException(type, module);
             }
 
             Map<QualifiedName, Object> properties = new HashMap<>();
-            final Preferences propsPrefs = entityPrefs.node( "properties" );
+            final Preferences propsPrefs = entityPrefs.node("properties");
             entityDescriptor.state().properties().forEach(
                 persistentPropertyDescriptor ->
                 {
-                    if( persistentPropertyDescriptor.qualifiedName().name().equals( "reference" ) )
+                    if(persistentPropertyDescriptor.qualifiedName().name().equals("reference"))
                     {
                         // Fake reference property
-                        properties.put( persistentPropertyDescriptor.qualifiedName(), reference.identity().toString() );
+                        properties.put(persistentPropertyDescriptor.qualifiedName(), reference.identity().toString());
                     }
                     else
                     {
                         ValueType propertyType = persistentPropertyDescriptor.valueType();
                         Class<?> primaryType = propertyType.primaryType();
-                        if( Number.class.isAssignableFrom( primaryType ) )
+                        if(Number.class.isAssignableFrom(primaryType))
                         {
-                            if( primaryType.equals( Long.class ) )
+                            if(primaryType.equals(Long.class))
                             {
-                                properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                                this.getNumber( propsPrefs, module, persistentPropertyDescriptor, LONG_PARSER ) );
+                                properties.put(persistentPropertyDescriptor.qualifiedName(),
+                                    this.getNumber(propsPrefs, module, persistentPropertyDescriptor, LONG_PARSER));
                             }
-                            else if( primaryType.equals( Integer.class ) )
+                            else if(primaryType.equals(Integer.class))
                             {
-                                properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                                this.getNumber( propsPrefs, module, persistentPropertyDescriptor, INT_PARSER ) );
+                                properties.put(persistentPropertyDescriptor.qualifiedName(),
+                                    this.getNumber(propsPrefs, module, persistentPropertyDescriptor, INT_PARSER));
                             }
-                            else if( primaryType.equals( Double.class ) )
+                            else if(primaryType.equals(Double.class))
                             {
-                                properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                                this.getNumber( propsPrefs, module, persistentPropertyDescriptor, DOUBLE_PARSER ) );
+                                properties.put(persistentPropertyDescriptor.qualifiedName(),
+                                    this.getNumber(propsPrefs, module, persistentPropertyDescriptor, DOUBLE_PARSER));
                             }
-                            else if( primaryType.equals( Float.class ) )
+                            else if(primaryType.equals(Float.class))
                             {
-                                properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                                this.getNumber( propsPrefs, module, persistentPropertyDescriptor, FLOAT_PARSER ) );
+                                properties.put(persistentPropertyDescriptor.qualifiedName(),
+                                    this.getNumber(propsPrefs, module, persistentPropertyDescriptor, FLOAT_PARSER));
                             }
                             else
                             {
                                 // Load as string even though it's a number
-                                String string = propsPrefs.get( persistentPropertyDescriptor.qualifiedName()
-                                                                                            .name(), null );
+                                String string = propsPrefs.get(persistentPropertyDescriptor.qualifiedName()
+                                    .name(), null);
                                 Object value;
-                                if( string == null )
+                                if(string == null)
                                 {
                                     value = null;
                                 }
                                 else
                                 {
-                                    value = serialization.deserialize( module, propertyType, string );
+                                    value = serialization.deserialize(module, Options.ENTITY_STORAGE, propertyType, string);
                                 }
-                                properties.put( persistentPropertyDescriptor.qualifiedName(), value );
+                                properties.put(persistentPropertyDescriptor.qualifiedName(), value);
                             }
                         }
-                        else if( primaryType.equals( Boolean.class ) )
+                        else if(primaryType.equals(Boolean.class))
                         {
                             Boolean initialValue = (Boolean) persistentPropertyDescriptor.resolveInitialValue(module);
-                            properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                            propsPrefs.getBoolean( persistentPropertyDescriptor.qualifiedName().name(),
-                                                                   initialValue == null ? false : initialValue ) );
+                            //noinspection SimplifiableConditionalExpression
+                            initialValue = initialValue == null ? false : initialValue;
+                            properties.put(persistentPropertyDescriptor.qualifiedName(),
+                                propsPrefs.getBoolean(persistentPropertyDescriptor.qualifiedName().name(), initialValue));
                         }
-                        else if( propertyType instanceof ValueCompositeType
-                                 || propertyType instanceof MapType
-                                 || propertyType instanceof CollectionType
-                                 || propertyType instanceof EnumType )
+                        else if(propertyType instanceof ValueCompositeType
+                            || propertyType instanceof MapType
+                            || propertyType instanceof CollectionType
+                            || propertyType instanceof EnumType)
                         {
-                            String string = propsPrefs.get( persistentPropertyDescriptor.qualifiedName().name(), null );
+                            String string = propsPrefs.get(persistentPropertyDescriptor.qualifiedName().name(), null);
                             Object value;
-                            if( string == null )
+                            if(string == null)
                             {
                                 value = null;
                             }
                             else
                             {
-                                value = serialization.deserialize( module, propertyType, string );
+                                value = serialization.deserialize(module, Options.ENTITY_STORAGE, propertyType, string);
                             }
-                            properties.put( persistentPropertyDescriptor.qualifiedName(), value );
+                            properties.put(persistentPropertyDescriptor.qualifiedName(), value);
                         }
                         else
                         {
-                            String string = propsPrefs.get( persistentPropertyDescriptor.qualifiedName().name(), null );
-                            if( string == null )
+                            String string = propsPrefs.get(persistentPropertyDescriptor.qualifiedName().name(), null);
+                            if(string == null)
                             {
-                                if( persistentPropertyDescriptor.resolveInitialValue( module ) != null )
+                                if(persistentPropertyDescriptor.resolveInitialValue(module) != null)
                                 {
-                                    properties.put( persistentPropertyDescriptor.qualifiedName(),
-                                                    persistentPropertyDescriptor.resolveInitialValue( module ) );
+                                    properties.put(persistentPropertyDescriptor.qualifiedName(),
+                                        persistentPropertyDescriptor.resolveInitialValue(module));
                                 }
                                 else
                                 {
-                                    properties.put( persistentPropertyDescriptor.qualifiedName(), null );
+                                    properties.put(persistentPropertyDescriptor.qualifiedName(), null);
                                 }
                             }
                             else
                             {
-                                Object value = serialization.deserialize( module, propertyType, string );
-                                properties.put( persistentPropertyDescriptor.qualifiedName(), value );
+                                Object value = serialization.deserialize(module, Options.ENTITY_STORAGE, propertyType, string);
+                                properties.put(persistentPropertyDescriptor.qualifiedName(), value);
                             }
                         }
                     }
-                } );
+                });
 
             // Associations
             Map<QualifiedName, EntityReference> associations = new HashMap<>();
-            final Preferences assocs = entityPrefs.node( "associations" );
-            entityDescriptor.state().associations().forEach( associationType -> {
-                String associatedEntity = assocs.get( associationType.qualifiedName().name(), null );
+            final Preferences assocs = entityPrefs.node("associations");
+            entityDescriptor.state().associations().forEach(associationType -> {
+                String associatedEntity = assocs.get(associationType.qualifiedName().name(), null);
                 EntityReference value = associatedEntity == null
-                                        ? null
-                                        : EntityReference.parseEntityReference( associatedEntity );
-                associations.put( associationType.qualifiedName(), value );
-            } );
+                    ? null
+                    : EntityReference.parseEntityReference(associatedEntity);
+                associations.put(associationType.qualifiedName(), value);
+            });
 
             // ManyAssociations
             Map<QualifiedName, List<EntityReference>> manyAssociations = new HashMap<>();
-            Preferences manyAssocs = entityPrefs.node( "manyassociations" );
-            entityDescriptor.state().manyAssociations().forEach( manyAssociationType -> {
+            Preferences manyAssocs = entityPrefs.node("manyassociations");
+            entityDescriptor.state().manyAssociations().forEach(manyAssociationType -> {
                 List<EntityReference> references = new ArrayList<>();
-                String entityReferences = manyAssocs.get( manyAssociationType
-                                                              .qualifiedName()
-                                                              .name(), null );
-                if( entityReferences == null )
+                String entityReferences = manyAssocs.get(manyAssociationType
+                    .qualifiedName()
+                    .name(), null);
+                if(entityReferences == null)
                 {
                     // ManyAssociation not found, default to empty one
-                    manyAssociations.put( manyAssociationType.qualifiedName(), references );
+                    manyAssociations.put(manyAssociationType.qualifiedName(), references);
                 }
                 else
                 {
-                    String[] refs = entityReferences.split( "\n" );
-                    for( String ref : refs )
+                    String[] refs = entityReferences.split("\n");
+                    for(String ref : refs)
                     {
                         EntityReference value = ref == null
-                                                ? null
-                                                : EntityReference.parseEntityReference( ref );
-                        references.add( value );
+                            ? null
+                            : EntityReference.parseEntityReference(ref);
+                        references.add(value);
                     }
-                    manyAssociations.put( manyAssociationType.qualifiedName(), references );
+                    manyAssociations.put(manyAssociationType.qualifiedName(), references);
                 }
-            } );
+            });
 
             // NamedAssociations
             Map<QualifiedName, Map<String, EntityReference>> namedAssociations = new HashMap<>();
-            Preferences namedAssocs = entityPrefs.node( "namedassociations" );
-            entityDescriptor.state().namedAssociations().forEach( namedAssociationType -> {
+            Preferences namedAssocs = entityPrefs.node("namedassociations");
+            entityDescriptor.state().namedAssociations().forEach(namedAssociationType -> {
                 Map<String, EntityReference> references = new LinkedHashMap<>();
-                String entityReferences = namedAssocs.get( namedAssociationType.qualifiedName().name(), null );
-                if( entityReferences == null )
+                String entityReferences = namedAssocs.get(namedAssociationType.qualifiedName().name(), null);
+                if(entityReferences == null)
                 {
                     // NamedAssociation not found, default to empty one
-                    namedAssociations.put( namedAssociationType.qualifiedName(), references );
+                    namedAssociations.put(namedAssociationType.qualifiedName(), references);
                 }
                 else
                 {
-                    String[] namedRefs = entityReferences.split( "\n" );
-                    if( namedRefs.length % 2 != 0 )
+                    String[] namedRefs = entityReferences.split("\n");
+                    if(namedRefs.length % 2 != 0)
                     {
-                        throw new EntityStoreException( "Invalid NamedAssociation storage format" );
+                        throw new EntityStoreException("Invalid NamedAssociation storage format");
                     }
-                    for( int idx = 0; idx < namedRefs.length; idx += 2 )
+                    for(int idx = 0; idx < namedRefs.length; idx += 2)
                     {
-                        String name = namedRefs[ idx ];
-                        String ref = namedRefs[ idx + 1 ];
-                        references.put( name, EntityReference.parseEntityReference( ref ) );
+                        String name = namedRefs[idx];
+                        String ref = namedRefs[idx + 1];
+                        references.put(name, EntityReference.parseEntityReference(ref));
                     }
-                    namedAssociations.put( namedAssociationType.qualifiedName(), references );
+                    namedAssociations.put(namedAssociationType.qualifiedName(), references);
                 }
-            } );
+            });
 
-            return new DefaultEntityState( entityPrefs.get( "version", "" ),
-                                           Instant.ofEpochMilli(entityPrefs.getLong( "modified", unitOfWork.currentTime().toEpochMilli() )),
-                                           reference,
-                                           status,
-                                           entityDescriptor,
-                                           properties,
-                                           associations,
-                                           manyAssociations,
-                                           namedAssociations
+            return new DefaultEntityState(entityPrefs.get("version", ""),
+                Instant.ofEpochMilli(entityPrefs.getLong("modified", unitOfWork.currentTime().toEpochMilli())),
+                reference,
+                status,
+                entityDescriptor,
+                properties,
+                associations,
+                manyAssociations,
+                namedAssociations
             );
         }
-        catch( SerializationException | BackingStoreException e )
+        catch(SerializationException | BackingStoreException e)
         {
-            throw new EntityStoreException( e );
+            throw new EntityStoreException(e);
         }
     }
 
     @Override
-    public String versionOf( EntityStoreUnitOfWork unitOfWork, EntityReference reference )
+    public String versionOf(EntityStoreUnitOfWork unitOfWork, EntityReference reference)
     {
         try
         {
-            if( !root.nodeExists( reference.identity().toString() ) )
+            if(!root.nodeExists(reference.identity().toString()))
             {
-                throw new NoSuchEntityException( reference, UnknownType.class, unitOfWork.usecase() );
+                throw new NoSuchEntityException(reference, UnknownType.class, unitOfWork.usecase());
             }
 
-            Preferences entityPrefs = root.node( reference.identity().toString() );
-            return entityPrefs.get( "version", "" );
+            Preferences entityPrefs = root.node(reference.identity().toString());
+            return entityPrefs.get("version", "");
         }
-        catch( BackingStoreException e )
+        catch(BackingStoreException e)
         {
-            throw new EntityStoreException( e );
+            throw new EntityStoreException(e);
         }
     }
 
     @Override
-    public StateCommitter applyChanges( final EntityStoreUnitOfWork unitofwork, final Iterable<EntityState> state )
+    public StateCommitter applyChanges(final EntityStoreUnitOfWork unitofwork, final Iterable<EntityState> state)
     {
         return new StateCommitter()
         {
-            @SuppressWarnings( "SynchronizeOnNonFinalField" )
+            @SuppressWarnings("SynchronizeOnNonFinalField")
             @Override
             public void commit()
             {
                 try
                 {
-                    synchronized( root )
+                    synchronized(root)
                     {
-                        for( EntityState entityState : state )
+                        for(EntityState entityState : state)
                         {
                             DefaultEntityState state = (DefaultEntityState) entityState;
-                            if( state.status().equals( EntityStatus.NEW ) )
+                            if(state.status().equals(EntityStatus.NEW))
                             {
-                                Preferences entityPrefs = root.node( state.entityReference().identity().toString() );
-                                writeEntityState( state, entityPrefs, unitofwork.identity(), unitofwork.currentTime() );
+                                Preferences entityPrefs = root.node(state.entityReference().identity().toString());
+                                writeEntityState(state, entityPrefs, unitofwork.identity(), unitofwork.currentTime());
                             }
-                            else if( state.status().equals( EntityStatus.UPDATED ) )
+                            else if(state.status().equals(EntityStatus.UPDATED))
                             {
-                                Preferences entityPrefs = root.node( state.entityReference().identity().toString() );
-                                writeEntityState( state, entityPrefs, unitofwork.identity(), unitofwork.currentTime() );
+                                Preferences entityPrefs = root.node(state.entityReference().identity().toString());
+                                writeEntityState(state, entityPrefs, unitofwork.identity(), unitofwork.currentTime());
                             }
-                            else if( state.status().equals( EntityStatus.REMOVED ) )
+                            else if(state.status().equals(EntityStatus.REMOVED))
                             {
-                                root.node( state.entityReference().identity().toString() ).removeNode();
+                                root.node(state.entityReference().identity().toString()).removeNode();
                             }
                         }
                         root.flush();
                     }
                 }
-                catch( BackingStoreException e )
+                catch(BackingStoreException e)
                 {
-                    throw new EntityStoreException( e );
+                    throw new EntityStoreException(e);
                 }
             }
 
@@ -466,161 +466,163 @@ public class PreferencesEntityStoreMixin
         };
     }
 
-    protected void writeEntityState( DefaultEntityState state,
-                                     Preferences entityPrefs,
-                                     Identity identity,
-                                     Instant lastModified
+    protected void writeEntityState(DefaultEntityState state,
+                                    Preferences entityPrefs,
+                                    Identity identity,
+                                    Instant lastModified
     )
         throws EntityStoreException
     {
         try
         {
+            ModuleDescriptor module = state.entityDescriptor().module();
             // Store into Preferences API
-            entityPrefs.put( "type", state.entityDescriptor().types().findFirst().get().getName() );
-            entityPrefs.put( "version", identity.toString() );
-            entityPrefs.putLong( "modified", lastModified.toEpochMilli() );
+            Optional<Class<?>> entityType = state.entityDescriptor().types().findFirst();
+            entityPrefs.put("type", entityType.orElseThrow().getName());
+            entityPrefs.put("version", identity.toString());
+            entityPrefs.putLong("modified", lastModified.toEpochMilli());
 
             // Properties
-            Preferences propsPrefs = entityPrefs.node( "properties" );
+            Preferences propsPrefs = entityPrefs.node("properties");
             state.entityDescriptor().state().properties()
-                .filter( property -> !property.qualifiedName().name().equals( "reference" ) )
-                .forEach( persistentProperty ->
-                          {
-                              Object value = state.properties().get( persistentProperty.qualifiedName() );
-
-                              if( value == null )
-                              {
-                                  propsPrefs.remove( persistentProperty.qualifiedName().name() );
-                              }
-                              else
-                              {
-                                  ValueType valueType = persistentProperty.valueType();
-                                  Class<?> primaryType = valueType.primaryType();
-                                  if( Number.class.isAssignableFrom( primaryType ) )
-                                  {
-                                      if( primaryType.equals( Long.class ) )
-                                      {
-                                          propsPrefs.putLong( persistentProperty.qualifiedName().name(), (Long) value );
-                                      }
-                                      else if( primaryType.equals( Integer.class ) )
-                                      {
-                                          propsPrefs.putInt( persistentProperty.qualifiedName()
-                                                                 .name(), (Integer) value );
-                                      }
-                                      else if( primaryType.equals( Double.class ) )
-                                      {
-                                          propsPrefs.putDouble( persistentProperty.qualifiedName()
-                                                                    .name(), (Double) value );
-                                      }
-                                      else if( primaryType.equals( Float.class ) )
-                                      {
-                                          propsPrefs.putFloat( persistentProperty.qualifiedName()
-                                                                   .name(), (Float) value );
-                                      }
-                                      else
-                                      {
-                                          // Store as string even though it's a number
-                                          String string = serialization.serialize( value );
-                                          propsPrefs.put( persistentProperty.qualifiedName().name(), string );
-                                      }
-                                  }
-                                  else if( primaryType.equals( Boolean.class ) )
-                                  {
-                                      propsPrefs.putBoolean( persistentProperty.qualifiedName()
-                                                                 .name(), (Boolean) value );
-                                  }
-                                  else if( valueType instanceof ValueCompositeType
-                                           || valueType instanceof MapType
-                                           || valueType instanceof CollectionType
-                                           || valueType instanceof EnumType )
-                                  {
-                                      String string = serialization.serialize( value );
-                                      propsPrefs.put( persistentProperty.qualifiedName().name(), string );
-                                  }
-                                  else
-                                  {
-                                      String string = serialization.serialize( value );
-                                      propsPrefs.put( persistentProperty.qualifiedName().name(), string );
-                                  }
-                              }
-                          } );
-
-            // Associations
-            if( !state.associations().isEmpty() )
-            {
-                Preferences assocsPrefs = entityPrefs.node( "associations" );
-                for( Map.Entry<QualifiedName, EntityReference> association : state.associations().entrySet() )
+                .filter(property -> !property.qualifiedName().name().equals("reference"))
+                .forEach(persistentProperty ->
                 {
-                    if( association.getValue() == null )
+                    Object value = state.properties().get(persistentProperty.qualifiedName());
+
+                    if(value == null)
                     {
-                        assocsPrefs.remove( association.getKey().name() );
+                        propsPrefs.remove(persistentProperty.qualifiedName().name());
                     }
                     else
                     {
-                        assocsPrefs.put( association.getKey().name(), association.getValue().identity().toString() );
+                        ValueType valueType = persistentProperty.valueType();
+                        Class<?> primaryType = valueType.primaryType();
+                        if(Number.class.isAssignableFrom(primaryType))
+                        {
+                            if(primaryType.equals(Long.class))
+                            {
+                                propsPrefs.putLong(persistentProperty.qualifiedName().name(), (Long) value);
+                            }
+                            else if(primaryType.equals(Integer.class))
+                            {
+                                propsPrefs.putInt(persistentProperty.qualifiedName()
+                                    .name(), (Integer) value);
+                            }
+                            else if(primaryType.equals(Double.class))
+                            {
+                                propsPrefs.putDouble(persistentProperty.qualifiedName()
+                                    .name(), (Double) value);
+                            }
+                            else if(primaryType.equals(Float.class))
+                            {
+                                propsPrefs.putFloat(persistentProperty.qualifiedName()
+                                    .name(), (Float) value);
+                            }
+                            else
+                            {
+                                // Store as string even though it's a number
+                                String string = serialization.serialize(module, Options.ENTITY_STORAGE, value);
+                                propsPrefs.put(persistentProperty.qualifiedName().name(), string);
+                            }
+                        }
+                        else if(primaryType.equals(Boolean.class))
+                        {
+                            propsPrefs.putBoolean(persistentProperty.qualifiedName()
+                                .name(), (Boolean) value);
+                        }
+                        else if(valueType instanceof ValueCompositeType
+                            || valueType instanceof MapType
+                            || valueType instanceof CollectionType
+                            || valueType instanceof EnumType)
+                        {
+                            String string = serialization.serialize(module, Options.ENTITY_STORAGE, value);
+                            propsPrefs.put(persistentProperty.qualifiedName().name(), string);
+                        }
+                        else
+                        {
+                            String string = serialization.serialize(module, Options.ENTITY_STORAGE, value);
+                            propsPrefs.put(persistentProperty.qualifiedName().name(), string);
+                        }
+                    }
+                });
+
+            // Associations
+            if(!state.associations().isEmpty())
+            {
+                Preferences assocsPrefs = entityPrefs.node("associations");
+                for(Map.Entry<QualifiedName, EntityReference> association : state.associations().entrySet())
+                {
+                    if(association.getValue() == null)
+                    {
+                        assocsPrefs.remove(association.getKey().name());
+                    }
+                    else
+                    {
+                        assocsPrefs.put(association.getKey().name(), association.getValue().identity().toString());
                     }
                 }
             }
 
             // ManyAssociations
-            if( !state.manyAssociations().isEmpty() )
+            if(!state.manyAssociations().isEmpty())
             {
-                Preferences manyAssocsPrefs = entityPrefs.node( "manyassociations" );
-                for( Map.Entry<QualifiedName, List<EntityReference>> manyAssociation : state.manyAssociations()
-                    .entrySet() )
+                Preferences manyAssocsPrefs = entityPrefs.node("manyassociations");
+                for(Map.Entry<QualifiedName, List<EntityReference>> manyAssociation : state.manyAssociations()
+                    .entrySet())
                 {
-                    if( manyAssociation.getValue().isEmpty() )
+                    if(manyAssociation.getValue().isEmpty())
                     {
-                        manyAssocsPrefs.remove( manyAssociation.getKey().name() );
+                        manyAssocsPrefs.remove(manyAssociation.getKey().name());
                     }
                     else
                     {
                         StringBuilder manyAssocs = new StringBuilder();
-                        for( EntityReference entityReference : manyAssociation.getValue() )
+                        for(EntityReference entityReference : manyAssociation.getValue())
                         {
-                            if( manyAssocs.length() > 0 )
+                            if(!manyAssocs.isEmpty())
                             {
-                                manyAssocs.append( "\n" );
+                                manyAssocs.append("\n");
                             }
-                            manyAssocs.append( entityReference.identity().toString() );
+                            manyAssocs.append(entityReference.identity().toString());
                         }
-                        manyAssocsPrefs.put( manyAssociation.getKey().name(), manyAssocs.toString() );
+                        manyAssocsPrefs.put(manyAssociation.getKey().name(), manyAssocs.toString());
                     }
                 }
             }
 
             // NamedAssociations
-            if( !state.namedAssociations().isEmpty() )
+            if(!state.namedAssociations().isEmpty())
             {
-                Preferences namedAssocsPrefs = entityPrefs.node( "namedassociations" );
-                for( Map.Entry<QualifiedName, Map<String, EntityReference>> namedAssociation : state.namedAssociations()
-                    .entrySet() )
+                Preferences namedAssocsPrefs = entityPrefs.node("namedassociations");
+                for(Map.Entry<QualifiedName, Map<String, EntityReference>> namedAssociation : state.namedAssociations()
+                    .entrySet())
                 {
-                    if( namedAssociation.getValue().isEmpty() )
+                    if(namedAssociation.getValue().isEmpty())
                     {
-                        namedAssocsPrefs.remove( namedAssociation.getKey().name() );
+                        namedAssocsPrefs.remove(namedAssociation.getKey().name());
                     }
                     else
                     {
                         StringBuilder namedAssocs = new StringBuilder();
-                        for( Map.Entry<String, EntityReference> namedRef : namedAssociation.getValue().entrySet() )
+                        for(Map.Entry<String, EntityReference> namedRef : namedAssociation.getValue().entrySet())
                         {
-                            if( namedAssocs.length() > 0 )
+                            if(!namedAssocs.isEmpty())
                             {
-                                namedAssocs.append( "\n" );
+                                namedAssocs.append("\n");
                             }
-                            namedAssocs.append( namedRef.getKey() ).append( "\n" ).append(
-                                namedRef.getValue().identity().toString() );
+                            namedAssocs.append(namedRef.getKey()).append("\n").append(
+                                namedRef.getValue().identity().toString());
                         }
                         String key = namedAssociation.getKey().name();
-                        namedAssocsPrefs.put( key, namedAssocs.toString() );
+                        namedAssocsPrefs.put(key, namedAssocs.toString());
                     }
                 }
             }
         }
-        catch( SerializationException e )
+        catch(SerializationException e)
         {
-            throw new EntityStoreException( "Could not store EntityState", e );
+            throw new EntityStoreException("Could not store EntityState", e);
         }
     }
 
@@ -631,7 +633,7 @@ public class PreferencesEntityStoreMixin
 
     private interface NumberParser<T>
     {
-        T parse( String str );
+        T parse(String str);
     }
 
     private static final NumberParser<Long> LONG_PARSER = Long::parseLong;
@@ -642,14 +644,14 @@ public class PreferencesEntityStoreMixin
 
     private static final NumberParser<Float> FLOAT_PARSER = Float::parseFloat;
 
-    private <T> T getNumber( Preferences prefs, ModuleDescriptor module, PropertyDescriptor pDesc, NumberParser<T> parser )
+    private <T> T getNumber(Preferences prefs, ModuleDescriptor module, PropertyDescriptor pDesc, NumberParser<T> parser)
     {
-        Object initialValue = pDesc.resolveInitialValue( module );
-        String str = prefs.get( pDesc.qualifiedName().name(), initialValue == null ? null : initialValue.toString() );
+        Object initialValue = pDesc.resolveInitialValue(module);
+        String str = prefs.get(pDesc.qualifiedName().name(), initialValue == null ? null : initialValue.toString());
         T result = null;
-        if( str != null )
+        if(str != null)
         {
-            result = parser.parse( str );
+            result = parser.parse(str);
         }
         return result;
     }

@@ -24,7 +24,6 @@ import org.qi4j.api.service.ServiceActivation;
 
 public interface OpenSearchSupport extends ServiceActivation
 {
-
     OpenSearchClient client();
 
     String index();

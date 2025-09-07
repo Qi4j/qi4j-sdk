@@ -17,13 +17,13 @@
  */
 package org.qi4j.index.opensearch.client;
 
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.qi4j.api.configuration.Configuration;
 import org.qi4j.api.injection.scope.This;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.service.ServiceDescriptor;
 import org.qi4j.index.opensearch.OpenSearchIndexingConfiguration;
 import org.qi4j.index.opensearch.internal.AbstractOpenSearchSupport;
-import org.opensearch.client.Client;
 
 public class OpenSearchClientSupport extends AbstractOpenSearchSupport
 {
@@ -34,7 +34,7 @@ public class OpenSearchClientSupport extends AbstractOpenSearchSupport
     private ServiceDescriptor descriptor;
 
     @Override
-    protected void activateElasticSearch() throws Exception
+    protected void activateOpenSearch() throws Exception
     {
         configuration.refresh();
         OpenSearchIndexingConfiguration config = configuration.get();
@@ -42,7 +42,7 @@ public class OpenSearchClientSupport extends AbstractOpenSearchSupport
         index = config.index().get() == null ? DEFAULT_INDEX_NAME : config.index().get();
         indexNonAggregatedAssociations = config.indexNonAggregatedAssociations().get();
 
-        client = descriptor.metaInfo( Client.class );
+        client = descriptor.metaInfo( OpenSearchClient.class );
     }
 
     @Override

@@ -19,27 +19,22 @@
  */
 package org.qi4j.tools.model;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonWriter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.qi4j.api.activation.Activation;
-import org.qi4j.api.activation.ActivationException;
-import org.qi4j.api.activation.PassivationException;
 import org.qi4j.api.injection.scope.Structure;
 import org.qi4j.api.mixin.Mixins;
 import org.qi4j.api.structure.ApplicationDescriptor;
-import org.qi4j.tools.model.descriptor.ApplicationDetailDescriptorBuilder;
+import org.qi4j.tools.model.v2.Application;
 
-import static org.qi4j.tools.model.descriptor.ApplicationDetailDescriptorBuilder.createApplicationDetailDescriptor;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 
 @Mixins( EnvisageServlet.Mixin.class )
 public interface EnvisageServlet extends Servlet
@@ -47,11 +42,12 @@ public interface EnvisageServlet extends Servlet
     class Mixin extends HttpServlet
         implements EnvisageServlet
     {
-        private JsonObject model;
+        private final String jsonModel;
 
         public Mixin( @Structure ApplicationDescriptor descriptor )
+            throws JsonProcessingException
         {
-            model = ApplicationDetailDescriptorBuilder.createApplicationDetailDescriptor( descriptor ).toJson();
+            jsonModel = new ObjectMapper().writeValueAsString(new Application(descriptor));
         }
 
         @Override
@@ -105,18 +101,10 @@ public interface EnvisageServlet extends Servlet
         private void serviceJson( HttpServletResponse resp )
             throws IOException
         {
-            if( model == null )
-            {
-                resp.setStatus( HttpServletResponse.SC_NO_CONTENT );
-            }
-            else
-            {
-                PrintWriter out = resp.getWriter();
-                JsonWriter writer = Json.createWriter( out );
-                writer.writeObject( model );
-                writer.close();
-                out.flush();
-            }
+            PrintWriter pw = resp.getWriter();
+            pw.write( jsonModel );
+            pw.flush();
+            pw.close();
         }
 
         private void copy( InputStream resource, ServletOutputStream out )

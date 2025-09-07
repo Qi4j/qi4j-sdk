@@ -17,15 +17,17 @@
  */
 package org.qi4j.serialization.javaxxml;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.injection.scope.Service;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.serialization.javaxxml.assembly.JavaxXmlSerializationAssembler;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -49,9 +51,9 @@ public class JavaxXmlAdaptersTest extends AbstractQi4jTest
         JavaxXmlAdapter<String> adapter = adapters.adapterFor( String.class );
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         String original = "Cou<cou>€ôÙÔ#‰¥Ô";
-        Node node = adapter.serialize( doc, original, null );
+        Node node = adapter.serialize( module, Options.DEFAULT, doc, original, null );
         assertThat( node.getNodeValue(), equalTo( original ) );
-        String result = adapter.deserialize( node, null );
+        String result = adapter.deserialize( module, Options.DEFAULT, node, null );
         assertThat( result, equalTo( original ) );
     }
 }

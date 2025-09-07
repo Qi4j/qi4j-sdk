@@ -19,6 +19,7 @@
  */
 package org.qi4j.entitystore.sql.assembly;
 
+import org.jooq.conf.RenderQuotedNames;
 import org.qi4j.api.identity.Identity;
 import org.qi4j.api.identity.StringIdentity;
 import org.qi4j.bootstrap.Assembler;
@@ -73,6 +74,6 @@ public abstract class AbstractSQLEntityStoreAssembler<T extends AbstractSQLEntit
 
     protected Settings getSettings()
     {
-        return new Settings().withRenderNameStyle( RenderNameStyle.QUOTED );
+        return new Settings().withRenderQuotedNames(RenderQuotedNames.ALWAYS);
     }
 }

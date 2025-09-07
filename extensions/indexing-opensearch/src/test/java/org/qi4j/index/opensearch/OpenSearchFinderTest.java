@@ -17,30 +17,34 @@
  */
 package org.qi4j.index.opensearch;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.qi4j.api.common.Visibility;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.index.opensearch.assembly.OpenSearchClientIndexQueryAssembler;
+import org.qi4j.index.opensearch.assembly.OpenSearchClusterIndexQueryAssembler;
 import org.qi4j.library.fileconfig.FileConfigurationAssembler;
 import org.qi4j.library.fileconfig.FileConfigurationOverride;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.TemporaryFolder;
 import org.qi4j.test.TestName;
 import org.qi4j.test.indexing.AbstractEntityFinderTest;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.junit.jupiter.Container;
 
 import static org.qi4j.test.util.Assume.assumeNoIbmJdk;
 
 @SuppressWarnings( "unused" )
-@ExtendWith( { TemporaryFolder.class, EmbeddedElasticSearchExtension.class, TestName.class } )
+@ExtendWith( { TemporaryFolder.class, TestName.class } )
 public class OpenSearchFinderTest extends AbstractEntityFinderTest
 {
-    private static EmbeddedElasticSearchExtension ELASTIC_SEARCH;
-
     private TestName testName;
 
     private TemporaryFolder tmpDir;
+
+    @Container
+    public static OpenSearchContainer container = new OpenSearchContainer("opensearchproject/opensearch:latest")
+        .withLogConsumer( out -> System.out.println( out.getUtf8StringWithoutLineEnding() ) )
+        .withReuse(true);
 
     @BeforeAll
     public static void beforeClass_IBMJDK()
@@ -59,13 +63,19 @@ public class OpenSearchFinderTest extends AbstractEntityFinderTest
         new EntityTestAssembler().assemble( config );
 
         // Index/Query
-        new OpenSearchClientIndexQueryAssembler( ELASTIC_SEARCH.client() )
+        new OpenSearchClusterIndexQueryAssembler()
             .withConfig( config, Visibility.layer )
             .assemble( module );
-        OpenSearchIndexingConfiguration esConfig = config.forMixin( OpenSearchIndexingConfiguration.class ).declareDefaults();
-        esConfig.index().set( ELASTIC_SEARCH.indexName( ElasticSearchQueryTest.class.getName(),
-                                                        testName.getMethodName() ) );
-        esConfig.indexNonAggregatedAssociations().set( Boolean.TRUE );
+
+        OpenSearchClusterConfiguration clusterConfig = config.forMixin( OpenSearchClusterConfiguration.class ).declareDefaults();
+        clusterConfig.clusterName().set( "qi4j-test" );
+        String host = container.getHost();
+        Integer port = container.getFirstMappedPort();
+        clusterConfig.nodes().set(host + ":" + port);
+
+        OpenSearchIndexingConfiguration openSearchConfig = config.forMixin( OpenSearchIndexingConfiguration.class ).declareDefaults();
+        openSearchConfig.index().set( (getClass().getSimpleName() + "." + testName.getMethodName()).toLowerCase());
+        openSearchConfig.indexNonAggregatedAssociations().set( Boolean.TRUE );
 
         // FileConfig
         new FileConfigurationAssembler()
@@ -76,6 +86,6 @@ public class OpenSearchFinderTest extends AbstractEntityFinderTest
     @Override
     public void showNetwork()
     {
-        // IndexExporter not supported by ElasticSearch
+        // IndexExporter not supported by OpenSearch
     }
 }

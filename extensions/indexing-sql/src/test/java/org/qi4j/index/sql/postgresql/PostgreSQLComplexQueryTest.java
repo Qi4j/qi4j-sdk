@@ -19,22 +19,24 @@
  */
 package org.qi4j.index.sql.postgresql;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.test.indexing.AbstractComplexQueryTest;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+@SuppressWarnings("rawtypes")
 @Testcontainers
 public class PostgreSQLComplexQueryTest
     extends AbstractComplexQueryTest
 {
     @Container
-    public static PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer("postgres:17-alpine")
-        .withDatabaseName("jdbc_test_db")
-        .withReuse(true);
+    public static PostgreSQLContainer postgres = SetupProgres.newContainer();
+
 
     @Override
     public void assemble(ModuleAssembly mainModule)
@@ -66,5 +68,12 @@ public class PostgreSQLComplexQueryTest
             // had other reason!
             throw e;
         }
+    }
+
+    @AfterAll
+    static void tearDownDocker()
+    {
+        postgres.stop();
+        postgres.close();
     }
 }

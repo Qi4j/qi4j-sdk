@@ -21,7 +21,8 @@ import java.io.StringReader;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.serialization.Serializer;
+import org.qi4j.api.serialization.Serialization;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.serialization.jakartajson.assembly.JakartaJsonSerializationAssembler;
@@ -62,7 +63,7 @@ public class JakartaJsonValueCompositeSerializationTest extends AbstractValueCom
             Some valueInstance = buildSomeValue( moduleInstance, uow, "42" );
 
             // Serialize using injected service
-            JsonValue serializedJson = jsonSerialization.toJson( valueInstance );
+            JsonValue serializedJson = jsonSerialization.toJson( module, Options.DEFAULT, valueInstance );
             System.out.println( serializedJson.toString() );
 
             // Deserialize using Module API
@@ -71,7 +72,7 @@ public class JakartaJsonValueCompositeSerializationTest extends AbstractValueCom
             // END SNIPPET: json-serialization
 
             // value.toString()
-            JsonValue valueJsonWithoutTypeInfo = jsonSerialization.toJson( Serializer.Options.NO_TYPE_INFO, valueFromSerializedState );
+            JsonValue valueJsonWithoutTypeInfo = jsonSerialization.toJson( module, Options.INDEXING, valueFromSerializedState );
             JsonObject valueToStringJson = jsonFactories.readerFactory()
                                                         .createReader( new StringReader( valueFromSerializedState.toString() ) )
                                                         .readObject();

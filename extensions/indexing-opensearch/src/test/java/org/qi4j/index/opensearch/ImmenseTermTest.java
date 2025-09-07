@@ -20,6 +20,9 @@
 
 package org.qi4j.index.opensearch;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.qi4j.api.association.ManyAssociation;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.common.Visibility;
@@ -30,22 +33,20 @@ import org.qi4j.api.query.Query;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.AssemblyException;
 import org.qi4j.bootstrap.ModuleAssembly;
-import org.qi4j.index.opensearch.assembly.OpenSearchClientIndexQueryAssembler;
+import org.qi4j.index.opensearch.assembly.OpenSearchClusterIndexQueryAssembler;
 import org.qi4j.library.fileconfig.FileConfigurationAssembler;
 import org.qi4j.library.fileconfig.FileConfigurationOverride;
 import org.qi4j.test.AbstractQi4jTest;
 import org.qi4j.test.EntityTestAssembler;
 import org.qi4j.test.TemporaryFolder;
 import org.qi4j.test.TestName;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.testcontainers.junit.jupiter.Container;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 import static org.qi4j.api.query.QueryExpressions.eq;
 import static org.qi4j.api.query.QueryExpressions.templateFor;
 import static org.qi4j.test.util.Assume.assumeNoIbmJdk;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 
 /**
  * ImmenseTermTest.
@@ -53,15 +54,18 @@ import static org.hamcrest.core.Is.is;
  * See <a href="https://ops4j1.jira.com/browse/QI-412">QI-412</a>.
  */
 @SuppressWarnings( "unused" )
-@ExtendWith( { TemporaryFolder.class, EmbeddedElasticSearchExtension.class, TestName.class } )
+@ExtendWith( { TemporaryFolder.class, TestName.class } )
 public class ImmenseTermTest
     extends AbstractQi4jTest
 {
-    private static EmbeddedElasticSearchExtension ELASTIC_SEARCH;
-
     private TestName testName;
 
     private TemporaryFolder tmpDir;
+
+    @Container
+    public static OpenSearchContainer container = new OpenSearchContainer("opensearchproject/opensearch:latest")
+        .withLogConsumer( out -> System.out.println( out.getUtf8StringWithoutLineEnding() ) )
+        .withReuse(true);
 
     @BeforeAll
     public static void beforeClass_IBMJDK()
@@ -95,13 +99,19 @@ public class ImmenseTermTest
         new EntityTestAssembler().assemble( module );
 
         // Index/Query
-        new OpenSearchClientIndexQueryAssembler( ELASTIC_SEARCH.client() )
+        new OpenSearchClusterIndexQueryAssembler()
             .withConfig( config, Visibility.layer )
             .assemble( module );
-        OpenSearchIndexingConfiguration esConfig = config.forMixin( OpenSearchIndexingConfiguration.class ).declareDefaults();
-        esConfig.index().set( ELASTIC_SEARCH.indexName( ElasticSearchQueryTest.class.getName(),
-                                                        testName.getMethodName() ) );
-        esConfig.indexNonAggregatedAssociations().set( Boolean.TRUE );
+
+        OpenSearchClusterConfiguration clusterConfig = config.forMixin( OpenSearchClusterConfiguration.class ).declareDefaults();
+        clusterConfig.clusterName().set( "qi4j-test" );
+        String host = container.getHost();
+        Integer port = container.getFirstMappedPort();
+        clusterConfig.nodes().set(host + ":" + port);
+
+        OpenSearchIndexingConfiguration openSearchConfig = config.forMixin( OpenSearchIndexingConfiguration.class ).declareDefaults();
+        openSearchConfig.index().set( (getClass().getSimpleName() + "." + testName.getMethodName()).toLowerCase());
+        openSearchConfig.indexNonAggregatedAssociations().set( Boolean.TRUE );
 
         // FileConfig
         new FileConfigurationAssembler()
@@ -123,7 +133,7 @@ public class ImmenseTermTest
             testEntity = uow.newEntity( TestEntity.class );
             for( int i = 0; i < count; i++ )
             {
-                TestEntity2 testEntity2 = unitOfWorkFactory.currentUnitOfWork().newEntity( TestEntity2.class );
+                TestEntity2 testEntity2 = uow.newEntity( TestEntity2.class );
                 testEntity2.property().set( "test" );
                 testEntity.manyAssociation().add( testEntity2 );
             }

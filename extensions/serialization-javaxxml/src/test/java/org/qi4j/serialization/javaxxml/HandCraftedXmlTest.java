@@ -17,14 +17,15 @@
  */
 package org.qi4j.serialization.javaxxml;
 
+import org.junit.jupiter.api.Test;
 import org.qi4j.api.common.Optional;
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.property.Property;
 import org.qi4j.api.serialization.Deserializer;
+import org.qi4j.api.serialization.Serialization.Options;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.serialization.javaxxml.assembly.JavaxXmlSerializationAssembler;
 import org.qi4j.test.AbstractQi4jTest;
-import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -52,7 +53,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadSingleLineXml()
     {
         String xml = "<state><value><foo>bar</foo></value></state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar" ) );
     }
 
@@ -60,7 +61,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadMultiLineXml()
     {
         String xml = "<state>\n<value>\n<foo>bar</foo>\n</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar" ) );
     }
 
@@ -68,7 +69,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadIndentedMultiLineXml()
     {
         String xml = "<state>\n\t<value>\n\t\t<foo>bar</foo>\n\t</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar" ) );
     }
 
@@ -76,7 +77,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadSingleLineXmlWithMultilineStringValue()
     {
         String xml = "<state><value><foo>bar\nbaz\n</foo></value></state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar\nbaz\n" ) );
     }
 
@@ -84,7 +85,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadMultiLineXmlWithMultilineStringValue()
     {
         String xml = "<state>\n<value>\n<foo>bar\nbaz\n</foo>\n</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar\nbaz\n" ) );
     }
 
@@ -92,7 +93,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadIndentedMultiLineXmlWithMultilineStringValue()
     {
         String xml = "<state>\n\t<value>\n\t\t<foo>bar\nbaz\n</foo>\n\t</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar\nbaz\n" ) );
     }
 
@@ -100,7 +101,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadCommentedXml()
     {
         String xml = "<state><value><!-- Some comment --><foo>bar</foo></value></state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar" ) );
     }
 
@@ -108,7 +109,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadMultilineCommentedXml()
     {
         String xml = "<state>\n<value>\n<!-- Some comment -->\n<foo>bar</foo>\n</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar" ) );
     }
 
@@ -116,7 +117,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadIndentedMultilineCommentedXml()
     {
         String xml = "<state>\n\t<value>\n\t\t<!-- Some comment -->\n\t\t<foo>bar</foo>\n\t</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar" ) );
     }
 
@@ -124,7 +125,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadIndentedMultilineCommentedXmlWithMultilineStringValue()
     {
         String xml = "<state>\n\t<value>\n\t\t<!-- Some comment -->\n\t\t<foo>bar\nbaz\n</foo>\n\t</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "bar\nbaz\n" ) );
     }
 
@@ -133,7 +134,7 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     {
         String xml
             = "<state>\n\t<value>\n\t\t<!-- Some comment -->\n\t\t<foo>\n\t\t\tbar\n\t\t\tbaz\n</foo>\n\t</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(),
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(),
                     equalTo( "\n\t\t\tbar\n\t\t\tbaz\n" ) );
     }
 
@@ -141,6 +142,6 @@ public class HandCraftedXmlTest extends AbstractQi4jTest
     public void canReadIndentedMultilineXmlWithNullValues()
     {
         String xml = "<state>\n\t<value>\n\t\t<foo>\n<null/>\n</foo>\n\t</value>\n</state>";
-        assertThat( deserializer.deserialize( module, SomeValue.class, xml ).foo().get(), nullValue() );
+        assertThat( deserializer.deserialize( module, Options.DEFAULT, SomeValue.class, xml ).foo().get(), nullValue() );
     }
 }

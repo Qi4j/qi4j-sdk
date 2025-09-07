@@ -82,7 +82,8 @@ public interface Serialization extends Serializer, Deserializer
 
         Options ENTITY_STORAGE = builder().withRootTypeInfo().withNestedTypeInfo().build();
 
-        Options INDEXING = builder().withoutRootTypeInfo().withNestedTypeInfo().withIndexableTime().build();
+//        Options INDEXING = builder().withoutRootTypeInfo().withoutNestedTypeInfo().withIndexableTime().build();
+        Options INDEXING = builder().withoutRootTypeInfo().withoutNestedTypeInfo().build();
 
         boolean rootTypeInfo();
 

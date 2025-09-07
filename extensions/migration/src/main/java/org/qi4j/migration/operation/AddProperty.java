@@ -21,6 +21,7 @@
 package org.qi4j.migration.operation;
 
 import jakarta.json.JsonObject;
+import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.migration.assembly.MigrationContext;
 import org.qi4j.migration.Migrator;
 import org.qi4j.migration.assembly.EntityMigrationOperation;
@@ -32,8 +33,8 @@ import org.qi4j.spi.entitystore.helpers.StateStore;
 public class AddProperty
     implements EntityMigrationOperation
 {
-    private String property;
-    private Object defaultValue;
+    private final String property;
+    private final Object defaultValue;
 
     public AddProperty( String property, Object defaultValue )
     {
@@ -42,15 +43,15 @@ public class AddProperty
     }
 
     @Override
-    public JsonObject upgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject upgrade(ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
     {
-        return migrator.addProperty( context, state, property, defaultValue );
+        return migrator.addProperty(module, context, state, property, defaultValue);
     }
 
     @Override
-    public JsonObject downgrade( MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
+    public JsonObject downgrade( ModuleDescriptor module, MigrationContext context, JsonObject state, StateStore stateStore, Migrator migrator )
     {
-        return migrator.removeProperty( context, state, property );
+        return migrator.removeProperty( context, state, property, module);
     }
 
     @Override

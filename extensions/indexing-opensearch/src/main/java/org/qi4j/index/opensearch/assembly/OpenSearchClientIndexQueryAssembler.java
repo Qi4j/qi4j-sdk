@@ -38,7 +38,7 @@ public class OpenSearchClientIndexQueryAssembler
     {
         super.assemble( module );
         module.services( OpenSearchClientIndexQueryService.class )
-              .taggedWith( "elasticsearch", "query", "indexing" )
+              .taggedWith( "opensearch", "query", "indexing" )
               .identifiedBy( identity() )
               .setMetaInfo( client )
               .visibleIn( visibility() )

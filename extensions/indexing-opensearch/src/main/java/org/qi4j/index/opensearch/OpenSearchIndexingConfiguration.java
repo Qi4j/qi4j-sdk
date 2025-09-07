@@ -39,7 +39,7 @@ public interface OpenSearchIndexingConfiguration
     @Optional Property<String> index();
 
     /**
-     * Set to true to index non aggregated associations as if they were aggregated.
+     * Set to true to index non-aggregated associations as if they were aggregated.
      * WARN: Don't use this if your domain model contains circular dependencies.
      * Defaults to 'FALSE'.
      */

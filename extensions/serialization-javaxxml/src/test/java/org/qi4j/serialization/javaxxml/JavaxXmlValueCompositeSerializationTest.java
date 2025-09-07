@@ -18,7 +18,7 @@
 package org.qi4j.serialization.javaxxml;
 
 import org.qi4j.api.injection.scope.Service;
-import org.qi4j.api.serialization.Serializer;
+import org.qi4j.api.serialization.Serialization;
 import org.qi4j.api.unitofwork.UnitOfWork;
 import org.qi4j.bootstrap.ModuleAssembly;
 import org.qi4j.serialization.javaxxml.assembly.JavaxXmlSerializationAssembler;
@@ -59,7 +59,7 @@ public class JavaxXmlValueCompositeSerializationTest extends AbstractValueCompos
             Some valueInstance = buildSomeValue( moduleInstance, uow, "42" );
 
             // Serialize using injected service
-            String serializedXml = xmlSerialization.serialize( valueInstance );
+            String serializedXml = xmlSerialization.serialize( module, Serialization.Options.DEFAULT, valueInstance );
             System.out.println( serializedXml );
 
             // Deserialize using Module API
@@ -69,7 +69,7 @@ public class JavaxXmlValueCompositeSerializationTest extends AbstractValueCompos
 
             // value.toString()
             // Need to loosely compare because of HashMaps not retaining order
-            String valueXmlWithoutTypeInfo = xmlSerialization.serialize( Serializer.Options.NO_TYPE_INFO, valueFromSerializedState );
+            String valueXmlWithoutTypeInfo = xmlSerialization.serialize(module, Serialization.Options.INDEXING, valueFromSerializedState);
             assertThat( "value.toString() XML equality",
                         valueFromSerializedState.toString(),
                         isSimilarTo( valueXmlWithoutTypeInfo )

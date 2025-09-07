@@ -707,6 +707,34 @@ h5 { font-size: 1em; margin-bottom: 0.5em; }
     text-shadow: none  !important;
 }
 
+.devstatus-code-deprecated {
+    border: solid black 2px;
+    margin-right: 5px !important;
+    display: block;
+    float: right;
+    width: 4em;
+    font-size: 10pt !important;
+    font-weight: bolder;
+    font-family: "Courier New", "Courier", monospace !important;
+    background-color: #ffA000;
+    text-align: center;
+    text-shadow: none  !important;
+}
+
+.devstatus-code-abandoned {
+    border: solid black 2px;
+    margin-right: 5px !important;
+    display: block;
+    float: right;
+    width: 4em;
+    font-size: 10pt !important;
+    font-weight: bolder;
+    font-family: "Courier New", "Courier", monospace !important;
+    background-color: #ff0000;
+    text-align: center;
+    text-shadow: none  !important;
+}
+
 .devstatus-docs-none {
     border: solid black 2px;
     margin-right: 5px !important;

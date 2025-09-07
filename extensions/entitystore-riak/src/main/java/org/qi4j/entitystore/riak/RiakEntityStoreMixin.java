@@ -153,7 +153,7 @@ public class RiakEntityStoreMixin implements ServiceActivation, MapEntityStore, 
                     try
                     {
                         Class<?> bcType = Class.forName( "org.bouncycastle.jce.provider.BouncyCastleProvider" );
-                        Security.addProvider( (Provider) bcType.newInstance() );
+                        Security.addProvider( (Provider) bcType.getDeclaredConstructor().newInstance() );
                     }
                     catch( Exception ex )
                     {
