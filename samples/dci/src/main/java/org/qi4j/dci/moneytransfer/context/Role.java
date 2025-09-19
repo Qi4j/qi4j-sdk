@@ -20,11 +20,7 @@
 package org.qi4j.dci.moneytransfer.context;
 
 /**
- * TODO
- */
-
-/**
- * Base class for methodful roles
+ * Base class for method-based roles
  */
 public class Role<T>
     implements Comparable<Role<T>>
@@ -36,12 +32,12 @@ public class Role<T>
     {
     }
 
-    public Role( T self )
+    public Role(T self)
     {
         this.self = self;
     }
 
-    public void bind( T newSelf )
+    public void bind(T newSelf)
     {
         self = newSelf;
     }
@@ -52,16 +48,16 @@ public class Role<T>
     }
 
     @Override
-    public boolean equals( Object obj )
+    public boolean equals(Object obj)
     {
-        if( obj == null )
+        if(obj == null)
         {
             return false;
         }
 
-        if( obj instanceof Role )
+        if(obj instanceof Role)
         {
-            return self.equals( ( (Role) obj ).self );
+            return self.equals(((Role<?>) obj).self);
         }
         else
         {
@@ -69,8 +65,9 @@ public class Role<T>
         }
     }
 
-    public int compareTo( Role<T> role )
+    @SuppressWarnings("unchecked")
+    public int compareTo(Role<T> role)
     {
-        return ( (Comparable<T>) self ).compareTo( role.self );
+        return ((Comparable<T>) self).compareTo(role.self);
     }
 }

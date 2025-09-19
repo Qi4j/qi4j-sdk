@@ -20,16 +20,7 @@ package org.qi4j.serialization.messagepack;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Array;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.qi4j.api.association.AssociationDescriptor;
@@ -60,11 +51,13 @@ import org.msgpack.value.Value;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Objects.requireNonNull;
 import static org.qi4j.api.util.Collectors.toMap;
 
 @Mixins( MessagePackDeserializer.Mixin.class )
 public interface MessagePackDeserializer extends Deserializer
 {
+    @SuppressWarnings({"rawtypes", "unchecked"})
     class Mixin extends AbstractBinaryDeserializer
     {
         @This
@@ -91,7 +84,6 @@ public interface MessagePackDeserializer extends Deserializer
             }
         }
 
-        @SuppressWarnings( "unchecked" )
         private <T> T doDeserialize( ModuleDescriptor module, ValueType valueType, Value value )
         {
             try
@@ -103,7 +95,7 @@ public interface MessagePackDeserializer extends Deserializer
                 Converter<Object> converter = converters.converterFor( valueType );
                 if( converter != null )
                 {
-                    return (T) converter.fromString( doDeserialize( module, ValueType.STRING, value ).toString() );
+                    return (T) converter.fromString( requireNonNull(doDeserialize(module, ValueType.STRING, value)).toString() );
                 }
                 MessagePackAdapter<?> adapter = adapters.adapterFor( valueType );
                 if( adapter != null )
@@ -291,36 +283,34 @@ public interface MessagePackDeserializer extends Deserializer
         private Object doGuessDeserialize( ModuleDescriptor module, ValueType valueType, Value value )
             throws IOException, ClassNotFoundException
         {
-            switch( value.getValueType() )
+            if(requireNonNull(value.getValueType()) == org.msgpack.value.ValueType.MAP)
             {
-                case MAP:
-                    MapValue mapValue = value.asMapValue();
-                    Optional<String> typeInfo = mapValue
-                        .entrySet().stream()
-                        .filter( entry -> entry.getKey().isStringValue() )
-                        .map( entry ->
-                              {
-                                  String key = doDeserialize( module, ValueType.STRING, entry.getKey() );
-                                  return new AbstractMap.SimpleImmutableEntry<>( key, entry.getValue() );
-                              } )
-                        .filter( entry -> "_type".equals( entry.getKey() ) )
-                        .findFirst()
-                        .map( entry -> doDeserialize( module, ValueType.STRING, entry.getValue() ) );
-                    if( typeInfo.isPresent() )
+                MapValue mapValue = value.asMapValue();
+                Optional<String> typeInfo = mapValue
+                    .entrySet().stream()
+                    .filter(entry -> entry.getKey().isStringValue())
+                    .map(entry ->
                     {
-                        StatefulAssociationCompositeDescriptor descriptor = statefulCompositeDescriptorFor(
-                            module, typeInfo.get() );
-                        if( descriptor != null )
-                        {
-                            return deserializeStatefulAssociationValue( ( (CompositeDescriptor) descriptor ).module(),
-                                                                        descriptor.valueType(),
-                                                                        mapValue );
-                        }
+                        String key = doDeserialize(module, ValueType.STRING, entry.getKey());
+                        return new AbstractMap.SimpleImmutableEntry<>(key, entry.getValue());
+                    })
+                    .filter(entry -> "_type".equals(entry.getKey()))
+                    .findFirst()
+                    .map(entry -> doDeserialize(module, ValueType.STRING, entry.getValue()));
+                if(typeInfo.isPresent())
+                {
+                    StatefulAssociationCompositeDescriptor descriptor = statefulCompositeDescriptorFor(
+                        module, typeInfo.get());
+                    if(descriptor != null)
+                    {
+                        return deserializeStatefulAssociationValue(((CompositeDescriptor) descriptor).module(),
+                            descriptor.valueType(),
+                            mapValue);
                     }
-                default:
-                    throw new SerializationException( "Don't know how to deserialize " + valueType + " from " + value
-                                                      + " (" + value.getValueType() + ")" );
+                }
             }
+            throw new SerializationException("Don't know how to deserialize " + valueType + " from " + value
+                + " (" + value.getValueType() + ")");
         }
     }
 }

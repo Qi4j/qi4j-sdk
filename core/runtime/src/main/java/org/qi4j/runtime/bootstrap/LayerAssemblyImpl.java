@@ -113,6 +113,7 @@ public final class LayerAssemblyImpl
         return this;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public <ThrowableType extends Throwable> void visit(AssemblyVisitor<ThrowableType> visitor)
         throws ThrowableType

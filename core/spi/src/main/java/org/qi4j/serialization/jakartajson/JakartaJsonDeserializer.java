@@ -43,6 +43,8 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -244,10 +246,10 @@ public class JakartaJsonDeserializer extends AbstractTextDeserializer
     private <T> Collection<T> deserializeCollection(ModuleDescriptor module, Options options, CollectionType collectionType,
                                                     JsonArray json)
     {
-        return (Collection<T>) json.stream()
-            .map(item -> doDeserialize(module, options, collectionType.collectedType(), item))
-            .collect(toCollection(
-                () -> collectionType.isSet() ? new LinkedHashSet<>() : new ArrayList<>()));
+        Supplier<? extends Collection<T>> supplier = () -> collectionType.isSet() ? new LinkedHashSet<>() : new ArrayList<>();
+        Collector<T, ?, ? extends Collection<T>> collector = toCollection(supplier);
+        Stream<T> objectStream = json.stream().map(item -> doDeserialize(module, options, collectionType.collectedType(), item));
+        return objectStream.collect(collector);
     }
 
     /**

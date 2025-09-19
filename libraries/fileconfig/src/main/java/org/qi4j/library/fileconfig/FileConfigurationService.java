@@ -99,7 +99,8 @@ public interface FileConfigurationService
             data.os().set(os);
 
             // Get bundle with application name and configured directories
-            ResourceBundle bundle = ResourceBundle.getBundle(FileConfiguration.class.getName(), new Locale(os.name()));
+            // TODO: Why is OS name used as the Language?
+            ResourceBundle bundle = ResourceBundle.getBundle(FileConfiguration.class.getName(), Locale.of(os.name()));
 
             Map<String, String> arguments = getArguments(os);
 
@@ -286,7 +287,7 @@ public interface FileConfigurationService
             int lastEnd = 0;
             while( matcher.find() )
             {
-                buffer.append(configuration.substring(lastEnd, matcher.start()));
+                buffer.append(configuration, lastEnd, matcher.start());
                 lastEnd = matcher.end();
 
                 String var = matcher.group(1);

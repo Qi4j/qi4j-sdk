@@ -20,6 +20,7 @@ package org.qi4j.entitystore.sql;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import javax.sql.DataSource;
+
 import org.qi4j.api.injection.scope.Service;
 import org.qi4j.api.injection.scope.Uses;
 import org.qi4j.api.mixin.Mixins;
@@ -33,7 +34,6 @@ import org.jooq.Table;
 import org.jooq.TransactionProvider;
 import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
-import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
 import org.jooq.impl.ThreadLocalTransactionProvider;
 
@@ -55,7 +55,7 @@ public interface JooqDslContext extends DSLContext
 
         public Mixin( @Service DataSource dataSource, @Uses Settings settings, @Uses SQLDialect dialect )
         {
-            ConnectionProvider connectionProvider = new DataSourceConnectionProvider( dataSource );
+            ConnectionProvider connectionProvider = new ReadWriteDataSourceConnectionProvider(dataSource);
             TransactionProvider transactionProvider = new ThreadLocalTransactionProvider( connectionProvider, false );
             Configuration configuration = new DefaultConfiguration()
                 .set( dialect )

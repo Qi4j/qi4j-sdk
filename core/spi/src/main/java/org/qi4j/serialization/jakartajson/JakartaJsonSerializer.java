@@ -166,7 +166,7 @@ public class JakartaJsonSerializer extends AbstractTextSerializer
             property ->
             {
                 Object value = state.propertyFor(property.accessor()).get();
-                Converter converter = converters.converterFor(property);
+                Converter<Object> converter = converters.converterFor(property);
                 if(converter != null)
                 {
                     value = converter.toString(value);

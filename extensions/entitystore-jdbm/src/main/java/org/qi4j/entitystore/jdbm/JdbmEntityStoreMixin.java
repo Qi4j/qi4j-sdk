@@ -19,29 +19,9 @@
  */
 package org.qi4j.entitystore.jdbm;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.UncheckedIOException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.util.Properties;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-import jdbm.RecordManager;
-import jdbm.RecordManagerFactory;
-import jdbm.RecordManagerOptions;
-import jdbm.Serializer;
+import jdbm.*;
 import jdbm.btree.BTree;
 import jdbm.helper.ByteArrayComparator;
-import jdbm.helper.DefaultSerializer;
 import jdbm.helper.Tuple;
 import jdbm.helper.TupleBrowser;
 import jdbm.recman.CacheRecordManager;
@@ -63,9 +43,23 @@ import org.qi4j.spi.entitystore.EntityNotFoundException;
 import org.qi4j.spi.entitystore.EntityStoreException;
 import org.qi4j.spi.entitystore.helpers.MapEntityStore;
 
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Properties;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 /**
  * JDBM implementation of MapEntityStore.
  */
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public class JdbmEntityStoreMixin
     implements JdbmEntityStoreActivation, MapEntityStore, BackupRestore
 {
@@ -80,8 +74,8 @@ public class JdbmEntityStoreMixin
     private ServiceDescriptor descriptor;
 
     private RecordManager recordManager;
-    private BTree index;
-    private Serializer serializer;
+    private BTree<byte[],Long> index;
+    private Serializer<byte[]> serializer;
     private File tempDirectory;
 
     @This
@@ -115,14 +109,14 @@ public class JdbmEntityStoreMixin
                 throw new EntityNotFoundException( entityReference );
             }
 
-            byte[] serializedState = (byte[]) recordManager.fetch( stateIndex, serializer );
+            byte[] serializedState = recordManager.fetch( stateIndex, serializer );
 
             if( serializedState == null )
             {
                 throw new EntityNotFoundException( entityReference );
             }
 
-            return new StringReader( new String( serializedState, "UTF-8" ) );
+            return new StringReader( new String( serializedState, UTF_8) );
         }
         catch( IOException e )
         {
@@ -151,10 +145,10 @@ public class JdbmEntityStoreMixin
                         {
                             super.close();
 
-                            byte[] stateArray = toString().getBytes( "UTF-8" );
+                            byte[] stateArray = toString().getBytes(UTF_8);
                             long stateIndex = recordManager.insert( stateArray, serializer );
                             String indexKey = ref.toString();
-                            index.insert( indexKey.getBytes( "UTF-8" ), stateIndex, false );
+                            index.insert( indexKey.getBytes(UTF_8), stateIndex, false );
                         }
                     };
                 }
@@ -172,7 +166,7 @@ public class JdbmEntityStoreMixin
                             super.close();
 
                             Long stateIndex = getStateIndex( mapChange.reference().identity() );
-                            byte[] stateArray = toString().getBytes( "UTF-8" );
+                            byte[] stateArray = toString().getBytes(UTF_8);
                             recordManager.update( stateIndex, stateArray, serializer );
                         }
                     };
@@ -186,7 +180,7 @@ public class JdbmEntityStoreMixin
                     {
                         Long stateIndex = getStateIndex( ref.identity() );
                         recordManager.delete( stateIndex );
-                        index.remove( ref.toString().getBytes( "UTF-8" ) );
+                        index.remove( ref.toString().getBytes(UTF_8) );
                     }
                     catch( IOException e )
                     {
@@ -199,7 +193,6 @@ public class JdbmEntityStoreMixin
         }
         catch( Exception e )
         {
-            e.printStackTrace();
             recordManager.rollback();
             if( e instanceof IOException )
             {
@@ -226,7 +219,7 @@ public class JdbmEntityStoreMixin
     public Stream<String> backup()
     {
         lock.writeLock().lock();
-        TupleBrowser browser;
+        TupleBrowser<byte[],Long> browser;
         try
         {
             browser = index.browse();
@@ -239,7 +232,7 @@ public class JdbmEntityStoreMixin
         return StreamSupport.stream(
             new Spliterators.AbstractSpliterator<String>( Long.MAX_VALUE, Spliterator.ORDERED )
             {
-                private final Tuple tuple = new Tuple();
+                private final Tuple<byte[],Long> tuple = new Tuple<>();
 
                 @Override
                 public boolean tryAdvance( final Consumer<? super String> action )
@@ -257,7 +250,7 @@ public class JdbmEntityStoreMixin
                             return false;
                         }
                         byte[] serializedState = (byte[]) recordManager.fetch( stateIndex, serializer );
-                        String state = new String( serializedState, "UTF-8" );
+                        String state = new String( serializedState, UTF_8);
                         action.accept( state );
                         return true;
                     }
@@ -278,16 +271,16 @@ public class JdbmEntityStoreMixin
         File dbFile = new File( getDatabaseName() + ".db" );
         File lgFile = new File( getDatabaseName() + ".lg" );
 
-        // Create temporary store
+        // Create a temporary store
         File tempDatabase = createTemporaryDatabase();
         final RecordManager recordManager;
-        final BTree index;
+        final BTree<byte[],Long> index;
         try
         {
             recordManager = RecordManagerFactory.createRecordManager( tempDatabase.getAbsolutePath(),
                                                                       new Properties() );
             ByteArrayComparator comparator = new ByteArrayComparator();
-            index = BTree.createInstance( recordManager, comparator, serializer, DefaultSerializer.INSTANCE, 16 );
+            index = BTree.createInstance( recordManager, comparator, serializer, new SneakySerializer<>(), 16 );
             recordManager.setNamedObject( "index", index.getRecid() );
             recordManager.commit();
         }
@@ -313,9 +306,9 @@ public class JdbmEntityStoreMixin
                     id = id.substring( 0, id.indexOf( '"' ) );
 
                     // Insert
-                    byte[] stateArray = state.getBytes( "UTF-8" );
+                    byte[] stateArray = state.getBytes(UTF_8);
                     long stateIndex = recordManager.insert( stateArray, serializer );
-                    index.insert( id.getBytes( "UTF-8" ), stateIndex, false );
+                    index.insert( id.getBytes(UTF_8), stateIndex, false );
                 }
                 catch( IOException ex )
                 {
@@ -398,8 +391,7 @@ public class JdbmEntityStoreMixin
         File dataFile = new File( pathname );
         File directory = dataFile.getAbsoluteFile().getParentFile();
         directory.mkdirs();
-        String name = dataFile.getAbsolutePath();
-        return name;
+        return dataFile.getAbsolutePath();
     }
 
     private File createTemporaryDatabase()
@@ -461,7 +453,7 @@ public class JdbmEntityStoreMixin
         Properties properties = getProperties();
 
         recordManager = RecordManagerFactory.createRecordManager( name, properties );
-        serializer = DefaultSerializer.INSTANCE;
+        serializer = new SneakySerializer<>();
         recordManager = new CacheRecordManager( recordManager, 1000, false );
         long recid = recordManager.getNamedObject( "index" );
         if( recid != 0 )
@@ -471,9 +463,43 @@ public class JdbmEntityStoreMixin
         else
         {
             ByteArrayComparator comparator = new ByteArrayComparator();
-            index = BTree.createInstance( recordManager, comparator, serializer, DefaultSerializer.INSTANCE, 16 );
+            index = BTree.createInstance( recordManager, comparator, serializer, new SneakySerializer<>(), 16 );
             recordManager.setNamedObject( "index", index.getRecid() );
         }
         recordManager.commit();
+    }
+
+    /**
+     * Serializer for byte[], leveraging the default serialization system in JDBM.
+     */
+    private static class SneakySerializer<T>
+        implements Serializer<T>
+    {
+        /**
+         * Serialize the content of an object into a byte array.
+         *
+         * @param obj Object to serialize
+         */
+        public void serialize(SerializerOutput out, T obj)
+            throws IOException
+        {
+            out.writeObject(obj);
+        }
+
+        /**
+         * Deserialize the content of an object from a byte array.
+         *
+         * @param in Byte array representation of the object
+         * @return a byte array representing the object's state
+         */
+        public T deserialize(SerializerInput in )
+            throws IOException
+        {
+            try {
+                return in.readObject();
+            } catch ( ClassNotFoundException except ) {
+                throw new IOException( except );
+            }
+        }
     }
 }

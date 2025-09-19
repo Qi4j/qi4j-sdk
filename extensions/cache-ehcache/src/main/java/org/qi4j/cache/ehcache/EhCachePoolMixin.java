@@ -40,6 +40,7 @@ import org.ehcache.expiry.Duration;
 
 import static org.ehcache.expiry.Expirations.*;
 
+@SuppressWarnings("deprecation")
 public abstract class EhCachePoolMixin
     implements EhCachePoolService
 {
@@ -138,23 +139,16 @@ public abstract class EhCachePoolMixin
         {
             configBuilder = configBuilder.withSizeOfMaxObjectGraph( config.maxObjectGraphDepth().get() );
         }
-        switch( config.expiry().get() )
+        configBuilder = switch(config.expiry().get())
         {
-            case "TIME_TO_IDLE":
-                configBuilder = configBuilder.withExpiry( timeToIdleExpiration( Duration.of(
-                    config.expiryLength().get() == null ? - 1L : config.expiryLength().get(),
-                    TimeUnit.valueOf( config.expiryTimeUnit().get() ) ) ) );
-                break;
-            case "TIME_TO_LIVE":
-                configBuilder = configBuilder.withExpiry( timeToLiveExpiration( Duration.of(
-                    config.expiryLength().get() == null ? - 1L : config.expiryLength().get(),
-                    TimeUnit.valueOf( config.expiryTimeUnit().get() ) ) ) );
-                break;
-            case "NONE":
-            default:
-                configBuilder = configBuilder.withExpiry( noExpiration() );
-                break;
-        }
+            case "TIME_TO_IDLE" -> configBuilder.withExpiry(timeToIdleExpiration(Duration.of(
+                config.expiryLength().get() == null ? -1L : config.expiryLength().get(),
+                TimeUnit.valueOf(config.expiryTimeUnit().get()))));
+            case "TIME_TO_LIVE" -> configBuilder.withExpiry(timeToLiveExpiration(Duration.of(
+                config.expiryLength().get() == null ? -1L : config.expiryLength().get(),
+                TimeUnit.valueOf(config.expiryTimeUnit().get()))));
+            default -> configBuilder.withExpiry(noExpiration());
+        };
         CacheConfiguration<String, T> cacheConfig = configBuilder.build();
         org.ehcache.Cache<String, T> cache = cacheManager.createCache( cacheId, cacheConfig );
         return new EhCacheImpl<>( cacheId, cache, valueType );

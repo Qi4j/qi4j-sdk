@@ -203,6 +203,7 @@ public interface SqlTable extends ServiceActivation
 
             if( config.createIfMissing().get() )
             {
+
                 dsl.transaction( t -> {
                     types.create();
                     entitiesTable.create();

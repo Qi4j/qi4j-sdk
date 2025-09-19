@@ -95,6 +95,8 @@ class TypesTable
             if( tableName == null )
             {
                 Result<Record> newMixinTable = createNewMixinTable( type, descriptor );
+                if( newMixinTable.isEmpty() )
+                    return null;
                 return dsl.tableOf( newMixinTable.getValue( 0, tableNameColumn ) );
             }
             return dsl.tableOf( tableName );

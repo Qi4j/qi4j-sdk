@@ -384,6 +384,7 @@ public class EntitiesTable
             .filter( NOT_COMPOSITE )
             .filter( NOT_HASIDENTITY )
             .map( ( Class<?> type ) -> types.tableFor( type, entityDescriptor ) )
+            .filter( Objects::nonNull )
             .collect( Collectors.toList() );
     }
 

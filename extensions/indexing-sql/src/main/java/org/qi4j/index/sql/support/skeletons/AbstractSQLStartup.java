@@ -48,6 +48,7 @@ import org.qi4j.index.sql.support.common.ReindexingStrategy;
 import org.qi4j.library.sql.common.SQLConfiguration;
 import org.qi4j.library.sql.common.SQLUtil;
 import org.qi4j.library.sql.generator.grammar.builders.definition.TableElementListBuilder;
+import org.qi4j.library.sql.generator.grammar.common.TableNameDirect;
 import org.qi4j.library.sql.generator.grammar.common.datatypes.SQLDataType;
 import org.qi4j.library.sql.generator.grammar.definition.table.AutoGenerationPolicy;
 import org.qi4j.library.sql.generator.grammar.definition.table.ConstraintCharacteristics;
@@ -78,8 +79,7 @@ import java.util.stream.Collectors;
 
 import static org.qi4j.index.sql.support.common.DBNames.*;
 
-public abstract class AbstractSQLStartup
-    implements SQLAppStartup
+public abstract class AbstractSQLStartup implements SQLAppStartup
 {
     private interface SQLTypeCustomizer
     {
@@ -179,46 +179,37 @@ public abstract class AbstractSQLStartup
             report.append("qNameInfos: ").append(newline);
             for(Map.Entry<QualifiedName, QNameInfo> entry : _state.qNameInfos().get().entrySet())
             {
-                report.append(tab).append(entry.getKey()).append(colonspace)
-                    .append(entry.getValue()).append(newline);
+                report.append(tab).append(entry.getKey()).append(colonspace).append(entry.getValue()).append(newline);
             }
 
             report.append("entityUsedQNames:").append(newline);
-            for(Map.Entry<EntityDescriptor, Set<QualifiedName>> entry : _state.entityUsedQNames()
-                .get()
-                .entrySet())
+            for(Map.Entry<EntityDescriptor, Set<QualifiedName>> entry : _state.entityUsedQNames().get().entrySet())
             {
-                report.append(tab).append(entry.getKey()).append(colonspace)
-                    .append(entry.getValue()).append(newline);
+                report.append(tab).append(entry.getKey()).append(colonspace).append(entry.getValue()).append(newline);
             }
 
             report.append("usedClassesPKs:").append(newline);
-            for(Map.Entry<CompositeDescriptor, Integer> entry : _state.usedClassesPKs().get()
-                .entrySet())
+            for(Map.Entry<CompositeDescriptor, Integer> entry : _state.usedClassesPKs().get().entrySet())
             {
-                report.append(tab).append(entry.getKey()).append(colonspace)
-                    .append(entry.getValue()).append(newline);
+                report.append(tab).append(entry.getKey()).append(colonspace).append(entry.getValue()).append(newline);
             }
 
             report.append("javaTypes2SQLTypes:").append(newline);
             for(Map.Entry<Class<?>, Integer> entry : _state.javaTypes2SQLTypes().get().entrySet())
             {
-                report.append(tab).append(entry.getKey()).append(colonspace)
-                    .append(entry.getValue()).append(newline);
+                report.append(tab).append(entry.getKey()).append(colonspace).append(entry.getValue()).append(newline);
             }
 
             report.append("entityTypePKs:").append(newline);
             for(Map.Entry<String, Integer> entry : _state.entityTypePKs().get().entrySet())
             {
-                report.append(tab).append(entry.getKey()).append(colonspace)
-                    .append(entry.getValue()).append(newline);
+                report.append(tab).append(entry.getKey()).append(colonspace).append(entry.getValue()).append(newline);
             }
 
             report.append("enumPKs:").append(newline);
             for(Map.Entry<String, Integer> entry : _state.enumPKs().get().entrySet())
             {
-                report.append(tab).append(entry.getKey()).append(colonspace)
-                    .append(entry.getValue()).append(newline);
+                report.append(tab).append(entry.getKey()).append(colonspace).append(entry.getValue()).append(newline);
             }
 
             LOGGER.debug("SQLDBState after initConnection:\n{}", report.toString());
@@ -271,18 +262,9 @@ public abstract class AbstractSQLStartup
         this._state.javaTypes2SQLTypes().set(jdbcTypes);
 
         this._customizableTypes = new HashMap<>();
-        this._customizableTypes.put(
-            String.class,
-            (propertyType, sqlTypeInfo) -> _vendor.getDataTypeFactory().sqlVarChar(sqlTypeInfo.maxLength())
-        );
-        this._customizableTypes.put(
-            BigInteger.class,
-            (propertyType, sqlTypeInfo) -> _vendor.getDataTypeFactory().decimal(sqlTypeInfo.maxLength())
-        );
-        this._customizableTypes.put(
-            BigDecimal.class,
-            (propertyType, sqlTypeInfo) -> _vendor.getDataTypeFactory().decimal(sqlTypeInfo.maxLength())
-        );
+        this._customizableTypes.put(String.class, (propertyType, sqlTypeInfo) -> _vendor.getDataTypeFactory().sqlVarChar(sqlTypeInfo.maxLength()));
+        this._customizableTypes.put(BigInteger.class, (propertyType, sqlTypeInfo) -> _vendor.getDataTypeFactory().decimal(sqlTypeInfo.maxLength()));
+        this._customizableTypes.put(BigDecimal.class, (propertyType, sqlTypeInfo) -> _vendor.getDataTypeFactory().decimal(sqlTypeInfo.maxLength()));
     }
 
     protected void checkSchemaName(String schemaName)
@@ -310,8 +292,7 @@ public abstract class AbstractSQLStartup
         final ModuleDescriptor module;
         final CompositeDescriptor composite;
 
-        private CompositeDescriptorInfo(LayerDescriptor theLayer, ModuleDescriptor theModule,
-                                        CompositeDescriptor theComposite)
+        private CompositeDescriptorInfo(LayerDescriptor theLayer, ModuleDescriptor theModule, CompositeDescriptor theComposite)
         {
             this.layer = theLayer;
             this.module = theModule;
@@ -321,9 +302,7 @@ public abstract class AbstractSQLStartup
         @Override
         public boolean equals(Object obj)
         {
-            return this == obj
-                || (obj instanceof CompositeDescriptorInfo && this.composite
-                .equals(((CompositeDescriptorInfo) obj).composite));
+            return this == obj || (obj instanceof CompositeDescriptorInfo && this.composite.equals(((CompositeDescriptorInfo) obj).composite));
         }
 
         @Override
@@ -379,8 +358,7 @@ public abstract class AbstractSQLStartup
         }
     }
 
-    private void createSchemaAndRequiredTables(Connection connection, String schemaName,
-                                               Map<String, Long> tablePKs)
+    private void createSchemaAndRequiredTables(Connection connection, String schemaName, Map<String, Long> tablePKs)
         throws SQLException
     {
         boolean schemaFound = false;
@@ -763,7 +741,7 @@ public abstract class AbstractSQLStartup
                     pk = rs.getInt( 1 );
                     String descriptorTextualFormat = rs.getString( 2 );
                     this._state.usedClassesPKs().get().put(
-                        stringToCompositeDescriptor( ValueDescriptor.class,
+                        stringToCompositeDescriptor(
                                                      this._app.descriptor(),
                                                      descriptorTextualFormat ),
                         (int) pk );
@@ -826,8 +804,7 @@ public abstract class AbstractSQLStartup
         }
     }
 
-    private void writeAppMetadataToDB(Connection connection, ApplicationInfo appInfo,
-                                      Map<String, Long> tablePKs)
+    private void writeAppMetadataToDB(Connection connection, ApplicationInfo appInfo, Map<String, Long> tablePKs)
         throws SQLException
     {
         String schemaName = this._state.schemaName().get();
@@ -1095,7 +1072,7 @@ public abstract class AbstractSQLStartup
         if( qNameInfo.isFinalTypePrimitive() )
         {
 
-            if( this._customizableTypes.keySet().contains( finalClass )
+            if( this._customizableTypes.containsKey( finalClass )
                 && qNameInfo.getPropertyDescriptor().accessor()
                             .isAnnotationPresent( SQLTypeInfo.class ) )
             {
@@ -1335,8 +1312,7 @@ public abstract class AbstractSQLStartup
 
             for( int x = 0; x <= maxQNameUsed; ++x )
             {
-                this.dropTablesIfExist( schemaName, DBNames.QNAME_TABLE_NAME_PREFIX
-                                                    + x, stmt );
+                this.dropTablesIfExist( schemaName, DBNames.QNAME_TABLE_NAME_PREFIX                                                    + x, stmt );
             }
         }
         finally
@@ -1365,14 +1341,13 @@ public abstract class AbstractSQLStartup
                     if( visited instanceof EntityDescriptor || visited instanceof ValueDescriptor )
                     {
                         // TODO filter non-visible descriptors away.
-                        if( visited instanceof EntityDescriptor )
+                        if( visited instanceof EntityDescriptor entityDescriptor )
                         {
-                            EntityDescriptor entityDescriptor = (EntityDescriptor) visited;
                             if( entityDescriptor.queryable() )
                             {
                                 LOGGER.debug( "THIS ONE WORKS: {}", entityDescriptor );
-                                appInfo.entityDescriptors.put(
-                                    entityDescriptor.types().findFirst().get().getName(), entityDescriptor );
+                                //noinspection OptionalGetWithoutIsPresent
+                                appInfo.entityDescriptors.put(entityDescriptor.types().findFirst().get().getName(), entityDescriptor );
                             }
                         }
                         else
@@ -1444,17 +1419,15 @@ public abstract class AbstractSQLStartup
             {
                 vType = ( (ParameterizedType) vType ).getRawType();
             }
-            if( vType instanceof Class<?> ) //
+            if( vType instanceof  Class<?> vTypeClass ) //
             {
-                final Class<?> vTypeClass = (Class<?>) vType;
-                if( ( (Class<?>) vType ).isInterface() )
+                if( vTypeClass.isInterface() )
                 {
                     for( CompositeDescriptorInfo descInfo : vDescriptors )
                     {
                         CompositeDescriptor desc = descInfo.composite;
-                        if( desc instanceof ValueDescriptor )
+                        if( desc instanceof ValueDescriptor vDesc )
                         {
-                            ValueDescriptor vDesc = (ValueDescriptor) desc;
                             // TODO this doesn't understand, say, Map<String, String>, or indeed,
                             // any other Serializable
                             if( vDesc.types().anyMatch( vTypeClass::isAssignableFrom ) )
@@ -1474,12 +1447,11 @@ public abstract class AbstractSQLStartup
                         }
                     }
                 }
-                else if( Enum.class.isAssignableFrom( (Class<?>) vType ) )
+                else if( Enum.class.isAssignableFrom( vTypeClass ) )
                 {
-                    for( Object value : ( (Class<?>) vType ).getEnumConstants() )
+                    for( Object value : vTypeClass.getEnumConstants() )
                     {
-                        enumValues.add( QualifiedName
-                                            .fromClass( (Class<?>) vType, value.toString() ).toString() );
+                        enumValues.add( QualifiedName.fromClass( vTypeClass, value.toString() ).toString() );
                     }
                 }
             }
@@ -1566,30 +1538,20 @@ public abstract class AbstractSQLStartup
     protected abstract void testRequiredCapabilities( Connection connection )
         throws SQLException;
 
-    protected boolean dropTablesIfExist(
-        String schemaName,
-        String tableName,
-        Statement stmt
-                                       )
-        throws SQLException
+    protected void dropTablesIfExist( String schemaName, String tableName, Statement stmt)
     {
-        boolean result = false;
         try
         {
-            stmt.execute( this._vendor.toString( this._vendor.getManipulationFactory()
-                                                             .createDropTableOrViewStatement(
-                                                                 this._vendor
-                                                                     .getTableReferenceFactory()
-                                                                     .tableName( schemaName, tableName ), ObjectType.TABLE,
-                                                                 DropBehaviour.CASCADE
-                                                                                            ) ) );
-            result = true;
+            ManipulationFactory manipulationFactory = this._vendor.getManipulationFactory();
+            TableReferenceFactory tableReferenceFactory = this._vendor.getTableReferenceFactory();
+            TableNameDirect table = tableReferenceFactory.tableName( schemaName, tableName );
+            String sql = this._vendor.toString(manipulationFactory.createDropTableOrViewStatement(table, ObjectType.TABLE, DropBehaviour.CASCADE) );
+            stmt.execute( sql );
         }
         catch( SQLException sqle )
         {
             // Ignore
         }
-        return result;
     }
 
     private static final String DESCRIPTOR_COMPONENT_SEPARATOR_START = "{";
@@ -1623,9 +1585,7 @@ public abstract class AbstractSQLStartup
                + DESCRIPTOR_COMPONENT_SEPARATOR_END;
     }
 
-    protected static <TCompositeDescriptor extends CompositeDescriptor> TCompositeDescriptor
-    stringToCompositeDescriptor( final Class<TCompositeDescriptor> descriptorClass,
-                                 ApplicationDescriptor appDesc, String str )
+    protected static <TCompositeDescriptor extends CompositeDescriptor> TCompositeDescriptor stringToCompositeDescriptor( ApplicationDescriptor appDesc, String str )
     {
         Matcher matcher = DESCRIPTOR_TEXTUAL_REGEXP.matcher( str );
         if( !matcher.matches() )
@@ -1658,7 +1618,7 @@ public abstract class AbstractSQLStartup
                 {
                     thisResult = ( (ModuleDescriptor) visited ).name().equals( moduleName );
                 }
-                else if( descriptorClass.isAssignableFrom( visited.getClass() ) )
+                else if( ValueDescriptor.class.isAssignableFrom( visited.getClass() ) )
                 {
                     CompositeDescriptor desc = (CompositeDescriptor) visited;
                     Set<String> names = desc.types().map( Class::getName ).collect( Collectors.toSet() );

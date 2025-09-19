@@ -55,6 +55,7 @@ import static org.qi4j.api.query.QueryExpressions.templateFor;
 import org.qi4j.api.query.QueryBuilder;
 
 // END SNIPPET: 6
+@SuppressWarnings("ALL")
 public class ThirtyMinutesDocs
 {
     private QueryBuilderFactory queryBuilderFactory;

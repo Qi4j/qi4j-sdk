@@ -43,7 +43,6 @@ public interface LiquibaseService
 {
     /**
      * Creates a new Liquibase instance connected to a visible DataSource.
-     *
      * <strong>WARNING</strong> remember to {@literal liquibase.getDatabase().close()}
      *
      * @return a new Liquibase instance connected to a visible DataSource.
@@ -72,7 +71,6 @@ public interface LiquibaseService
 
     /**
      * Apply database changelog on application startup.
-     *
      * Assembled by {@link LiquibaseAssembler#applyChangelogOnStartup()}.
      *
      * @see LiquibaseService#applyChangelog()
@@ -87,6 +85,7 @@ public interface LiquibaseService
         }
     }
 
+    @SuppressWarnings("deprecation")
     class Mixin implements LiquibaseService
     {
         @This

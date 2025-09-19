@@ -19,24 +19,25 @@
  */
 package org.qi4j.library.constraints;
 
-import java.net.MalformedURLException;
 import org.qi4j.api.constraint.Constraint;
 import org.qi4j.library.constraints.annotation.URL;
-import org.qi4j.library.constraints.annotation.URL;
+
+import java.net.MalformedURLException;
+import java.net.URI;
 
 public class URLConstraint
     implements Constraint<URL, String>
 {
     @Override
-    @SuppressWarnings( "ResultOfObjectAllocationIgnored" )
-    public boolean isValid( URL annotation, String value )
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public boolean isValid(URL annotation, String value)
     {
         try
         {
-            new java.net.URL( value );
+            URI.create(value).toURL();
             return true;
         }
-        catch( MalformedURLException ignored )
+        catch(MalformedURLException ignored)
         {
             return false;
         }

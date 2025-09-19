@@ -16,6 +16,7 @@ import org.qi4j.index.opensearch.internal.AbstractOpenSearchSupport;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class OpenSearchClusterSupport extends AbstractOpenSearchSupport
 {
 

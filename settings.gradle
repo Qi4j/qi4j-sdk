@@ -56,8 +56,6 @@ include 'core:api',
         'libraries:uid',
         'libraries:uowfile',
         'extensions:cache-ehcache',
-        // TODO: Keep an eye on when/if TestContainers supports Memcached
-        'extensions:cache-memcache',
         'extensions:entitystore-cassandra',
         'extensions:entitystore-file',
         'extensions:entitystore-geode',
@@ -77,7 +75,7 @@ include 'core:api',
         'extensions:entitystore-zookeeper',
 
 // TODO; migrating from ElasticSearch to OpenSearch is not trivial in Qi4j. Done most of it, but still have Date/Time and BigInteger/BigDecimal left.
-//        'extensions:indexing-opensearch',
+        'extensions:indexing-opensearch',
 // TODO: RDF4J refuse to fix a bug in Java Modules packaging; same package in more than one JAR file.
 //        'extensions:indexing-rdf',
         'extensions:indexing-sql',

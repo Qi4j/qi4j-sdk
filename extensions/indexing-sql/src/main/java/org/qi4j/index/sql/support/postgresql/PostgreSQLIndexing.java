@@ -36,7 +36,6 @@ import org.qi4j.library.sql.generator.grammar.modification.InsertStatement;
 import org.qi4j.library.sql.generator.grammar.modification.ValueSource;
 import org.qi4j.library.sql.generator.vendor.SQLVendor;
 import org.qi4j.spi.entity.EntityState;
-import org.qi4j.library.sql.generator.vendor.SQLVendor;
 
 public class PostgreSQLIndexing
     extends AbstractSQLIndexing
@@ -72,7 +71,7 @@ public class PostgreSQLIndexing
 
         ColumnSourceByValuesBuilder columnBuilder = m.columnSourceByValues();
         columnBuilder.addValues( ValueSource.Default.INSTANCE );
-        for( Integer x = 1; x < AMOUNT_OF_COLUMNS_IN_ENTITY_TABLE; ++x )
+        for( int x = 1; x < AMOUNT_OF_COLUMNS_IN_ENTITY_TABLE; ++x )
         {
             columnBuilder.addValues( l.param() );
         }

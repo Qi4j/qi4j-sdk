@@ -820,7 +820,7 @@ public abstract class AbstractSQLQuerying
 
         String result = vendor.toString( finalMainQuery );
 
-        LOGGER.info( "SQL query:\n" + result );
+        LOGGER.debug( "SQL query:\n" + result );
         return result;
     }
 
@@ -1875,7 +1875,7 @@ public abstract class AbstractSQLQuerying
                                         this.getOperator( predicate ).getExpression( b, valueCol, l.param() ) ) );
                 values.add( dbValue );
                 valueSQLTypes.add( _typeHelper.getSQLType( value ) );
-                LOGGER.info( TABLE_NAME_PREFIX + currentTableIndex + "." + columnName + " is " + dbValue );
+                LOGGER.debug( TABLE_NAME_PREFIX + currentTableIndex + "." + columnName + " is " + dbValue );
             }
         }
 

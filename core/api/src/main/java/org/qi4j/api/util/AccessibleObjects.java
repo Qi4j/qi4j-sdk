@@ -35,11 +35,11 @@ public final class AccessibleObjects
      * @param <T>              AccessibleObject type
      * @return The given AccessibleObject, accessible
      */
+    @SuppressWarnings("deprecation")
     public static <T extends AccessibleObject> T accessible(T accessibleObject)
     {
-        if(accessibleObject instanceof Member)
+        if(accessibleObject instanceof Member member)
         {
-            Member member = (Member) accessibleObject;
             if(Modifier.isPublic(member.getModifiers())
                 && Modifier.isPublic(member.getDeclaringClass().getModifiers()))
             {

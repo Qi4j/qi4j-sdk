@@ -49,7 +49,7 @@ public interface Page
     /**
      * Returns the URL where the Page is mounted.
      *
-     * @return the URL mountpoint.
+     * @return the URL mount point.
      */
     String mountPoint();
 
@@ -136,7 +136,7 @@ public interface Page
 //              TODO: Future!!!
 //                if( result instanceof EntityComposite )
 //                {
-                // Locate HTML template for reault.type()
+                // Locate HTML template for result.type()
                 // If not present, use EntityComposite.html
                 // repeat rendering.
                 // Need mechanism to pass the "reference"

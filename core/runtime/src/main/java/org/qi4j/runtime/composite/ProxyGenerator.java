@@ -24,6 +24,7 @@ import java.lang.reflect.Proxy;
 /**
  * generates proxyclasses
  */
+@SuppressWarnings("deprecation")
 public class ProxyGenerator
 {
     public static Class<?> createProxyClass(ClassLoader mainTypeClassLoader, Class<?>[] interfaces)

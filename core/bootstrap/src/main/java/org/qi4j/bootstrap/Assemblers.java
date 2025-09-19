@@ -17,6 +17,8 @@
  */
 package org.qi4j.bootstrap;
 
+import java.lang.ref.Cleaner;
+
 /**
  * Assembler adapters for common use cases (visibility, reference, configuration).
  */
@@ -465,41 +467,37 @@ public class Assemblers
     {
         private boolean assembled = false;
 
+        @SuppressWarnings("CapturingCleaner")
         @Override
         public void assemble(ModuleAssembly module)
             throws AssemblyException
         {
             assembled = true;
-        }
-
-        @Override
-        protected void finalize()
-            throws Throwable
-        {
-            super.finalize();
-            if(!assembled)
-            {
-                System.err.println("WARNING!!!!!");
-                System.err.println("############################################################################");
-                System.err.println("##");
-                System.err.println("##  The " + getClass().getName() + " assembler was not assembled.");
-                System.err.println("##");
-                System.err.println("##  Expect that some functionality to be missing or incorrect.");
-                System.err.println("##");
-                if(getClass().getName().startsWith("org.qi4j"))
+            Cleaner.create().register(this, () -> {
+                if(!assembled)
                 {
-                    System.err.println("## When instantiating a provided Assembler, you must call the assemble(module)");
-                    System.err.println("## method after setting the options. This was not done.");
+                    System.err.println("WARNING!!!!!");
+                    System.err.println("############################################################################");
+                    System.err.println("##");
+                    System.err.println("##  The " + getClass().getName() + " assembler was not assembled.");
+                    System.err.println("##");
+                    System.err.println("##  Expect that some functionality to be missing or incorrect.");
+                    System.err.println("##");
+                    if(getClass().getName().startsWith("org.qi4j"))
+                    {
+                        System.err.println("## When instantiating a provided Assembler, you must call the assemble(module)");
+                        System.err.println("## method after setting the options. This was not done.");
+                    }
+                    else
+                    {
+                        System.err.println("## When overriding any helper class in org.qi4j.bootstrap.Assemblers");
+                        System.err.println("## you must call super.assemble(module) in the assmeble(ModuleAssembly module)");
+                        System.err.println("## method. This was not done, OR that you forgot to call assemble() method ");
+                        System.err.println("## after instantiating and setting the options.");
+                    }
+                    System.err.println("############################################################################");
                 }
-                else
-                {
-                    System.err.println("## When overriding any helper class in org.qi4j.bootstrap.Assemblers");
-                    System.err.println("## you must call super.assemble(module) in the assmeble(ModuleAssembly module)");
-                    System.err.println("## method. This was not done, OR that you forgot to call assemble() method ");
-                    System.err.println("## after instantiating and setting the options.");
-                }
-                System.err.println("############################################################################");
-            }
+            });
         }
     }
 }
