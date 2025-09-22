@@ -288,7 +288,7 @@ class MixinTable
                 .column(indexColumn)
                 .column(referenceColumn)
                 .execute();
-            dsl.createIndex(DSL.name("IDX_" + table.getName()))
+            dsl.createIndexIfNotExists(DSL.name("IDX_" + table.getName()))
                 .on(table, types.identityColumn())
                 .execute();
             return table;
