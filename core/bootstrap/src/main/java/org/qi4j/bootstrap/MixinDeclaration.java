@@ -27,7 +27,23 @@ package org.qi4j.bootstrap;
  */
 public interface MixinDeclaration<T>
 {
+    /**
+     * Allows to declare defaults for mixin properties.
+     * Example;
+     * <code><pre>
+     *     module.forMixin( MyMixin.class ).declareDefaults().myProperty().set( "default value" );
+     * </pre></code>
+     */
     T declareDefaults();
 
+    /**
+     * Setting meta-information on the mixin.
+     * Example;
+     * <code><pre>
+     *     module.forMixin(MyMixin.class).setMetaInfo(new MyMetaInfo("this", "that", "and the other"));
+     * </pre></code>
+     *
+     * @param info Meta-information of any type.
+     */
     MixinDeclaration<T> setMetaInfo(Object info);
 }

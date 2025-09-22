@@ -21,6 +21,7 @@
 package org.qi4j.api.property;
 
 import org.qi4j.api.common.QualifiedName;
+import org.qi4j.api.composite.MetaStateDescriptor;
 import org.qi4j.api.structure.MetaInfoHolder;
 import org.qi4j.api.structure.ModuleDescriptor;
 import org.qi4j.api.type.ValueType;
@@ -31,33 +32,17 @@ import java.lang.reflect.Type;
 /**
  * Property Descriptor.
  */
-public interface PropertyDescriptor extends MetaInfoHolder
+public interface PropertyDescriptor extends MetaInfoHolder, MetaStateDescriptor
 {
     /**
-     * Get the qualified name of the property which is equal to:
-     * <pre><code>
-     * &lt;interface name&gt;:&lt;method name&gt;
-     * </code></pre>
-     *
-     * @return the qualified name of the property
+     * @return A ValueType that describes the property type itself.
      */
-    QualifiedName qualifiedName();
-
-    /**
-     * Get the type of the property. If the property is declared
-     * as Property&lt;X&gt; then X is returned.
-     *
-     * @return the property type
-     */
-    Type type();
-
-    AccessibleObject accessor();
-
-    boolean isImmutable();
-
-    boolean queryable();
-
     ValueType valueType();
 
+    /**
+     * Resolves the initial value of the property, from annotations and/or assembly configuration.
+     *
+     * @see org.qi4j.bootstrap.MixinDeclaration#declareDefaults()
+     */
     Object resolveInitialValue(ModuleDescriptor moduleDescriptor);
 }

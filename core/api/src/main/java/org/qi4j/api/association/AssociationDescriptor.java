@@ -21,6 +21,7 @@
 package org.qi4j.api.association;
 
 import org.qi4j.api.common.QualifiedName;
+import org.qi4j.api.composite.MetaStateDescriptor;
 import org.qi4j.api.structure.MetaInfoHolder;
 
 import java.lang.reflect.AccessibleObject;
@@ -29,42 +30,7 @@ import java.lang.reflect.Type;
 /**
  * Association Descriptor.
  */
-public interface AssociationDescriptor extends MetaInfoHolder
+public interface AssociationDescriptor extends MetaInfoHolder, MetaStateDescriptor
 {
-    /**
-     * Get the qualified name of the association. This is constructed by
-     * concatenating the name of the declaring interface with the name
-     * of the method, using ":" as separator.
-     * <p>
-     * Example:
-     * </p>
-     * <p>
-     * com.somecompany.MyInterface with association method
-     * </p>
-     * <pre><code>
-     * Association&lt;String&gt; someAssociation();
-     * </code></pre>
-     * will have the qualified name:
-     * <pre><code>
-     * com.somecompany.MyInterface:someAssociation
-     * </code></pre>
-     *
-     * @return the qualified name of the association
-     */
-    QualifiedName qualifiedName();
-
-    /**
-     * Get the type of the associated Entities
-     *
-     * @return the type of the associated Entities
-     */
-    Type type();
-
-    AccessibleObject accessor();
-
-    boolean queryable();
-
-    boolean isImmutable();
-
     boolean isAggregated();
 }
