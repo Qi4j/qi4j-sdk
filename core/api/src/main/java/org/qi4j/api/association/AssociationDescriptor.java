@@ -30,7 +30,7 @@ import java.lang.reflect.Type;
 /**
  * Association Descriptor.
  */
-public interface AssociationDescriptor extends MetaInfoHolder, MetaStateDescriptor
+public interface AssociationDescriptor extends MetaStateDescriptor
 {
     boolean isAggregated();
 }

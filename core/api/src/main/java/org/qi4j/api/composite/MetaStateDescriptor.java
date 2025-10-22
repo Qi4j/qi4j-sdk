@@ -1,11 +1,12 @@
 package org.qi4j.api.composite;
 
 import org.qi4j.api.common.QualifiedName;
+import org.qi4j.api.structure.MetaInfoHolder;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Type;
 
-public interface MetaStateDescriptor
+public interface MetaStateDescriptor extends MetaInfoHolder
 {
     /**
      * Get the qualified name of the property which is equal to:

@@ -32,7 +32,7 @@ import java.lang.reflect.Type;
 /**
  * Property Descriptor.
  */
-public interface PropertyDescriptor extends MetaInfoHolder, MetaStateDescriptor
+public interface PropertyDescriptor extends MetaStateDescriptor
 {
     /**
      * @return A ValueType that describes the property type itself.
