@@ -259,8 +259,12 @@ class MixinTable
         // Set the Association<?> fields
         associations.forEach((assocName, assocField) -> primaryTable.set(assocField, referenceToString(state, assocName)));
 
-        int result = primaryTable.execute();
-
+        Condition rowSelect = types.identityColumn().eq(valueId);
+        int result = primaryTable.where(rowSelect).execute();
+        if( result != 1 )
+        {
+            System.err.println("WARN: One record was expected to be updated, but " + result + " were updated instead.");
+        }
         if(mixinAssocsTable != null)
         {
             // Need to remove existing records.
